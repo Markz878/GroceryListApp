@@ -1,0 +1,23 @@
+﻿<NavLink class="nav-link text-primary" href="">Grocery List Helper</NavLink>
+<AuthorizeView>
+    <Authorized>
+        <NavLink class="nav-link" href="profile">Hello, @context.User.FindFirst("email").Value</NavLink>
+        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+        <NavLink class="nav-link" href="about">About</NavLink>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink class="nav-link" href="login">Log in</NavLink>
+        <NavLink class="nav-link" href="register">Register</NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    [Inject] public NavigationManager Navigation { get; set; }
+    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    private void BeginSignOut()
+    {
+        (AuthenticationStateProvider as CustomAuthenticationStateProvider).Logout();
+        Navigation.NavigateTo("login");
+    }
+}

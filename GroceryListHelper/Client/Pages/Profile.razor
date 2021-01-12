@@ -1,0 +1,40 @@
+﻿@page "/profile"
+
+<h2>Welcome @email</h2>
+
+<p>Change your password by submitting the form below:</p>
+<EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
+    <FluentValidationValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="current-password">Current password:</label>
+        <InputText id="current-password" type="password" class="form-control" placeholder="Current password" @bind-Value="@changePasswordRequest.CurrentPassword" />
+    </div>
+    <div class="form-group">
+        <label for="new-password">Confirm new password:</label>
+        <InputText id="new-password" type="password" class="form-control" placeholder="New password" @bind-Value="@changePasswordRequest.NewPassword" />
+    </div>
+    <div class="form-group">
+        <label for="confirm-new-password">Confirm new password:</label>
+        <InputText id="confirm-new-password" type="password" class="form-control" placeholder="Confirm new password" @bind-Value="@changePasswordRequest.ConfirmNewPassword" />
+    </div>
+    <button class="btn btn-secondary" type="submit" disabled="@isBusy">Change password</button>
+    <p>@passwordMessage</p>
+</EditForm>
+
+<hr />
+
+<p>You can delete your profile by submitting the form below (can't be undone):</p>
+<EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
+    <FluentValidationValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="password">Current password:</label>
+        <InputText id="password" type="password" class="form-control" placeholder="Current password" @bind-Value="@deleteProfileRequest.Password" />
+    </div>
+    <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
+    <p>@deleteMessage</p>
+</EditForm>
+
+<hr/>
+
