@@ -6,6 +6,7 @@
 <EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
     <FluentValidationValidator />
     <ValidationSummary />
+    <CustomValidationMessage Message="@passwordMessage" />
     <div class="form-group">
         <label for="current-password">Current password:</label>
         <InputText id="current-password" type="password" class="form-control" placeholder="Current password" @bind-Value="@changePasswordRequest.CurrentPassword" />
@@ -19,7 +20,6 @@
         <InputText id="confirm-new-password" type="password" class="form-control" placeholder="Confirm new password" @bind-Value="@changePasswordRequest.ConfirmNewPassword" />
     </div>
     <button class="btn btn-secondary" type="submit" disabled="@isBusy">Change password</button>
-    <p>@passwordMessage</p>
 </EditForm>
 
 <hr />
@@ -28,12 +28,12 @@
 <EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
     <FluentValidationValidator />
     <ValidationSummary />
+    <CustomValidationMessage Message="@deleteMessage" />
     <div class="form-group">
         <label for="password">Current password:</label>
         <InputText id="password" type="password" class="form-control" placeholder="Current password" @bind-Value="@deleteProfileRequest.Password" />
     </div>
     <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
-    <p>@deleteMessage</p>
 </EditForm>
 
 <hr/>

@@ -3,9 +3,6 @@ using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Pages
@@ -53,6 +50,7 @@ namespace GroceryListHelper.Client.Pages
                 isBusy = true;
                 string response = await ProfileService.Delete(deleteProfileRequest);
                 deleteMessage = response ?? "Profile deleted";
+                (Authentication as CustomAuthenticationStateProvider).Logout();
             }
             catch (Exception ex)
             {

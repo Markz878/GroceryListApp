@@ -2,6 +2,12 @@
     min-width: 650px;
 }
 
+.content {
+    padding: 1rem 2rem;
+    margin: auto;
+    max-width: 60rem;
+}
+
 .top-row {
     background-color: rgb(130, 214, 130);
     border-bottom: 1px solid #d6d5d5;

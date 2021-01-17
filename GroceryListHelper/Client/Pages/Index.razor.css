@@ -12,20 +12,6 @@ td {
     vertical-align: middle;
 }
 
-.lastrow {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    justify-items: center;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-b {
-    text-align: center;
-    vertical-align: middle;
-    text-wrap: none;
-}
-
 .tooltip {
 }
 

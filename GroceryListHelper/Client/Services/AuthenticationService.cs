@@ -32,9 +32,9 @@ namespace GroceryListHelper.Client.Services
             await SaveTokenAndGoToIndex(response);
         }
 
-        public async Task Register(UserCredentialsModel user)
+        public async Task Register(RegisterRequestModel request)
         {
-            var response = await client.PostAsJsonAsync(uri + "/register", user);
+            var response = await client.PostAsJsonAsync(uri + "/register", request);
             await SaveTokenAndGoToIndex(response);
         }
 
@@ -57,7 +57,6 @@ namespace GroceryListHelper.Client.Services
         private async Task SaveTokenAndGoToIndex(HttpResponseMessage response)
         {
             string resp = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(resp);
             LoginResponseModel tokens = await response.Content.ReadFromJsonAsync<LoginResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
             if (response.IsSuccessStatusCode)
             {

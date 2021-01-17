@@ -25,11 +25,5 @@
 		<ProjectReference Include="..\Shared\GroceryListHelper.Shared.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Update="database.db">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
 
 </Project>

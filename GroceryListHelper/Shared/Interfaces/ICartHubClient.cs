@@ -1,0 +1,15 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace GroceryListHelper.Shared.Interfaces
+{
+    public interface ICartHubClient
+    {
+        Task GetCart(List<CartProductCollectable> cartProducts);
+        Task ItemAdded(CartProductCollectable cartProduct);
+        Task ItemModified(CartProductCollectable cartProduct);
+        Task ItemCollected(int id);
+        Task ItemDeleted(int id);
+        Task GetMessage(string message);
+    }
+}

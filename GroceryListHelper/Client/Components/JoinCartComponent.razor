@@ -1,0 +1,15 @@
+﻿<p>Join someone else's cart by giving their username/email:</p>
+
+<input type="email" class="form-control" @bind="HostEmail" placeholder="Host email" />
+
+<div>
+    <button class="btn btn-primary" @onclick="JoinCart" disabled="@Polling">Join cart</button>
+    <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+</div>
+
+@code {
+    [Parameter] public string HostEmail { get; set; }
+    [Parameter] public EventCallback JoinCart { get; set; }
+    [Parameter] public EventCallback ExitCart { get; set; }
+    [Parameter] public bool Polling { get; set; }
+}

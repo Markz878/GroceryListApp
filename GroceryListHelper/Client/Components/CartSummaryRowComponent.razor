@@ -1,0 +1,16 @@
+﻿<div class="last-row">
+    <b style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
+    <b>Total: @Total.ToString("N2") €</b>
+    <button class="btn btn-primary text-nowrap" disabled="@Polling" style="justify-self: center" @onclick="ClearCartProducts">Clear cart</button>
+    <button class="btn btn-secondary text-nowrap" disabled="@Polling" style="justify-self: center" @onclick="ClearStoreProducts">Clear shop</button>
+</div>
+
+@code {
+    [Parameter] public List<CartProductUIModel> CartProducts { get; set; }
+    [Parameter] public bool Polling { get; set; }
+    [Parameter] public EventCallback ClearCartProducts { get; set; }
+    [Parameter] public EventCallback ClearStoreProducts { get; set; }
+
+    public bool AllCollected => !CartProducts.Select(x => x.IsCollected).Contains(false);
+    public double Total => CartProducts.Sum(x => x.Total);
+}

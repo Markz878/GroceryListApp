@@ -4,7 +4,7 @@
 <EditForm Model="user" OnValidSubmit="LoginMethod">
     <FluentValidationValidator />
     <ValidationSummary />
-    <p>@message</p>
+    <CustomValidationMessage Message="@message"/>
     <div class="form-group">
         <label for="email">Email: </label>
         <InputText id="email" class="form-control" placeholder="Enter email" @bind-Value="@user.Email" />

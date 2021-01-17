@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -32,6 +33,17 @@ namespace GroceryListHelper.Client.HelperMethods
             {
                 exception.Redirect();
             }
+        }
+
+        public static string CreateRandomRoomName()
+        {
+            Random rng = new Random();
+            char[] result = new char[6];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = (char)rng.Next(65, 91);
+            }
+            return new string(result);
         }
     }
 }

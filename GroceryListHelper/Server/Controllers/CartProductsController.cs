@@ -94,7 +94,7 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateProduct(int id, CartProductUpdateModel updatedProduct)
+        public async Task<IActionResult> UpdateProduct(int id, CartProduct updatedProduct)
         {
             var product = db.CartProducts.Find(id);
             if (product != null)

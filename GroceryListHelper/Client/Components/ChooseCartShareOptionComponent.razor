@@ -1,0 +1,11 @@
+﻿<div class="share-cart-option">
+    <b>You can share cart state with other users, choose how:</b>
+    <select class="form-control" @bind="ShareMode">
+        <option value="@ShareModeType.Self">Share your cart</option>
+        <option value="@ShareModeType.Join">Join a cart</option>
+    </select>
+</div>
+
+@code {
+    [Parameter] public ShareModeType ShareMode { get; set; } 
+}

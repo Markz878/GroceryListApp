@@ -7,7 +7,7 @@ namespace GroceryListHelper.Shared.Validators
     {
         public DeleteProfileRequestValidator()
         {
-            RuleFor(x => x.Password).Length(6, 30).Must(x => x.Any(char.IsDigit)).WithMessage("Password must contain at least one digit");
+            RuleFor(x => x.Password).Cascade(CascadeMode.Stop).NotEmpty().Length(6, 30).Must(x => x.Any(char.IsDigit)).WithMessage("Password must contain at least one digit");
         }
     }
 }

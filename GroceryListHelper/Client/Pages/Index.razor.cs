@@ -1,9 +1,13 @@
-﻿using GroceryListHelper.Client.Models;
+﻿using GroceryListHelper.Client.HelperMethods;
+using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,22 +16,29 @@ using System.Threading.Tasks;
 namespace GroceryListHelper.Client.Pages
 {
     [Authorize]
-    public partial class Index
+    public partial class Index : ComponentBase, IAsyncDisposable
     {
         [Inject] public CartProductsService CartProductsService { get; set; }
         [Inject] public StoreProductsService StoreProductsService { get; set; }
+        [Inject] public NavigationManager Navigation { get; set; }
+        [Inject] public IAccessTokenProvider AccessTokenProvider { get; set; }
         public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel();
         public List<CartProductUIModel> CartProducts { get; set; } = new List<CartProductUIModel>();
         public List<StoreProductUIModel> StoreProducts { get; set; } = new List<StoreProductUIModel>();
-        public bool AllCollected => !CartProducts.Select(x => x.IsCollected).Contains(false);
-        public double Total => CartProducts.Sum(x => x.Total);
         public string Message { get; set; } = string.Empty;
+
+        public ShareModeType ShareMode { get; set; }
+        public List<string> AllowedUsers { get; set; } = new List<string>();
+        public string CartHostEmail { get; set; } = string.Empty;
+        public string AllowEmail { get; set; } = string.Empty;
+        public string ShareCartInfo { get; set; } = string.Empty;
         public CartProduct EditingItem { get; set; }
 
         private ElementReference NewProductNameBox;
         private ElementReference AddProductButton;
         private CartProductValidator cartProductValidator;
         private StoreProductValidator storeProductValidator;
+        private HubConnection hubConnection;
         private bool polling;
 
         protected override async Task OnInitializedAsync()
@@ -36,6 +47,54 @@ namespace GroceryListHelper.Client.Pages
             StoreProducts = await StoreProductsService.GetCartProducts();
             cartProductValidator = new CartProductValidator(CartProducts);
             storeProductValidator = new StoreProductValidator(StoreProducts);
+            BuildHubConnection();
+        }
+
+        public void BuildHubConnection()
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl(Navigation.ToAbsoluteUri("/carthub"), options =>
+            {
+                options.AccessTokenProvider = async () =>
+                {
+                    var tokenResult = await AccessTokenProvider.RequestAccessToken();
+                    tokenResult.TryGetToken(out AccessToken accessToken);
+                    return accessToken.Value;
+                };
+            }).WithAutomaticReconnect().Build();
+
+            hubConnection.On<string>(nameof(ICartHubClient.GetMessage), (message) =>
+            {
+                Console.WriteLine("Received message " + message);
+                ShareCartInfo = message;
+            });
+
+            hubConnection.On<List<CartProductCollectable>>(nameof(ICartHubClient.GetCart), (cartProducts) =>
+            {
+                CartProducts.Clear();
+                CartProducts.AddRange(cartProducts.ConvertAll(x => x as CartProductUIModel));
+            });
+
+            hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemAdded), (cartProduct) =>
+            {
+                CartProducts.Add((CartProductUIModel)cartProduct);
+            });
+
+            hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemModified), (cartProduct) =>
+            {
+                var product = CartProducts.First(x => x.Id.Equals(cartProduct.Id));
+                product.Amount = cartProduct.Amount;
+                product.UnitPrice = cartProduct.UnitPrice;
+            });
+
+            hubConnection.On<int>(nameof(ICartHubClient.ItemCollected), (id) =>
+            {
+                CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
+            });
+
+            hubConnection.On<int>(nameof(ICartHubClient.ItemDeleted), (id) =>
+            {
+                CartProducts.RemoveAll(x => x.Id.Equals(id));
+            });
         }
 
         private async Task PollItems()
@@ -47,6 +106,78 @@ namespace GroceryListHelper.Client.Pages
                 cartProductValidator = new CartProductValidator(CartProducts);
                 StateHasChanged();
                 await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+        }
+        private void AddUser()
+        {
+            AllowedUsers.Add(AllowEmail);
+            AllowEmail = string.Empty;
+        }
+
+        private void DeleteUser(string user)
+        {
+            AllowedUsers.Remove(user);
+        }
+
+        private async Task ShareCart()
+        {
+            if (AllowedUsers.Count>0)
+            {
+                try
+                {
+                    polling = true;
+                    await hubConnection.StartAsync();
+                    ShareCartInfo = await hubConnection.InvokeAsync<string>(nameof(ICartHub.CreateGroup), AllowedUsers);
+                }
+                catch (Exception ex)
+                {
+                    ShareCartInfo = ex.Message;
+                    polling = false;
+                }
+            }
+            else
+            {
+                ShareCartInfo = "There are no allowed users for your cart.";
+            }
+
+        }
+
+        private async Task JoinCart()
+        {
+            if (string.IsNullOrEmpty(CartHostEmail))
+            {
+                try
+                {
+                    polling = true;
+                    await hubConnection.StartAsync();
+                    ShareCartInfo = await hubConnection.InvokeAsync<string>(nameof(ICartHub.JoinGroup), CartHostEmail);
+                }
+                catch (Exception ex)
+                {
+                    ShareCartInfo = ex.Message;
+                    polling = false;
+                }
+            }
+            else
+            {
+                ShareCartInfo = "Give cart host username/email.";
+            }
+        }
+
+        private async Task ExitCart()
+        {
+            try
+            {
+                ShareCartInfo = await hubConnection.InvokeAsync<string>(nameof(ICartHub.JoinGroup), CartHostEmail);
+            }
+            catch (Exception ex)
+            {
+                ShareCartInfo = ex.Message;
+            }
+            finally
+            {
+                await hubConnection.StopAsync();
+                polling = false;
             }
         }
 
@@ -69,22 +200,37 @@ namespace GroceryListHelper.Client.Pages
             }
         }
 
-        private async Task SaveCartProduct(CartProductUIModel product)
+        private Task SaveCartProduct(CartProductUIModel product)
         {
             CartProducts.Add(product);
             try
             {
-                await CartProductsService.SaveCartProduct(product);
+                if (polling)
+                {
+                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemAdded), CartHostEmail, product);
+                }
+                else
+                {
+                    return CartProductsService.SaveCartProduct(product);
+                }
             }
             catch (Exception ex)
             {
                 Message = ex.Message;
+                return Task.CompletedTask;
             }
         }
 
-        private async Task MarkItemCollected(CartProductUIModel product)
+        private Task MarkItemCollected(CartProductUIModel product)
         {
-            await CartProductsService.MarkCartProductCollected(product.Id);
+            if (polling)
+            {
+                return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemCollected), product.Id);
+            }
+            else
+            {
+                return CartProductsService.MarkCartProductCollected(product.Id);
+            }
         }
 
         private Task SaveStoreProduct(string productName, double unitPrice)
@@ -125,7 +271,14 @@ namespace GroceryListHelper.Client.Pages
             if (string.IsNullOrEmpty(Message))
             {
                 EditingItem = null;
-                return CartProductsService.UpdateCartProduct(product);
+                if (polling)
+                {
+                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemModified), CartHostEmail, product);
+                }
+                else
+                {
+                    return CartProductsService.UpdateCartProduct(product);
+                }
             }
             return Task.CompletedTask;
         }
@@ -152,7 +305,14 @@ namespace GroceryListHelper.Client.Pages
         private Task RemoveProduct(CartProductUIModel product)
         {
             CartProducts.Remove(product);
-            return CartProductsService.DeleteCartProduct(product.Id);
+            if (polling)
+            {
+                return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemDeleted), product.Id);
+            }
+            else
+            {
+                return CartProductsService.DeleteCartProduct(product.Id);
+            }
         }
 
         private Task ClearCartProducts()
@@ -165,6 +325,11 @@ namespace GroceryListHelper.Client.Pages
         {
             StoreProducts.Clear();
             return StoreProductsService.ClearStoreProducts();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await hubConnection.StopAsync();
         }
     }
 }

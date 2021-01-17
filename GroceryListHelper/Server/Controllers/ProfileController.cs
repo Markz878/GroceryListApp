@@ -1,15 +1,13 @@
-﻿using GroceryListHelper.Server.Data;
-using GroceryListHelper.Server.HelperMethods;
+﻿using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class ProfileController : ControllerBase

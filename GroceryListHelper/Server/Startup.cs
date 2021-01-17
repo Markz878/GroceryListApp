@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using GroceryListHelper.Server.Data;
 using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Validators;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server
 {
@@ -41,12 +45,14 @@ namespace GroceryListHelper.Server
 
             AddRateLimiter(services);
 
-            AddCustomValidators(services);
             services.AddControllers(x => x.Filters.Add(new ValidationFilter())).AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<UserCredentialsValidator>(lifetime: ServiceLifetime.Singleton));
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-            
             services.AddRazorPages();
-
+            services.AddSignalR();
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
+            });
             AddSwagger(services);
         }
 
@@ -66,20 +72,27 @@ namespace GroceryListHelper.Server
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AccessTokenKey"])),
                     ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = true,
-                    ValidIssuer = Configuration["ServerURL"],
-                    ValidateAudience = true,
-                    ValidAudience = Configuration["ClientURL"]
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
                 };
+                //x.Events = new JwtBearerEvents
+                //{
+                //    OnMessageReceived = context =>
+                //    {
+                //        var accessToken = context.Request.Query["access_token"];
+
+                //        // If the request is for our hub...
+                //        var path = context.HttpContext.Request.Path;
+                //        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                //        {
+                //            // Read the token out of the query string
+                //            context.Token = accessToken;
+                //        }
+                //        return Task.CompletedTask;
+                //    }
+                //};
             });
             services.AddTransient(serviceProvider => new JWTAuthenticationManager(Configuration, serviceProvider.GetService<GroceryStoreDbContext>()));
-        }
-
-        private static void AddCustomValidators(IServiceCollection services)
-        {
-            services.AddTransient<IValidator<CartProduct>, CartProductValidator>(options => new CartProductValidator(options.GetRequiredService<GroceryStoreDbContext>().CartProducts));
-            services.AddTransient<IValidator<CartProductUpdateModel>, CartProductUpdateValidator>();
-            services.AddTransient<IValidator<StoreProduct>, StoreProductValidator>(options => new StoreProductValidator(options.GetRequiredService<GroceryStoreDbContext>().StoreProducts));
         }
 
         private static void AddSwagger(IServiceCollection services)
@@ -125,6 +138,8 @@ namespace GroceryListHelper.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+            
             if (env.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-local-development");
@@ -153,6 +168,7 @@ namespace GroceryListHelper.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<CartHub>("/carthub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

@@ -76,23 +76,5 @@ namespace GroceryListHelper.Server.Controllers
             RefreshTokenResponseModel errorResponse = new() { Message = "Invalid access- or refresh token" };
             return Unauthorized(errorResponse);
         }
-
-        //[HttpPost]
-        //[Authorize]
-        //public async Task<ActionResult<RefreshTokenResponseModel>> Delete([FromBody] UserCredentialsModel user)
-        //{
-            //await Task.Delay(rng.Next(300, 700));
-            //string status = await authenticationManager.DeleteUser(user.Email, user.Password);
-            //if (!string.IsNullOrEmpty(status))
-            //{
-            //    LoginResponseModel response = new() { Message = "Invalid username or password" };
-            //    return Unauthorized(response);
-            //}
-            //else
-            //{
-            //    LoginResponseModel response = new() { AccessToken = accessToken, RefreshToken = refreshToken };
-            //    return Ok(response);
-            //}
-        //}
     }
 }

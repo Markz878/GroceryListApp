@@ -1,0 +1,38 @@
+﻿<p class="share-text">Share your cart with these users:</p>
+<div class="share-email-row">
+    <input type="email" class="form-control" width="300" @bind="AllowEmail" placeholder="User email" />
+    <button class="btn btn-success" @onclick="AddUser">+</button>
+</div>
+@for (int i = 0; i < AllowedUsers.Count; i++)
+{
+    var index = i;
+    <div  class="share-email-row">
+        <input type="email" class="form-control" width="300" @bind="AllowedUsers[index]" placeholder="User email" />
+        <button class="btn btn-danger" @onclick="()=>DeleteUser(AllowedUsers[index])">X</button>
+    </div>
+}
+
+<div class="btn-row">
+    <button class="btn btn-primary" @onclick="ShareCart" disabled="@Polling">Share your cart</button>
+    <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+</div>
+
+@code {
+    [Parameter] public List<string> AllowedUsers { get; set; }
+    [Parameter] public EventCallback ShareCart { get; set; }
+    [Parameter] public EventCallback ExitCart { get; set; }
+    [Parameter] public bool Polling { get; set; }
+
+    public string AllowEmail { get; set; }
+
+    public void DeleteUser(string user)
+    {
+        AllowedUsers.Remove(user);
+    }
+
+    public void AddUser()
+    {
+        AllowedUsers.Add(AllowEmail);
+        AllowEmail = string.Empty;
+    }
+}

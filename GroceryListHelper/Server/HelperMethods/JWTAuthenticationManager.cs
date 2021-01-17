@@ -101,7 +101,7 @@ namespace GroceryListHelper.Server.HelperMethods
         /// <returns></returns>
         internal string RefreshAccessToken(string accessToken, string refreshToken)
         {
-            if (ValidateToken(AccessTokenKey, accessToken, false, out ClaimsPrincipal atClaimsPrincipal) && ValidateToken(RefreshTokenKey, refreshToken, false, out ClaimsPrincipal rtClaimsPrincipal) && atClaimsPrincipal.Claims.Zip(rtClaimsPrincipal.Claims).All(x => x.First.Value.Equals(x.Second.Value)))
+            if (ValidateToken(AccessTokenKey, accessToken, false, out ClaimsPrincipal atClaimsPrincipal) && ValidateToken(RefreshTokenKey, refreshToken, false, out ClaimsPrincipal rtClaimsPrincipal) && atClaimsPrincipal.FindFirstValue(ClaimTypes.Email).Equals(rtClaimsPrincipal.FindFirstValue(ClaimTypes.Email)))
             {
                 return GenerateAccessToken(rtClaimsPrincipal.FindFirstValue("Id"), rtClaimsPrincipal.FindFirstValue(ClaimTypes.Email));
             }
@@ -213,10 +213,8 @@ namespace GroceryListHelper.Server.HelperMethods
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
                 ClockSkew = TimeSpan.Zero,
-                ValidateIssuer = true,
-                ValidIssuer = configuration["ServerURL"],
-                ValidateAudience = true,
-                ValidAudience = configuration["ClientURL"],
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ValidateLifetime = validateLifetime
             };
             try
