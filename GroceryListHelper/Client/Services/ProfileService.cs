@@ -17,9 +17,14 @@ namespace GroceryListHelper.Client.Services
             client = clientFactory.CreateClient("ProtectedClient");
         }
 
+        internal async Task LogOut()
+        {
+            await client.GetAsync(uri+"/logout");
+        }
+
         internal async Task<string> ChangePassword(ChangePasswordRequest changePasswordRequest)
         {
-            var response = await client.PatchAsync(uri, JsonContent.Create(changePasswordRequest));
+            var response = await client.PatchAsync(uri + "/changepassword", JsonContent.Create(changePasswordRequest));
             if (response.IsSuccessStatusCode)
             {
                 return null;
@@ -32,7 +37,7 @@ namespace GroceryListHelper.Client.Services
 
         public async Task<string> Delete(DeleteProfileRequest user)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri + "/delete");
             request.Content = JsonContent.Create(user);
             Console.WriteLine(uri);
             var response = await client.SendAsync(request);

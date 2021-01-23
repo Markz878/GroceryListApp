@@ -2,11 +2,10 @@
     margin-left: 1rem;
 }
 
-.share-email-row {
+.join-email-row {
     margin-left: 1rem;
     width: 60%;
     min-width: 200px;
-    display: flex;
 }
 
 .btn-row {

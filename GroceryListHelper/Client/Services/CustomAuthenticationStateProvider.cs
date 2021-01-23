@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -17,6 +19,7 @@ namespace GroceryListHelper.Client.Services
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
+            Console.WriteLine("Geting auth state");
             AccessTokenResult tokenResult = await accessTokenProvider.RequestAccessToken();
             if (tokenResult.Status == AccessTokenResultStatus.Success && (tokenResult.TryGetToken(out AccessToken token)))
             {
@@ -30,12 +33,12 @@ namespace GroceryListHelper.Client.Services
             }
             else
             {
-                Logout();
+                NotifyLogOut();
                 return new AuthenticationState(new ClaimsPrincipal());
             }
         }
 
-        public void Logout()
+        public void NotifyLogOut()
         {
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
         }

@@ -25,6 +25,21 @@ namespace GroceryListHelper.Server.HelperMethods
             this.configuration = configuration;
         }
 
+        internal async Task<string> LogOut(string email)
+        {
+            UserDbModel user = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+            if (user == null)
+            {
+                return "User not found";
+            }
+            else
+            {
+                user.RefreshToken = string.Empty;
+                await db.SaveChangesAsync();
+                return null;
+            }
+        }
+
         /// <summary>
         /// Registers a new user. Checks first if there is already a user with the given email.
         /// </summary>
@@ -94,14 +109,11 @@ namespace GroceryListHelper.Server.HelperMethods
         }
 
         /// <summary>
-        /// Generates a new access token from the old token by reading the listed claims.
-        /// Does not validate expiration, as it is assumed that the old token has expired.
+        /// Validates refreshtoken and on success generates a new accesstoken by reading refreshtoken's listed claims.
         /// </summary>
-        /// <param name="accessToken"></param>
-        /// <returns></returns>
-        internal string RefreshAccessToken(string accessToken, string refreshToken)
+        internal string RefreshAccessToken(string refreshToken)
         {
-            if (ValidateToken(AccessTokenKey, accessToken, false, out ClaimsPrincipal atClaimsPrincipal) && ValidateToken(RefreshTokenKey, refreshToken, false, out ClaimsPrincipal rtClaimsPrincipal) && atClaimsPrincipal.FindFirstValue(ClaimTypes.Email).Equals(rtClaimsPrincipal.FindFirstValue(ClaimTypes.Email)))
+            if (ValidateToken(RefreshTokenKey, refreshToken, true, out ClaimsPrincipal rtClaimsPrincipal))
             {
                 return GenerateAccessToken(rtClaimsPrincipal.FindFirstValue("Id"), rtClaimsPrincipal.FindFirstValue(ClaimTypes.Email));
             }

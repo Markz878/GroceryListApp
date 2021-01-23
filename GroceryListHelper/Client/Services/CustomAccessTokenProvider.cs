@@ -13,9 +13,7 @@ namespace GroceryListHelper.Client.Services
     public class CustomAccessTokenProvider : IAccessTokenProvider
     {
         private string accessToken;
-        private string refreshToken;
         private readonly HttpClient client;
-
         private static AccessTokenResult RedirectResult => new(AccessTokenResultStatus.RequiresRedirect, null, "/login");
 
         public CustomAccessTokenProvider(IHttpClientFactory httpClientFactory)
@@ -25,17 +23,12 @@ namespace GroceryListHelper.Client.Services
 
         public async ValueTask<AccessTokenResult> RequestAccessToken()
         {
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            {
-                return RedirectResult;
-            }
             JwtSecurityTokenHandler tokenHandler = new();
-            JwtSecurityToken jwtAccessToken = tokenHandler.ReadJwtToken(accessToken);
-            if (jwtAccessToken.ValidTo.ToUniversalTime() < DateTime.UtcNow)
+            if(string.IsNullOrEmpty(accessToken))
             {
                 if (await TryToRefreshToken())
                 {
-                    jwtAccessToken = tokenHandler.ReadJwtToken(accessToken);
+                    JwtSecurityToken jwtAccessToken = tokenHandler.ReadJwtToken(accessToken);
                     return new AccessTokenResult(AccessTokenResultStatus.Success,
                         new AccessToken() { Expires = jwtAccessToken.ValidTo, GrantedScopes = jwtAccessToken.Claims.Select(x => x.Type).ToArray(), Value = accessToken },
                         string.Empty);
@@ -44,19 +37,34 @@ namespace GroceryListHelper.Client.Services
             }
             else
             {
-                return new AccessTokenResult(AccessTokenResultStatus.Success,
-                    new AccessToken() { Expires = jwtAccessToken.ValidTo, GrantedScopes = jwtAccessToken.Claims.Select(x => x.Type).ToArray(), Value = accessToken },
-                    string.Empty);
+                JwtSecurityToken jwtAccessToken = tokenHandler.ReadJwtToken(accessToken);
+                if (jwtAccessToken.ValidTo.ToUniversalTime() < DateTime.UtcNow)
+                {
+                    if (await TryToRefreshToken())
+                    {
+                        jwtAccessToken = tokenHandler.ReadJwtToken(accessToken);
+                        return new AccessTokenResult(AccessTokenResultStatus.Success,
+                            new AccessToken() { Expires = jwtAccessToken.ValidTo, GrantedScopes = jwtAccessToken.Claims.Select(x => x.Type).ToArray(), Value = accessToken },
+                            string.Empty);
+                    }
+                    return RedirectResult;
+                }
+                else
+                {
+                    return new AccessTokenResult(AccessTokenResultStatus.Success,
+                        new AccessToken() { Expires = jwtAccessToken.ValidTo, GrantedScopes = jwtAccessToken.Claims.Select(x => x.Type).ToArray(), Value = accessToken },
+                        string.Empty);
+                }
             }
+
         }
 
         private async Task<bool> TryToRefreshToken()
         {
-            RefreshTokenRequestModel request = new RefreshTokenRequestModel() { AccessToken = accessToken, RefreshToken = refreshToken };
-            var response = await client.PostAsJsonAsync("api/authentication/refresh", request);
+            var response = await client.GetAsync("api/authentication/refresh");
             if (response.IsSuccessStatusCode)
             {
-                RefreshTokenResponseModel token = await response.Content.ReadFromJsonAsync<RefreshTokenResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                LoginResponseModel token = await response.Content.ReadFromJsonAsync<LoginResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                 accessToken = token.AccessToken;
                 return true;
             }
@@ -69,12 +77,6 @@ namespace GroceryListHelper.Client.Services
         public void SaveAccessToken(string accessToken)
         {
             this.accessToken = accessToken;
-        }
-
-        public void SaveTokens(string accessToken, string refreshToken)
-        {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
         }
 
         public ValueTask<AccessTokenResult> RequestAccessToken(AccessTokenRequestOptions options)

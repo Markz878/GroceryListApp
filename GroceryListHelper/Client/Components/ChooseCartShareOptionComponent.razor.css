@@ -1,6 +1,10 @@
 ﻿.share-cart-option {
     margin: 1rem;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     align-items: center;
+}
+
+.select {
+    margin-left: 1rem;
+    width: 10rem;
 }

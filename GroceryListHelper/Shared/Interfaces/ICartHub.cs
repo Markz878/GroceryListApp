@@ -8,8 +8,8 @@ namespace GroceryListHelper.Shared.Interfaces
         Task<bool> CartItemCollected(int id);
         Task<bool> CartItemDeleted(int id);
         Task<bool> CartItemModified(string hostEmail, CartProductCollectable product);
-        Task<string> CreateGroup(string[] allowedUsers);
-        Task<string> JoinGroup(string hostEmail);
-        Task<string> LeaveGroup(string hostEmail);
+        Task<HubResponse> CreateGroup(string[] allowedUsers);
+        Task<HubResponse> JoinGroup(string hostEmail);
+        Task<HubResponse> LeaveGroup(string hostEmail);
     }
 }

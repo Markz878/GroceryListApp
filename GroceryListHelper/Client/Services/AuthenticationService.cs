@@ -38,29 +38,18 @@ namespace GroceryListHelper.Client.Services
             await SaveTokenAndGoToIndex(response);
         }
 
-        public async Task Refresh(RefreshTokenRequestModel request)
+        public async Task Refresh()
         {
-            var response = await client.PostAsJsonAsync(uri + "/refresh", request);
-            RefreshTokenResponseModel tokens = await response.Content.ReadFromJsonAsync<RefreshTokenResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-            if (response.IsSuccessStatusCode)
-            {
-                accessTokenProvider.SaveAccessToken(tokens.AccessToken);
-                await authenticationStateProvider.GetAuthenticationStateAsync();
-                navigation.NavigateTo("/");
-            }
-            else
-            {
-                throw new ArgumentException(tokens.Message);
-            }
+            var response = await client.GetAsync(uri + "/refresh");
+            await SaveTokenAndGoToIndex(response);
         }
 
         private async Task SaveTokenAndGoToIndex(HttpResponseMessage response)
         {
-            string resp = await response.Content.ReadAsStringAsync();
             LoginResponseModel tokens = await response.Content.ReadFromJsonAsync<LoginResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
             if (response.IsSuccessStatusCode)
             {
-                accessTokenProvider.SaveTokens(tokens.AccessToken, tokens.RefreshToken);
+                accessTokenProvider.SaveAccessToken(tokens.AccessToken);
                 await authenticationStateProvider.GetAuthenticationStateAsync();
                 navigation.NavigateTo("/");
             }

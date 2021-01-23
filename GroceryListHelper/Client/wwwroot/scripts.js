@@ -2,3 +2,7 @@
     await navigator.clipboard.writeText(text);
 }
 
+alert = (message) => {
+    alert(message);
+}
+

@@ -63,14 +63,14 @@
 
 <CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts"/>
 
-<ChooseCartShareOptionComponent ShareMode="ShareMode"/>
+<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode"/>
 @if (ShareMode==ShareModeType.Self)
 {
     <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart"/>
 }
 else
 {
-    <JoinCartComponent HostEmail="CartHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart"/>
+    <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart"/>
 }
-<span>@ShareCartInfo</span>
+<p style="margin-left: 1rem;">@ShareCartInfo</p>
 <Modal Header="Error occurred" Message="@Message" />

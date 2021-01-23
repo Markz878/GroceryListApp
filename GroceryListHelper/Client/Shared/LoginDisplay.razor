@@ -14,10 +14,12 @@
 @code{
     [Inject] public NavigationManager Navigation { get; set; }
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    [Inject] public ProfileService ProfileService { get; set; }
 
-    private void BeginSignOut()
+    private async Task BeginSignOut()
     {
-        (AuthenticationStateProvider as CustomAuthenticationStateProvider).Logout();
-        Navigation.NavigateTo("login");
+        await ProfileService.LogOut();
+        (AuthenticationStateProvider as CustomAuthenticationStateProvider).NotifyLogOut();
+        //Navigation.NavigateTo("/");
     }
 }

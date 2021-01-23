@@ -26,7 +26,8 @@ namespace GroceryListHelper.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(await db.CartProducts.Where(x => x.UserId == User.GetUserId()).AsNoTracking().ToListAsync());
+            var results = await db.CartProducts.Where(x => x.UserId == User.GetUserId()).AsNoTracking().ToListAsync();
+            return Ok(results);
         }
 
         [HttpPost]

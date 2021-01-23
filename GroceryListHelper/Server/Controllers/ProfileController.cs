@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class ProfileController : ControllerBase
@@ -17,6 +17,21 @@ namespace GroceryListHelper.Server.Controllers
         public ProfileController(JWTAuthenticationManager authenticationManager)
         {
             this.authenticationManager = authenticationManager;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LogOut()
+        {
+            string email = User.FindFirst(ClaimTypes.Email).Value;
+            string response = await authenticationManager.LogOut(email);
+            if (string.IsNullOrEmpty(response))
+            {
+                return Ok();
+            }
+            else
+            {
+                return Unauthorized(response);
+            }
         }
 
         [HttpPatch]

@@ -2,6 +2,7 @@
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace GroceryListHelper.Client.Pages
     {
         [Inject] public ProfileService ProfileService { get; set; }
         [Inject] public AuthenticationStateProvider Authentication { get; set; }
+        [Inject] public IJSRuntime JS { get; set; }
 
         private string email = string.Empty;
         private readonly ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
@@ -30,8 +32,11 @@ namespace GroceryListHelper.Client.Pages
             try
             {
                 isBusy = true;
-                string response = await ProfileService.ChangePassword(changePasswordRequest);
-                passwordMessage = response ?? "Password changed";
+                passwordMessage = await ProfileService.ChangePassword(changePasswordRequest);
+                if (string.IsNullOrEmpty(passwordMessage))
+                {
+                    await JS.InvokeVoidAsync("alert", "Password changed succesfully");
+                }
             }
             catch (Exception ex)
             {
@@ -48,9 +53,12 @@ namespace GroceryListHelper.Client.Pages
             try
             {
                 isBusy = true;
-                string response = await ProfileService.Delete(deleteProfileRequest);
-                deleteMessage = response ?? "Profile deleted";
-                (Authentication as CustomAuthenticationStateProvider).Logout();
+                deleteMessage = await ProfileService.Delete(deleteProfileRequest);
+                if (string.IsNullOrEmpty(deleteMessage))
+                {
+                    await JS.InvokeVoidAsync("alert", "Profile deleted succesfully");
+                }
+                (Authentication as CustomAuthenticationStateProvider)?.NotifyLogOut();
             }
             catch (Exception ex)
             {

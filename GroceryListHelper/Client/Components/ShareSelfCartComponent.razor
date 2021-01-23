@@ -1,13 +1,13 @@
 ﻿<p class="share-text">Share your cart with these users:</p>
 <div class="share-email-row">
-    <input type="email" class="form-control" width="300" @bind="AllowEmail" placeholder="User email" />
+    <input type="email" class="form-control" @bind="AllowEmail" placeholder="User email" />
     <button class="btn btn-success" @onclick="AddUser">+</button>
 </div>
 @for (int i = 0; i < AllowedUsers.Count; i++)
 {
     var index = i;
     <div  class="share-email-row">
-        <input type="email" class="form-control" width="300" @bind="AllowedUsers[index]" placeholder="User email" />
+        <input type="email" class="form-control" @bind="AllowedUsers[index]" placeholder="User email" />
         <button class="btn btn-danger" @onclick="()=>DeleteUser(AllowedUsers[index])">X</button>
     </div>
 }

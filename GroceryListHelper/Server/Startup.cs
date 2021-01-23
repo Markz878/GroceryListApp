@@ -1,11 +1,9 @@
 using AspNetCoreRateLimit;
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using GroceryListHelper.Server.Data;
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Validators;
-using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +19,6 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server
 {
@@ -45,15 +42,29 @@ namespace GroceryListHelper.Server
 
             AddRateLimiter(services);
 
+            AddCustomValidators(services);
             services.AddControllers(x => x.Filters.Add(new ValidationFilter())).AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<UserCredentialsValidator>(lifetime: ServiceLifetime.Singleton));
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRazorPages();
+            AddSignalR(services);
+            AddSwagger(services);
+        }
+
+        private void AddCustomValidators(IServiceCollection services)
+        {
+            services.AddTransient<CartProductValidator>();
+            services.AddTransient<StoreProductValidator>();
+            services.AddTransient(x => new RegisterRequestValidator(x.GetRequiredService<GroceryStoreDbContext>()));
+        }
+
+        private static void AddSignalR(IServiceCollection services)
+        {
             services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
-            AddSwagger(services);
+            services.AddSingleton<CartHubService>();
         }
 
         private void AddJWTAuthentication(IServiceCollection services)
@@ -75,22 +86,6 @@ namespace GroceryListHelper.Server
                     ValidateIssuer = false,
                     ValidateAudience = false,
                 };
-                //x.Events = new JwtBearerEvents
-                //{
-                //    OnMessageReceived = context =>
-                //    {
-                //        var accessToken = context.Request.Query["access_token"];
-
-                //        // If the request is for our hub...
-                //        var path = context.HttpContext.Request.Path;
-                //        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
-                //        {
-                //            // Read the token out of the query string
-                //            context.Token = accessToken;
-                //        }
-                //        return Task.CompletedTask;
-                //    }
-                //};
             });
             services.AddTransient(serviceProvider => new JWTAuthenticationManager(Configuration, serviceProvider.GetService<GroceryStoreDbContext>()));
         }
@@ -139,7 +134,7 @@ namespace GroceryListHelper.Server
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseResponseCompression();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-local-development");

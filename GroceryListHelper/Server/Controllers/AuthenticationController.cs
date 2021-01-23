@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -13,6 +13,7 @@ namespace GroceryListHelper.Server.Controllers
     {
         private readonly JWTAuthenticationManager authenticationManager;
         private readonly Random rng = new Random();
+        private readonly CookieBuilder cookieOptions = new CookieBuilder() { Expiration = TimeSpan.FromDays(1), HttpOnly = true, SecurePolicy = CookieSecurePolicy.Always, IsEssential = true, SameSite = SameSiteMode.Strict, MaxAge = TimeSpan.FromDays(1) };
 
         public AuthenticationController(JWTAuthenticationManager authenticationManager)
         {
@@ -33,15 +34,16 @@ namespace GroceryListHelper.Server.Controllers
             {
                 string accessToken = await authenticationManager.GetUserAccessToken(user.Email, user.Password);
                 string refreshToken = await authenticationManager.GetUserRefreshToken(accessToken);
-                if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
                 {
-                    LoginResponseModel response = new() { Message = "Access- or refreshtoken is invalid, please login." };
-                    return BadRequest(response);
+                    Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, cookieOptions.Build(HttpContext));
+                    LoginResponseModel response = new() { AccessToken = accessToken };
+                    return Ok(response);
                 }
                 else
                 {
-                    LoginResponseModel response = new() { AccessToken = accessToken, RefreshToken = refreshToken };
-                    return Ok(response);
+                    LoginResponseModel response = new() { Message = "Access- or refreshtoken is invalid, please login." };
+                    return BadRequest(response);
                 }
             }
         }
@@ -52,28 +54,34 @@ namespace GroceryListHelper.Server.Controllers
             await Task.Delay(rng.Next(300, 700));
             string accessToken = await authenticationManager.GetUserAccessToken(user.Email, user.Password);
             string refreshToken = await authenticationManager.GetUserRefreshToken(accessToken);
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+            if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
+            {
+                Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, cookieOptions.Build(HttpContext));
+                LoginResponseModel response = new() { AccessToken = accessToken };
+                return Ok(response);
+            }
+            else
             {
                 LoginResponseModel response = new() { Message = "Invalid username or password" };
                 return Unauthorized(response);
             }
-            else
-            {
-                LoginResponseModel response = new() { AccessToken = accessToken, RefreshToken = refreshToken };
-                return Ok(response);
-            }
         }
 
-        [HttpPost]
-        public ActionResult<RefreshTokenResponseModel> Refresh(RefreshTokenRequestModel request)
+        [HttpGet]
+        public async Task<ActionResult<LoginResponseModel>> Refresh()
         {
-            string accessToken = authenticationManager.RefreshAccessToken(request.AccessToken, request.RefreshToken);
-            if (!string.IsNullOrEmpty(accessToken))
+            if (Request.Cookies.TryGetValue(GlobalConstants.XRefreshToken, out string refreshToken))
             {
-                RefreshTokenResponseModel response = new() { AccessToken = accessToken };
-                return Ok(response);
+                string accessToken = authenticationManager.RefreshAccessToken(refreshToken);
+                string newRefreshToken = await authenticationManager.RenewRefreshToken(refreshToken);
+                if (!string.IsNullOrEmpty(accessToken) || !string.IsNullOrEmpty(accessToken))
+                {
+                    Response.Cookies.Append(GlobalConstants.XRefreshToken, newRefreshToken, cookieOptions.Build(HttpContext));
+                    LoginResponseModel response = new() { AccessToken = accessToken };
+                    return Ok(response);
+                }
             }
-            RefreshTokenResponseModel errorResponse = new() { Message = "Invalid access- or refresh token" };
+            LoginResponseModel errorResponse = new() { Message = "Invalid access- or refresh token" };
             return Unauthorized(errorResponse);
         }
     }
