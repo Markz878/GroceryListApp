@@ -71,19 +71,22 @@ namespace GroceryListHelper.Client.Pages
 
             hubConnection.On<List<CartProductCollectable>>(nameof(ICartHubClient.GetCart), (cartProducts) =>
             {
+                Console.WriteLine("Received cart from server..");
                 CartProducts.Clear();
                 CartProducts.AddRange(cartProducts.ConvertAll(x => new CartProductUIModel() { Id = x.Id, Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, UnitPrice = x.UnitPrice }));
                 StateHasChanged();
             });
 
-            hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemAdded), (cartProduct) =>
+            hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemAdded), (p) =>
             {
-                CartProducts.Add((CartProductUIModel)cartProduct);
+                Console.WriteLine("Received new item " + p.Name);
+                CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice });
                 StateHasChanged();
             });
 
             hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemModified), (cartProduct) =>
             {
+                Console.WriteLine($"Item {cartProduct.Name} was modified");
                 var product = CartProducts.First(x => x.Id.Equals(cartProduct.Id));
                 product.Amount = cartProduct.Amount;
                 product.UnitPrice = cartProduct.UnitPrice;
@@ -92,12 +95,14 @@ namespace GroceryListHelper.Client.Pages
 
             hubConnection.On<int>(nameof(ICartHubClient.ItemCollected), (id) =>
             {
+                Console.WriteLine($"Item with id {id} was modified");
                 CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
                 StateHasChanged();
             });
 
             hubConnection.On<int>(nameof(ICartHubClient.ItemDeleted), (id) =>
             {
+                Console.WriteLine($"Item with id {id} was deleted");
                 CartProducts.RemoveAll(x => x.Id.Equals(id));
                 StateHasChanged();
             });
@@ -169,7 +174,7 @@ namespace GroceryListHelper.Client.Pages
         {
             try
             {
-                var response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup), CartHostEmail);
+                var response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
                 ShareCartInfo = response.Message;
             }
             catch (Exception ex)
@@ -209,7 +214,7 @@ namespace GroceryListHelper.Client.Pages
             {
                 if (polling)
                 {
-                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemAdded), CartHostEmail, product);
+                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemAdded), product);
                 }
                 else
                 {
@@ -275,7 +280,7 @@ namespace GroceryListHelper.Client.Pages
                 EditingItem = null;
                 if (polling)
                 {
-                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemModified), CartHostEmail, product);
+                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemModified), product);
                 }
                 else
                 {

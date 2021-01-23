@@ -26,15 +26,17 @@ namespace GroceryListHelper.Server.Hubs
             this.cartHubService = cartHubService;
         }
 
-        public async Task<HubResponse> CreateGroup(string[] allowedUsers)
+        public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
         {
-            if (allowedUsers.Length == 0)
+            if (allowedUsers.Count == 0)
             {
                 return new HubResponse() { IsSuccess = false, Message = "There are no allowed users for your cart" };
             }
             await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId(Context).ToString());
+            string otherUsers = string.Join(", ", allowedUsers);
+            allowedUsers.Add(GetUserEmail(Context));
             cartHubService.GroupAllowedEmails[GetUserId(Context)] = allowedUsers;
-            return new HubResponse() { IsSuccess = true, Message = $"You are sharing your cart to {string.Join(", ", allowedUsers)}." };
+            return new HubResponse() { IsSuccess = true, Message = $"You are sharing your cart to {otherUsers}." };
         }
 
         public async Task<HubResponse> JoinGroup(string hostEmail)
@@ -44,7 +46,7 @@ namespace GroceryListHelper.Server.Hubs
             {
                 return new HubResponse() { IsSuccess = false, Message = "No user with that email." };
             }
-            if (cartHubService.GroupAllowedEmails.TryGetValue(hostId, out string[] emails))
+            if (cartHubService.GroupAllowedEmails.TryGetValue(hostId, out List<string> emails))
             {
                 if (emails.Contains(GetUserEmail(Context)))
                 {
@@ -64,9 +66,9 @@ namespace GroceryListHelper.Server.Hubs
             }
         }
 
-        public async Task<bool> CartItemAdded(string hostEmail, CartProductCollectable product)
+        public async Task<bool> CartItemAdded(CartProductCollectable product)
         {
-            int hostId = GetIdFromEmail(hostEmail);
+            int hostId = GetHostId();
             CartProductDbModel cartDbProduct = new CartProductDbModel() { Amount = product.Amount, Name = product.Name, UnitPrice = product.UnitPrice, UserId = hostId };
             db.CartProducts.Add(cartDbProduct);
             await db.SaveChangesAsync();
@@ -75,9 +77,9 @@ namespace GroceryListHelper.Server.Hubs
             return true;
         }
 
-        public async Task<bool> CartItemModified(string hostEmail, CartProductCollectable product)
+        public async Task<bool> CartItemModified(CartProductCollectable product)
         {
-            int hostId = GetIdFromEmail(hostEmail);
+            int hostId = GetHostId();
             CartProductDbModel cartDbProduct = db.CartProducts.First(x => x.Id.Equals(product.Id));
             cartDbProduct.Amount = product.Amount;
             cartDbProduct.Name = product.Name;
@@ -85,41 +87,45 @@ namespace GroceryListHelper.Server.Hubs
             await db.SaveChangesAsync();
             await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
             return true;
-
         }
 
         public async Task<bool> CartItemCollected(int id)
         {
-            string userEmail = GetUserEmail(Context);
-            int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
+            int hostId = GetHostId();
             db.CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
             await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
             await db.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> CartItemDeleted(int id)
+        private int GetHostId()
         {
             string userEmail = GetUserEmail(Context);
             int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
-            db.CartProducts.Remove(db.CartProducts.First(x => x.Id.Equals(id)));
+            return hostId;
+        }
+
+        public async Task<bool> CartItemDeleted(int id)
+        {
+            int hostId = GetHostId();
+            db.CartProducts.Remove(db.CartProducts.First(x => x.Id.Equals(id) && x.UserId.Equals(hostId)));
             await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
             await db.SaveChangesAsync();
             return true;
         }
 
-        public async Task<HubResponse> LeaveGroup(string hostEmail)
+        public async Task<HubResponse> LeaveGroup()
         {
-            int hostId = GetIdFromEmail(hostEmail);
+            int hostId = GetHostId();
             if (hostId>=0)
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{Context.User.FindFirst(ClaimTypes.Email).Value} has left the group {hostEmail}.");
-                return new HubResponse() { IsSuccess = true, Message = $"You have left the group {hostEmail}." };
+                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{Context.User.FindFirst(ClaimTypes.Email).Value} has left the group.");
+                return new HubResponse() { IsSuccess = true, Message = "You have left the group." };
             }
             else
             {
-                return new HubResponse() { IsSuccess = false, Message = "No group with that host." };
+                return new HubResponse() { IsSuccess = false, Message = "You are not part of any shopping cart." };
             }
         }
 

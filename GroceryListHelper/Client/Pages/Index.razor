@@ -16,7 +16,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton" disabled="@polling">Add</button></td>
+            <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton">Add</button></td>
             <td>
                 <input type="text" list="products" class="form-control" @bind="NewProduct.Name" @onfocusout="GetItemPrice" @ref="NewProductNameBox" />
                 <datalist id="products">
@@ -41,8 +41,8 @@
                     <td>@item.Amount</td>
                     <td>@item.UnitPrice</td>
                     <td>@item.Total.ToString("N2")</td>
-                    <td><button class="btn btn-success" @onclick="()=>StartEditItem(item)" disabled="@polling"><i class="fas fa-edit"></i></button></td>
-                    <td><button class="btn btn-danger" @onclick="()=>RemoveProduct(item)" disabled="@polling">X</button></td>
+                    <td><button class="btn btn-success" @onclick="()=>StartEditItem(item)"><i class="fas fa-edit"></i></button></td>
+                    <td><button class="btn btn-danger" @onclick="()=>RemoveProduct(item)">X</button></td>
                 </tr>
             }
             else
