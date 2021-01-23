@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.Client.Services;
 using GroceryListHelper.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Pages
 {
+    [Authorize]
     public partial class Profile
     {
         [Inject] public ProfileService ProfileService { get; set; }
