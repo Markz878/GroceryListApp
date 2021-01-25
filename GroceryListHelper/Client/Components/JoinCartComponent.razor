@@ -1,13 +1,16 @@
-﻿<p class="share-text">Join someone else's cart by giving their username/email:</p>
+﻿<div class="join-component">
+    <p>Join someone else's cart by giving their email:</p>
 
-<div class="join-email-row">
-    <input type="email" required class="form-control" @oninput="OnCartHostEmailChanged" placeholder="Host email" />
+    <div class="join-email-row">
+        <input type="email" required class="form-control" @oninput="OnCartHostEmailChanged" placeholder="Cart owner email" />
+    </div>
+
+    <div>
+        <button class="btn btn-primary" @onclick="JoinCart" disabled="@Polling">Join cart</button>
+        <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+    </div>
 </div>
 
-<div class="btn-row">
-    <button class="btn btn-primary" @onclick="JoinCart" disabled="@Polling">Join cart</button>
-    <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
-</div>
 
 @code {
     [Parameter] public EventCallback<string> CartHostEmailChanged { get; set; }

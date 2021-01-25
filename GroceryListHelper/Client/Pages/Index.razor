@@ -63,7 +63,7 @@
 
 <CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts"/>
 
-<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode"/>
+<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling"/>
 @if (ShareMode==ShareModeType.Self)
 {
     <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart"/>

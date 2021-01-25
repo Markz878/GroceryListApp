@@ -26,6 +26,16 @@ namespace GroceryListHelper.Server.Hubs
             this.cartHubService = cartHubService;
         }
 
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            if (exception == null)
+            {
+                int hostId = GetHostId();
+                cartHubService.GroupAllowedEmails.Remove(hostId);
+            }
+            return base.OnDisconnectedAsync(exception);
+        }
+
         public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
         {
             if (allowedUsers.Count == 0)
@@ -117,7 +127,7 @@ namespace GroceryListHelper.Server.Hubs
         public async Task<HubResponse> LeaveGroup()
         {
             int hostId = GetHostId();
-            if (hostId>=0)
+            if (hostId >= 0)
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
                 await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{Context.User.FindFirst(ClaimTypes.Email).Value} has left the group.");

@@ -12,7 +12,7 @@ namespace GroceryListHelper.Client.Pages
         [Inject] public AuthenticationService AuthenticationService { get; set; }
 
         private readonly RegisterRequestModel registerRequest = new RegisterRequestModel();
-        private string message = string.Empty;
+        public string Message { get; set; } = string.Empty;
         private bool isBusy;
 
         private async Task RegisterMethod()
@@ -24,7 +24,7 @@ namespace GroceryListHelper.Client.Pages
             }
             catch (Exception ex)
             {
-                message = ex.Message;
+                Message = ex.Message;
             }
             finally
             {

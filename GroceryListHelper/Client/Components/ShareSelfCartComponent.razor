@@ -1,38 +1,46 @@
-﻿<p class="share-text">Share your cart with these users:</p>
-<div class="share-email-row">
-    <input type="email" class="form-control" @bind="AllowEmail" placeholder="User email" />
-    <button class="btn btn-success" @onclick="AddUser">+</button>
-</div>
-@for (int i = 0; i < AllowedUsers.Count; i++)
-{
-    var index = i;
-    <div  class="share-email-row">
-        <input type="email" class="form-control" @bind="AllowedUsers[index]" placeholder="User email" />
-        <button class="btn btn-danger" @onclick="()=>DeleteUser(AllowedUsers[index])">X</button>
+﻿<div class="component">
+    <p>Share your cart with these users:</p>
+    <div class="component-row">
+        <EditForm Model="AllowEmail" OnValidSubmit="AddUser">
+            <FluentValidationValidator />
+            <ValidationSummary />
+            <div class="component-row">
+                <InputText type="email" required class="form-control" @bind-Value="AllowEmail.Email" placeholder="User email" />
+                <button type="submit" class="btn btn-success">+</button>
+            </div>
+        </EditForm>
     </div>
-}
+    @for (int i = 0; i < AllowedUsers.Count; i++)
+    {
+        var index = i;
+        <div class="component-row">
+            <div class="email-text">@AllowedUsers[index]</div>
+            <button class="btn btn-danger email-button" @onclick="()=>DeleteUser(AllowedUsers[index])">X</button>
+        </div>
+    }
 
-<div class="btn-row">
-    <button class="btn btn-primary" @onclick="ShareCart" disabled="@Polling">Share your cart</button>
-    <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+    <div>
+        <button class="btn btn-primary" @onclick="ShareCart" disabled="@Polling">Share your cart</button>
+        <button class="btn btn-secondary" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+    </div>
 </div>
+
 
 @code {
     [Parameter] public List<string> AllowedUsers { get; set; }
     [Parameter] public EventCallback ShareCart { get; set; }
     [Parameter] public EventCallback ExitCart { get; set; }
     [Parameter] public bool Polling { get; set; }
+    public EmailModel AllowEmail { get; set; } = new EmailModel();
 
-    public string AllowEmail { get; set; }
+    public void AddUser()
+    {
+        AllowedUsers.Add(AllowEmail.Email);
+        AllowEmail = new EmailModel();
+    }
 
     public void DeleteUser(string user)
     {
         AllowedUsers.Remove(user);
-    }
-
-    public void AddUser()
-    {
-        AllowedUsers.Add(AllowEmail);
-        AllowEmail = string.Empty;
     }
 }

@@ -1,16 +1,31 @@
 ﻿<div class="share-cart-option">
-    <b class="text-nowrap">You can share cart state with other users, choose how:</b>
-    <select class="form-control select" @onchange="ChangeMode">
-        <option value="@ShareModeType.Self">Share your cart</option>
-        <option value="@ShareModeType.Join">Join a cart</option>
-    </select>
+    <b class="text-nowrap">Choose how to share cart with other users:</b>
+    <button class="leftToggleButton toggleButton @leftButtonActive" disabled="@Polling" @onclick="SelectSelfShare">Share your cart</button>
+    <button class="rightToggleButton toggleButton @rightButtonActive" disabled="@Polling" @onclick="SelectJoinShare">Join a cart</button>
 </div>
 
 @code {
+    [Parameter] public bool Polling { get; set; }
     [Parameter] public EventCallback<ShareModeType> SwitchShareMode { get; set; }
+    public ShareModeType ShareMode { get; set; }
 
-    private async Task ChangeMode(ChangeEventArgs e)
+    string leftButtonActive => ShareMode == ShareModeType.Self ? "activeButton" : "";
+    string rightButtonActive => ShareMode == ShareModeType.Join ? "activeButton" : "";
+
+    private Task SelectShareMode(ShareModeType shareMode)
     {
-        await SwitchShareMode.InvokeAsync(Enum.Parse<ShareModeType>(e.Value.ToString()));
+        return SwitchShareMode.InvokeAsync(shareMode);
+    }
+
+    private Task SelectSelfShare()
+    {
+        ShareMode = ShareModeType.Self;
+        return SelectShareMode(ShareModeType.Self);
+    }
+
+    private Task SelectJoinShare()
+    {
+        ShareMode = ShareModeType.Join;
+        return SelectShareMode(ShareModeType.Join);
     }
 }

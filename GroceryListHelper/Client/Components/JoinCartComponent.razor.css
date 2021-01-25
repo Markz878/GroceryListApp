@@ -1,13 +1,9 @@
-﻿.share-text {
-    margin-left: 1rem;
+﻿.join-component {
+    margin: 1rem;
 }
 
 .join-email-row {
-    margin-left: 1rem;
-    width: 60%;
+    width: 400px;
     min-width: 200px;
-}
-
-.btn-row {
-    margin: 1rem;
+    margin-bottom: 10px;
 }

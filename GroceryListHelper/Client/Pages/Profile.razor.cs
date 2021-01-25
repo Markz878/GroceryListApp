@@ -15,6 +15,7 @@ namespace GroceryListHelper.Client.Pages
         [Inject] public ProfileService ProfileService { get; set; }
         [Inject] public AuthenticationStateProvider Authentication { get; set; }
         [Inject] public IJSRuntime JS { get; set; }
+        public string Message { get; set; }
 
         private string email = string.Empty;
         private readonly ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
@@ -37,7 +38,7 @@ namespace GroceryListHelper.Client.Pages
                 passwordMessage = await ProfileService.ChangePassword(changePasswordRequest);
                 if (string.IsNullOrEmpty(passwordMessage))
                 {
-                    await JS.InvokeVoidAsync("alert", "Password changed succesfully");
+                    Message = "Password changed succesfully";
                 }
             }
             catch (Exception ex)
@@ -58,7 +59,7 @@ namespace GroceryListHelper.Client.Pages
                 deleteMessage = await ProfileService.Delete(deleteProfileRequest);
                 if (string.IsNullOrEmpty(deleteMessage))
                 {
-                    await JS.InvokeVoidAsync("alert", "Profile deleted succesfully");
+                    Message = "Profile deleted succesfully";
                 }
                 (Authentication as CustomAuthenticationStateProvider)?.NotifyLogOut();
             }

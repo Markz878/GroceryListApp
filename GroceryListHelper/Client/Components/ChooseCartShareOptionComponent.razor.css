@@ -1,5 +1,6 @@
 ﻿.share-cart-option {
-    margin: 1rem;
+    margin: var(--left-margin);
+    width: max(100%, 650px);
     display: flex;
     align-items: center;
 }
@@ -7,4 +8,42 @@
 .select {
     margin-left: 1rem;
     width: 10rem;
+}
+
+.leftToggleButton {
+    margin: 5px 0 5px 5px;
+    border-radius: 10px 0 0 10px;
+}
+
+.rightToggleButton {
+    margin: 5px 5px 5px 0;
+    border-radius: 0 10px 10px 0;
+}
+
+.toggleButton {
+    float: left;
+    border: 2px solid transparent;
+    background-color: lightgray;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    padding: 10px;
+    width: 150px;
+}
+
+.toggleButton:focus {
+    outline: none;
+    border: 2px solid black;
+    background-position: right bottom;
+    color: #fff;
+    text-decoration: none;
+}
+
+.activeButton {
+    background-image: linear-gradient(to right, #348F50 0%, #56B4D3 51%, #348F50 100%);
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
 }

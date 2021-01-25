@@ -1,5 +1,5 @@
 .main {
-    min-width: 650px;
+    min-width: var(--min-content-width);
 }
 
 .content {

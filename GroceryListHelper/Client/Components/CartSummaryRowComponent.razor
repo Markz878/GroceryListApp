@@ -1,8 +1,8 @@
-﻿<div class="last-row">
+﻿<div class="summary-row">
     <b style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
     <b>Total: @Total.ToString("N2") €</b>
     <button class="btn btn-primary text-nowrap" disabled="@Polling" style="justify-self: center" @onclick="ClearCartProducts">Clear cart</button>
-    <button class="btn btn-secondary text-nowrap" disabled="@Polling" style="justify-self: center" @onclick="ClearStoreProducts">Clear shop</button>
+    <button class="btn btn-primary text-nowrap" disabled="@Polling" style="justify-self: center" @onclick="ClearStoreProducts">Clear shop</button>
 </div>
 
 @code {

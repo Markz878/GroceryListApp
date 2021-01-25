@@ -5,15 +5,15 @@
 @code {
     [Parameter] public string Message { get; set; }
     [CascadingParameter] public EditContext Context { get; set; }
+    [Parameter] public EventCallback ClearMessage { get; set; } 
 
     protected override void OnInitialized()
     {
-        Context.OnFieldChanged += ClearMessage;
+        Context.OnFieldChanged += ClearMessageFromParent;
     }
 
-    private void ClearMessage(object sender, FieldChangedEventArgs e)
+    private async void ClearMessageFromParent(object sender, FieldChangedEventArgs e)
     {
-        Message = string.Empty;
-        StateHasChanged();
+        await ClearMessage.InvokeAsync();
     }
 }

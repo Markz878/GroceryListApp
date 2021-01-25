@@ -1,10 +1,9 @@
 ﻿@page "/login"
-
 <h3>Login</h3>
 <EditForm Model="user" OnValidSubmit="LoginMethod">
     <FluentValidationValidator />
     <ValidationSummary />
-    <CustomValidationMessage Message="@message"/>
+    <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)"/>
     <div class="form-group">
         <label for="email">Email: </label>
         <InputText id="email" class="form-control" placeholder="Enter email" @bind-Value="@user.Email" />

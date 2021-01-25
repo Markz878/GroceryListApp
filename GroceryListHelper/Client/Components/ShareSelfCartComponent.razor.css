@@ -1,14 +1,17 @@
-﻿.share-text {
-    margin-left: 1rem;
-}
-
-.share-email-row {
-    margin-left: 1rem;
-    width: 60%;
-    min-width: 200px;
-    display: flex;
-}
-
-.btn-row {
+﻿.component {
     margin: 1rem;
+}
+
+.component-row {
+    margin-bottom: 5px;
+    display: flex;
+    width: var(--width);
+}
+
+.email-text {
+    margin: 5px;
+    width: var(--width);
+}
+.email-button {
+    margin: auto;
 }
