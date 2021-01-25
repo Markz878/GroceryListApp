@@ -1,11 +1,11 @@
 ﻿@page "/register"
+<Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Register" />
 
 <h3>Register</h3>
-
 <EditForm Model="registerRequest" OnValidSubmit="RegisterMethod">
     <FluentValidationValidator />
     <ValidationSummary />
-    <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)"/>
+    <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)" />
     <div class="form-group">
         <label for="email">Email: </label>
         <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="@registerRequest.Email" />

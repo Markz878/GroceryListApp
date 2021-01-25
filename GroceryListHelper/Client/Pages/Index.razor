@@ -1,4 +1,5 @@
 ﻿@page "/"
+<Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Grocery List Helper" />
 
 <h3 class="text-center">Grocery List Collector<sup> &copy;M&S Productions</sup></h3>
 <h5 class="text-center">Helps you remember</h5>
@@ -16,7 +17,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton">Add</button></td>
+            <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton" aria-label="Add product">Add</button></td>
             <td>
                 <input type="text" list="products" class="form-control" @bind="NewProduct.Name" @onfocusout="GetItemPrice" @ref="NewProductNameBox" />
                 <datalist id="products">
@@ -41,8 +42,8 @@
                     <td>@item.Amount</td>
                     <td>@item.UnitPrice</td>
                     <td>@item.Total.ToString("N2")</td>
-                    <td><button class="btn btn-success" @onclick="()=>StartEditItem(item)"><i class="fas fa-edit"></i></button></td>
-                    <td><button class="btn btn-danger" @onclick="()=>RemoveProduct(item)">X</button></td>
+                    <td><button class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product"><i class="fas fa-edit"></i></button></td>
+                    <td><button class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product">X</button></td>
                 </tr>
             }
             else
@@ -53,24 +54,24 @@
                     <td><input type="number" step="0.01" min="0" class="form-control text-center" @bind="item.Amount" /></td>
                     <td><input type="number" step="0.01" min="0" class="form-control text-center" @bind="item.UnitPrice" /></td>
                     <td>@item.Total.ToString("N2")</td>
-                    <td><button class="btn btn-success text-nowrap" @onclick="()=>UpdateCartProduct(item)">Submit</button></td>
-                    <td><button class="btn btn-danger text-nowrap" @onclick="()=>CancelProductUpdate()">Cancel</button></td>
+                    <td><button class="btn btn-success text-nowrap" @onclick="()=>UpdateCartProduct(item)" aria-label="Submit change">Submit</button></td>
+                    <td><button class="btn btn-danger text-nowrap" @onclick="()=>CancelProductUpdate()" aria-label="Cancel change">Cancel</button></td>
                 </tr>
             }
         }
     </tbody>
 </table>
 
-<CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts"/>
+<CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts" />
 
-<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling"/>
-@if (ShareMode==ShareModeType.Self)
+<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling" />
+@if (ShareMode == ShareModeType.Self)
 {
-    <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart"/>
+    <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart" />
 }
 else
 {
-    <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart"/>
+    <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart" />
 }
 <p style="margin-left: 1rem;">@ShareCartInfo</p>
 <Modal Header="Error occurred" Message="@Message" />
