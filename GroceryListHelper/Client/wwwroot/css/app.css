@@ -5,6 +5,9 @@
     --left-margin: 1rem;
 }
 
+#app {
+    min-height: 100vh;
+}
 
 .message {
     text-align: center;
@@ -45,6 +48,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100%;
 }
 
 .valid.modified:not([type=checkbox]) {

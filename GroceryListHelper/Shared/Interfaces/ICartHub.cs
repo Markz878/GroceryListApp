@@ -8,9 +8,9 @@ namespace GroceryListHelper.Shared.Interfaces
         Task<HubResponse> CreateGroup(List<string> allowedUsers);
         Task<HubResponse> JoinGroup(string hostEmail);
         Task<HubResponse> LeaveGroup();
-        Task<bool> CartItemAdded(CartProductCollectable product);
-        Task<bool> CartItemModified(CartProductCollectable product);
-        Task<bool> CartItemCollected(int id);
-        Task<bool> CartItemDeleted(int id);
+        Task<int> CartItemAdded(CartProductCollectable product);
+        Task CartItemModified(CartProductCollectable product);
+        Task CartItemCollected(int id);
+        Task CartItemDeleted(int id);
     }
 }

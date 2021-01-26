@@ -76,7 +76,7 @@ namespace GroceryListHelper.Server.Hubs
             }
         }
 
-        public async Task<bool> CartItemAdded(CartProductCollectable product)
+        public async Task<int> CartItemAdded(CartProductCollectable product)
         {
             int hostId = GetHostId();
             CartProductDbModel cartDbProduct = new CartProductDbModel() { Amount = product.Amount, Name = product.Name, UnitPrice = product.UnitPrice, UserId = hostId };
@@ -84,10 +84,10 @@ namespace GroceryListHelper.Server.Hubs
             await db.SaveChangesAsync();
             product.Id = cartDbProduct.Id;
             await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
-            return true;
+            return product.Id;
         }
 
-        public async Task<bool> CartItemModified(CartProductCollectable product)
+        public async Task CartItemModified(CartProductCollectable product)
         {
             int hostId = GetHostId();
             CartProductDbModel cartDbProduct = db.CartProducts.First(x => x.Id.Equals(product.Id));
@@ -96,16 +96,14 @@ namespace GroceryListHelper.Server.Hubs
             cartDbProduct.UnitPrice = product.UnitPrice;
             await db.SaveChangesAsync();
             await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
-            return true;
         }
 
-        public async Task<bool> CartItemCollected(int id)
+        public async Task CartItemCollected(int id)
         {
             int hostId = GetHostId();
             db.CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
             await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
             await db.SaveChangesAsync();
-            return true;
         }
 
         private int GetHostId()
@@ -115,13 +113,12 @@ namespace GroceryListHelper.Server.Hubs
             return hostId;
         }
 
-        public async Task<bool> CartItemDeleted(int id)
+        public async Task CartItemDeleted(int id)
         {
             int hostId = GetHostId();
             db.CartProducts.Remove(db.CartProducts.First(x => x.Id.Equals(id) && x.UserId.Equals(hostId)));
             await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
             await db.SaveChangesAsync();
-            return true;
         }
 
         public async Task<HubResponse> LeaveGroup()

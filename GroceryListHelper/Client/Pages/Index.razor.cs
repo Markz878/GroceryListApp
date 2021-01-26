@@ -79,7 +79,7 @@ namespace GroceryListHelper.Client.Pages
 
             hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemAdded), (p) =>
             {
-                Console.WriteLine("Received new item " + p.Name);
+                Console.WriteLine("Received new item with id " + p.Id + " and name " + p.Name);
                 CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice });
                 StateHasChanged();
             });
@@ -207,24 +207,23 @@ namespace GroceryListHelper.Client.Pages
             }
         }
 
-        private Task SaveCartProduct(CartProductUIModel product)
+        private async Task SaveCartProduct(CartProductUIModel product)
         {
             CartProducts.Add(product);
             try
             {
                 if (polling)
                 {
-                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemAdded), product);
+                    product.Id = await hubConnection.InvokeAsync<int>(nameof(ICartHub.CartItemAdded), product);
                 }
                 else
                 {
-                    return CartProductsService.SaveCartProduct(product);
+                    await CartProductsService.SaveCartProduct(product);
                 }
             }
             catch (Exception ex)
             {
                 Message = ex.Message;
-                return Task.CompletedTask;
             }
         }
 
@@ -232,7 +231,7 @@ namespace GroceryListHelper.Client.Pages
         {
             if (polling)
             {
-                return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemCollected), product.Id);
+                return hubConnection.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
             }
             else
             {
@@ -280,7 +279,7 @@ namespace GroceryListHelper.Client.Pages
                 EditingItem = null;
                 if (polling)
                 {
-                    return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemModified), product);
+                    return hubConnection.SendAsync(nameof(ICartHub.CartItemModified), product);
                 }
                 else
                 {
@@ -314,7 +313,7 @@ namespace GroceryListHelper.Client.Pages
             CartProducts.Remove(product);
             if (polling)
             {
-                return hubConnection.InvokeAsync<bool>(nameof(ICartHub.CartItemDeleted), product.Id);
+                return hubConnection.SendAsync(nameof(ICartHub.CartItemDeleted), product.Id);
             }
             else
             {
