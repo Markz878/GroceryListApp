@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client
@@ -20,9 +21,19 @@ namespace GroceryListHelper.Client
             builder.Services.AddScoped<BearerTokenHandler>();
             builder.Services.AddAuthorizationCore();
 
-            builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-            builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-                .AddHttpMessageHandler<BearerTokenHandler>();
+            builder.Services.AddHttpClient("AnonymousClient", client =>
+            {
+                client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
+                client.DefaultRequestVersion = HttpVersion.Version20;
+                client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+            });
+            builder.Services.AddHttpClient("ProtectedClient", client =>
+            {
+                client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
+                client.DefaultRequestVersion = HttpVersion.Version20;
+                client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+            })
+            .AddHttpMessageHandler<BearerTokenHandler>();
 
             builder.Services.AddScoped<AuthenticationService>();
             builder.Services.AddScoped<CartProductsService>();
