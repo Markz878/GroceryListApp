@@ -5,12 +5,12 @@
 .component-row {
     margin-bottom: 5px;
     display: flex;
-    width: var(--width);
+    width: 450px;
 }
 
 .email-text {
     margin: 5px;
-    width: var(--width);
+    width: 450px;
 }
 .email-button {
     margin: auto;
