@@ -23,14 +23,14 @@ namespace GroceryListHelper.Client
 
             builder.Services.AddHttpClient("AnonymousClient", client =>
             {
-                client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
-                client.DefaultRequestVersion = HttpVersion.Version20;
+                //client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
+                //client.DefaultRequestVersion = HttpVersion.Version20;
                 client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
             });
             builder.Services.AddHttpClient("ProtectedClient", client =>
             {
-                client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
-                client.DefaultRequestVersion = HttpVersion.Version20;
+                //client.DefaultVersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact;
+                //client.DefaultRequestVersion = HttpVersion.Version20;
                 client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
             })
             .AddHttpMessageHandler<BearerTokenHandler>();
