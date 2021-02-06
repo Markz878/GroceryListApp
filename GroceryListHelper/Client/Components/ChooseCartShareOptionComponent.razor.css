@@ -40,10 +40,7 @@
 }
 
 .activeButton {
-    background-image: linear-gradient(to right, #348F50 0%, #56B4D3 51%, #348F50 100%);
+    background-color: rgb(30, 121, 255);
     text-align: center;
-    transition: 0.5s;
-    background-size: 200% auto;
     color: white;
-    box-shadow: 0 0 20px #eee;
 }

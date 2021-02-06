@@ -18,8 +18,8 @@ namespace GroceryListHelper.Client.Pages
         public string Message { get; set; }
 
         private string email = string.Empty;
-        private readonly ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
-        private readonly DeleteProfileRequest deleteProfileRequest = new DeleteProfileRequest();
+        private ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
+        private DeleteProfileRequest deleteProfileRequest = new DeleteProfileRequest();
         private string passwordMessage = string.Empty;
         private string deleteMessage = string.Empty;
         private bool isBusy;
@@ -39,6 +39,7 @@ namespace GroceryListHelper.Client.Pages
                 if (string.IsNullOrEmpty(passwordMessage))
                 {
                     Message = "Password changed succesfully";
+                    changePasswordRequest = new ChangePasswordRequest();
                 }
             }
             catch (Exception ex)
@@ -60,6 +61,7 @@ namespace GroceryListHelper.Client.Pages
                 if (string.IsNullOrEmpty(deleteMessage))
                 {
                     Message = "Profile deleted succesfully";
+                    deleteProfileRequest = new DeleteProfileRequest();
                 }
                 (Authentication as CustomAuthenticationStateProvider)?.NotifyLogOut();
             }

@@ -23,7 +23,6 @@ namespace GroceryListHelper.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<LoginResponseModel>> Register([FromBody] RegisterRequestModel user)
         {
-            await Task.Delay(rng.Next(300, 700));
             string status = await authenticationManager.Register(user.Email, user.Password);
             if (!string.IsNullOrEmpty(status))
             {
@@ -51,7 +50,6 @@ namespace GroceryListHelper.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<LoginResponseModel>> Login([FromBody] UserCredentialsModel user)
         {
-            await Task.Delay(rng.Next(300, 700));
             string accessToken = await authenticationManager.GetUserAccessToken(user.Email, user.Password);
             string refreshToken = await authenticationManager.GetUserRefreshToken(accessToken);
             if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
