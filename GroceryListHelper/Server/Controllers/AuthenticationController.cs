@@ -12,7 +12,6 @@ namespace GroceryListHelper.Server.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly JWTAuthenticationManager authenticationManager;
-        private readonly Random rng = new Random();
         private readonly CookieBuilder cookieOptions = new CookieBuilder() { Expiration = TimeSpan.FromDays(1), HttpOnly = true, SecurePolicy = CookieSecurePolicy.Always, IsEssential = true, SameSite = SameSiteMode.Strict, MaxAge = TimeSpan.FromDays(1) };
 
         public AuthenticationController(JWTAuthenticationManager authenticationManager)
