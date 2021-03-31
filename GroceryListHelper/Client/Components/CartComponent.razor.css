@@ -1,0 +1,13 @@
+﻿.checkbox {
+    margin: auto;
+    transform: scale(2,2);
+}
+
+th {
+    text-align: center;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}

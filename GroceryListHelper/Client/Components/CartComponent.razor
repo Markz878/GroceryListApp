@@ -1,0 +1,58 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Collected?</th>
+            <th style="min-width: 150px;">Product</th>
+            <th style="min-width: 100px;">Amount</th>
+            <th style="min-width: 100px;">Price</th>
+            <th>Total</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton" aria-label="Add product">Add</button></td>
+            <td>
+                <input type="text" list="products" class="form-control" @bind="NewProduct.Name" @onfocusout="GetItemPrice" @ref="NewProductNameBox" />
+                <datalist id="products">
+                    @foreach (var product in StoreProducts.Where(x => !CartProducts.Select(y => y.Name).Contains(x.Name)))
+                    {
+                        <option value="@product.Name" />
+                    }
+                </datalist>
+            </td>
+
+            <td><input type="number" step="1" min="0" class="form-control text-center" @bind="NewProduct.Amount" /></td>
+            <td><input type="number" step="0.01" min="0" class="form-control text-center" @bind="NewProduct.UnitPrice" @onfocusout="async () => await AddProductButton.FocusAsync()" /></td>
+            <td>@NewProduct.Total.ToString("N2")</td>
+        </tr>
+        @foreach (var item in CartProducts)
+        {
+            @if (item != EditingItem)
+            {
+                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")">
+                    <td><input type="checkbox" class="checkbox" @bind="item.IsCollected" @onclick="(()=>MarkItemCollected(item))" /></td>
+                    <td style="text-decoration: @(item.IsCollected ? "line-through" : "none")">@item.Name</td>
+                    <td>@item.Amount</td>
+                    <td>@item.UnitPrice</td>
+                    <td>@item.Total.ToString("N2")</td>
+                    <td><button class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product"><i class="fas fa-edit"></i></button></td>
+                    <td><button class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product">X</button></td>
+                </tr>
+            }
+            else
+            {
+                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")">
+                    <td><input type="checkbox" class="checkbox" @bind="item.IsCollected" @onclick="(()=>MarkItemCollected(item))" /></td>
+                    <td style="text-decoration: @(item.IsCollected ? "line-through" : "none")">@item.Name</td>
+                    <td><input type="number" step="0.01" min="0" class="form-control text-center" @bind="item.Amount" /></td>
+                    <td><input type="number" step="0.01" min="0" class="form-control text-center" @bind="item.UnitPrice" /></td>
+                    <td>@item.Total.ToString("N2")</td>
+                    <td><button class="btn btn-success text-nowrap" @onclick="()=>UpdateCartProduct(item)" aria-label="Submit change">Submit</button></td>
+                    <td><button class="btn btn-danger text-nowrap" @onclick="()=>CancelProductUpdate()" aria-label="Cancel change">Cancel</button></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

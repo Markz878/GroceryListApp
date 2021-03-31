@@ -22,7 +22,6 @@ namespace GroceryListHelper.Client.Pages
         [Inject] public StoreProductsService StoreProductsService { get; set; }
         [Inject] public NavigationManager Navigation { get; set; }
         [Inject] public IAccessTokenProvider AccessTokenProvider { get; set; }
-        public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel();
         public List<CartProductUIModel> CartProducts { get; set; } = new List<CartProductUIModel>();
         public List<StoreProductUIModel> StoreProducts { get; set; } = new List<StoreProductUIModel>();
         public string Message { get; set; } = string.Empty;
@@ -32,12 +31,7 @@ namespace GroceryListHelper.Client.Pages
         public string CartHostEmail { get; set; } = string.Empty;
         public string AllowEmail { get; set; } = string.Empty;
         public string ShareCartInfo { get; set; } = string.Empty;
-        public CartProduct EditingItem { get; set; }
 
-        private ElementReference NewProductNameBox;
-        private ElementReference AddProductButton;
-        private CartProductValidator cartProductValidator;
-        private StoreProductValidator storeProductValidator;
         private HubConnection hubConnection;
         private bool polling;
 
@@ -45,8 +39,6 @@ namespace GroceryListHelper.Client.Pages
         {
             CartProducts = await CartProductsService.GetCartProducts();
             StoreProducts = await StoreProductsService.GetCartProducts();
-            cartProductValidator = new CartProductValidator(CartProducts);
-            storeProductValidator = new StoreProductValidator(StoreProducts);
             BuildHubConnection();
         }
 
@@ -108,6 +100,11 @@ namespace GroceryListHelper.Client.Pages
             });
         }
 
+        private void MessageChanged(string message)
+        {
+            Message = message;
+        }
+
         private void SetShareMode(ShareModeType shareMode)
         {
             ShareMode = shareMode;
@@ -130,7 +127,7 @@ namespace GroceryListHelper.Client.Pages
             {
                 polling = true;
                 await hubConnection.StartAsync();
-                var response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.CreateGroup), AllowedUsers);
+                HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.CreateGroup), AllowedUsers);
                 ShareCartInfo = response.Message;
                 if (!response.IsSuccess)
                 {
@@ -151,7 +148,7 @@ namespace GroceryListHelper.Client.Pages
             {
                 polling = true;
                 await hubConnection.StartAsync();
-                var response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.JoinGroup), CartHostEmail);
+                HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.JoinGroup), CartHostEmail);
                 ShareCartInfo = response.Message;
                 if (!response.IsSuccess)
                 {
@@ -174,7 +171,7 @@ namespace GroceryListHelper.Client.Pages
         {
             try
             {
-                var response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
+                HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
                 ShareCartInfo = response.Message;
             }
             catch (Exception ex)
@@ -188,137 +185,9 @@ namespace GroceryListHelper.Client.Pages
             }
         }
 
-        private async Task AddNewProduct()
-        {
-            Message = string.Join(" ", cartProductValidator.Validate(NewProduct).Errors.Select(x => x.ErrorMessage));
-            if (string.IsNullOrEmpty(Message))
-            {
-                CartProductUIModel newProduct = NewProduct;
-                NewProduct = new CartProductUIModel();
-                Task task1 = SaveCartProduct(newProduct);
-                Task task2 = SaveStoreProduct(newProduct.Name, newProduct.UnitPrice);
-                await Task.WhenAll(task1, task2).ContinueWith(x =>
-                {
-                    if (!x.IsFaulted)
-                    {
-                        NewProductNameBox.FocusAsync().AsTask();
-                    }
-                });
-            }
-        }
-
-        private async Task SaveCartProduct(CartProductUIModel product)
-        {
-            CartProducts.Add(product);
-            try
-            {
-                if (polling)
-                {
-                    product.Id = await hubConnection.InvokeAsync<int>(nameof(ICartHub.CartItemAdded), product);
-                }
-                else
-                {
-                    await CartProductsService.SaveCartProduct(product);
-                }
-            }
-            catch (Exception ex)
-            {
-                Message = ex.Message;
-            }
-        }
-
-        private Task MarkItemCollected(CartProductUIModel product)
-        {
-            if (polling)
-            {
-                return hubConnection.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
-            }
-            else
-            {
-                return CartProductsService.MarkCartProductCollected(product.Id);
-            }
-        }
-
-        private Task SaveStoreProduct(string productName, double unitPrice)
-        {
-            StoreProductUIModel product = StoreProducts.Find(x => x.Name == productName);
-            if (product != null)
-            {
-                if (product.UnitPrice != unitPrice)
-                {
-                    product.UnitPrice = unitPrice;
-                    return StoreProductsService.UpdateStoreProductPrice(product.Id, unitPrice);
-                }
-                else
-                {
-                    return Task.CompletedTask;
-                }
-            }
-            else
-            {
-                product = new StoreProductUIModel() { Name = productName, UnitPrice = unitPrice };
-                if (storeProductValidator.Validate(product).IsValid)
-                {
-                    StoreProducts.Add(product);
-                    return StoreProductsService.SaveStoreProduct(product);
-                }
-                return Task.CompletedTask;
-            }
-        }
-
-        private void StartEditItem(CartProductUIModel product)
-        {
-            EditingItem = product;
-        }
-
-        private Task UpdateCartProduct(CartProductUIModel product)
-        {
-            Message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
-            if (string.IsNullOrEmpty(Message))
-            {
-                EditingItem = null;
-                if (polling)
-                {
-                    return hubConnection.SendAsync(nameof(ICartHub.CartItemModified), product);
-                }
-                else
-                {
-                    return CartProductsService.UpdateCartProduct(product);
-                }
-            }
-            return Task.CompletedTask;
-        }
-
-        private void CancelProductUpdate()
-        {
-            EditingItem = null;
-        }
-
-        private void GetItemPrice()
-        {
-            var product = StoreProducts.Find(x => x.Name == NewProduct.Name);
-            if (product?.UnitPrice > 0)
-            {
-                NewProduct.UnitPrice = product.UnitPrice;
-            }
-        }
-
         private void ModalCancel()
         {
             Message = string.Empty;
-        }
-
-        private Task RemoveProduct(CartProductUIModel product)
-        {
-            CartProducts.Remove(product);
-            if (polling)
-            {
-                return hubConnection.SendAsync(nameof(ICartHub.CartItemDeleted), product.Id);
-            }
-            else
-            {
-                return CartProductsService.DeleteCartProduct(product.Id);
-            }
         }
 
         private Task ClearCartProducts()
