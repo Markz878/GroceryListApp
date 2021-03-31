@@ -4,6 +4,7 @@ using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace GroceryListHelper.Client.Components
         [Parameter] public List<StoreProductUIModel> StoreProducts { get; set; }
         [Parameter] public EventCallback<string> OnMessageChanged { get; set; }
         [Parameter] public bool Polling { get; set; }
-        [Parameter] public HubConnection HubConnection { get; set; } 
+        [Parameter] public HubConnection HubConnection { get; set; }
         public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel() { Amount = 1 };
         public CartProduct EditingItem { get; set; }
 
@@ -161,6 +162,23 @@ namespace GroceryListHelper.Client.Components
             else
             {
                 return CartProductsService.DeleteCartProduct(product.Id);
+            }
+        }
+
+        private CartProductUIModel dragTarget;
+        private void DragStarted(CartProductUIModel product)
+        {
+            dragTarget = product;
+        }
+
+        private void OnDrop(CartProductUIModel product)
+        {
+            int dragTargetIndex = CartProducts.IndexOf(dragTarget);
+            int dropTargetIndex = CartProducts.IndexOf(product);
+            if (dragTargetIndex != dropTargetIndex)
+            {
+                CartProducts.Remove(dragTarget);
+                CartProducts.Insert(dropTargetIndex, dragTarget);
             }
         }
     }
