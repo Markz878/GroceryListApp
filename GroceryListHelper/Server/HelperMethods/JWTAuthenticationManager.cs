@@ -55,7 +55,7 @@ namespace GroceryListHelper.Server.HelperMethods
             else
             {
                 byte[] salt = PasswordHelper.GenerateSalt();
-                UserDbModel user = new UserDbModel() { Email = email, Salt = salt, PasswordHash = PasswordHelper.HashPassword(password, salt) };
+                UserDbModel user = new() { Email = email, Salt = salt, PasswordHash = PasswordHelper.HashPassword(password, salt) };
                 db.Users.Add(user);
                 await db.SaveChangesAsync();
                 return null;
@@ -147,7 +147,7 @@ namespace GroceryListHelper.Server.HelperMethods
 
         private string GenerateRefreshToken(string id, string email)
         {
-            return GenerateToken(RefreshTokenKey, TimeSpan.FromMinutes(double.Parse(configuration["AccessTokenLifeTimeMinutes"])), id, email);
+            return GenerateToken(RefreshTokenKey, TimeSpan.FromMinutes(double.Parse(configuration["RefreshTokenLifeTimeMinutes"])), id, email);
         }
 
         private string GenerateToken(string key, TimeSpan duration, string id, string email)
@@ -220,21 +220,23 @@ namespace GroceryListHelper.Server.HelperMethods
         private bool ValidateToken(string key, string token, bool validateLifetime, out ClaimsPrincipal claimsPrincipal)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            TokenValidationParameters validationParameters = new TokenValidationParameters()
+            TokenValidationParameters validationParameters = new()
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
                 ClockSkew = TimeSpan.Zero,
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = validateLifetime
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = validateLifetime,
+                ValidIssuer = configuration["ServerURL"],
+                ValidAudience = configuration["ClientURL"],
             };
             try
             {
                 claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken jwt);
                 return true;
             }
-            catch
+            catch(Exception e)
             {
                 if (tokenHandler.CanReadToken(token))
                 {

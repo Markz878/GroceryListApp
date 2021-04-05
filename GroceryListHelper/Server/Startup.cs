@@ -69,25 +69,24 @@ namespace GroceryListHelper.Server
 
         private void AddJWTAuthentication(IServiceCollection services)
         {
+            TokenValidationParameters tokenValidationParameters = new()
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AccessTokenKey"])),
+                ClockSkew = TimeSpan.Zero,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = Configuration["ServerURL"],
+                ValidAudience = Configuration["ClientURL"],
+            };
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(x =>
-            {
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AccessTokenKey"])),
-                    ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                };
-            });
-            services.AddTransient(serviceProvider => new JWTAuthenticationManager(Configuration, serviceProvider.GetService<GroceryStoreDbContext>()));
+            .AddJwtBearer(x => x.TokenValidationParameters = tokenValidationParameters);
+            services.AddTransient<JWTAuthenticationManager>();
         }
 
         private static void AddSwagger(IServiceCollection services)
