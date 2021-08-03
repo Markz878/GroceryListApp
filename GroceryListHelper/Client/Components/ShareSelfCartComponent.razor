@@ -1,4 +1,6 @@
-﻿<div class="component">
+﻿@inherits ShareSelfCartComponentBase
+
+<div class="component">
     <p>Share your cart with these users:</p>
     <div class="component-row">
         <EditForm Model="AllowEmail" OnValidSubmit="AddUser">
@@ -10,37 +12,20 @@
             </div>
         </EditForm>
     </div>
-    @for (int i = 0; i < AllowedUsers.Count; i++)
+    @for (int i = 0; i < ViewModel.AllowedUsers.Count; i++)
     {
         var index = i;
         <div class="component-row">
-            <div class="email-text">@AllowedUsers[index]</div>
-            <button class="btn btn-danger email-button" @onclick="()=>DeleteUser(AllowedUsers[index])">X</button>
+            <div class="email-text">@ViewModel.AllowedUsers[index]</div>
+            <button class="btn btn-danger email-button" @onclick="()=>DeleteUser(ViewModel.AllowedUsers[index])">X</button>
         </div>
     }
 
     <div>
-        <button class="btn btn-primary" @onclick="ShareCart" disabled="@Polling">Share your cart</button>
-        <button class="btn btn-secondary" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+        <button class="btn btn-primary" @onclick="ShareCart" disabled="@ViewModel.IsPolling">Share your cart</button>
+        <button class="btn btn-secondary" @onclick="ExitCart" disabled="@(!ViewModel.IsPolling)">Exit cart</button>
     </div>
 </div>
 
 
-@code {
-    [Parameter] public List<string> AllowedUsers { get; set; }
-    [Parameter] public EventCallback ShareCart { get; set; }
-    [Parameter] public EventCallback ExitCart { get; set; }
-    [Parameter] public bool Polling { get; set; }
-    public EmailModel AllowEmail { get; set; } = new EmailModel();
 
-    public void AddUser()
-    {
-        AllowedUsers.Add(AllowEmail.Email);
-        AllowEmail = new EmailModel();
-    }
-
-    public void DeleteUser(string user)
-    {
-        AllowedUsers.Remove(user);
-    }
-}

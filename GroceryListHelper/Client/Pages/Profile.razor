@@ -1,12 +1,9 @@
 ﻿@page "/profile"
+@inherits ProfileBase
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Profile" />
 
 <AuthorizeView Context="authContext">
     <h2>Welcome @authContext.User.FindFirst("nameid").Value</h2>
-
-    <Modal Header="Message" IsVisible="@(!string.IsNullOrEmpty(Message))" OnModalClose="@(()=>Message=string.Empty)">
-        <p>@Message</p>
-    </Modal>
 
     <fieldset>
         <legend>Change password</legend>
@@ -45,6 +42,8 @@
             <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
         </EditForm>
     </fieldset>
+
+    <Modal />
 </AuthorizeView>
 
 

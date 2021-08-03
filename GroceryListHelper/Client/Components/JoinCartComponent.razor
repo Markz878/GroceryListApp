@@ -1,25 +1,17 @@
-﻿<div class="join-component">
+﻿@inherits JoinCartComponentBase
+
+<div class="join-component">
     <p>Join someone else's cart by giving their email:</p>
 
     <div class="join-email-row">
-        <input type="email" required class="form-control" @oninput="OnCartHostEmailChanged" placeholder="Cart owner email" />
+        <input type="email" required class="form-control" @bind="ViewModel.CartHostEmail" placeholder="Cart owner email" />
     </div>
 
     <div>
-        <button class="btn btn-primary" @onclick="JoinCart" disabled="@Polling">Join cart</button>
-        <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!Polling)">Exit cart</button>
+        <button class="btn btn-primary" @onclick="JoinCart" disabled="@ViewModel.IsPolling">Join cart</button>
+        <button class="btn btn-secondary text-nowrap" @onclick="ExitCart" disabled="@(!ViewModel.IsPolling)">Exit cart</button>
     </div>
 </div>
 
 
-@code {
-    [Parameter] public EventCallback<string> CartHostEmailChanged { get; set; }
-    [Parameter] public EventCallback JoinCart { get; set; }
-    [Parameter] public EventCallback ExitCart { get; set; }
-    [Parameter] public bool Polling { get; set; }
 
-    private Task OnCartHostEmailChanged(ChangeEventArgs e)
-    {
-        return CartHostEmailChanged.InvokeAsync(e.Value.ToString());
-    }
-}

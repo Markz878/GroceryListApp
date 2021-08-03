@@ -1,37 +1,34 @@
-﻿using GroceryListHelper.Client.Models;
+﻿using GroceryListHelper.Client.HelperMethods;
+using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
+using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Components
 {
-    public partial class CartComponent
+    public class CartComponentBase : BasePage<IndexViewModel>
     {
         [Inject] public CartProductsService CartProductsService { get; set; }
         [Inject] public StoreProductsService StoreProductsService { get; set; }
-        [Parameter] public List<CartProductUIModel> CartProducts { get; set; }
-        [Parameter] public List<StoreProductUIModel> StoreProducts { get; set; }
-        [Parameter] public EventCallback<string> OnMessageChanged { get; set; }
-        [Parameter] public bool Polling { get; set; }
-        [Parameter] public HubConnection HubConnection { get; set; }
+        [Inject] public ModalViewModel ModalViewModel { get; set; }
         public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel() { Amount = 1 };
         public CartProduct EditingItem { get; set; }
 
-        private ElementReference NewProductNameBox;
-        private ElementReference AddProductButton;
-        private CartProductValidator cartProductValidator;
-        private StoreProductValidator storeProductValidator;
+        public ElementReference NewProductNameBox;
+        public ElementReference AddProductButton;
+        public CartProductValidator cartProductValidator;
+        public StoreProductValidator storeProductValidator;
 
-        private async Task AddNewProduct()
+        public async Task AddNewProduct()
         {
-            cartProductValidator = new CartProductValidator(CartProducts);
+            cartProductValidator = new CartProductValidator(ViewModel.CartProducts);
             string message = string.Join(" ", cartProductValidator.Validate(NewProduct).Errors.Select(x => x.ErrorMessage));
             if (string.IsNullOrEmpty(message))
             {
@@ -49,18 +46,18 @@ namespace GroceryListHelper.Client.Components
             }
             else
             {
-                await OnMessageChanged.InvokeAsync(message);
+                ModalViewModel.Message = message;
             }
         }
 
-        private async Task SaveCartProduct(CartProductUIModel product)
+        public async Task SaveCartProduct(CartProductUIModel product)
         {
-            CartProducts.Add(product);
+            ViewModel.CartProducts.Add(product);
             try
             {
-                if (Polling)
+                if (ViewModel.IsPolling)
                 {
-                    product.Id = await HubConnection.InvokeAsync<int>(nameof(ICartHub.CartItemAdded), product);
+                    product.Id = await ViewModel.CartHub.InvokeAsync<int>(nameof(ICartHub.CartItemAdded), product);
                 }
                 else
                 {
@@ -69,15 +66,15 @@ namespace GroceryListHelper.Client.Components
             }
             catch (Exception ex)
             {
-                await OnMessageChanged.InvokeAsync(ex.Message);
+                ModalViewModel.Message = ex.Message;
             }
         }
 
-        private Task MarkItemCollected(CartProductUIModel product)
+        public Task MarkItemCollected(CartProductUIModel product)
         {
-            if (Polling)
+            if (ViewModel.IsPolling)
             {
-                return HubConnection.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
+                return ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
             }
             else
             {
@@ -85,9 +82,9 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        private Task SaveStoreProduct(string productName, double unitPrice)
+        public Task SaveStoreProduct(string productName, double unitPrice)
         {
-            StoreProductUIModel product = StoreProducts.Find(x => x.Name == productName);
+            StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == productName);
             if (product != null)
             {
                 if (product.UnitPrice != unitPrice)
@@ -102,61 +99,61 @@ namespace GroceryListHelper.Client.Components
             }
             else
             {
-                storeProductValidator = new StoreProductValidator(StoreProducts);
+                storeProductValidator = new StoreProductValidator(ViewModel.StoreProducts);
                 product = new StoreProductUIModel() { Name = productName, UnitPrice = unitPrice };
                 if (storeProductValidator.Validate(product).IsValid)
                 {
-                    StoreProducts.Add(product);
+                    ViewModel.StoreProducts.Add(product);
                     return StoreProductsService.SaveStoreProduct(product);
                 }
                 return Task.CompletedTask;
             }
         }
 
-        private void StartEditItem(CartProductUIModel product)
+        public void StartEditItem(CartProductUIModel product)
         {
             EditingItem = product;
         }
 
-        private async Task UpdateCartProduct(CartProductUIModel product)
+        public async Task UpdateCartProduct(CartProductUIModel product)
         {
-            cartProductValidator = new CartProductValidator(CartProducts);
+            cartProductValidator = new CartProductValidator(ViewModel.CartProducts);
             string message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
             if (string.IsNullOrEmpty(message))
             {
                 EditingItem = null;
-                if (Polling)
+                if (ViewModel.IsPolling)
                 {
-                    await HubConnection.SendAsync(nameof(ICartHub.CartItemModified), product);
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemModified), product);
                 }
                 else
                 {
                     await CartProductsService.UpdateCartProduct(product);
                 }
             }
-            await OnMessageChanged.InvokeAsync(message);
+            ModalViewModel.Message = message;
         }
 
-        private void CancelProductUpdate()
+        public void CancelProductUpdate()
         {
             EditingItem = null;
         }
 
-        private void GetItemPrice()
+        public void GetItemPrice()
         {
-            StoreProductUIModel product = StoreProducts.Find(x => x.Name == NewProduct.Name);
+            StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == NewProduct.Name);
             if (product?.UnitPrice > 0)
             {
                 NewProduct.UnitPrice = product.UnitPrice;
             }
         }
 
-        private Task RemoveProduct(CartProductUIModel product)
+        public Task RemoveProduct(CartProductUIModel product)
         {
-            CartProducts.Remove(product);
-            if (Polling)
+            ViewModel.CartProducts.Remove(product);
+            if (ViewModel.IsPolling)
             {
-                return HubConnection.SendAsync(nameof(ICartHub.CartItemDeleted), product.Id);
+                return ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemDeleted), product.Id);
             }
             else
             {
@@ -164,20 +161,20 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        private CartProductUIModel dragTarget;
-        private void DragStarted(CartProductUIModel product)
+        public CartProductUIModel dragTarget;
+        public void DragStarted(CartProductUIModel product)
         {
             dragTarget = product;
         }
 
-        private void OnDrop(CartProductUIModel product)
+        public void OnDrop(CartProductUIModel product)
         {
-            int dragTargetIndex = CartProducts.IndexOf(dragTarget);
-            int dropTargetIndex = CartProducts.IndexOf(product);
+            int dragTargetIndex = ViewModel.CartProducts.IndexOf(dragTarget);
+            int dropTargetIndex = ViewModel.CartProducts.IndexOf(product);
             if (dragTargetIndex != dropTargetIndex)
             {
-                CartProducts.Remove(dragTarget);
-                CartProducts.Insert(dropTargetIndex, dragTarget);
+                ViewModel.CartProducts.Remove(dragTarget);
+                ViewModel.CartProducts.Insert(dropTargetIndex, dragTarget);
             }
         }
     }

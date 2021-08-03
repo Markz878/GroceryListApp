@@ -1,25 +1,26 @@
 ﻿@page "/"
+@inherits IndexBase
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Grocery List Helper v1.3" />
 
 <h3 class="text-center">Grocery List Collector<sup> &copy;M&S Productions</sup></h3>
 <h5 class="text-center">Helps you remember</h5>
-<CartComponent CartProducts="CartProducts" StoreProducts="StoreProducts" HubConnection="hubConnection" Polling="polling" OnMessageChanged="MessageChanged"/>
+<CartComponent />
 
-<CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts" />
+<CartSummaryRowComponent />
 
-@*<AuthorizeView>
+<AuthorizeView>
     <Authorized>
-        <ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling" />
-        @if (ShareMode == ShareModeType.Self)
+        <ChooseCartShareOptionComponent />
+        @if (ViewModel.ShareMode == ShareModeType.Self)
         {
-            <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart" />
+            <ShareSelfCartComponent />
         }
         else
         {
-            <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart" />
+            <JoinCartComponent />
         }
-        <p style="margin-left: 1rem;">@ShareCartInfo</p>
+        <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
     </Authorized>
-</AuthorizeView>*@
+</AuthorizeView>
 
-<Modal Header="Error occurred" Message="@Message" />
+<Modal />

@@ -1,24 +1,16 @@
-﻿@if (IsVisible)
+﻿@inherits ModalBase
+
+@if (!string.IsNullOrWhiteSpace(ViewModel.Message))
 {
-    <div class="modal" @onmousedown="(() => OnModalClose.InvokeAsync())">
+    <div class="modal" @onmousedown="CloseModal">
         <div class="modal-content" @onmousedown:stopPropagation="true">
-            @if (!string.IsNullOrEmpty(Header))
-            {
-                <div class="modal-header">
-                    <span class="close" @onmousedown="(() => OnModalClose.InvokeAsync())">&times;</span>
-                    <h2>@Header</h2>
-                </div>
-            }
+            <div class="modal-header">
+                <span class="close" @onmousedown="CloseModal">&times;</span>
+                <h2>@ViewModel.Header</h2>
+            </div>
             <div class="modal-body">
-                <h4>@Message</h4>
+                <h4>@ViewModel.Message</h4>
             </div>
         </div>
     </div>
-}
-
-@code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public string Header { get; set; }
-    [Parameter] public string Message { get; set; }
-    [Parameter] public EventCallback OnModalClose { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿using GroceryListHelper.Client.Services;
+﻿using GroceryListHelper.Client.HelperMethods;
+using GroceryListHelper.Client.Services;
+using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -10,21 +12,21 @@ using System.Threading.Tasks;
 namespace GroceryListHelper.Client.Pages
 {
     [Authorize]
-    public partial class Profile
+    public class ProfileBase : ComponentBase
     {
         [Inject] public ProfileService ProfileService { get; set; }
         [Inject] public AuthenticationStateProvider Authentication { get; set; }
         [Inject] public IJSRuntime JS { get; set; }
-        public string Message { get; set; }
+        [Inject] public ModalViewModel ModalViewModel { get; set; } 
 
-        private ChangePasswordRequest changePasswordRequest = new();
-        private DeleteProfileRequest deleteProfileRequest = new();
-        private string passwordMessage = string.Empty;
-        private string deleteMessage = string.Empty;
-        private string downloadMessage = string.Empty;
-        private bool isBusy;
+        public ChangePasswordRequest changePasswordRequest = new();
+        public DeleteProfileRequest deleteProfileRequest = new();
+        public string passwordMessage = string.Empty;
+        public string deleteMessage = string.Empty;
+        public string downloadMessage = string.Empty;
+        public bool isBusy;
 
-        private async Task ChangePassword()
+        public async Task ChangePassword()
         {
             try
             {
@@ -32,7 +34,7 @@ namespace GroceryListHelper.Client.Pages
                 passwordMessage = await ProfileService.ChangePassword(changePasswordRequest);
                 if (string.IsNullOrEmpty(passwordMessage))
                 {
-                    Message = "Password changed succesfully";
+                    ModalViewModel.Message = "Password changed succesfully";
                     changePasswordRequest = new ChangePasswordRequest();
                 }
             }
@@ -46,7 +48,7 @@ namespace GroceryListHelper.Client.Pages
             }
         }
 
-        private async Task DeleteProfile()
+        public async Task DeleteProfile()
         {
             try
             {
@@ -54,7 +56,7 @@ namespace GroceryListHelper.Client.Pages
                 deleteMessage = await ProfileService.Delete(deleteProfileRequest);
                 if (string.IsNullOrEmpty(deleteMessage))
                 {
-                    Message = "Profile deleted succesfully";
+                    ModalViewModel.Message = "Profile deleted succesfully";
                     deleteProfileRequest = new DeleteProfileRequest();
                     await ProfileService.LogOut();
                 }
@@ -69,7 +71,7 @@ namespace GroceryListHelper.Client.Pages
             }
         }
 
-        private async Task DownloadPersonalInfo()
+        public async Task DownloadPersonalInfo()
         {
             try
             {
