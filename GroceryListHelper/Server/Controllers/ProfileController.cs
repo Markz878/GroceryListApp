@@ -1,8 +1,8 @@
-﻿using GroceryListHelper.Server.HelperMethods;
+﻿using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers
@@ -12,54 +12,54 @@ namespace GroceryListHelper.Server.Controllers
     [Authorize]
     public class ProfileController : ControllerBase
     {
-        private readonly JWTAuthenticationManager authenticationManager;
+        private readonly UserRepository userRepository;
 
-        public ProfileController(JWTAuthenticationManager authenticationManager)
+        public ProfileController(UserRepository userRepository)
         {
-            this.authenticationManager = authenticationManager;
+            this.userRepository = userRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> LogOut()
         {
-            string email = User.FindFirst(ClaimTypes.Email).Value;
-            string response = await authenticationManager.LogOut(email);
+            int id = User.GetUserId();
+            string response = await userRepository.RemoveRefreshToken(id);
             if (string.IsNullOrEmpty(response))
             {
                 return Ok();
             }
             else
             {
-                return Unauthorized(response);
+                return BadRequest(response);
             }
         }
 
         [HttpPatch]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
-            string email = User.FindFirst(ClaimTypes.Email).Value;
-            string response = await authenticationManager.ChangePassword(email, request.CurrentPassword, request.NewPassword);
+            string email = User.GetUserEmail();
+            string response = await userRepository.ChangePassword(email, request.CurrentPassword, request.NewPassword);
             if (string.IsNullOrEmpty(response))
             {
                 return Ok();
             }
             else
             {
-                return Unauthorized(response);
+                return BadRequest(response);
             }
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteProfileRequest request)
         {
-            string response = await authenticationManager.DeleteUser(User.FindFirstValue(ClaimTypes.Email), request.Password);
+            string response = await userRepository.DeleteUser(User.GetUserEmail(), request.Password);
             if (string.IsNullOrEmpty(response))
             {
                 return Ok();
             }
             else
             {
-                return Unauthorized(response);
+                return BadRequest(response);
             }
         }
     }

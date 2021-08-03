@@ -1,11 +1,9 @@
-﻿using GroceryListHelper.Server.Data;
+﻿using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Server.Models;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers
@@ -15,107 +13,53 @@ namespace GroceryListHelper.Server.Controllers
     [Authorize]
     public class CartProductsController : ControllerBase
     {
-        private readonly GroceryStoreDbContext db;
+        private readonly CartProductRepository cartProductsRepository;
 
-        public CartProductsController(GroceryStoreDbContext db)
+        public CartProductsController(CartProductRepository cartProductsRepository)
         {
-            this.db = db;
+            this.cartProductsRepository = cartProductsRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var results = await db.CartProducts.Where(x => x.UserId == User.GetUserId()).AsNoTracking().ToListAsync();
+            IEnumerable<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(User.GetUserId());
             return Ok(results);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(CartProduct product)
         {
-            CartProductDbModel productDb = new CartProductDbModel() { Amount = product.Amount, Name = product.Name, UnitPrice = product.UnitPrice, UserId = User.GetUserId() };
-            db.CartProducts.Add(productDb);
-            await db.SaveChangesAsync();
-            return Ok(productDb.Id);
+            int id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
+            return Ok(id);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> DeleteAllProducts()
         {
-            db.CartProducts.RemoveRange(db.CartProducts.Where(x => x.UserId == User.GetUserId()));
-            await db.SaveChangesAsync();
+            await cartProductsRepository.RemoveItemsForUser(User.GetUserId());
             return Ok();
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = db.CartProducts.Find(id);
-            if (product != null)
-            {
-                if (product.UserId == User.GetUserId())
-                {
-                    db.CartProducts.Remove(product);
-                    await db.SaveChangesAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return Unauthorized();
-
-                }
-            }
-            else
-            {
-                return NotFound();
-            }
+            bool success = await cartProductsRepository.DeleteItem(id, User.GetUserId());
+            return success ? Ok() : NotFound();
         }
 
         [HttpPatch("{id:int}")]
         public async Task<IActionResult> MarkAsCollected(int id)
         {
-            var product = db.CartProducts.Find(id);
-            if (product != null)
-            {
-                if (product.UserId == User.GetUserId())
-                {
-                    product.IsCollected ^= true;
-                    await db.SaveChangesAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return Unauthorized();
-                }
-            }
-            else
-            {
-                return NotFound();
-            }
+            bool success = await cartProductsRepository.MarkAsCollected(id, User.GetUserId());
+            return success ? Ok() : NotFound();
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateProduct(int id, CartProduct updatedProduct)
         {
-            var product = db.CartProducts.Find(id);
-            if (product != null)
-            {
-                if (product.UserId == User.GetUserId())
-                {
-                    product.Name = updatedProduct.Name;
-                    product.Amount = updatedProduct.Amount;
-                    product.UnitPrice = updatedProduct.UnitPrice;
-                    await db.SaveChangesAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return Unauthorized();
-                }
-            }
-            else
-            {
-                return NotFound();
-            }
+            bool success = await cartProductsRepository.UpdateProduct(id, User.GetUserId(), updatedProduct);
+            return success ? Ok() : NotFound();
         }
     }
 }

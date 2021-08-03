@@ -1,12 +1,11 @@
-﻿using GroceryListHelper.Client.HelperMethods;
+﻿using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
-using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Pages
 {
-    [Authorize]
     public partial class Index : ComponentBase, IAsyncDisposable
     {
         [Inject] public CartProductsService CartProductsService { get; set; }
@@ -38,7 +36,7 @@ namespace GroceryListHelper.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             CartProducts = await CartProductsService.GetCartProducts();
-            StoreProducts = await StoreProductsService.GetCartProducts();
+            StoreProducts = await StoreProductsService.GetStoreProducts();
             BuildHubConnection();
         }
 
@@ -48,9 +46,8 @@ namespace GroceryListHelper.Client.Pages
             {
                 options.AccessTokenProvider = async () =>
                 {
-                    var tokenResult = await AccessTokenProvider.RequestAccessToken();
-                    tokenResult.TryGetToken(out AccessToken accessToken);
-                    return accessToken.Value;
+                    string tokenResult = await AccessTokenProvider.RequestAccessToken();
+                    return tokenResult;
                 };
             }).WithAutomaticReconnect().Build();
 
@@ -79,7 +76,7 @@ namespace GroceryListHelper.Client.Pages
             hubConnection.On<CartProductCollectable>(nameof(ICartHubClient.ItemModified), (cartProduct) =>
             {
                 Console.WriteLine($"Item {cartProduct.Name} was modified");
-                var product = CartProducts.First(x => x.Id.Equals(cartProduct.Id));
+                CartProductUIModel product = CartProducts.First(x => x.Id.Equals(cartProduct.Id));
                 product.Amount = cartProduct.Amount;
                 product.UnitPrice = cartProduct.UnitPrice;
                 StateHasChanged();
@@ -128,11 +125,16 @@ namespace GroceryListHelper.Client.Pages
                 polling = true;
                 await hubConnection.StartAsync();
                 HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.CreateGroup), AllowedUsers);
-                ShareCartInfo = response.Message;
-                if (!response.IsSuccess)
+                
+                if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
                     polling = false;
                     await hubConnection.StopAsync();
+                    ShareCartInfo = response.ErrorMessage;
+                }
+                else if (!string.IsNullOrEmpty(response.SuccessMessage))
+                {
+                    ShareCartInfo = response.SuccessMessage;
                 }
             }
             else
@@ -149,11 +151,16 @@ namespace GroceryListHelper.Client.Pages
                 polling = true;
                 await hubConnection.StartAsync();
                 HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.JoinGroup), CartHostEmail);
-                ShareCartInfo = response.Message;
-                if (!response.IsSuccess)
+                
+                if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
                     polling = false;
                     await hubConnection.StopAsync();
+                    ShareCartInfo = response.ErrorMessage;
+                }
+                else if (!string.IsNullOrEmpty(response.SuccessMessage))
+                {
+                    ShareCartInfo = response.SuccessMessage;
                 }
             }
             else
@@ -172,7 +179,7 @@ namespace GroceryListHelper.Client.Pages
             try
             {
                 HubResponse response = await hubConnection.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
-                ShareCartInfo = response.Message;
+                ShareCartInfo = response.ErrorMessage;
             }
             catch (Exception ex)
             {

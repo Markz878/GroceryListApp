@@ -4,7 +4,6 @@ using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -145,7 +144,7 @@ namespace GroceryListHelper.Client.Components
 
         private void GetItemPrice()
         {
-            var product = StoreProducts.Find(x => x.Name == NewProduct.Name);
+            StoreProductUIModel product = StoreProducts.Find(x => x.Name == NewProduct.Name);
             if (product?.UnitPrice > 0)
             {
                 NewProduct.UnitPrice = product.UnitPrice;

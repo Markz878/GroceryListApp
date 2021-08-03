@@ -11,7 +11,7 @@ namespace GroceryListHelper.Client.Pages
     {
         [Inject] public AuthenticationService AuthenticationService { get; set; }
 
-        private readonly RegisterRequestModel registerRequest = new RegisterRequestModel();
+        private readonly RegisterRequestModel registerRequest = new();
         public string Message { get; set; } = string.Empty;
         private bool isBusy;
 

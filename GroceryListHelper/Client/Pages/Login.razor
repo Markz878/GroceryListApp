@@ -1,21 +1,17 @@
 ﻿@page "/login"
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Login" />
 
-<h3>Login</h3>
-<EditForm Model="user" OnValidSubmit="LoginMethod">
-    <FluentValidationValidator />
-    <ValidationSummary />
-    <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)" />
-    <div class="form-group">
-        <label for="email">Email: </label>
-        <InputText id="email" class="form-control" placeholder="Enter email" @bind-Value="@user.Email" />
-    </div>
-    <div class="form-group">
-        <label for="password">Password: </label>
-        <InputText id="password" autocomplete="current-password" type="password" class="form-control" placeholder="Password" @bind-Value="@user.Password" />
-    </div>
-    <button class="btn btn-primary" type="submit" disabled="@isBusy">Login</button>
-</EditForm>
+<fieldset>
+    <legend class="legend">Login</legend>
+    <EditForm Model="user" OnValidSubmit="LoginMethod">
+        <FluentValidationValidator />
+        <ValidationSummary />
+        <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)" />
+        <InputTextComponent DisplayName="Email" @bind-Value="@user.Email" />
+        <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="@user.Password" />
+        <button class="btn btn-primary" type="submit" disabled="@isBusy">Login</button>
+    </EditForm>
+</fieldset>
 
 
 

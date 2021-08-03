@@ -10,7 +10,7 @@ namespace GroceryListHelper.Client.Pages
     {
         [Inject] public AuthenticationService AuthenticationService { get; set; }
 
-        private readonly UserCredentialsModel user = new UserCredentialsModel();
+        private readonly UserCredentialsModel user = new();
         public string Message { get; set; } = string.Empty;
         private bool isBusy;
 

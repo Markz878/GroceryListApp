@@ -1,7 +1,8 @@
-﻿using GroceryListHelper.Shared;
-using System;
+﻿using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Shared;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -11,20 +12,29 @@ namespace GroceryListHelper.Client.Services
     {
         private const string uri = "api/profile";
         private readonly HttpClient client;
+        private readonly NavigationManager navigation;
+        private readonly IAccessTokenProvider accessTokenHandler;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
 
-        public ProfileService(IHttpClientFactory clientFactory)
+        public ProfileService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenHandler, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation)
         {
             client = clientFactory.CreateClient("ProtectedClient");
+            this.accessTokenHandler = accessTokenHandler;
+            this.authenticationStateProvider = authenticationStateProvider;
+            this.navigation = navigation;
         }
 
-        internal async Task LogOut()
+        public async Task LogOut()
         {
-            await client.GetAsync(uri+"/logout");
+            await client.GetAsync(uri + "/logout");
+            await accessTokenHandler.RemoveToken();
+            await authenticationStateProvider.GetAuthenticationStateAsync();
+            navigation.NavigateTo("/", true);
         }
 
-        internal async Task<string> ChangePassword(ChangePasswordRequest changePasswordRequest)
+        public async Task<string> ChangePassword(ChangePasswordRequest changePasswordRequest)
         {
-            var response = await client.PatchAsync(uri + "/changepassword", JsonContent.Create(changePasswordRequest));
+            HttpResponseMessage response = await client.PatchAsync(uri + "/changepassword", JsonContent.Create(changePasswordRequest));
             if (response.IsSuccessStatusCode)
             {
                 return null;
@@ -37,10 +47,9 @@ namespace GroceryListHelper.Client.Services
 
         public async Task<string> Delete(DeleteProfileRequest user)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri + "/delete");
+            HttpRequestMessage request = new(HttpMethod.Delete, uri + "/delete");
             request.Content = JsonContent.Create(user);
-            Console.WriteLine(uri);
-            var response = await client.SendAsync(request);
+            HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 return null;
@@ -49,6 +58,11 @@ namespace GroceryListHelper.Client.Services
             {
                 return await response.Content.ReadAsStringAsync();
             }
+        }
+
+        public Task<UserModel> DownloadPersonalData()
+        {
+            return client.GetFromJsonAsync<UserModel>(uri + "/getuser");
         }
     }
 }

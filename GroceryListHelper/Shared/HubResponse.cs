@@ -1,7 +1,7 @@
 ﻿namespace GroceryListHelper.Shared
 {
-    public class HubResponse : BaseAPIResponse
+    public class HubResponse : BaseResponse
     {
-        public bool IsSuccess { get; set; }
+        public string SuccessMessage { get; set; }
     }
 }

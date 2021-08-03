@@ -1,11 +1,16 @@
+using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.CircuitBreaker;
+using Polly.Extensions.Http;
+using Polly.Wrap;
 using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 
 namespace GroceryListHelper.Client
 {
@@ -13,22 +18,27 @@ namespace GroceryListHelper.Client
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddSingleton<IAccessTokenProvider, CustomAccessTokenProvider>();
+            builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            builder.Services.AddScoped<BearerTokenHandler>();
+            builder.Services.AddScoped<ProtectedClientAuthorizationHandler>();
             builder.Services.AddAuthorizationCore();
 
-            builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
+            AsyncPolicyWrap<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2)).WrapAsync(ciruitBreakerPolicy);
+            AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
+
+            builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
             builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-            .AddHttpMessageHandler<BearerTokenHandler>();
+            .AddHttpMessageHandler<ProtectedClientAuthorizationHandler>().AddPolicyHandler(pollyPolicy); ;
 
             builder.Services.AddScoped<AuthenticationService>();
             builder.Services.AddScoped<CartProductsService>();
             builder.Services.AddScoped<StoreProductsService>();
             builder.Services.AddScoped<ProfileService>();
+            builder.Services.AddBlazoredLocalStorage();
 
             await builder.Build().RunAsync();
         }

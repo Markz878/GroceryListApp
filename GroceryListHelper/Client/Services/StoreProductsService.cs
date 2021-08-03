@@ -1,11 +1,12 @@
-﻿using GroceryListHelper.Client.Models;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using Blazored.LocalStorage;
+using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Client.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using static GroceryListHelper.Client.HelperMethods.HelperMethods;
 
 namespace GroceryListHelper.Client.Services
 {
@@ -13,30 +14,30 @@ namespace GroceryListHelper.Client.Services
     {
         private readonly HttpClient client;
         private const string uri = "api/storeproducts";
+        private readonly AuthenticationStateProvider authenticationStateProvider;
+        private readonly ILocalStorageService localStorage;
+        private const string storeProductsKey = "storeProducts";
 
-        public StoreProductsService(IHttpClientFactory clientFactory)
+        public StoreProductsService(IHttpClientFactory clientFactory, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage)
         {
             client = clientFactory.CreateClient("ProtectedClient");
+            this.authenticationStateProvider = authenticationStateProvider;
+            this.localStorage = localStorage;
         }
 
-        public Task<List<StoreProductUIModel>> GetCartProducts()
+        public async Task<List<StoreProductUIModel>> GetStoreProducts()
         {
-            try
-            {
-                return client.GetFromJsonAsync<List<StoreProductUIModel>>(uri);
-            }
-            catch (AccessTokenNotAvailableException exception)
-            {
-                exception.Redirect();
-                return Task.FromResult(new List<StoreProductUIModel>());
-            }
+            return (await authenticationStateProvider.IsUserAuthenticated() ?
+                 await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) :
+                 await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey))
+                 ?? new List<StoreProductUIModel>();
         }
 
         public async Task SaveStoreProduct(StoreProductUIModel product)
         {
-            try
+            if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                var response = await client.PostAsJsonAsync(uri, product);
+                HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
                 if (response.IsSuccessStatusCode)
                 {
                     string id = await response.Content.ReadAsStringAsync();
@@ -47,20 +48,39 @@ namespace GroceryListHelper.Client.Services
                     throw new InvalidOperationException("Could not add product");
                 }
             }
-            catch (AccessTokenNotAvailableException exception)
+            else
             {
-                exception.Redirect();
+                List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
+                products.Add(product);
+                await localStorage.SetItemAsync(storeProductsKey, products);
             }
         }
 
-        public Task ClearStoreProducts()
+        public async Task ClearStoreProducts()
         {
-            return CheckAccessToken(client.DeleteAsync(uri));
+            if (await authenticationStateProvider.IsUserAuthenticated())
+            {
+                HttpResponseMessage response = await client.DeleteAsync(uri);
+            }
+            else
+            {
+                await localStorage.RemoveItemAsync(storeProductsKey);
+            }
         }
 
-        public Task UpdateStoreProductPrice(int id, double price)
+        public async Task UpdateStoreProductPrice(int id, double price)
         {
-            return CheckAccessToken(client.PatchAsync(uri + $"/{id}?price={price}", null));
+            if (await authenticationStateProvider.IsUserAuthenticated())
+            {
+                HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}?price={price}", null);
+            }
+            else
+            {
+                List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey);
+                StoreProductUIModel product = products.Find(x => x.Id == id);
+                product.UnitPrice = price;
+                await localStorage.SetItemAsync(storeProductsKey, products);
+            }
         }
     }
 }

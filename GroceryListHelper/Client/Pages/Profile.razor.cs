@@ -17,18 +17,12 @@ namespace GroceryListHelper.Client.Pages
         [Inject] public IJSRuntime JS { get; set; }
         public string Message { get; set; }
 
-        private string email = string.Empty;
-        private ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
-        private DeleteProfileRequest deleteProfileRequest = new DeleteProfileRequest();
+        private ChangePasswordRequest changePasswordRequest = new();
+        private DeleteProfileRequest deleteProfileRequest = new();
         private string passwordMessage = string.Empty;
         private string deleteMessage = string.Empty;
+        private string downloadMessage = string.Empty;
         private bool isBusy;
-
-        protected override async Task OnInitializedAsync()
-        {
-            var authState = await Authentication.GetAuthenticationStateAsync();
-            email = authState.User.FindFirst("email").Value;
-        }
 
         private async Task ChangePassword()
         {
@@ -62,8 +56,8 @@ namespace GroceryListHelper.Client.Pages
                 {
                     Message = "Profile deleted succesfully";
                     deleteProfileRequest = new DeleteProfileRequest();
+                    await ProfileService.LogOut();
                 }
-                (Authentication as CustomAuthenticationStateProvider)?.NotifyLogOut();
             }
             catch (Exception ex)
             {
@@ -74,5 +68,31 @@ namespace GroceryListHelper.Client.Pages
                 isBusy = false;
             }
         }
+
+        private async Task DownloadPersonalInfo()
+        {
+            try
+            {
+                isBusy = true;
+                UserModel user = await ProfileService.DownloadPersonalData();
+                if (user != null)
+                {
+                    await JS.InvokeVoidAsync("downloadObjectAsJson", new { user.Email }, "personaldata");
+                }
+                else
+                {
+                    downloadMessage = "Could not find your personal data";
+                }
+            }
+            catch (Exception ex)
+            {
+                downloadMessage = ex.Message;
+            }
+            finally
+            {
+                isBusy = false;
+            }
+        }
+
     }
 }

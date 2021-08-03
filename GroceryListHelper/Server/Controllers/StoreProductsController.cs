@@ -1,11 +1,10 @@
-﻿using GroceryListHelper.Server.Data;
+﻿using GroceryListHelper.DataAccess.Models;
+using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Server.Models;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers
@@ -15,57 +14,39 @@ namespace GroceryListHelper.Server.Controllers
     [Authorize]
     public class StoreProductsController : ControllerBase
     {
-        private readonly GroceryStoreDbContext db;
+        private readonly StoreProductRepository db;
 
-        public StoreProductsController(GroceryStoreDbContext db)
+        public StoreProductsController(StoreProductRepository db)
         {
             this.db = db;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IAsyncEnumerable<StoreProductDbModel> GetProducts()
         {
-            return Ok(await db.StoreProducts.Where(x => x.UserId == User.GetUserId()).AsNoTracking().ToListAsync());
+            IAsyncEnumerable<StoreProductDbModel> result = db.GetStoreProductsForUser(User.GetUserId());
+            return result;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(StoreProduct product)
         {
-            StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, UserId = User.GetUserId() };
-            db.StoreProducts.Add(storeProduct);
-            await db.SaveChangesAsync();
-            return Ok(storeProduct.Id);
+            int id = await db.AddProduct(product, User.GetUserId());
+            return Ok(id);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAll()
         {
-            db.StoreProducts.RemoveRange(db.StoreProducts.Where(x => x.UserId == User.GetUserId()));
-            await db.SaveChangesAsync();
+            await db.DeleteAll(User.GetUserId());
             return Ok();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = db.StoreProducts.Find(id);
-            if (product != null)
-            {
-                if (product.UserId == User.GetUserId())
-                {
-                    db.StoreProducts.Remove(product);
-                    await db.SaveChangesAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return Unauthorized();
-                }
-            }
-            else
-            {
-                return NotFound("No item with the given Id");
-            }
+            bool success = await db.DeleteItem(id, User.GetUserId());
+            return success ? Ok() : NotFound();
         }
 
         [HttpPatch("{id:int}")]
@@ -75,24 +56,8 @@ namespace GroceryListHelper.Server.Controllers
             {
                 return BadRequest("Price can't be negative.");
             }
-            var product = db.StoreProducts.Find(id);
-            if (product != null)
-            {
-                if (product.UserId == User.GetUserId())
-                {
-                    product.UnitPrice = price;
-                    await db.SaveChangesAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return Unauthorized();
-                }
-            }
-            else
-            {
-                return NotFound();
-            }
+            bool success = await db.UpdatePrice(id, User.GetUserId(), price);
+            return success ? Ok() : NotFound();
         }
     }
 }

@@ -2,6 +2,8 @@
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -11,69 +13,74 @@ namespace GroceryListHelper.Server.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        private readonly IConfiguration configuration;
         private readonly JWTAuthenticationManager authenticationManager;
-        private readonly CookieBuilder cookieOptions = new() { Expiration = TimeSpan.FromDays(1), HttpOnly = true, SecurePolicy = CookieSecurePolicy.Always, IsEssential = true, SameSite = SameSiteMode.Strict, MaxAge = TimeSpan.FromDays(1) };
+        private readonly ILogger<AuthenticationController> logger;
 
-        public AuthenticationController(JWTAuthenticationManager authenticationManager)
+        public AuthenticationController(IConfiguration configuration, JWTAuthenticationManager authenticationManager, ILogger<AuthenticationController> logger)
         {
+            this.configuration = configuration;
             this.authenticationManager = authenticationManager;
+            this.logger = logger;
         }
 
         [HttpPost]
-        public async Task<ActionResult<LoginResponseModel>> Register([FromBody] RegisterRequestModel user)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticationResponseModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
+        public async Task<ActionResult<AuthenticationResponseModel>> Register([FromBody] RegisterRequestModel user)
         {
-            string error = await authenticationManager.Register(user.Email, user.Password);
-            if (!string.IsNullOrEmpty(error))
+            (AuthenticationResponseModel response, string refreshToken) = await authenticationManager.Register(user.Email, user.Password);
+            if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.AccessToken) && !string.IsNullOrEmpty(refreshToken))
             {
-                LoginResponseModel response = new() { Message = error };
-                return BadRequest(response);
-            }
-            else
-            {
-                string accessToken = await authenticationManager.GetUserAccessToken(user.Email, user.Password);
-                string refreshToken = await authenticationManager.GetUserRefreshToken(accessToken);
-                if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
-                {
-                    Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, cookieOptions.Build(HttpContext));
-                    LoginResponseModel response = new() { AccessToken = accessToken };
-                    return Ok(response);
-                }
-                LoginResponseModel errorResponse = new() { Message = "Access- or refreshtoken is invalid, please login." };
-                return Unauthorized(errorResponse);
-            }
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<LoginResponseModel>> Login([FromBody] UserCredentialsModel user)
-        {
-            string accessToken = await authenticationManager.GetUserAccessToken(user.Email, user.Password);
-            string refreshToken = await authenticationManager.GetUserRefreshToken(accessToken);
-            if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(refreshToken))
-            {
-                Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, cookieOptions.Build(HttpContext));
-                LoginResponseModel response = new() { AccessToken = accessToken };
+                Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, GetCookieOptions(HttpContext));
                 return Ok(response);
             }
-            LoginResponseModel errorResponse = new() { Message = "Invalid username or password" };
-            return Unauthorized(errorResponse);
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticationResponseModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
+        public async Task<ActionResult<AuthenticationResponseModel>> Login([FromBody] UserCredentialsModel user)
+        {
+            (AuthenticationResponseModel response, string refreshToken) = await authenticationManager.Login(user.Email, user.Password);
+            if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.AccessToken) && !string.IsNullOrEmpty(refreshToken))
+            {
+                Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, GetCookieOptions(HttpContext));
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
 
         [HttpGet]
-        public async Task<ActionResult<LoginResponseModel>> Refresh()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticationResponseModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
+        public async Task<ActionResult<AuthenticationResponseModel>> Refresh()
         {
             if (Request.Cookies.TryGetValue(GlobalConstants.XRefreshToken, out string refreshToken))
             {
-                string accessToken = authenticationManager.RefreshAccessToken(refreshToken);
-                string newRefreshToken = await authenticationManager.RenewRefreshToken(refreshToken);
-                if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(newRefreshToken))
+                (AuthenticationResponseModel response, string newRefreshToken) = await authenticationManager.RefreshTokens(refreshToken);
+                if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.AccessToken) && !string.IsNullOrEmpty(newRefreshToken))
                 {
-                    Response.Cookies.Append(GlobalConstants.XRefreshToken, newRefreshToken, cookieOptions.Build(HttpContext));
-                    LoginResponseModel response = new() { AccessToken = accessToken };
+                    Response.Cookies.Append(GlobalConstants.XRefreshToken, newRefreshToken, GetCookieOptions(HttpContext));
                     return Ok(response);
                 }
+                return BadRequest(response);
             }
-            LoginResponseModel errorResponse = new() { Message = "Invalid access- or refresh token" };
-            return Unauthorized(errorResponse);
+            AuthenticationResponseModel errorResponse = new() { ErrorMessage = "No refresh token in cookies." };
+            return BadRequest(errorResponse);
+        }
+
+        private CookieOptions GetCookieOptions(HttpContext httpContext)
+        {
+            return new CookieBuilder()
+            {
+                Expiration = TimeSpan.FromMinutes(configuration.GetValue<int>("RefreshTokenLifeTimeMinutes")),
+                HttpOnly = true,
+                SecurePolicy = CookieSecurePolicy.Always,
+                IsEssential = true,
+                SameSite = SameSiteMode.Strict
+            }.Build(httpContext);
         }
     }
 }

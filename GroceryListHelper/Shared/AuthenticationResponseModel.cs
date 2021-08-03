@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Shared
 {
-    public class LoginResponseModel : BaseAPIResponse
+    public class AuthenticationResponseModel : BaseResponse
     {
         public string AccessToken { get; set; }
     }

@@ -1,8 +1,6 @@
-﻿using GroceryListHelper.Shared;
-using Microsoft.AspNetCore.Components;
+﻿using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -14,48 +12,42 @@ namespace GroceryListHelper.Client.Services
     {
         private const string uri = "api/authentication";
         private readonly HttpClient client;
-        private readonly NavigationManager navigation;
-        private readonly CustomAccessTokenProvider accessTokenProvider;
         private readonly AuthenticationStateProvider authenticationStateProvider;
+        private readonly JsonSerializerOptions jsonOptions;
+        private readonly IAccessTokenProvider accessTokenHandler;
 
-        public AuthenticationService(IHttpClientFactory clientFactory, NavigationManager navigation, IAccessTokenProvider accessTokenProvider, AuthenticationStateProvider authenticationStateProvider)
+        public AuthenticationService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenHandler, AuthenticationStateProvider authenticationStateProvider, JsonSerializerOptions jsonOptions)
         {
             client = clientFactory.CreateClient("AnonymousClient");
-            this.navigation = navigation;
-            this.accessTokenProvider = accessTokenProvider as CustomAccessTokenProvider;
             this.authenticationStateProvider = authenticationStateProvider;
+            this.jsonOptions = jsonOptions;
+            this.accessTokenHandler = accessTokenHandler;
         }
 
-        public async Task Login(UserCredentialsModel user)
+        public async Task<string> Login(UserCredentialsModel user)
         {
-            var response = await client.PostAsJsonAsync(uri + "/login", user);
-            await SaveTokenAndGoToIndex(response);
+            HttpResponseMessage response = await client.PostAsJsonAsync(uri + "/login", user);
+            return await SaveToken(response);
         }
 
-        public async Task Register(RegisterRequestModel request)
+        public async Task<string> Register(RegisterRequestModel request)
         {
-            var response = await client.PostAsJsonAsync(uri + "/register", request);
-            await SaveTokenAndGoToIndex(response);
+            HttpResponseMessage response = await client.PostAsJsonAsync(uri + "/register", request);
+            return await SaveToken(response);
         }
 
-        public async Task Refresh()
+        private async Task<string> SaveToken(HttpResponseMessage response)
         {
-            var response = await client.GetAsync(uri + "/refresh");
-            await SaveTokenAndGoToIndex(response);
-        }
-
-        private async Task SaveTokenAndGoToIndex(HttpResponseMessage response)
-        {
-            LoginResponseModel tokens = await response.Content.ReadFromJsonAsync<LoginResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            AuthenticationResponseModel tokenResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(jsonOptions);
             if (response.IsSuccessStatusCode)
             {
-                accessTokenProvider.SaveAccessToken(tokens.AccessToken);
+                await accessTokenHandler.SaveToken(tokenResponse.AccessToken);
                 await authenticationStateProvider.GetAuthenticationStateAsync();
-                navigation.NavigateTo("/");
+                return null;
             }
             else
             {
-                throw new ArgumentException(tokens.Message);
+                return tokenResponse.ErrorMessage;
             }
         }
     }

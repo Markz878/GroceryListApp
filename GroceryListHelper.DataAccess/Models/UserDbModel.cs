@@ -1,9 +1,9 @@
-﻿namespace GroceryListHelper.Server.Models
+﻿using GroceryListHelper.Shared;
+
+namespace GroceryListHelper.DataAccess.Models
 {
-    public class UserDbModel
+    public class UserDbModel : UserModel
     {
-        public int Id { get; set; }
-        public string Email { get; set; }
         public string PasswordHash { get; set; }
         public byte[] Salt { get; set; }
         public string RefreshToken { get; set; }

@@ -1,43 +1,50 @@
 ﻿@page "/profile"
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Profile" />
 
-<h2>Welcome @email</h2>
-<p>Change your password by submitting the form below:</p>
-<EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
-    <FluentValidationValidator />
-    <ValidationSummary />
-    <CustomValidationMessage Message="@passwordMessage" />
-    <div class="form-group">
-        <label for="current-password">Current password:</label>
-        <InputText id="current-password" type="password" class="form-control" placeholder="Current password" @bind-Value="@changePasswordRequest.CurrentPassword" />
-    </div>
-    <div class="form-group">
-        <label for="new-password">New password:</label>
-        <InputText id="new-password" type="password" class="form-control" placeholder="New password" @bind-Value="@changePasswordRequest.NewPassword" />
-    </div>
-    <div class="form-group">
-        <label for="confirm-new-password">Confirm new password:</label>
-        <InputText id="confirm-new-password" type="password" class="form-control" placeholder="Confirm new password" @bind-Value="@changePasswordRequest.ConfirmNewPassword" />
-    </div>
-    <button class="btn btn-secondary" type="submit" disabled="@isBusy">Change password</button>
-</EditForm>
+<AuthorizeView Context="authContext">
+    <h2>Welcome @authContext.User.FindFirst("nameid").Value</h2>
 
-<hr />
+    <Modal Header="Message" IsVisible="@(!string.IsNullOrEmpty(Message))" OnModalClose="@(()=>Message=string.Empty)">
+        <p>@Message</p>
+    </Modal>
 
-<p>You can delete your profile by submitting the form below (can't be undone):</p>
-<EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
-    <FluentValidationValidator />
-    <ValidationSummary />
-    <CustomValidationMessage Message="@deleteMessage" />
-    <div class="form-group">
-        <label for="password">Current password:</label>
-        <InputText id="password" type="password" class="form-control" placeholder="Current password" @bind-Value="@deleteProfileRequest.Password" />
-    </div>
-    <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
-</EditForm>
+    <fieldset>
+        <legend>Change password</legend>
+        <p>Change your password by submitting the form below:</p>
+        <EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <CustomValidationMessage Message="@passwordMessage" />
+            <InputTextComponent DisplayName="Current password" IsPassword="true" @bind-Value="changePasswordRequest.CurrentPassword " />
+            <InputTextComponent DisplayName="New password" IsPassword="true" @bind-Value="changePasswordRequest.NewPassword" />
+            <InputTextComponent DisplayName="Confirm new password" IsPassword="true" @bind-Value="changePasswordRequest.ConfirmNewPassword" />
+            <button class="btn btn-primary" type="submit" disabled="@isBusy">Change password</button>
+        </EditForm>
+    </fieldset>
 
-<hr />
+    <fieldset>
+        <legend>Request personal info</legend>
+        <p>Download your personal information:</p>
+        @if (!string.IsNullOrEmpty(downloadMessage))
+        {
+            <ul>
+                <li class="validation-message">@downloadMessage</li>
+            </ul>
+        }
+        <button class="btn btn-primary" @onclick="DownloadPersonalInfo">Download</button>
+    </fieldset>
 
-<Modal Header="Information" Message="@Message" />
+    <fieldset>
+        <legend>Delete profile</legend>
+        <p>You can delete your profile (includes all uploaded pictures, comments and likes) by submitting the form below (can't be undone):</p>
+        <EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <CustomValidationMessage Message="@deleteMessage" />
+            <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="deleteProfileRequest.Password" />
+            <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
+        </EditForm>
+    </fieldset>
+</AuthorizeView>
 
 

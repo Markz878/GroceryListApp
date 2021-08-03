@@ -1,77 +1,148 @@
-﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using Blazored.LocalStorage;
+using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Client.Models;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using static GroceryListHelper.Client.HelperMethods.HelperMethods;
 
 namespace GroceryListHelper.Client.Services
 {
     public class CartProductsService
     {
         private readonly HttpClient client;
+        private readonly ILocalStorageService localStorage;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
         private const string uri = "api/cartproducts";
+        private const string cartProductsKey = "cartProducts";
 
-        public CartProductsService(IHttpClientFactory clientFactory)
+        public CartProductsService(ILocalStorageService localStorage, IHttpClientFactory clientFactory, AuthenticationStateProvider authenticationStateProvider)
         {
             client = clientFactory.CreateClient("ProtectedClient");
+            this.localStorage = localStorage;
+            this.authenticationStateProvider = authenticationStateProvider;
         }
 
         public async Task<List<CartProductUIModel>> GetCartProducts()
         {
-            try
-            {
-                return await client.GetFromJsonAsync<List<CartProductUIModel>>(uri);
-            }
-            catch (AccessTokenNotAvailableException exception)
-            {
-                exception.Redirect();
-                return new List<CartProductUIModel>();
-            }
+            return (await authenticationStateProvider.IsUserAuthenticated() ?
+                await client.GetFromJsonAsync<List<CartProductUIModel>>(uri) :
+                await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey))
+                ?? new List<CartProductUIModel>();
         }
 
         public async Task SaveCartProduct(CartProductUIModel product)
         {
-            try
+            if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                var response = await client.PostAsJsonAsync(uri, product as CartProduct);
-                var content = await response.Content.ReadAsStringAsync();
+                HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
+                string content = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
                     product.Id = int.Parse(content);
                 }
+            }
+            else
+            {
+                List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
+                product.Id = GetNextId(products);
+                products.Add(product);
+                await localStorage.SetItemAsync(cartProductsKey, products);
+            }
+        }
+
+        private static int GetNextId(IEnumerable<CartProductUIModel> products)
+        {
+            int id = 0;
+            while (true)
+            {
+                if (products.Any(x => x.Id == id))
+                {
+                    id++;
+                }
                 else
                 {
-                    throw new InvalidOperationException(content);
+                    return id;
                 }
             }
-            catch (AccessTokenNotAvailableException exception)
+        }
+
+        public async Task DeleteCartProduct(int id)
+        {
+            if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                exception.Redirect();
+                HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                }
+            }
+            else
+            {
+                List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
+                products.Remove(products.Find(x => x.Id == id));
+                await localStorage.SetItemAsync(cartProductsKey, products);
             }
         }
 
-        public Task DeleteCartProduct(int id)
+        public async Task ClearCartProducts()
         {
-            return CheckAccessToken(client.DeleteAsync(uri + $"/{id}"));
+            if (await authenticationStateProvider.IsUserAuthenticated())
+            {
+                HttpResponseMessage response = await client.DeleteAsync(uri);
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                }
+            }
+            else
+            {
+                await localStorage.RemoveItemAsync(cartProductsKey);
+            }
         }
 
-        public Task ClearCartProducts()
+        public async Task MarkCartProductCollected(int id)
         {
-            return CheckAccessToken(client.DeleteAsync(uri));
+            if (await authenticationStateProvider.IsUserAuthenticated())
+            {
+                HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}", null);
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                }
+            }
+            else
+            {
+                List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
+                CartProductUIModel product = products.Find(x => x.Id == id);
+                product.IsCollected = !product.IsCollected;
+                await localStorage.SetItemAsync(cartProductsKey, products);
+            }
         }
 
-        public Task MarkCartProductCollected(int id)
+        internal async Task UpdateCartProduct(CartProductUIModel cartProduct)
         {
-            return CheckAccessToken(client.PatchAsync(uri + $"/{id}", null));
-        }
-
-        internal Task UpdateCartProduct(CartProductUIModel cartProduct)
-        {
-            return CheckAccessToken(client.PutAsJsonAsync(uri + $"/{cartProduct.Id}", cartProduct));
+            if (await authenticationStateProvider.IsUserAuthenticated())
+            {
+                HttpResponseMessage response = await client.PutAsJsonAsync(uri + $"/{cartProduct.Id}", cartProduct);
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                }
+            }
+            else
+            {
+                List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
+                CartProductUIModel product = products.Find(x => x.Id == cartProduct.Id);
+                product.Name = cartProduct.Name;
+                product.Amount = cartProduct.Amount;
+                product.UnitPrice = cartProduct.UnitPrice;
+                await localStorage.SetItemAsync(cartProductsKey, products);
+            }
         }
     }
 }

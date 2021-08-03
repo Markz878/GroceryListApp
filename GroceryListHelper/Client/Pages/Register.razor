@@ -1,22 +1,15 @@
 ﻿@page "/register"
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Register" />
 
-<h3>Register</h3>
-<EditForm Model="registerRequest" OnValidSubmit="RegisterMethod">
-    <FluentValidationValidator />
-    <ValidationSummary />
-    <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)" />
-    <div class="form-group">
-        <label for="email">Email: </label>
-        <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="@registerRequest.Email" />
-    </div>
-    <div class="form-group">
-        <label for="password">Password: </label>
-        <InputText id="password" class="form-control" type="password" placeholder="Password" @bind-Value="@registerRequest.Password" />
-    </div>
-    <div class="form-group">
-        <label for="confirmpassword">Confirm password: </label>
-        <InputText id="confirmpassword" class="form-control" type="password" placeholder="Confirm password" @bind-Value="@registerRequest.ConfirmPassword" />
-    </div>
-    <button class="btn btn-primary" type="submit" disabled="@isBusy">Register</button>
-</EditForm>
+<fieldset>
+    <legend class="legend">Register</legend>
+    <EditForm Model="registerRequest" OnValidSubmit="RegisterMethod">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <CustomValidationMessage Message="@Message" ClearMessage="(()=>Message=string.Empty)" />
+        <InputTextComponent DisplayName="Email" @bind-Value="@registerRequest.Email" />
+        <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="@registerRequest.Password" />
+        <InputTextComponent DisplayName="Confirm password" IsPassword="true" @bind-Value="@registerRequest.ConfirmPassword" />
+        <button class="btn btn-primary" type="submit" disabled="@isBusy">Register</button>
+    </EditForm>
+</fieldset>

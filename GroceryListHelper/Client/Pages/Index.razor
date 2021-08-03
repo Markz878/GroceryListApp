@@ -1,5 +1,5 @@
 ﻿@page "/"
-<Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Grocery List Helper v1.2" />
+<Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Grocery List Helper v1.3" />
 
 <h3 class="text-center">Grocery List Collector<sup> &copy;M&S Productions</sup></h3>
 <h5 class="text-center">Helps you remember</h5>
@@ -7,14 +7,19 @@
 
 <CartSummaryRowComponent CartProducts="CartProducts" Polling="polling" ClearCartProducts="ClearCartProducts" ClearStoreProducts="ClearStoreProducts" />
 
-<ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling" />
-@if (ShareMode == ShareModeType.Self)
-{
-    <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart" />
-}
-else
-{
-    <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart" />
-}
-<p style="margin-left: 1rem;">@ShareCartInfo</p>
+@*<AuthorizeView>
+    <Authorized>
+        <ChooseCartShareOptionComponent SwitchShareMode="SetShareMode" Polling="polling" />
+        @if (ShareMode == ShareModeType.Self)
+        {
+            <ShareSelfCartComponent AllowedUsers="AllowedUsers" Polling="polling" ShareCart="ShareCart" ExitCart="ExitCart" />
+        }
+        else
+        {
+            <JoinCartComponent CartHostEmailChanged="SetHostEmail" Polling="polling" JoinCart="JoinCart" ExitCart="ExitCart" />
+        }
+        <p style="margin-left: 1rem;">@ShareCartInfo</p>
+    </Authorized>
+</AuthorizeView>*@
+
 <Modal Header="Error occurred" Message="@Message" />

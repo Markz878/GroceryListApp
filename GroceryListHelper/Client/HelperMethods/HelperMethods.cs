@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using System;
+﻿using System;
 using System.Globalization;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.HelperMethods
 {
@@ -20,18 +18,6 @@ namespace GroceryListHelper.Client.HelperMethods
             else
             {
                 return false;
-            }
-        }
-
-        public static async Task CheckAccessToken<T>(Task<T> method)
-        {
-            try
-            {
-                await method;
-            }
-            catch (AccessTokenNotAvailableException exception)
-            {
-                exception.Redirect();
             }
         }
 

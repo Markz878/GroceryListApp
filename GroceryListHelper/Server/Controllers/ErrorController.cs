@@ -18,11 +18,14 @@ namespace GroceryListHelper.Server.Controllers
             {
                 throw new InvalidOperationException("This shouldn't be invoked in non-development environments.");
             }
-            var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            IExceptionHandlerFeature context = HttpContext.Features.Get<IExceptionHandlerFeature>();
             return Problem(detail: context.Error.StackTrace, title: context.Error.Message);
         }
 
         [Route("/error")]
-        public IActionResult Error() => Problem();
+        public IActionResult Error()
+        {
+            return Problem();
+        }
     }
 }

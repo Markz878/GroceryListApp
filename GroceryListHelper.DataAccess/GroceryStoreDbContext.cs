@@ -1,7 +1,7 @@
-﻿using GroceryListHelper.Server.Models;
+﻿using GroceryListHelper.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GroceryListHelper.Server.Data
+namespace GroceryListHelper.DataAccess
 {
     public class GroceryStoreDbContext : DbContext
     {

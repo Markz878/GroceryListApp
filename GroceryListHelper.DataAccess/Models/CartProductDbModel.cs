@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.Shared;
 
-namespace GroceryListHelper.Server.Models
+namespace GroceryListHelper.DataAccess.Models
 {
     public class CartProductDbModel : CartProductCollectable
     {

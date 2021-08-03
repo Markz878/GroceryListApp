@@ -1,0 +1,18 @@
+﻿@inherits InputBase<string>
+<div class="form-group">
+    <label for="@id">@DisplayName:</label>
+    <input id="@id" type="@type" class="form-control" placeholder="@DisplayName" @bind="@CurrentValueAsString"/>
+</div>
+@code {
+    [Parameter] public bool IsPassword { get; set; }
+
+    private string id => DisplayName.Replace(" ", "-").ToLowerInvariant();
+    public string type => IsPassword ? "password" : "text";
+
+    protected override bool TryParseValueFromString(string value, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out string result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string validationErrorMessage)
+    {
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+}

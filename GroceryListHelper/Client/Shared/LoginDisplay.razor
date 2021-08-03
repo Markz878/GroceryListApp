@@ -12,13 +12,10 @@
 </AuthorizeView>
 
 @code{
-    [Inject] public NavigationManager Navigation { get; set; }
-    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject] public ProfileService ProfileService { get; set; }
 
     private async Task BeginSignOut()
     {
         await ProfileService.LogOut();
-        (AuthenticationStateProvider as CustomAuthenticationStateProvider).NotifyLogOut();
     }
 }
