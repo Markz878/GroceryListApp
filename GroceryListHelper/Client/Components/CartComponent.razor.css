@@ -10,3 +10,12 @@
     margin: auto;
     transform: scale(2,2);
 }
+
+.sort-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.sort-buttons > button {
+    margin: 5px;
+}

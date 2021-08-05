@@ -3,6 +3,7 @@
 <table>
     <thead>
         <tr>
+            <th></th>
             <th>Collected?</th>
             <th class="product-col">Product</th>
             <th class="number-col">Amount</th>
@@ -14,6 +15,7 @@
     </thead>
     <tbody>
         <tr>
+            <td></td>
             <td><button type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton" aria-label="Add product">Add</button></td>
             <td>
                 <input type="text" list="products" class="form-control" @bind="NewProduct.Name" @onfocusout="GetItemPrice" @ref="NewProductNameBox" />
@@ -33,6 +35,12 @@
             @if (item != EditingItem)
             {
                 <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")" @ondragstart="e=>DragStarted(item)" draggable="true" ondragover="event.preventDefault()" @ondrop="e=>OnDrop(item)">
+                    <td>
+                        <div class="sort-buttons">
+                            <button class="btn btn-primary" title="Move up" @onclick="(()=>MoveUp(item))"><i class="fas fa-angle-up"></i></button>
+                            <button class="btn btn-primary" title="Move down" @onclick="(()=>MoveDown(item))"><i class="fas fa-angle-down"></i></button>
+                        </div>
+                    </td>
                     <td><input type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange="((e)=>MarkItemCollected(e, item))" /></td>
                     <td style="text-decoration: @(item.IsCollected ? "line-through" : "none")">@item.Name</td>
                     <td>@item.Amount</td>

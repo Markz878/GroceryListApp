@@ -151,6 +151,24 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
+        public void MoveUp(CartProductUIModel cartProduct)
+        {
+            int index = ViewModel.CartProducts.IndexOf(cartProduct);
+            if (index > 0)
+            {
+                ViewModel.CartProducts.Move(index, index - 1);
+            }
+        }
+
+        public void MoveDown(CartProductUIModel cartProduct)
+        {
+            int index = ViewModel.CartProducts.IndexOf(cartProduct);
+            if (index < ViewModel.CartProducts.Count-1)
+            {
+                ViewModel.CartProducts.Move(index, index + 1);
+            }
+        }
+
         public Task RemoveProduct(CartProductUIModel product)
         {
             ViewModel.CartProducts.Remove(product);
