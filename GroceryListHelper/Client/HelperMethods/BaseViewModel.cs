@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace GroceryListHelper.Client.HelperMethods
 {
-    public class BaseViewModel
+    public abstract class BaseViewModel
     {
         public event Action StateChanged;
 
         public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
         private bool isBusy;
 
-        public virtual void OnPropertyChanged()
+        public void OnPropertyChanged()
         {
             StateChanged?.Invoke();
         }

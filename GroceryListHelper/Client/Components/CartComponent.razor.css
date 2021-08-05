@@ -13,7 +13,7 @@
 
 .sort-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 }
 
 .sort-buttons > button {
