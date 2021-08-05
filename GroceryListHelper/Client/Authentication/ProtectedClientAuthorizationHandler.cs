@@ -56,7 +56,7 @@ namespace GroceryListHelper.Client.Authentication
             await tokenProvider.RemoveToken();
             await authenticationStateProvider.GetAuthenticationStateAsync();
             modal.Message = "Your session has expired, please login.";
-            await Task.Delay(1500);
+            await Task.Delay(2000);
             navigation.NavigateTo("/login", true);
         }
     }

@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
 
 namespace GroceryListHelper.Server.Installers
 {
@@ -12,6 +9,8 @@ namespace GroceryListHelper.Server.Installers
     {
         public void Install(IServiceCollection services, IConfiguration configuration)
         {
+            TokenValidationParametersFactory tokenValidationParametersFactory = new(configuration);
+            services.AddSingleton(tokenValidationParametersFactory);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -20,15 +19,7 @@ namespace GroceryListHelper.Server.Installers
             .AddJwtBearer(x =>
             {
                 x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["AccessTokenKey"])),
-                    ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                };
+                x.TokenValidationParameters = tokenValidationParametersFactory.CreateParameters("AccessTokenKey");
             });
             services.AddScoped<JWTAuthenticationManager>();
         }

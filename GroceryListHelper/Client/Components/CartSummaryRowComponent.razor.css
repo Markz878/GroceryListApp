@@ -3,12 +3,4 @@
     grid-template-columns: 2fr 1fr 1fr 1fr;
     justify-items: center;
     align-items: center;
-    margin-bottom: 2rem;
-    min-width: var(--min-content-width);
-}
-
-b {
-    text-align: center;
-    vertical-align: middle;
-    text-wrap: none;
 }

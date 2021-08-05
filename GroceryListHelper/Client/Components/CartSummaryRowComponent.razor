@@ -3,8 +3,8 @@
 <div class="summary-row">
     <b style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
     <b>Total: @Total.ToString("N2") €</b>
-    <button class="btn btn-primary text-nowrap" disabled="@ViewModel.IsPolling" style="justify-self: center" @onclick="ClearCartProducts" aria-label="Clear cart">Clear cart</button>
-    <button class="btn btn-primary text-nowrap" disabled="@ViewModel.IsPolling" style="justify-self: center" @onclick="ClearStoreProducts" aria-label="Clear store products">Clear shop</button>
+    <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearCartProducts" aria-label="Clear cart">Clear cart</button>
+    <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearStoreProducts" aria-label="Clear store products">Clear shop</button>
 </div>
 
 

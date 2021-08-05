@@ -15,13 +15,15 @@ namespace GroceryListHelper.Server.HelperMethods
     public class JWTAuthenticationManager
     {
         private readonly UserRepository userRepository;
+        private readonly TokenValidationParametersFactory tokenValidationParametersFactory;
         private readonly IConfiguration configuration;
         private const string AccessTokenKey = "AccessTokenKey";
         private const string RefreshTokenKey = "RefreshTokenKey";
 
-        public JWTAuthenticationManager(IConfiguration configuration, UserRepository userRepository)
+        public JWTAuthenticationManager(IConfiguration configuration, UserRepository userRepository, TokenValidationParametersFactory tokenValidationParametersFactory)
         {
             this.userRepository = userRepository;
+            this.tokenValidationParametersFactory = tokenValidationParametersFactory;
             this.configuration = configuration;
         }
 
@@ -138,20 +140,9 @@ namespace GroceryListHelper.Server.HelperMethods
         private bool ValidateToken(string key, string token, out ClaimsPrincipal claimsPrincipal)
         {
             JwtSecurityTokenHandler tokenHandler = new();
-            TokenValidationParameters validationParameters = new()
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
-                ClockSkew = TimeSpan.Zero,
-                ValidateLifetime = true,
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                //ValidIssuer = configuration["ServerURL"],
-                //ValidAudience = configuration["ClientURL"],
-            };
             try
             {
-                claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken jwt);
+                claimsPrincipal = tokenHandler.ValidateToken(token, tokenValidationParametersFactory.CreateParameters(key), out SecurityToken jwt);
                 return true;
             }
             catch (Exception)
