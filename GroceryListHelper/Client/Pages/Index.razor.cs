@@ -23,13 +23,25 @@ namespace GroceryListHelper.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            ViewModel.CartProducts = await CartProductsService.GetCartProducts();
-            ViewModel.StoreProducts = await StoreProductsService.GetStoreProducts();
+            ViewModel.CartProducts.Clear();
+            foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
+            {
+                ViewModel.CartProducts.Add(item);
+            }
+            ViewModel.StoreProducts.Clear();
+            foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
+            {
+                ViewModel.StoreProducts.Add(item);
+            }
             BuildHubConnection();
         }
 
         public void BuildHubConnection()
         {
+            if (ViewModel.CartHub != null)
+            {
+                return;
+            }
             ViewModel.CartHub = new HubConnectionBuilder().WithUrl(Navigation.ToAbsoluteUri("/carthub"), options =>
             {
                 options.AccessTokenProvider = async () =>
@@ -50,7 +62,10 @@ namespace GroceryListHelper.Client.Pages
             {
                 Console.WriteLine("Received cart from server..");
                 ViewModel.CartProducts.Clear();
-                ViewModel.CartProducts = cartProducts.ConvertAll(x => (CartProductUIModel)x);
+                foreach (CartProductUIModel item in cartProducts.ConvertAll(x => (CartProductUIModel)x))
+                {
+                    ViewModel.CartProducts.Add(item);
+                }
                 StateHasChanged();
             });
 
@@ -87,7 +102,7 @@ namespace GroceryListHelper.Client.Pages
 
         public async ValueTask DisposeAsync()
         {
-            await ViewModel.CartHub?.StopAsync();
+            await ViewModel?.CartHub?.StopAsync();
         }
     }
 }

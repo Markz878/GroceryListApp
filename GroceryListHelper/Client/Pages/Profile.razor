@@ -3,11 +3,11 @@
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Profile" />
 
 <AuthorizeView Context="authContext">
-    <h2>Welcome @authContext.User.FindFirst("nameid").Value</h2>
+    <h2> Profile settings for @authContext.User.FindFirst("email").Value</h2>
 
     <fieldset>
         <legend>Change password</legend>
-        <p>Change your password by submitting the form below:</p>
+        <div class="form-info">Change your password by submitting the form below:</div>
         <EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -21,7 +21,7 @@
 
     <fieldset>
         <legend>Request personal info</legend>
-        <p>Download your personal information:</p>
+        <div class="form-info">Download your personal information:</div>
         @if (!string.IsNullOrEmpty(downloadMessage))
         {
             <ul>
@@ -33,7 +33,7 @@
 
     <fieldset>
         <legend>Delete profile</legend>
-        <p>You can delete your profile (includes all uploaded pictures, comments and likes) by submitting the form below (can't be undone):</p>
+        <div class="form-info">You can delete your profile by submitting the form below (can't be undone):</div>
         <EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -43,7 +43,6 @@
         </EditForm>
     </fieldset>
 
-    <Modal />
 </AuthorizeView>
 
 

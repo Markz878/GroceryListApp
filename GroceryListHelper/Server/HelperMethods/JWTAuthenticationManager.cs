@@ -34,19 +34,20 @@ namespace GroceryListHelper.Server.HelperMethods
         internal async Task<(AuthenticationResponseModel response, string refreshToken)> Register(string email, string password)
         {
             AuthenticationResponseModel response = new();
-            if (userRepository.GetUserFromEmail(email) != null)
+            if (await userRepository.GetUserFromEmail(email) != null)
             {
                 response.ErrorMessage = "Email is already in use.";
                 return (response, "");
             }
-            if (!string.IsNullOrEmpty(await userRepository.AddUser(email, password)))
+            UserDbModel user = await userRepository.AddUser(email, password);
+            if (user == null)
             {
                 response.ErrorMessage = "Error creating user.";
                 return (response, "");
             }
-
-            response.AccessToken = GenerateAccessToken(email);
-            string refreshToken = GenerateRefreshToken(email);
+            response.AccessToken = GenerateAccessToken(user);
+            string refreshToken = GenerateRefreshToken(user);
+            await userRepository.UpdateRefreshToken(user.Id, refreshToken);
             return (response, refreshToken);
         }
 
@@ -65,8 +66,9 @@ namespace GroceryListHelper.Server.HelperMethods
                 return (response, "");
             }
 
-            response.AccessToken = GenerateAccessToken(email);
-            string refreshToken = GenerateRefreshToken(email);
+            response.AccessToken = GenerateAccessToken(user);
+            string refreshToken = GenerateRefreshToken(user);
+            await userRepository.UpdateRefreshToken(user.Id, refreshToken);
             return (response, refreshToken);
         }
 
@@ -80,43 +82,42 @@ namespace GroceryListHelper.Server.HelperMethods
             AuthenticationResponseModel response = new();
             if (ValidateToken(RefreshTokenKey, refreshToken, out ClaimsPrincipal claimsPrincipal))
             {
-                string email = claimsPrincipal.GetUserEmail();
-                UserDbModel user = await userRepository.GetUserFromEmail(email);
+                UserDbModel user = await userRepository.GetUserFromId(claimsPrincipal.GetUserId());
                 if (user == null)
                 {
                     response.ErrorMessage = "User not found.";
                     return (response, null);
                 }
-                if(user.RefreshToken == refreshToken)
+                if (user.RefreshToken != refreshToken)
                 {
                     response.ErrorMessage = "Invalid refresh token.";
                     return (response, null);
                 }
-                response.AccessToken = GenerateAccessToken(email);
-                string newRefreshToken = GenerateRefreshToken(email);
-                await userRepository.RenewRefreshToken(email, newRefreshToken);
+                response.AccessToken = GenerateAccessToken(user);
+                string newRefreshToken = GenerateRefreshToken(user);
+                await userRepository.UpdateRefreshToken(user.Id, newRefreshToken);
                 return (response, newRefreshToken);
             }
             response.ErrorMessage = "Invalid refresh token";
             return (response, null);
         }
 
-        private string GenerateAccessToken(string email)
+        private string GenerateAccessToken(UserModel user)
         {
-            return GenerateToken(AccessTokenKey, TimeSpan.FromMinutes(double.Parse(configuration["AccessTokenLifeTimeMinutes"])), email);
+            return GenerateToken(AccessTokenKey, TimeSpan.FromMinutes(configuration.GetValue<double>("AccessTokenLifeTimeMinutes")), user);
         }
 
 
-        private string GenerateRefreshToken(string email)
+        private string GenerateRefreshToken(UserModel user)
         {
-            return GenerateToken(RefreshTokenKey, TimeSpan.FromMinutes(double.Parse(configuration["RefreshTokenLifeTimeMinutes"])), email);
+            return GenerateToken(RefreshTokenKey, TimeSpan.FromMinutes(configuration.GetValue<double>("RefreshTokenLifeTimeMinutes")), user);
         }
 
-        private string GenerateToken(string key, TimeSpan duration, string email)
+        private string GenerateToken(string key, TimeSpan duration, UserModel user)
         {
-            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(key) || user == null)
             {
-                return null;
+                throw new ArgumentNullException(nameof(user), "Error generating token.");
             }
             JwtSecurityTokenHandler tokenHandler = new();
             byte[] keyBytes = Encoding.ASCII.GetBytes(configuration[key]);
@@ -124,7 +125,7 @@ namespace GroceryListHelper.Server.HelperMethods
             {
                 //Issuer = configuration["ServerURL"],
                 //Audience = configuration["ClientURL"],
-                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.Email, email) }),
+                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Email, user.Email) }),
                 Expires = DateTime.UtcNow + duration,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(keyBytes),
@@ -142,11 +143,11 @@ namespace GroceryListHelper.Server.HelperMethods
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
                 ClockSkew = TimeSpan.Zero,
-                ValidateIssuer = true,
-                ValidateAudience = true,
                 ValidateLifetime = true,
-                ValidIssuer = configuration["ServerURL"],
-                ValidAudience = configuration["ClientURL"],
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                //ValidIssuer = configuration["ServerURL"],
+                //ValidAudience = configuration["ClientURL"],
             };
             try
             {

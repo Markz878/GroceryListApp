@@ -70,8 +70,10 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public Task MarkItemCollected(CartProductUIModel product)
+        public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
         {
+            product.IsCollected = (bool)e.Value;
+            ViewModel.OnPropertyChanged();
             if (ViewModel.IsPolling)
             {
                 return ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
@@ -122,6 +124,7 @@ namespace GroceryListHelper.Client.Components
             if (string.IsNullOrEmpty(message))
             {
                 EditingItem = null;
+                ViewModel.OnPropertyChanged();
                 if (ViewModel.IsPolling)
                 {
                     await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemModified), product);

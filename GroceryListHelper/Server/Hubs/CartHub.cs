@@ -27,6 +27,11 @@ namespace GroceryListHelper.Server.Hubs
             this.cartHubService = cartHubService;
         }
 
+        public override Task OnConnectedAsync()
+        {
+            return base.OnConnectedAsync();
+        }
+
         public override Task OnDisconnectedAsync(Exception exception)
         {
             if (exception == null)
@@ -52,23 +57,23 @@ namespace GroceryListHelper.Server.Hubs
 
         public async Task<HubResponse> JoinGroup(string hostEmail)
         {
-            int hostId = await userRepository.GetIdFromEmail(hostEmail);
-            if (hostId < 0)
+            UserDbModel user = await userRepository.GetUserFromEmail(hostEmail);
+            if (user == null)
             {
                 return new HubResponse() { ErrorMessage = "No user with that email." };
             }
-            if (cartHubService.GroupAllowedEmails.TryGetValue(hostId, out List<string> emails))
+            if (cartHubService.GroupAllowedEmails.TryGetValue(user.Id, out List<string> emails))
             {
                 if (emails.Contains(GetUserEmail(Context)))
                 {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, hostId.ToString());
-                    await Clients.Caller.GetCart((await db.GetCartProductsForUser(hostId)).ToList());
+                    await Groups.AddToGroupAsync(Context.ConnectionId, user.Id.ToString());
+                    await Clients.Caller.GetCart((await db.GetCartProductsForUser(user.Id)).ToList());
                 }
                 else
                 {
                     return new HubResponse() { ErrorMessage = "You are not allowed to join this cart." };
                 }
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has joined {hostEmail}'s cart.");
+                await Clients.OthersInGroup(user.Id.ToString()).GetMessage($"{GetUserEmail(Context)} has joined {hostEmail}'s cart.");
                 return new HubResponse() { SuccessMessage = $"You have joined {hostEmail}'s cart" };
             }
             else

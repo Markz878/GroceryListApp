@@ -8,20 +8,6 @@ namespace GroceryListHelper.Client.Authentication
 {
     public static class AuthenticationStateExtensions
     {
-        //public static UserModel GetUserFromClaims(this ClaimsPrincipal claims)
-        //{
-        //    if ((claims?.Claims.Any()) == true)
-        //    {
-        //        return new UserModel()
-        //        {
-        //            Id = int.Parse(claims.FindFirst("id").Value),
-        //            Name = claims.FindFirst("nameid").Value,
-        //            Email = claims.FindFirst("email").Value
-        //        };
-        //    }
-        //    return null;
-        //}
-
         internal static IEnumerable<Claim> ParseTokenClaims(this string value)
         {
             string payload = value.Split('.')[1];

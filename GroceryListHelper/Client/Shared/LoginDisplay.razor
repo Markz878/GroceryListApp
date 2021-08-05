@@ -1,8 +1,8 @@
-﻿<NavLink class="nav-link text-primary" href="">Grocery List Helper</NavLink>
+﻿<NavLink class="nav-link logo" href="">Grocery List Helper</NavLink>
 <AuthorizeView>
     <Authorized>
         <NavLink class="nav-link" href="profile">Hello, @context.User.FindFirst("email").Value</NavLink>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+        <button class="nav-link" @onclick="BeginSignOut">Log out</button>
         <NavLink class="nav-link" href="about">About</NavLink>
     </Authorized>
     <NotAuthorized>

@@ -11,20 +11,18 @@ namespace GroceryListHelper.Client.Components
     {
         [Inject] public CartProductsService CartProductsService { get; set; }
         [Inject] public StoreProductsService StoreProductsService { get; set; } 
-        public bool AllCollected => ViewModel.CartProducts.Any(x => !x.IsCollected);
+        public bool AllCollected => ViewModel.CartProducts.All(x => x.IsCollected);
         public double Total => ViewModel.CartProducts.Sum(x => x.Total);
 
         public Task ClearCartProducts()
         {
             ViewModel.CartProducts.Clear();
-            ViewModel.OnPropertyChanged();
             return CartProductsService.ClearCartProducts();
         }
 
         public Task ClearStoreProducts()
         {
             ViewModel.StoreProducts.Clear();
-            ViewModel.OnPropertyChanged();
             return StoreProductsService.ClearStoreProducts();
         }
     }

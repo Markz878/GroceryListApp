@@ -1,8 +1,8 @@
 ﻿using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.DataAccess.Repositories
@@ -10,16 +10,19 @@ namespace GroceryListHelper.DataAccess.Repositories
     public class UserRepository
     {
         private readonly GroceryStoreDbContext db;
-        public UserRepository(GroceryStoreDbContext db)
+        private readonly ILogger<UserRepository> logger;
+
+        public UserRepository(GroceryStoreDbContext db, ILogger<UserRepository> logger)
         {
             this.db = db;
+            this.logger = logger;
         }
 
         public async Task<string> RemoveRefreshToken(int id)
         {
             try
             {
-                UserDbModel user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+                UserDbModel user = await GetUserFromId(id);
                 if (user == null)
                 {
                     return "User not found.";
@@ -37,23 +40,19 @@ namespace GroceryListHelper.DataAccess.Repositories
             }
         }
 
+        public async Task<UserDbModel> GetUserFromId(int id)
+        {
+            UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Id.Equals(id));
+            return userDbModel;
+        }
+
         public async Task<UserDbModel> GetUserFromEmail(string email)
         {
             UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
             return userDbModel;
         }
 
-        public async Task<int> GetIdFromEmail(string email)
-        {
-            UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
-            if (userDbModel == null)
-            {
-                return -1;
-            }
-            return userDbModel.Id;
-        }
-
-        public async Task<string> AddUser(string email, string password)
+        public async Task<UserDbModel> AddUser(string email, string password)
         {
             try
             {
@@ -61,17 +60,18 @@ namespace GroceryListHelper.DataAccess.Repositories
                 UserDbModel user = new() { Email = email, Salt = salt, PasswordHash = PasswordHelper.HashPassword(password, salt) };
                 db.Users.Add(user);
                 await db.SaveChangesAsync();
-                return null;
+                return user;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                logger.LogError(ex, "Error creating user.");
+                return null;
             }
         }
 
-        public async Task<string> ChangePassword(string email, string currentPassword, string newPassword)
+        public async Task<string> ChangePassword(int id, string currentPassword, string newPassword)
         {
-            UserDbModel user = await db.Users.Where(x => x.Email == email).FirstOrDefaultAsync();
+            UserDbModel user = await GetUserFromId(id);
             if (user == null)
             {
                 return "User not found";
@@ -89,9 +89,9 @@ namespace GroceryListHelper.DataAccess.Repositories
             }
         }
 
-        public async Task<string> DeleteUser(string email, string password)
+        public async Task<string> DeleteUser(int id, string password)
         {
-            UserDbModel user = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+            UserDbModel user = await GetUserFromId(id);
             if (user == null)
             {
                 return "User not found";
@@ -108,11 +108,11 @@ namespace GroceryListHelper.DataAccess.Repositories
             return "Invalid username or password";
         }
 
-        public async Task<string> RenewRefreshToken(string email, string refreshToken)
+        public async Task<string> UpdateRefreshToken(int id, string refreshToken)
         {
             try
             {
-                UserDbModel user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+                UserDbModel user = await GetUserFromId(id);
                 if (user == null)
                 {
                     return "User not found.";
@@ -126,6 +126,7 @@ namespace GroceryListHelper.DataAccess.Repositories
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Error renewing refresh token.");
                 return ex.Message;
             }
         }

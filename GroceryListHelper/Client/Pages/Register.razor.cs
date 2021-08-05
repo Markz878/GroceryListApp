@@ -10,6 +10,7 @@ namespace GroceryListHelper.Client.Pages
     public partial class Register
     {
         [Inject] public AuthenticationService AuthenticationService { get; set; }
+        [Inject] public NavigationManager Navigation { get; set; }
 
         private readonly RegisterRequestModel registerRequest = new();
         public string Message { get; set; } = string.Empty;
@@ -20,7 +21,15 @@ namespace GroceryListHelper.Client.Pages
             try
             {
                 isBusy = true;
-                await AuthenticationService.Register(registerRequest);
+                string error = await AuthenticationService.Register(registerRequest);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Message = error;
+                }
+                else
+                {
+                    Navigation.NavigateTo("/", true);
+                }
             }
             catch (Exception ex)
             {

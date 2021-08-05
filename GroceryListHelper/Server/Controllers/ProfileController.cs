@@ -37,8 +37,8 @@ namespace GroceryListHelper.Server.Controllers
         [HttpPatch]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
-            string email = User.GetUserEmail();
-            string response = await userRepository.ChangePassword(email, request.CurrentPassword, request.NewPassword);
+            int id = User.GetUserId();
+            string response = await userRepository.ChangePassword(id, request.CurrentPassword, request.NewPassword);
             if (string.IsNullOrEmpty(response))
             {
                 return Ok();
@@ -52,7 +52,7 @@ namespace GroceryListHelper.Server.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(DeleteProfileRequest request)
         {
-            string response = await userRepository.DeleteUser(User.GetUserEmail(), request.Password);
+            string response = await userRepository.DeleteUser(User.GetUserId(), request.Password);
             if (string.IsNullOrEmpty(response))
             {
                 return Ok();

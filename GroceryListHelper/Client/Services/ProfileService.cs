@@ -13,13 +13,13 @@ namespace GroceryListHelper.Client.Services
         private const string uri = "api/profile";
         private readonly HttpClient client;
         private readonly NavigationManager navigation;
-        private readonly IAccessTokenProvider accessTokenHandler;
+        private readonly IAccessTokenProvider accessTokenProvider;
         private readonly AuthenticationStateProvider authenticationStateProvider;
 
-        public ProfileService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenHandler, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation)
+        public ProfileService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenProvider, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation)
         {
             client = clientFactory.CreateClient("ProtectedClient");
-            this.accessTokenHandler = accessTokenHandler;
+            this.accessTokenProvider = accessTokenProvider;
             this.authenticationStateProvider = authenticationStateProvider;
             this.navigation = navigation;
         }
@@ -27,7 +27,7 @@ namespace GroceryListHelper.Client.Services
         public async Task LogOut()
         {
             await client.GetAsync(uri + "/logout");
-            await accessTokenHandler.RemoveToken();
+            await accessTokenProvider.RemoveToken();
             await authenticationStateProvider.GetAuthenticationStateAsync();
             navigation.NavigateTo("/", true);
         }

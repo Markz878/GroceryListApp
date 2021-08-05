@@ -2,13 +2,14 @@
 @inherits IndexBase
 <Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Grocery List Helper v1.3" />
 
-<h3 class="text-center">Grocery List Collector<sup> &copy;M&S Productions</sup></h3>
-<h5 class="text-center">Helps you remember</h5>
+<h2 class="text-center">Grocery List Helper<sup> &copy;M&S Productions</sup></h2>
+<h3 class="text-center">Helps you remember</h3>
+
 <CartComponent />
 
 <CartSummaryRowComponent />
 
-<AuthorizeView>
+@*<AuthorizeView>
     <Authorized>
         <ChooseCartShareOptionComponent />
         @if (ViewModel.ShareMode == ShareModeType.Self)
@@ -21,6 +22,4 @@
         }
         <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
     </Authorized>
-</AuthorizeView>
-
-<Modal />
+</AuthorizeView>*@

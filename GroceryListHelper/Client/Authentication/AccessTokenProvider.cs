@@ -1,6 +1,5 @@
 ﻿using GroceryListHelper.Shared;
 using Microsoft.JSInterop;
-using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -58,12 +57,12 @@ namespace GroceryListHelper.Client.Authentication
         public ValueTask SaveToken(string accessToken)
         {
             this.accessToken = accessToken;
-            return jsRuntime.InvokeVoidAsync("localStorage.setItem", accessToken.Trim('"'));
+            return jsRuntime.InvokeVoidAsync("localStorage.setItem", accessTokenKey, accessToken.Trim('"'));
         }
 
         public ValueTask RemoveToken()
         {
-            accessToken = null;
+            accessToken = string.Empty;
             return jsRuntime.InvokeVoidAsync("localStorage.removeItem", accessTokenKey);
         }
     }

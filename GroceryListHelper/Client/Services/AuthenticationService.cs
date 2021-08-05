@@ -13,14 +13,12 @@ namespace GroceryListHelper.Client.Services
         private const string uri = "api/authentication";
         private readonly HttpClient client;
         private readonly AuthenticationStateProvider authenticationStateProvider;
-        private readonly JsonSerializerOptions jsonOptions;
         private readonly IAccessTokenProvider accessTokenHandler;
 
-        public AuthenticationService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenHandler, AuthenticationStateProvider authenticationStateProvider, JsonSerializerOptions jsonOptions)
+        public AuthenticationService(IHttpClientFactory clientFactory, IAccessTokenProvider accessTokenHandler, AuthenticationStateProvider authenticationStateProvider)
         {
             client = clientFactory.CreateClient("AnonymousClient");
             this.authenticationStateProvider = authenticationStateProvider;
-            this.jsonOptions = jsonOptions;
             this.accessTokenHandler = accessTokenHandler;
         }
 
@@ -38,7 +36,7 @@ namespace GroceryListHelper.Client.Services
 
         private async Task<string> SaveToken(HttpResponseMessage response)
         {
-            AuthenticationResponseModel tokenResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(jsonOptions);
+            AuthenticationResponseModel tokenResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>();
             if (response.IsSuccessStatusCode)
             {
                 await accessTokenHandler.SaveToken(tokenResponse.AccessToken);

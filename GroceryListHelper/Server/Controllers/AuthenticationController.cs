@@ -15,13 +15,11 @@ namespace GroceryListHelper.Server.Controllers
     {
         private readonly IConfiguration configuration;
         private readonly JWTAuthenticationManager authenticationManager;
-        private readonly ILogger<AuthenticationController> logger;
 
-        public AuthenticationController(IConfiguration configuration, JWTAuthenticationManager authenticationManager, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IConfiguration configuration, JWTAuthenticationManager authenticationManager)
         {
             this.configuration = configuration;
             this.authenticationManager = authenticationManager;
-            this.logger = logger;
         }
 
         [HttpPost]
@@ -75,7 +73,7 @@ namespace GroceryListHelper.Server.Controllers
         {
             return new CookieBuilder()
             {
-                Expiration = TimeSpan.FromMinutes(configuration.GetValue<int>("RefreshTokenLifeTimeMinutes")),
+                Expiration = TimeSpan.FromMinutes(configuration.GetValue<double>("RefreshTokenLifeTimeMinutes")),
                 HttpOnly = true,
                 SecurePolicy = CookieSecurePolicy.Always,
                 IsEssential = true,

@@ -28,7 +28,6 @@ namespace GroceryListHelper.Server.Installers
                     ClockSkew = TimeSpan.Zero,
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidAlgorithms = new string[] { SecurityAlgorithms.HmacSha512 },
                 };
             });
             services.AddScoped<JWTAuthenticationManager>();
