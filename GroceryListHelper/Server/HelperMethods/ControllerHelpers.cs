@@ -6,7 +6,7 @@ namespace GroceryListHelper.Server.HelperMethods
     {
         public static int GetUserId(this ClaimsPrincipal user)
         {
-            return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user.FindFirst("Id")?.Value);
         }
     }
 }
