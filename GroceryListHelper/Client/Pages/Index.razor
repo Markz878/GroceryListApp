@@ -9,7 +9,7 @@
 
 <CartSummaryRowComponent />
 
-@*<AuthorizeView>
+<AuthorizeView>
     <Authorized>
         <ChooseCartShareOptionComponent />
         @if (ViewModel.ShareMode == ShareModeType.Self)
@@ -22,4 +22,4 @@
         }
         <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
     </Authorized>
-</AuthorizeView>*@
+</AuthorizeView>

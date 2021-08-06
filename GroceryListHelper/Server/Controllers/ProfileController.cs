@@ -2,6 +2,7 @@
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> LogOut()
         {
             int id = User.GetUserId();
@@ -35,6 +38,8 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
             int id = User.GetUserId();
@@ -50,6 +55,8 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> Delete(DeleteProfileRequest request)
         {
             string response = await userRepository.DeleteUser(User.GetUserId(), request.Password);
@@ -64,6 +71,8 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserInfo()
         {
             UserModel user = await userRepository.GetUserFromId(User.GetUserId());
