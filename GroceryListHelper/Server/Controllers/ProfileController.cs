@@ -62,5 +62,19 @@ namespace GroceryListHelper.Server.Controllers
                 return BadRequest(response);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            UserModel user = await userRepository.GetUserFromId(User.GetUserId());
+            if (user!=null)
+            {
+                return Ok(user);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }
