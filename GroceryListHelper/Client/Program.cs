@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using GroceryListHelper.Client.ViewModels;
+using GroceryListHelper.Client.HelperMethods;
 
 namespace GroceryListHelper.Client
 {
@@ -39,6 +40,7 @@ namespace GroceryListHelper.Client
             builder.Services.AddScoped<CartProductsService>();
             builder.Services.AddScoped<StoreProductsService>();
             builder.Services.AddScoped<ProfileService>();
+            builder.Services.AddScoped<CartHubBuilder>();
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddSingleton<IndexViewModel>();

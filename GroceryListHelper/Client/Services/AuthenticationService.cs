@@ -3,7 +3,6 @@ using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services

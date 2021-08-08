@@ -60,7 +60,7 @@ namespace GroceryListHelper.Client.Services
             }
         }
 
-        public Task<UserModel> DownloadPersonalData()
+        public Task<UserModel> GetUserInfo()
         {
             return client.GetFromJsonAsync<UserModel>(uri + "/getuserinfo");
         }

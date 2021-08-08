@@ -14,6 +14,7 @@ namespace GroceryListHelper.Client.HelperMethods
 
         private void PropertyChanged()
         {
+            Console.WriteLine($"Called {nameof(BasePage<T>)} PropertyChanged with GUID {ViewModel.Guid}");
             StateHasChanged();
         }
 

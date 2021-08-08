@@ -15,7 +15,6 @@ namespace GroceryListHelper.Client.Pages
     public class ProfileBase : ComponentBase
     {
         [Inject] public ProfileService ProfileService { get; set; }
-        [Inject] public AuthenticationStateProvider Authentication { get; set; }
         [Inject] public IJSRuntime JS { get; set; }
         [Inject] public ModalViewModel ModalViewModel { get; set; } 
 
@@ -76,7 +75,7 @@ namespace GroceryListHelper.Client.Pages
             try
             {
                 isBusy = true;
-                UserModel user = await ProfileService.DownloadPersonalData();
+                UserModel user = await ProfileService.GetUserInfo();
                 if (user != null)
                 {
                     await JS.InvokeVoidAsync("downloadObjectAsJson", new { user.Email }, "personaldata");

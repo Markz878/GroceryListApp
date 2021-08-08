@@ -6,12 +6,13 @@ namespace GroceryListHelper.Client.HelperMethods
     public abstract class BaseViewModel
     {
         public event Action StateChanged;
-
+        public Guid Guid { get; set; } = Guid.NewGuid();
         public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
         private bool isBusy;
 
         public void OnPropertyChanged()
         {
+            Console.WriteLine($"Called {nameof(BaseViewModel)} OnPropertyChanged with GUID {Guid}");
             StateChanged?.Invoke();
         }
 

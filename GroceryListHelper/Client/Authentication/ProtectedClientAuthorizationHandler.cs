@@ -39,19 +39,19 @@ namespace GroceryListHelper.Client.Authentication
                 accessToken = await tokenProvider.TryToRefreshToken();
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    await Logout();
+                    await HandleSessionExpired();
                 }
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 response = await base.SendAsync(request, cancellationToken);
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    await Logout();
+                    await HandleSessionExpired();
                 }
             }
             return response;
         }
 
-        private async Task Logout()
+        private async Task HandleSessionExpired()
         {
             await tokenProvider.RemoveToken();
             await authenticationStateProvider.GetAuthenticationStateAsync();
