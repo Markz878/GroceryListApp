@@ -35,47 +35,42 @@ namespace GroceryListHelper.Client.HelperMethods
             {
                 options.AccessTokenProvider = async () =>
                 {
-                    Console.WriteLine("Trying to authorize hub...");
+                    Console.WriteLine("Authorizing hub connection...");
                     HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
                     if (response.IsSuccessStatusCode)
                     {
                         AuthenticationResponseModel loginResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
                         return loginResponse.AccessToken;
                     }
-                    string tokenResult = await accessTokenProvider.RequestAccessToken();
-                    Console.WriteLine("Got token :" + tokenResult);
-                    return tokenResult;
+                    return null;
                 };
             }).WithAutomaticReconnect().Build();
 
             indexViewModel.CartHub.On<string>(nameof(ICartHubClient.GetMessage), (message) =>
             {
-                Console.WriteLine("Received message " + message);
+                Console.WriteLine($"Received message '{message}'.");
                 indexViewModel.ShareCartInfo = message;
-                indexViewModel.OnPropertyChanged();
             });
 
             indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubClient.GetCart), (cartProducts) =>
             {
-                Console.WriteLine("Received cart from server, items count is " + cartProducts.Count);
+                Console.WriteLine($"Received cart from server, items count is {cartProducts.Count}.");
                 indexViewModel.CartProducts.Clear();
                 foreach (CartProductCollectable item in cartProducts)
                 {
                     indexViewModel.CartProducts.Add(new CartProductUIModel() { Id = item.Id, Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice });
                 }
-                indexViewModel.OnPropertyChanged();
             });
 
             indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubClient.ItemAdded), (p) =>
             {
-                Console.WriteLine("Received new item with id " + p.Id + " and name " + p.Name);
+                Console.WriteLine($"Received new item with id {p.Id} and name {p.Name}.");
                 indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice });
-                indexViewModel.OnPropertyChanged();
             });
 
             indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubClient.ItemModified), (cartProduct) =>
             {
-                Console.WriteLine($"Item {cartProduct.Name} was modified");
+                Console.WriteLine($"Item {cartProduct.Name} was modified.");
                 CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
                 product.Amount = cartProduct.Amount;
                 product.UnitPrice = cartProduct.UnitPrice;
@@ -84,16 +79,23 @@ namespace GroceryListHelper.Client.HelperMethods
 
             indexViewModel.CartHub.On<int>(nameof(ICartHubClient.ItemCollected), (id) =>
             {
-                Console.WriteLine($"Item with id {id} was modified");
+                Console.WriteLine($"Item with id {id} was collected.");
                 indexViewModel.CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
                 indexViewModel.OnPropertyChanged();
             });
 
             indexViewModel.CartHub.On<int>(nameof(ICartHubClient.ItemDeleted), (id) =>
             {
-                Console.WriteLine($"Item with id {id} was deleted");
+                Console.WriteLine($"Item with id {id} was deleted.");
                 indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
-                indexViewModel.OnPropertyChanged();
+            });
+
+            indexViewModel.CartHub.On<int, int>(nameof(ICartHubClient.ItemMoved), (id, newIndex) =>
+            {
+                Console.WriteLine($"Item with id {id} was moved to {newIndex}.");
+                CartProductUIModel item = indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id);
+                int oldIndex = indexViewModel.CartProducts.IndexOf(item);
+                indexViewModel.CartProducts.Move(oldIndex, newIndex);
             });
         }
     }

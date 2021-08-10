@@ -10,6 +10,7 @@ namespace GroceryListHelper.Shared.Interfaces
         Task ItemModified(CartProductCollectable cartProduct);
         Task ItemCollected(int id);
         Task ItemDeleted(int id);
+        Task ItemMoved(int id, int newIndex);
         Task GetMessage(string message);
     }
 }

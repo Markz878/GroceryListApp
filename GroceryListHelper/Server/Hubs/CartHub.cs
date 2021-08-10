@@ -34,11 +34,6 @@ namespace GroceryListHelper.Server.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (exception == null)
-            {
-                int hostId = GetHostId();
-                cartHubService.GroupAllowedEmails.Remove(hostId);
-            }
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -82,6 +77,13 @@ namespace GroceryListHelper.Server.Hubs
             }
         }
 
+        private int GetHostId()
+        {
+            string userEmail = GetUserEmail(Context);
+            int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
+            return hostId;
+        }
+
         public async Task<int> CartItemAdded(CartProductCollectable product)
         {
             int hostId = GetHostId();
@@ -104,18 +106,17 @@ namespace GroceryListHelper.Server.Hubs
             await db.MarkAsCollected(id, hostId);
         }
 
-        private int GetHostId()
-        {
-            string userEmail = GetUserEmail(Context);
-            int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
-            return hostId;
-        }
-
         public async Task CartItemDeleted(int id)
         {
             int hostId = GetHostId();
             await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
             await db.DeleteItem(id, hostId);
+        }
+
+        public async Task CartItemMoved(int id, int newIndex)
+        {
+            int hostId = GetHostId();
+            await Clients.OthersInGroup(hostId.ToString()).ItemMoved(id, newIndex);
         }
 
         public async Task<HubResponse> LeaveGroup()
@@ -124,7 +125,7 @@ namespace GroceryListHelper.Server.Hubs
             if (hostId >= 0)
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{Context.User.FindFirst(ClaimTypes.Email).Value} has left the group.");
+                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
                 return new HubResponse() { SuccessMessage = "You have left the group." };
             }
             else

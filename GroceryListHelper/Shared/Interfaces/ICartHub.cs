@@ -12,5 +12,6 @@ namespace GroceryListHelper.Shared.Interfaces
         Task CartItemModified(CartProductCollectable product);
         Task CartItemCollected(int id);
         Task CartItemDeleted(int id);
+        Task CartItemMoved(int id, int newIndex);
     }
 }

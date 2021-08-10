@@ -5,11 +5,25 @@
 <AuthorizeView Context="authContext">
     <h2> Profile settings for @authContext.User.FindFirst("email").Value</h2>
 
+    
+    <fieldset>
+        <legend>Change email</legend>
+        <div class="form-info">Change your email by submitting the form below:</div>
+        <EditForm Model="changeEmailRequest" OnValidSubmit="ChangeEmail">
+            <FluentValidationValidator />
+            <ValidationSummary />
+            <CustomValidationMessage Message="@emailMessage" />
+            <InputTextComponent DisplayName="New email" @bind-Value="changeEmailRequest.NewEmail " />
+            <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="changeEmailRequest.Password" />
+            <button class="btn btn-primary" type="submit" disabled="@isBusy">Change Email</button>
+        </EditForm>
+    </fieldset>
+
     <fieldset>
         <legend>Change password</legend>
         <div class="form-info">Change your password by submitting the form below:</div>
         <EditForm Model="changePasswordRequest" OnValidSubmit="ChangePassword">
-            <DataAnnotationsValidator />
+            <FluentValidationValidator />
             <ValidationSummary />
             <CustomValidationMessage Message="@passwordMessage" />
             <InputTextComponent DisplayName="Current password" IsPassword="true" @bind-Value="changePasswordRequest.CurrentPassword " />
@@ -35,7 +49,7 @@
         <legend>Delete profile</legend>
         <div class="form-info">You can delete your profile by submitting the form below (can't be undone):</div>
         <EditForm Model="deleteProfileRequest" OnValidSubmit="DeleteProfile">
-            <DataAnnotationsValidator />
+            <FluentValidationValidator />
             <ValidationSummary />
             <CustomValidationMessage Message="@deleteMessage" />
             <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="deleteProfileRequest.Password" />

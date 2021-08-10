@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,33 +9,20 @@ namespace GroceryListHelper.Client.Authentication
     public class AccessTokenProvider : IAccessTokenProvider
     {
         private readonly HttpClient client;
-        private readonly ILocalStorageService localStorage;
-        private const string accessTokenKey = "AccessToken";
-        //private string accessToken; // Null => try to get, String.Empty => Skip trying
+        private string accessToken;
 
-        public AccessTokenProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage)
+        public AccessTokenProvider(IHttpClientFactory httpClientFactory)
         {
             client = httpClientFactory.CreateClient("AnonymousClient");
-            this.localStorage = localStorage;
         }
 
         public async ValueTask<string> RequestAccessToken()
         {
-            //if (accessToken != null)
-            //{
-            //    return accessToken;
-            //}
-            string accuiredToken = await localStorage.GetItemAsStringAsync(accessTokenKey);
-            if (string.IsNullOrEmpty(accuiredToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
-                accuiredToken = await TryToRefreshToken();
+                accessToken = await TryToRefreshToken();
             }
-            //accessToken = accuiredToken;
-            //if (accessToken == null)
-            //{
-            //    accessToken = string.Empty;
-            //}
-            return accuiredToken?.Trim('"');
+            return accessToken;
         }
 
         public async ValueTask<string> TryToRefreshToken()
@@ -56,14 +42,14 @@ namespace GroceryListHelper.Client.Authentication
 
         public ValueTask SaveToken(string accessToken)
         {
-            //this.accessToken = accessToken;
-            return localStorage.SetItemAsStringAsync(accessTokenKey, accessToken.Trim('"'));
+            this.accessToken = accessToken;
+            return ValueTask.CompletedTask;
         }
 
         public ValueTask RemoveToken()
         {
-            //accessToken = string.Empty;
-            return localStorage.RemoveItemAsync(accessTokenKey);
+            accessToken = string.Empty;
+            return ValueTask.CompletedTask;
         }
     }
 }

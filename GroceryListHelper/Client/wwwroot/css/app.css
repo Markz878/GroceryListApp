@@ -1,4 +1,9 @@
-﻿html, body {
+﻿:root {
+    --disabled-btn-background: #D2D2D2;
+    --disabled-btn-color: #ABABAB;
+}
+
+html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     height: 100%;
     margin: 0;
@@ -74,7 +79,7 @@ legend {
 }
 
 .text-center {
-    text-align: center!important;
+    text-align: center !important;
 }
 
 .btn {
@@ -91,29 +96,38 @@ legend {
     border-radius: .25rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+    .btn:disabled {
+        color: var(--disabled-btn-color);
+    }
 
 .btn-primary {
     background-color: #007bff;
 }
-
     .btn-primary:hover {
         background-color: #0069d9;
+    }
+    .btn-primary:disabled {
+        background-color: var(--disabled-btn-background);
     }
 
 .btn-success {
     background-color: #28a745;
 }
-
     .btn-success:hover {
         background-color: #1A762F;
+    }
+    .btn-success:disabled {
+        background-color: var(--disabled-btn-background);
     }
 
 .btn-danger {
     background-color: #dc3545;
 }
-
     .btn-danger:hover {
         background-color: #932631;
+    }
+    .btn-danger:disabled {
+        background-color: var(--disabled-btn-background);
     }
 
 .form-group {
@@ -121,9 +135,9 @@ legend {
     margin: 0.5rem 0 1rem 0;
 }
 
-.form-group > label {
-    margin: 0.75rem;
-}
+    .form-group > label {
+        margin: 0.75rem;
+    }
 
 .form-control {
     display: block;
@@ -142,6 +156,7 @@ legend {
     border-radius: .25rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+
     .form-control:focus {
         box-shadow: 0 0 10px 3px rgba(71, 133, 183, 0.30);
         border: 1px solid #8B8D8F;

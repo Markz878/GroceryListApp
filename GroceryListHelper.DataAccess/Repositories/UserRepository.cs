@@ -69,6 +69,25 @@ namespace GroceryListHelper.DataAccess.Repositories
             }
         }
 
+        public async Task<string> ChangeEmail(int id, string newEmail, string password)
+        {
+            UserDbModel user = await GetUserFromId(id);
+            if (user == null)
+            {
+                return "User not found";
+            }
+            else
+            {
+                if (user.PasswordHash.Equals(PasswordHelper.HashPassword(password, user.Salt)))
+                {
+                    user.Email = newEmail;
+                    await db.SaveChangesAsync();
+                    return null;
+                }
+                return "Invalid password";
+            }
+        }
+
         public async Task<string> ChangePassword(int id, string currentPassword, string newPassword)
         {
             UserDbModel user = await GetUserFromId(id);

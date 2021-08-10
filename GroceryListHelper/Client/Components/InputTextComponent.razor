@@ -1,7 +1,7 @@
 ﻿@inherits InputBase<string>
 <div class="form-group">
     <label for="@id">@DisplayName:</label>
-    <input id="@id" type="@type" required class="form-control" placeholder="@DisplayName" @bind="@CurrentValueAsString"/>
+    <input id="@id" class="form-control" type="@type" @bind="@CurrentValueAsString" required placeholder="@DisplayName" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"/>
 </div>
 @code {
     [Parameter] public bool IsPassword { get; set; }

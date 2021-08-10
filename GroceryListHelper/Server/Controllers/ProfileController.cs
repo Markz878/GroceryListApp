@@ -54,6 +54,23 @@ namespace GroceryListHelper.Server.Controllers
             }
         }
 
+        [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
+        {
+            int id = User.GetUserId();
+            string response = await userRepository.ChangeEmail(id, request.NewEmail, request.Password);
+            if (string.IsNullOrEmpty(response))
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(response);
+            }
+        }
+
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]

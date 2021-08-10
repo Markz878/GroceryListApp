@@ -12,7 +12,6 @@ namespace GroceryListHelper.Client.HelperMethods
 
         public void OnPropertyChanged()
         {
-            Console.WriteLine($"Called {nameof(BaseViewModel)} OnPropertyChanged with GUID {Guid}");
             StateChanged?.Invoke();
         }
 

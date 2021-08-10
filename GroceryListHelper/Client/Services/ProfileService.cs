@@ -2,6 +2,7 @@
 using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -30,6 +31,19 @@ namespace GroceryListHelper.Client.Services
             await accessTokenProvider.RemoveToken();
             await authenticationStateProvider.GetAuthenticationStateAsync();
             navigation.NavigateTo("/", true);
+        }
+
+        public async Task<string> ChangeEmail(ChangeEmailRequest changeEmailRequest)
+        {
+            HttpResponseMessage response = await client.PatchAsync(uri + "/changeemail", JsonContent.Create(changeEmailRequest));
+            if (response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            else
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
         }
 
         public async Task<string> ChangePassword(ChangePasswordRequest changePasswordRequest)

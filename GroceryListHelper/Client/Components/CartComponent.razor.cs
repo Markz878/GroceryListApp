@@ -151,21 +151,29 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public void MoveUp(CartProductUIModel cartProduct)
+        public async Task MoveUp(CartProductUIModel cartProduct)
         {
             int index = ViewModel.CartProducts.IndexOf(cartProduct);
             if (index > 0)
             {
                 ViewModel.CartProducts.Move(index, index - 1);
+                if (ViewModel.IsPolling)
+                {
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), cartProduct.Id, index-1);
+                }
             }
         }
 
-        public void MoveDown(CartProductUIModel cartProduct)
+        public async Task MoveDown(CartProductUIModel cartProduct)
         {
             int index = ViewModel.CartProducts.IndexOf(cartProduct);
             if (index < ViewModel.CartProducts.Count-1)
             {
                 ViewModel.CartProducts.Move(index, index + 1);
+                if (ViewModel.IsPolling)
+                {
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), cartProduct.Id, index + 1);
+                }
             }
         }
 
@@ -188,14 +196,17 @@ namespace GroceryListHelper.Client.Components
             dragTarget = product;
         }
 
-        public void OnDrop(CartProductUIModel product)
+        public async Task OnDrop(CartProductUIModel product)
         {
             int dragTargetIndex = ViewModel.CartProducts.IndexOf(dragTarget);
             int dropTargetIndex = ViewModel.CartProducts.IndexOf(product);
             if (dragTargetIndex != dropTargetIndex)
             {
-                ViewModel.CartProducts.Remove(dragTarget);
-                ViewModel.CartProducts.Insert(dropTargetIndex, dragTarget);
+                ViewModel.CartProducts.Move(dragTargetIndex, dropTargetIndex);
+                if (ViewModel.IsPolling)
+                {
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), dragTarget.Id, dropTargetIndex);
+                }
             }
         }
     }

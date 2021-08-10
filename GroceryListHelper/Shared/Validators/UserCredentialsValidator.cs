@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using System.Linq;
 
-
 namespace GroceryListHelper.Shared.Validators
 {
     public class UserCredentialsValidator : AbstractValidator<UserCredentialsModel>
