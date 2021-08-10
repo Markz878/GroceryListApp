@@ -76,7 +76,8 @@ namespace GroceryListHelper.Server.Controllers
                 HttpOnly = true,
                 SecurePolicy = CookieSecurePolicy.Always,
                 IsEssential = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Strict,
+                Path = "/api/authentication"
             }.Build(httpContext);
         }
     }

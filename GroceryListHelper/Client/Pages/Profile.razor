@@ -14,7 +14,7 @@
             <ValidationSummary />
             <CustomValidationMessage Message="@emailMessage" />
             <InputTextComponent DisplayName="New email" @bind-Value="changeEmailRequest.NewEmail " />
-            <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="changeEmailRequest.Password" />
+            <InputTextComponent DisplayName="Password" Id="password-for-email-change" IsPassword="true" @bind-Value="changeEmailRequest.Password" />
             <button class="btn btn-primary" type="submit" disabled="@isBusy">Change Email</button>
         </EditForm>
     </fieldset>
@@ -52,7 +52,7 @@
             <FluentValidationValidator />
             <ValidationSummary />
             <CustomValidationMessage Message="@deleteMessage" />
-            <InputTextComponent DisplayName="Password" IsPassword="true" @bind-Value="deleteProfileRequest.Password" />
+            <InputTextComponent DisplayName="Password" Id="password-for-account-deletion" IsPassword="true" @bind-Value="deleteProfileRequest.Password" />
             <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
         </EditForm>
     </fieldset>

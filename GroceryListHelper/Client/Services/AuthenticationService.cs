@@ -35,16 +35,23 @@ namespace GroceryListHelper.Client.Services
 
         private async Task<string> SaveToken(HttpResponseMessage response)
         {
-            AuthenticationResponseModel tokenResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>();
-            if (response.IsSuccessStatusCode)
+            try
             {
-                await accessTokenHandler.SaveToken(tokenResponse.AccessToken);
-                await authenticationStateProvider.GetAuthenticationStateAsync();
-                return null;
+                AuthenticationResponseModel tokenResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>();
+                if (response.IsSuccessStatusCode)
+                {
+                    await accessTokenHandler.SaveToken(tokenResponse.AccessToken);
+                    await authenticationStateProvider.GetAuthenticationStateAsync();
+                    return null;
+                }
+                else
+                {
+                    return tokenResponse.ErrorMessage;
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                return tokenResponse.ErrorMessage;
+                return ex.Message;
             }
         }
     }

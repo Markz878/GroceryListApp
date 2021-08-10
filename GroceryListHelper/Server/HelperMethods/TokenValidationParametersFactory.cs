@@ -23,8 +23,10 @@ namespace GroceryListHelper.Server.HelperMethods
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
                 ClockSkew = TimeSpan.Zero,
                 ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512 },
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = configuration["HostUrl"],
+                ValidAudience = configuration["HostUrl"],
             };
         }
     }

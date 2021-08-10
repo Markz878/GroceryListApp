@@ -3,6 +3,7 @@ using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Shared;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,14 +17,19 @@ namespace GroceryListHelper.Server.HelperMethods
     {
         private readonly UserRepository userRepository;
         private readonly TokenValidationParametersFactory tokenValidationParametersFactory;
+        private readonly ILogger<JWTAuthenticationManager> logger;
         private readonly IConfiguration configuration;
         private const string AccessTokenKey = "AccessTokenKey";
         private const string RefreshTokenKey = "RefreshTokenKey";
 
-        public JWTAuthenticationManager(IConfiguration configuration, UserRepository userRepository, TokenValidationParametersFactory tokenValidationParametersFactory)
+        public JWTAuthenticationManager(IConfiguration configuration,
+                                        UserRepository userRepository,
+                                        TokenValidationParametersFactory tokenValidationParametersFactory,
+                                        ILogger<JWTAuthenticationManager> logger)
         {
             this.userRepository = userRepository;
             this.tokenValidationParametersFactory = tokenValidationParametersFactory;
+            this.logger = logger;
             this.configuration = configuration;
         }
 
@@ -109,7 +115,6 @@ namespace GroceryListHelper.Server.HelperMethods
             return GenerateToken(AccessTokenKey, TimeSpan.FromMinutes(configuration.GetValue<double>("AccessTokenLifeTimeMinutes")), user);
         }
 
-
         private string GenerateRefreshToken(UserModel user)
         {
             return GenerateToken(RefreshTokenKey, TimeSpan.FromMinutes(configuration.GetValue<double>("RefreshTokenLifeTimeMinutes")), user);
@@ -125,13 +130,13 @@ namespace GroceryListHelper.Server.HelperMethods
             byte[] keyBytes = Encoding.ASCII.GetBytes(configuration[key]);
             SecurityTokenDescriptor tokenDescriptor = new()
             {
-                //Issuer = configuration["ServerURL"],
-                //Audience = configuration["ClientURL"],
                 Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Email, user.Email) }),
                 Expires = DateTime.UtcNow + duration,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(keyBytes),
-                    SecurityAlgorithms.HmacSha512Signature)
+                    SecurityAlgorithms.HmacSha512Signature),
+                Audience = configuration["HostUrl"],
+                Issuer = configuration["HostUrl"],
             };
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -145,8 +150,9 @@ namespace GroceryListHelper.Server.HelperMethods
                 claimsPrincipal = tokenHandler.ValidateToken(token, tokenValidationParametersFactory.CreateParameters(key), out SecurityToken jwt);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.LogError(ex, "Token validation failed.");
                 if (tokenHandler.CanReadToken(token))
                 {
                     claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(tokenHandler.ReadJwtToken(token).Claims));

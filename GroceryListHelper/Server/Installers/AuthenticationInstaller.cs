@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Installers
@@ -31,15 +30,7 @@ namespace GroceryListHelper.Server.Installers
 
                         if (path.StartsWithSegments("/carthub"))
                         {
-                            string accessToken = context.Request.Query["access_token"];
-                            if(string.IsNullOrEmpty(accessToken) && context.Request.Headers.TryGetValue("Authorization", out StringValues token))
-                            {
-                                accessToken = token;
-                            }
-                            if (!string.IsNullOrEmpty(accessToken))
-                            {
-                                context.Token = accessToken.Replace("Bearer ", "");
-                            }
+                            context.Token = context.Request.Query["access_token"];
                         }
                         return Task.CompletedTask;
                     }
