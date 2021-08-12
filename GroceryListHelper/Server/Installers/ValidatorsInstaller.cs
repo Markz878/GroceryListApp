@@ -11,7 +11,7 @@ namespace GroceryListHelper.Server.Installers
         {
             services.AddTransient<CartProductValidator>();
             services.AddTransient<StoreProductValidator>();
-            services.AddTransient(x => new RegisterRequestValidator(x.GetRequiredService<UserRepository>()));
+            services.AddTransient(x => new RegisterRequestValidator(x.GetRequiredService<IUserRepository>()));
         }
     }
 }

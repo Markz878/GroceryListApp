@@ -13,9 +13,9 @@ namespace GroceryListHelper.Server.Controllers
     [Authorize]
     public class ProfileController : ControllerBase
     {
-        private readonly UserRepository userRepository;
+        private readonly IUserRepository userRepository;
 
-        public ProfileController(UserRepository userRepository)
+        public ProfileController(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
         }

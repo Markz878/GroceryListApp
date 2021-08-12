@@ -16,11 +16,11 @@ namespace GroceryListHelper.Server.Hubs
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CartHub : Hub<ICartHubClient>, ICartHub
     {
-        private readonly CartProductRepository db;
-        private readonly UserRepository userRepository;
+        private readonly ICartProductRepository db;
+        private readonly IUserRepository userRepository;
         private readonly CartHubService cartHubService;
 
-        public CartHub(CartProductRepository db, UserRepository userRepository, CartHubService cartHubService)
+        public CartHub(ICartProductRepository db, IUserRepository userRepository, CartHubService cartHubService)
         {
             this.db = db;
             this.userRepository = userRepository;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.DataAccess.Repositories
 {
-    public class StoreProductRepository
+    public class StoreProductRepository : IStoreProductRepository
     {
         private readonly GroceryStoreDbContext db;
 

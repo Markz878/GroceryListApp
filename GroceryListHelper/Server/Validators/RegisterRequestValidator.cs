@@ -10,9 +10,9 @@ namespace GroceryListHelper.Server.Validators
 {
     public class RegisterRequestValidator : AbstractValidator<RegisterRequestModel>
     {
-        private readonly UserRepository db;
+        private readonly IUserRepository db;
 
-        public RegisterRequestValidator(UserRepository db)
+        public RegisterRequestValidator(IUserRepository db)
         {
             this.db = db;
         }

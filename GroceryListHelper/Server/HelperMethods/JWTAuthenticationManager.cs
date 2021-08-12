@@ -15,7 +15,7 @@ namespace GroceryListHelper.Server.HelperMethods
 {
     public class JWTAuthenticationManager
     {
-        private readonly UserRepository userRepository;
+        private readonly IUserRepository userRepository;
         private readonly TokenValidationParametersFactory tokenValidationParametersFactory;
         private readonly ILogger<JWTAuthenticationManager> logger;
         private readonly IConfiguration configuration;
@@ -23,7 +23,7 @@ namespace GroceryListHelper.Server.HelperMethods
         private const string RefreshTokenKey = "RefreshTokenKey";
 
         public JWTAuthenticationManager(IConfiguration configuration,
-                                        UserRepository userRepository,
+                                        IUserRepository userRepository,
                                         TokenValidationParametersFactory tokenValidationParametersFactory,
                                         ILogger<JWTAuthenticationManager> logger)
         {

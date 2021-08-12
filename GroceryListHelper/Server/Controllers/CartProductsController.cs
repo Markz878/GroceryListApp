@@ -13,9 +13,9 @@ namespace GroceryListHelper.Server.Controllers
     [Authorize]
     public class CartProductsController : ControllerBase
     {
-        private readonly CartProductRepository cartProductsRepository;
+        private readonly ICartProductRepository cartProductsRepository;
 
-        public CartProductsController(CartProductRepository cartProductsRepository)
+        public CartProductsController(ICartProductRepository cartProductsRepository)
         {
             this.cartProductsRepository = cartProductsRepository;
         }

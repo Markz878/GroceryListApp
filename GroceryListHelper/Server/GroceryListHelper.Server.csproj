@@ -33,5 +33,4 @@
 		<ProjectReference Include="..\Shared\GroceryListHelper.Shared.csproj" />
 	</ItemGroup>
 
-
 </Project>

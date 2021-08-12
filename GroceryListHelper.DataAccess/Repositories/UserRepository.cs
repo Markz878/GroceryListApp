@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.DataAccess.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly GroceryStoreDbContext db;
         private readonly ILogger<UserRepository> logger;

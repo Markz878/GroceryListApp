@@ -13,9 +13,9 @@ namespace GroceryListHelper.Server.Installers
             services.AddDbContext<GroceryStoreDbContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("DatabaseConnection")));
 
-            services.AddScoped<CartProductRepository>();
-            services.AddScoped<StoreProductRepository>();
-            services.AddScoped<UserRepository>();
+            services.AddScoped<ICartProductRepository, CartProductRepository>();
+            services.AddScoped<IStoreProductRepository, StoreProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
     }
 }
