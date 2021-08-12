@@ -13,28 +13,26 @@ namespace GroceryListHelper.Server.Installers
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GroceryListHelper.Server", Version = "v1" });
-                c.AddSecurityDefinition("Bearer",
-                    new OpenApiSecurityScheme
-                    {
-                        In = ParameterLocation.Header,
-                        Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.ApiKey,
-                        Scheme = "Bearer"
-                    });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GroceryListHelper", Version = "v1" });
+                OpenApiSecurityScheme securitySchema = new()
                 {
+                    Description = "Using the Authorization header with the Bearer scheme.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    Reference = new OpenApiReference
                     {
-                        new OpenApiSecurityScheme
-                        { Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
                     }
+                };
+
+                c.AddSecurityDefinition("Bearer", securitySchema);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    { securitySchema, new[] { "Bearer" } }
                 });
                 string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
