@@ -134,9 +134,7 @@ namespace GroceryListHelper.Server.HelperMethods
                 Expires = DateTime.UtcNow + duration,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(keyBytes),
-                    SecurityAlgorithms.HmacSha512Signature),
-                Audience = configuration["HostUrl"],
-                Issuer = configuration["HostUrl"],
+                    SecurityAlgorithms.HmacSha512Signature)
             };
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);

@@ -11,11 +11,6 @@
     transform: scale(2,2);
 }
 
-.sort-buttons {
-    display: flex;
-    flex-direction: row;
-}
-
-.sort-buttons > button {
-    margin: 5px;
+.moving-button {
+    background: #3827b4
 }

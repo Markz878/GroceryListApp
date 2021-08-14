@@ -19,7 +19,9 @@ namespace GroceryListHelper.Client.Components
         [Inject] public StoreProductsService StoreProductsService { get; set; }
         [Inject] public ModalViewModel ModalViewModel { get; set; }
         public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel() { Amount = 1 };
-        public CartProduct EditingItem { get; set; }
+        public CartProductUIModel EditingItem { get; set; }
+        public CartProductUIModel MovingItem { get; set; }
+        public bool IsMoving { get; set; }
 
         public ElementReference NewProductNameBox;
         public ElementReference AddProductButton;
@@ -34,15 +36,9 @@ namespace GroceryListHelper.Client.Components
             {
                 CartProductUIModel newProduct = NewProduct;
                 NewProduct = new CartProductUIModel() { Amount = 1 };
-                Task task1 = SaveCartProduct(newProduct);
-                Task task2 = SaveStoreProduct(newProduct.Name, newProduct.UnitPrice);
-                await Task.WhenAll(task1, task2).ContinueWith(x =>
-                {
-                    if (!x.IsFaulted)
-                    {
-                        NewProductNameBox.FocusAsync().AsTask();
-                    }
-                });
+                await SaveCartProduct(newProduct);
+                await SaveStoreProduct(newProduct.Name, newProduct.UnitPrice);
+                await NewProductNameBox.FocusAsync();
             }
             else
             {
@@ -151,29 +147,25 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public async Task MoveUp(CartProductUIModel cartProduct)
+        public async Task Move(CartProductUIModel cartProduct)
         {
-            int index = ViewModel.CartProducts.IndexOf(cartProduct);
-            if (index > 0)
+            if (MovingItem == null)
             {
-                ViewModel.CartProducts.Move(index, index - 1);
-                if (ViewModel.IsPolling)
-                {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, index-1);
-                }
+                MovingItem = cartProduct;
             }
-        }
-
-        public async Task MoveDown(CartProductUIModel cartProduct)
-        {
-            int index = ViewModel.CartProducts.IndexOf(cartProduct);
-            if (index < ViewModel.CartProducts.Count-1)
+            else
             {
-                ViewModel.CartProducts.Move(index, index + 1);
-                if (ViewModel.IsPolling)
+                if (cartProduct != MovingItem)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, index + 1);
+                    int itemIndex = ViewModel.CartProducts.IndexOf(MovingItem);
+                    int newIndex = ViewModel.CartProducts.IndexOf(cartProduct);
+                    ViewModel.CartProducts.Move(itemIndex, newIndex);
+                    if (ViewModel.IsPolling)
+                    {
+                        await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, newIndex);
+                    }
                 }
+                MovingItem = null;
             }
         }
 
