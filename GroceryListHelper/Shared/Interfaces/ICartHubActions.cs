@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.Shared.Interfaces
 {
-    public interface ICartHub
+    public interface ICartHubActions
     {
         Task<HubResponse> CreateGroup(List<string> allowedUsers);
         Task<HubResponse> JoinGroup(string hostEmail);

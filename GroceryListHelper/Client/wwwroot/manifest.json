@@ -1,10 +1,11 @@
 {
-  "name": "GroceryListHelper",
+  "name": "Grocery List Helper",
   "short_name": "GroceryListHelper",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#03173d",
+  "description": "Grocery List Helper App - Helps you remember!",
   "icons": [
     {
       "src": "store.png",

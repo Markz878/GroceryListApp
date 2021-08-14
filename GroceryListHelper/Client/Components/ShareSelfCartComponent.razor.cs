@@ -29,7 +29,7 @@ namespace GroceryListHelper.Client.Components
             {
                 ViewModel.IsPolling = true;
                 await ViewModel.CartHub.StartAsync();
-                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHub.CreateGroup), ViewModel.AllowedUsers);
+                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CreateGroup), ViewModel.AllowedUsers);
 
                 if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
@@ -52,7 +52,7 @@ namespace GroceryListHelper.Client.Components
         {
             try
             {
-                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
+                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.LeaveGroup));
                 ViewModel.ShareCartInfo = response.ErrorMessage;
             }
             catch (Exception ex)
@@ -63,6 +63,7 @@ namespace GroceryListHelper.Client.Components
             {
                 await ViewModel.CartHub.StopAsync();
                 ViewModel.IsPolling = false;
+                ViewModel.AllowedUsers.Clear();
             }
         }
     }

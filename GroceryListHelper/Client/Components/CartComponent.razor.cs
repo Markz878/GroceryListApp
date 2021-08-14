@@ -57,7 +57,7 @@ namespace GroceryListHelper.Client.Components
             {
                 if (ViewModel.IsPolling)
                 {
-                    product.Id = await ViewModel.CartHub.InvokeAsync<int>(nameof(ICartHub.CartItemAdded), product);
+                    product.Id = await ViewModel.CartHub.InvokeAsync<int>(nameof(ICartHubActions.CartItemAdded), product);
                 }
                 else
                 {
@@ -76,7 +76,7 @@ namespace GroceryListHelper.Client.Components
             ViewModel.OnPropertyChanged();
             if (ViewModel.IsPolling)
             {
-                return ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemCollected), product.Id);
+                return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
             }
             else
             {
@@ -127,7 +127,7 @@ namespace GroceryListHelper.Client.Components
                 ViewModel.OnPropertyChanged();
                 if (ViewModel.IsPolling)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemModified), product);
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemModified), product);
                 }
                 else
                 {
@@ -159,7 +159,7 @@ namespace GroceryListHelper.Client.Components
                 ViewModel.CartProducts.Move(index, index - 1);
                 if (ViewModel.IsPolling)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), cartProduct.Id, index-1);
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, index-1);
                 }
             }
         }
@@ -172,7 +172,7 @@ namespace GroceryListHelper.Client.Components
                 ViewModel.CartProducts.Move(index, index + 1);
                 if (ViewModel.IsPolling)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), cartProduct.Id, index + 1);
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, index + 1);
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace GroceryListHelper.Client.Components
             ViewModel.CartProducts.Remove(product);
             if (ViewModel.IsPolling)
             {
-                return ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemDeleted), product.Id);
+                return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), product.Id);
             }
             else
             {
@@ -205,7 +205,7 @@ namespace GroceryListHelper.Client.Components
                 ViewModel.CartProducts.Move(dragTargetIndex, dropTargetIndex);
                 if (ViewModel.IsPolling)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHub.CartItemMoved), dragTarget.Id, dropTargetIndex);
+                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), dragTarget.Id, dropTargetIndex);
                 }
             }
         }

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GroceryListHelper\Client\GroceryListHelper.Client.csproj" />
+    <ProjectReference Include="..\GroceryListHelper\Server\GroceryListHelper.Server.csproj" />
     <ProjectReference Include="..\GroceryListHelper\Shared\GroceryListHelper.Shared.csproj" />
   </ItemGroup>
 

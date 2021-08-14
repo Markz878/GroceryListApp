@@ -5,7 +5,6 @@ using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -14,27 +13,17 @@ using System.Threading.Tasks;
 namespace GroceryListHelper.Server.Hubs
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class CartHub : Hub<ICartHubClient>, ICartHub
+    public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
     {
         private readonly ICartProductRepository db;
         private readonly IUserRepository userRepository;
-        private readonly CartHubService cartHubService;
+        private readonly ICartHubService cartHubService;
 
-        public CartHub(ICartProductRepository db, IUserRepository userRepository, CartHubService cartHubService)
+        public CartHub(ICartProductRepository db, IUserRepository userRepository, ICartHubService cartHubService)
         {
             this.db = db;
             this.userRepository = userRepository;
             this.cartHubService = cartHubService;
-        }
-
-        public override Task OnConnectedAsync()
-        {
-            return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            return base.OnDisconnectedAsync(exception);
         }
 
         public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
@@ -62,7 +51,7 @@ namespace GroceryListHelper.Server.Hubs
                 if (emails.Contains(GetUserEmail(Context)))
                 {
                     await Groups.AddToGroupAsync(Context.ConnectionId, user.Id.ToString());
-                    await Clients.Caller.GetCart((await db.GetCartProductsForUser(user.Id)).ToList());
+                    await Clients.Caller.ReceiveCart((await db.GetCartProductsForUser(user.Id)).ToList());
                 }
                 else
                 {
@@ -125,7 +114,15 @@ namespace GroceryListHelper.Server.Hubs
             if (hostId >= 0)
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
+                if (hostId == GetUserId(Context))
+                {
+                    await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail(Context));
+                    cartHubService.GroupAllowedEmails.Remove(hostId);
+                }
+                else
+                {
+                    await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
+                }
                 return new HubResponse() { SuccessMessage = "You have left the group." };
             }
             else

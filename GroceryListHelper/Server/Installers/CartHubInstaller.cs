@@ -16,7 +16,7 @@ namespace GroceryListHelper.Server.Installers
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
-            services.AddSingleton<CartHubService>();
+            services.AddSingleton<ICartHubService, CartHubService>();
         }
     }
 }

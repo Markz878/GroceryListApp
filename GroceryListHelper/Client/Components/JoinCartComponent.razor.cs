@@ -17,7 +17,7 @@ namespace GroceryListHelper.Client.Components
             {
                 ViewModel.IsPolling = true;
                 await ViewModel.CartHub.StartAsync();
-                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHub.JoinGroup), ViewModel.CartHostEmail);
+                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.JoinGroup), ViewModel.CartHostEmail);
 
                 if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
@@ -40,7 +40,7 @@ namespace GroceryListHelper.Client.Components
         {
             try
             {
-                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHub.LeaveGroup));
+                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.LeaveGroup));
                 ViewModel.ShareCartInfo = response.ErrorMessage;
             }
             catch (Exception ex)
