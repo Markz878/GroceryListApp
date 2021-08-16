@@ -13,9 +13,9 @@ namespace GroceryListHelper.Server.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration configuration;
-        private readonly JWTAuthenticationManager authenticationManager;
+        private readonly IJWTAuthenticationManager authenticationManager;
 
-        public AuthenticationController(IConfiguration configuration, JWTAuthenticationManager authenticationManager)
+        public AuthenticationController(IConfiguration configuration, IJWTAuthenticationManager authenticationManager)
         {
             this.configuration = configuration;
             this.authenticationManager = authenticationManager;
@@ -27,7 +27,7 @@ namespace GroceryListHelper.Server.Controllers
         public async Task<ActionResult<AuthenticationResponseModel>> Register([FromBody] RegisterRequestModel user)
         {
             (AuthenticationResponseModel response, string refreshToken) = await authenticationManager.Register(user.Email, user.Password);
-            if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.AccessToken) && !string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(response?.ErrorMessage) && !string.IsNullOrEmpty(response?.AccessToken) && !string.IsNullOrEmpty(refreshToken))
             {
                 Response.Cookies.Append(GlobalConstants.XRefreshToken, refreshToken, GetCookieOptions(HttpContext));
                 return Ok(response);

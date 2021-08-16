@@ -9,19 +9,26 @@ namespace GroceryListHelper.IntegrationTests.Hooks
     [Binding]
     public class TestHook
     {
-        [BeforeScenario("CanAddCartProduct")]
+        [BeforeScenario("AnonymousUserCartInteraction")]
         public async Task BeforeCanAddCartProductScenario(IObjectContainer container)
         {
             IPlaywright playwright = await Playwright.CreateAsync();
-            IBrowser browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
+            IBrowser browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions()
             {
                 Headless = false,
-                SlowMo = 2000
+                SlowMo = 500,
             });
-            IndexPageObject pageObject = new(browser);
+            IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions()
+            {
+                IgnoreHTTPSErrors = true,
+                BaseURL = "https://localhost:5001",
+            });
+            IndexPageObject indexPage = new(context);
+            LoginPageObject loginPage = new(context);
             container.RegisterInstanceAs(playwright);
             container.RegisterInstanceAs(browser);
-            container.RegisterInstanceAs(pageObject);
+            container.RegisterInstanceAs(indexPage);
+            container.RegisterInstanceAs(loginPage);
         }
 
         [AfterScenario]

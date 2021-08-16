@@ -5,13 +5,14 @@ namespace GroceryListHelper.IntegrationTests.PageObjects
 {
     public abstract class BasePageObject
     {
-        public abstract string PagePath { get; }
+        public string PagePath { get; }
         public IPage Page { get; set; }
-        public IBrowser Browser { get; set; }
+        public IBrowserContext Browser { get; set; }
 
-        public BasePageObject(IBrowser browser)
+        public BasePageObject(IBrowserContext browser, string path)
         {
             Browser = browser;
+            PagePath = path;
         }
 
         public async Task NavigateAsync()

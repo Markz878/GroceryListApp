@@ -34,9 +34,6 @@ namespace GroceryListHelper.Server.Installers
                 {
                     { securitySchema, new[] { "Bearer" } }
                 });
-                string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
             });
 
         }

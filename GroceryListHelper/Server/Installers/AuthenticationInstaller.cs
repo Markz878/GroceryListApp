@@ -36,7 +36,7 @@ namespace GroceryListHelper.Server.Installers
                     }
                 };
             });
-            services.AddScoped<JWTAuthenticationManager>();
+            services.AddScoped<IJWTAuthenticationManager, JWTAuthenticationManager>();
         }
     }
 }

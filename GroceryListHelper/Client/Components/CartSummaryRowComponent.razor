@@ -1,8 +1,8 @@
 ﻿@inherits CartSummaryRowComponentBase
 
 <div class="summary-row">
-    <b style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
-    <b>Total: @Total.ToString("N2") €</b>
+    <b id="cart-collected-info" style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
+    <b id="cart-total">Total: @Total.ToString("N2") €</b>
     <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearCartProducts" aria-label="Clear cart">Clear cart</button>
     <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearStoreProducts" aria-label="Clear store products">Clear shop</button>
 </div>

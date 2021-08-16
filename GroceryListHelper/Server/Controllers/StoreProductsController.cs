@@ -39,24 +39,24 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteAll()
         {
             await db.DeleteAll(User.GetUserId());
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             bool success = await db.DeleteItem(id, User.GetUserId());
-            return success ? Ok() : NotFound();
+            return success ? NoContent() : NotFound();
         }
 
         [HttpPatch("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdatePrice(int id, [FromQuery] double price)
@@ -66,7 +66,7 @@ namespace GroceryListHelper.Server.Controllers
                 return BadRequest("Price can't be negative.");
             }
             bool success = await db.UpdatePrice(id, User.GetUserId(), price);
-            return success ? Ok() : NotFound();
+            return success ? NoContent() : NotFound();
         }
     }
 }

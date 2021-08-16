@@ -21,7 +21,7 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> LogOut()
         {
@@ -29,7 +29,7 @@ namespace GroceryListHelper.Server.Controllers
             string response = await userRepository.RemoveRefreshToken(id);
             if (string.IsNullOrEmpty(response))
             {
-                return Ok();
+                return NoContent();
             }
             else
             {
@@ -38,7 +38,7 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
@@ -46,7 +46,7 @@ namespace GroceryListHelper.Server.Controllers
             string response = await userRepository.ChangePassword(id, request.CurrentPassword, request.NewPassword);
             if (string.IsNullOrEmpty(response))
             {
-                return Ok();
+                return NoContent();
             }
             else
             {
@@ -55,7 +55,7 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
         {
@@ -63,7 +63,7 @@ namespace GroceryListHelper.Server.Controllers
             string response = await userRepository.ChangeEmail(id, request.NewEmail, request.Password);
             if (string.IsNullOrEmpty(response))
             {
-                return Ok();
+                return NoContent();
             }
             else
             {
@@ -72,14 +72,14 @@ namespace GroceryListHelper.Server.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> Delete(DeleteProfileRequest request)
         {
             string response = await userRepository.DeleteUser(User.GetUserId(), request.Password);
             if (string.IsNullOrEmpty(response))
             {
-                return Ok();
+                return NoContent();
             }
             else
             {

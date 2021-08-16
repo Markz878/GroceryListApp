@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.HelperMethods
 {
-    public class JWTAuthenticationManager
+    public class JWTAuthenticationManager : IJWTAuthenticationManager
     {
         private readonly IUserRepository userRepository;
         private readonly TokenValidationParametersFactory tokenValidationParametersFactory;
@@ -39,7 +39,7 @@ namespace GroceryListHelper.Server.HelperMethods
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>Returns an error message if email is already in use, otherwise null.</returns>
-        internal async Task<(AuthenticationResponseModel response, string refreshToken)> Register(string email, string password)
+        public async Task<(AuthenticationResponseModel response, string refreshToken)> Register(string email, string password)
         {
             AuthenticationResponseModel response = new();
             if (await userRepository.GetUserFromEmail(email) != null)
@@ -59,7 +59,7 @@ namespace GroceryListHelper.Server.HelperMethods
             return (response, refreshToken);
         }
 
-        internal async Task<(AuthenticationResponseModel response, string refreshToken)> Login(string email, string password)
+        public async Task<(AuthenticationResponseModel response, string refreshToken)> Login(string email, string password)
         {
             AuthenticationResponseModel response = new();
             UserDbModel user = await userRepository.GetUserFromEmail(email);
@@ -85,7 +85,7 @@ namespace GroceryListHelper.Server.HelperMethods
         /// Checks that the previous refresh token has not expired and is otherwise valid.
         /// </summary>
         /// <param name="refreshToken">Previous refresh token</param>
-        internal async Task<(AuthenticationResponseModel response, string newRefreshToken)> RefreshTokens(string refreshToken)
+        public async Task<(AuthenticationResponseModel response, string newRefreshToken)> RefreshTokens(string refreshToken)
         {
             AuthenticationResponseModel response = new();
             if (ValidateToken(RefreshTokenKey, refreshToken, out ClaimsPrincipal claimsPrincipal))

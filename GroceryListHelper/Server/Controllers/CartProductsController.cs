@@ -38,28 +38,28 @@ namespace GroceryListHelper.Server.Controllers
         public async Task<IActionResult> DeleteAllProducts()
         {
             await cartProductsRepository.RemoveItemsForUser(User.GetUserId());
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             bool success = await cartProductsRepository.DeleteItem(id, User.GetUserId());
-            return success ? Ok() : NotFound();
+            return success ? NoContent() : NotFound();
         }
 
         [HttpPatch("{id:int}")]
         public async Task<IActionResult> MarkAsCollected(int id)
         {
             bool success = await cartProductsRepository.MarkAsCollected(id, User.GetUserId());
-            return success ? Ok() : NotFound();
+            return success ? NoContent() : NotFound();
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateProduct(int id, CartProduct updatedProduct)
         {
             bool success = await cartProductsRepository.UpdateProduct(id, User.GetUserId(), updatedProduct);
-            return success ? Ok() : NotFound();
+            return success ? NoContent() : NotFound();
         }
     }
 }
