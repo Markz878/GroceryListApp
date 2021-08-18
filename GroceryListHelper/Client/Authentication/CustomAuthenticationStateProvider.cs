@@ -31,13 +31,4 @@ namespace GroceryListHelper.Client.Authentication
             }
         }
     }
-
-    public static class AuthenticationStateProviderExtensions
-    {
-        public static async Task<bool> IsUserAuthenticated(this AuthenticationStateProvider authenticationStateProvider)
-        {
-            AuthenticationState authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            return authenticationState.User?.Identity?.IsAuthenticated == true;
-        }
-    }
 }

@@ -141,5 +141,24 @@ namespace GroceryListHelper.IntegrationTests.Features
             Assert.Equal(amount.ToString(), amountText);
             Assert.Equal(price.ToString(), priceText);
         }
+
+        [When(@"the (.*) products are checked to have been collected")]
+        public async Task WhenTheProductsAreCheckedToHaveBeenCollected(int p0)
+        {
+            for (int i = 0; i < p0; i++)
+            {
+                await indexPage.Page.CheckAsync($"#item-collected-checkbox-{i}");
+            }
+        }
+
+        [Then(@"the all-collected check should say ""(.*)""")]
+        public async Task ThenTheAll_CollectedCheckShouldSay(string p0)
+        {
+            var collectedInfoElement = await indexPage.Page.QuerySelectorAsync("#cart-collected-info");
+            string collectedInfoText = await collectedInfoElement.InnerTextAsync();
+            Assert.Equal(p0, collectedInfoText);
+        }
+
+
     }
 }

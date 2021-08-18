@@ -21,7 +21,7 @@ namespace GroceryListHelper.Server.HelperMethods
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[key])),
-                ClockSkew = TimeSpan.Zero,
+                ClockSkew = TimeSpan.FromSeconds(5),
                 ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512 },
                 ValidateIssuer = false,
                 ValidateAudience = false,

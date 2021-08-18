@@ -16,7 +16,7 @@ namespace GroceryListHelper.IntegrationTests.Hooks
             IBrowser browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions()
             {
                 Headless = false,
-                SlowMo = 500,
+                SlowMo = 1000,
             });
             IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions()
             {

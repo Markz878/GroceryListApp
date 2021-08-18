@@ -1,8 +1,12 @@
 ﻿using GroceryListHelper.Client.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,26 +33,47 @@ namespace GroceryListHelper.Client.Authentication
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             string accessToken = await tokenProvider.RequestAccessToken();
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            }
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            if (!accessToken.AccessTokenStillValid())
             {
                 accessToken = await tokenProvider.TryToRefreshToken();
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     await HandleSessionExpired();
+                    return null;
                 }
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                response = await base.SendAsync(request, cancellationToken);
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else
                 {
-                    await HandleSessionExpired();
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                    HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await HandleSessionExpired();
+                    }
+                    return response;
                 }
             }
-            return response;
+            else
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    accessToken = await tokenProvider.TryToRefreshToken();
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        await HandleSessionExpired();
+                        return response;
+                    }
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                    response = await base.SendAsync(request, cancellationToken);
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await HandleSessionExpired();
+                    }
+                }
+                return response;
+            }
+
         }
 
         private async Task HandleSessionExpired()

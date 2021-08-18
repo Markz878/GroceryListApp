@@ -51,3 +51,12 @@ Scenario: Edit cart items
 	When user starts to edit item
 	And changes the item amount to 1 and price to 3
 	Then the item amount should be 1 and price 3
+
+Scenario: Cart shows when all items are collected
+	Given a user in the index page
+	And the following products in cart
+		| Name | Amount | Price |
+		| Milk | 2		| 2.5	|
+		| Meat | 1		| 4		|
+	When the 2 products are checked to have been collected
+	Then the all-collected check should say "All collected!"
