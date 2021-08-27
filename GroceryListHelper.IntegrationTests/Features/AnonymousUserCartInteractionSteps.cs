@@ -57,6 +57,7 @@ namespace GroceryListHelper.IntegrationTests.Features
         [Then(@"the item should be added to the cart")]
         public async Task ThenTheItemShouldBeAddedToTheCart()
         {
+            await Task.Delay(500);
             string cartProductsJson = await indexPage.Page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
             CartProductCollectable[] models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
             Assert.True(models[0].Id == 0);

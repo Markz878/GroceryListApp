@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 
 namespace GroceryListHelper.Server.HelperMethods
 {
@@ -6,7 +7,12 @@ namespace GroceryListHelper.Server.HelperMethods
     {
         public static int GetUserId(this ClaimsPrincipal user)
         {
-            return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user.FindFirst("Id")?.Value);
+            string idClaim = user.FindFirstValue("id");
+            if (string.IsNullOrEmpty(idClaim))
+            {
+                return -1;
+            }
+            return int.Parse(idClaim);
         }
     }
 }

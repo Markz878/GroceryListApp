@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
+using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared.Validators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,8 +28,10 @@ namespace GroceryListHelper.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.InstallAssemblyServices(Configuration);
-            services.AddControllers(x => x.Filters.Add(new ValidationFilter())).AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<UserCredentialsValidator>(lifetime: ServiceLifetime.Singleton));
-            services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+            services.AddControllers().AddFluentValidation(options =>
+            {
+                options.RegisterValidatorsFromAssemblyContaining<UserCredentialsValidator>();
+            });
             services.AddRazorPages();
         }
 
@@ -50,7 +53,7 @@ namespace GroceryListHelper.Server
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseIpRateLimiting();
 
             app.UseBlazorFrameworkFiles();

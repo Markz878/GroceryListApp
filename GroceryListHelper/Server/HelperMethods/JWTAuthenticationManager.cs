@@ -130,7 +130,7 @@ namespace GroceryListHelper.Server.HelperMethods
             byte[] keyBytes = Encoding.ASCII.GetBytes(configuration[key]);
             SecurityTokenDescriptor tokenDescriptor = new()
             {
-                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Email, user.Email) }),
+                Subject = new ClaimsIdentity(new Claim[] { new Claim("id", user.Id.ToString()), new Claim(ClaimTypes.Email, user.Email) }),
                 Expires = DateTime.UtcNow + duration,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(keyBytes),

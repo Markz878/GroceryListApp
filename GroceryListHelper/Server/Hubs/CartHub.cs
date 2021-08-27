@@ -133,7 +133,7 @@ namespace GroceryListHelper.Server.Hubs
 
         private static int GetUserId(HubCallerContext context)
         {
-            return int.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return int.Parse(context.User.FindFirst("id").Value);
         }
 
         private static string GetUserEmail(HubCallerContext context)
