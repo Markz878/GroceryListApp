@@ -1,16 +1,14 @@
 using AspNetCoreRateLimit;
 using FluentValidation.AspNetCore;
-using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
-using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared.Validators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace GroceryListHelper.Server
 {
@@ -53,7 +51,10 @@ namespace GroceryListHelper.Server
                 app.UseHsts();
             }
 
-            //app.UseHttpsRedirection();
+            if (!InDocker)
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseIpRateLimiting();
 
             app.UseBlazorFrameworkFiles();
@@ -71,5 +72,7 @@ namespace GroceryListHelper.Server
                 endpoints.MapFallbackToFile("index.html");
             });
         }
+
+        private static bool InDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
     }
 }
