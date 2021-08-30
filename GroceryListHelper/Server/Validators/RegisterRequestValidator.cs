@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.Authentication;
 using System.Linq;
 
 namespace GroceryListHelper.Server.Validators

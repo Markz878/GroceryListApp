@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

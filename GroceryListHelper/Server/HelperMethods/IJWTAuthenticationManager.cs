@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Models.Authentication;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.HelperMethods

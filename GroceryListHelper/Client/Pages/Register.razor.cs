@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.Client.Services;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Threading.Tasks;

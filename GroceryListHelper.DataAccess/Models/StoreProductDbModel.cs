@@ -1,10 +1,9 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Models.StoreProduct;
 
 namespace GroceryListHelper.DataAccess.Models
 {
-    public class StoreProductDbModel : StoreProduct
+    public class StoreProductDbModel : StoreProductResponseModel
     {
-        public int Id { get; set; }
         public int UserId { get; set; }
     }
 }

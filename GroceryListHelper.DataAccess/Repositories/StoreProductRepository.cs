@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +16,12 @@ namespace GroceryListHelper.DataAccess.Repositories
             this.db = db;
         }
 
-        public IAsyncEnumerable<StoreProductDbModel> GetStoreProductsForUser(int userId)
+        public IAsyncEnumerable<StoreProductResponseModel> GetStoreProductsForUser(int userId)
         {
-            return db.StoreProducts.Where(x => x.UserId == userId).AsAsyncEnumerable();
+            return db.StoreProducts.Where(x => x.UserId == userId).Select(x=>(StoreProductResponseModel)x).AsAsyncEnumerable();
         }
 
-        public async Task<int> AddProduct(StoreProduct product, int userId)
+        public async Task<int> AddProduct(StoreProductModel product, int userId)
         {
             StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, UserId = userId };
             db.StoreProducts.Add(storeProduct);
@@ -43,8 +43,7 @@ namespace GroceryListHelper.DataAccess.Repositories
                 return false;
             }
             db.StoreProducts.Remove(product);
-            await db.SaveChangesAsync();
-            return true;
+            return await db.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> UpdatePrice(int productId, int userId, double price)
@@ -55,8 +54,7 @@ namespace GroceryListHelper.DataAccess.Repositories
                 return false;
             }
             product.UnitPrice = price;
-            await db.SaveChangesAsync();
-            return true;
+            return await db.SaveChangesAsync() > 0;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.Authentication;
+using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

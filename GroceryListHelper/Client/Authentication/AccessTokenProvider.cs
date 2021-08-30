@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Models.Authentication;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;

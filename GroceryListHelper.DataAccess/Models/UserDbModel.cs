@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Models.Authentication;
 
 namespace GroceryListHelper.DataAccess.Models
 {

@@ -1,6 +1,6 @@
-﻿namespace GroceryListHelper.Shared
+﻿namespace GroceryListHelper.Shared.Models.StoreProduct
 {
-    public class StoreProduct
+    public class StoreProductModel
     {
         public string Name { get; set; }
         public double UnitPrice { get; set; }

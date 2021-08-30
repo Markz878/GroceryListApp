@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Shared
+﻿using GroceryListHelper.Shared.Models.CartProduct;
+
+namespace GroceryListHelper.Shared
 {
     public class CartProductCollectable : CartProduct
     {

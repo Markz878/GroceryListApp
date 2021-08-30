@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Shared
+﻿using GroceryListHelper.Shared.Models.BaseModels;
+
+namespace GroceryListHelper.Shared.Models.Authentication
 {
     public class AuthenticationResponseModel : BaseResponse
     {

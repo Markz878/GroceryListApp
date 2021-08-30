@@ -1,7 +1,7 @@
 ﻿using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,15 +24,15 @@ namespace GroceryListHelper.Server.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel[]))]
-        public IAsyncEnumerable<StoreProductDbModel> GetProducts()
+        public IAsyncEnumerable<StoreProductResponseModel> GetProducts()
         {
-            IAsyncEnumerable<StoreProductDbModel> result = db.GetStoreProductsForUser(User.GetUserId());
+            IAsyncEnumerable<StoreProductResponseModel> result = db.GetStoreProductsForUser(User.GetUserId());
             return result;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
-        public async Task<IActionResult> Post(StoreProduct product)
+        public async Task<IActionResult> Post(StoreProductModel product)
         {
             int id = await db.AddProduct(product, User.GetUserId());
             return Ok(id);

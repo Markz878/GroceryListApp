@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,12 @@ namespace GroceryListHelper.DataAccess.Repositories
             return cartDbProduct.Id;
         }
 
-        public async Task<IEnumerable<CartProductCollectable>> GetCartProductsForUser(int userId)
+        public Task<List<CartProductCollectable>> GetCartProductsForUser(int userId)
         {
-            return (await db.CartProducts.Where(x => x.UserId == userId).AsNoTracking().ToListAsync()).ConvertAll(x => (CartProductCollectable)x);
+            return db.CartProducts.AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Select(x=> new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice })
+                .ToListAsync();
         }
 
         public Task RemoveItemsForUser(int userId)

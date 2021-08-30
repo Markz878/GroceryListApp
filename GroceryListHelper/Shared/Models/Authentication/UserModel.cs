@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace GroceryListHelper.Shared
+﻿namespace GroceryListHelper.Shared.Models.Authentication
 {
     public class UserModel
     {

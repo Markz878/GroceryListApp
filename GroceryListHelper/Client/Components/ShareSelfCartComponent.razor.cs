@@ -2,6 +2,7 @@ using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
+using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Threading.Tasks;

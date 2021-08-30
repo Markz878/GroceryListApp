@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.Shared
+﻿namespace GroceryListHelper.Shared.Models.Authentication
 {
     public class RefreshTokenRequestModel
     {

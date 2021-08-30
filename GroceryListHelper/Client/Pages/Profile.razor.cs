@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;

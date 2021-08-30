@@ -43,7 +43,7 @@ namespace GroceryListHelper.UnitTests.ControllerTests
         public async Task CartProductsController_Get_ReturnsIEnumerableOfCartProducts()
         {
             // Arrange
-            IEnumerable<CartProductCollectable> cartProducts = new Faker<CartProductCollectable>()
+            List<CartProductCollectable> cartProducts = new Faker<CartProductCollectable>()
                 .RuleFor(x => x.Id, x => x.Random.Int(0, 100))
                 .RuleFor(x => x.UnitPrice, x => x.Random.Double(0, 100))
                 .RuleFor(x => x.Amount, x => x.Random.Int(0, 100))

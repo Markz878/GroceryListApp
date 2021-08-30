@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.StoreProduct;
 
 namespace GroceryListHelper.Server.Validators
 {
-    public class StoreProductValidator : AbstractValidator<StoreProduct>
+    public class StoreProductValidator : AbstractValidator<StoreProductModel>
     {
         public StoreProductValidator()
         {
