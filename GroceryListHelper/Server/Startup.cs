@@ -65,6 +65,8 @@ namespace GroceryListHelper.Server
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<SecurityHeadersMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
