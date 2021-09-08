@@ -23,6 +23,8 @@ namespace GroceryListHelper.Client.ViewModels
         public HubConnection CartHub { get; set; }
         public bool IsPolling { get => isPolling; set => SetProperty(ref isPolling, value); }
         private bool isPolling;
+        public bool ShowOnlyUncollected { get => showOnlyUncollected; set => SetProperty(ref showOnlyUncollected, value); }
+        private bool showOnlyUncollected;
 
         public IndexViewModel()
         {

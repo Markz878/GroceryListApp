@@ -1,7 +1,16 @@
 ﻿.summary-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     justify-items: center;
     align-items: center;
     margin-bottom: 1rem;
+}
+
+.checkbox {
+    transform: scale(2,2);
+}
+
+#filter-collected-label {
+    margin: 5px;
+    font-weight: bold;
 }

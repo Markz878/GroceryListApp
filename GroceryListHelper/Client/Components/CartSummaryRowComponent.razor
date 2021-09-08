@@ -1,6 +1,10 @@
 ﻿@inherits CartSummaryRowComponentBase
 
 <div class="summary-row">
+    <div>
+        <input id="filter-collected-checkbox" type="checkbox" class="checkbox" @bind=@ViewModel.ShowOnlyUncollected/>
+        <label id="filter-collected-label" for="filter-collected-checkbox">Filter collected</label>
+    </div>
     <b id="cart-collected-info" style="color: @(AllCollected ? "green" : "black");">@(AllCollected ? "All collected!" : "Check collected items")</b>
     <b id="cart-total">Total: @Total.ToString("N2") €</b>
     <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearCartProducts" aria-label="Clear cart">Clear cart</button>
