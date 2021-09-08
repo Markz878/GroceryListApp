@@ -73,11 +73,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
-                string content = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                }
+                await client.DeleteAsync(uri + $"/{id}");
             }
             else
             {
@@ -91,11 +87,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.DeleteAsync(uri);
-                string content = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                }
+                await client.DeleteAsync(uri);
             }
             else
             {
@@ -107,11 +99,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}", null);
-                string content = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                }
+                await client.PatchAsync(uri + $"/{id}", null);
             }
             else
             {
@@ -126,11 +114,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.PutAsJsonAsync(uri + $"/{cartProduct.Id}", cartProduct);
-                string content = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                }
+                await client.PutAsJsonAsync(uri + $"/{cartProduct.Id}", cartProduct);
             }
             else
             {

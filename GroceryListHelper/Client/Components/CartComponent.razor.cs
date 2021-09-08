@@ -3,7 +3,6 @@ using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
