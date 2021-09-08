@@ -1,14 +1,14 @@
 ﻿using FluentValidation;
-using GroceryListHelper.Shared.Models.CartProduct;
+using GroceryListHelper.Client.Models;
 using System.Collections.Generic;
 
 namespace GroceryListHelper.Client.Validators
 {
-    public class CartProductValidator : AbstractValidator<CartProduct>
+    public class CartProductValidator : AbstractValidator<CartProductUIModel>
     {
-        private readonly IEnumerable<CartProduct> productList;
+        private readonly IEnumerable<CartProductUIModel> productList;
 
-        public CartProductValidator(IEnumerable<CartProduct> productList)
+        public CartProductValidator(IEnumerable<CartProductUIModel> productList)
         {
             this.productList = productList;
             RuleFor(x => x.Name).NotEmpty().Must(BeUnique).WithMessage("Product name must be unique");
@@ -16,9 +16,9 @@ namespace GroceryListHelper.Client.Validators
             RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
         }
 
-        private bool BeUnique(CartProduct product, string name)
+        private bool BeUnique(CartProductUIModel product, string name)
         {
-            foreach (var item in productList)
+            foreach (CartProductUIModel item in productList)
             {
                 if (product.Equals(item))
                 {

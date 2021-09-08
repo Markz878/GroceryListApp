@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +26,12 @@ namespace GroceryListHelper.Client.Services
             this.authenticationStateProvider = authenticationStateProvider;
         }
 
-        public async Task<List<CartProductUIModel>> GetCartProducts()
+        public async Task<List<CartProductCollectable>> GetCartProducts()
         {
             return (await authenticationStateProvider.IsUserAuthenticated() ?
-                await client.GetFromJsonAsync<List<CartProductUIModel>>(uri) :
-                await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey))
-                ?? new List<CartProductUIModel>();
+                await client.GetFromJsonAsync<List<CartProductCollectable>>(uri) :
+                await localStorage.GetItemAsync<List<CartProductCollectable>>(cartProductsKey))
+                ?? new List<CartProductCollectable>();
         }
 
         public async Task SaveCartProduct(CartProductUIModel product)

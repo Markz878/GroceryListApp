@@ -17,7 +17,7 @@ namespace GroceryListHelper.Client.Components
         [Inject] public CartProductsService CartProductsService { get; set; }
         [Inject] public StoreProductsService StoreProductsService { get; set; }
         [Inject] public ModalViewModel ModalViewModel { get; set; }
-        public CartProductUIModel NewProduct { get; set; } = new CartProductUIModel() { Amount = 1 };
+        public CartProductUIModel NewProduct { get; set; }
         public CartProductUIModel EditingItem { get; set; }
         public CartProductUIModel MovingItem { get; set; }
         public bool IsMoving { get; set; }
@@ -27,6 +27,12 @@ namespace GroceryListHelper.Client.Components
         public CartProductValidator cartProductValidator;
         public StoreProductValidator storeProductValidator;
 
+        protected override void OnInitialized()
+        {
+            NewProduct = new CartProductUIModel(ViewModel) { Amount = 1 };
+            base.OnInitialized();
+        }
+
         public async Task AddNewProduct()
         {
             cartProductValidator = new CartProductValidator(ViewModel.CartProducts);
@@ -34,7 +40,7 @@ namespace GroceryListHelper.Client.Components
             if (string.IsNullOrEmpty(message))
             {
                 CartProductUIModel newProduct = NewProduct;
-                NewProduct = new CartProductUIModel() { Amount = 1 };
+                NewProduct = new CartProductUIModel(ViewModel) { Amount = 1 };
                 await SaveCartProduct(newProduct);
                 await SaveStoreProduct(newProduct.Name, newProduct.UnitPrice);
                 await NewProductNameBox.FocusAsync();
@@ -65,10 +71,9 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
+        public Task MarkItemCollected(CartProductUIModel product)
         {
-            product.IsCollected = (bool)e.Value;
-            ViewModel.OnPropertyChanged();
+            
             if (ViewModel.IsPolling)
             {
                 return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
