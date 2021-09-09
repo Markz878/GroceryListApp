@@ -81,7 +81,7 @@ namespace GroceryListHelper.Client.Components
             {
                 await CartProductsService.MarkCartProductCollected(product.Id);
             }
-            await Task.Delay(10);
+            await Task.Delay(TimeSpan.FromMilliseconds(5));
             ViewModel.OnPropertyChanged();
         }
 
