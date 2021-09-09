@@ -4,7 +4,6 @@ using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.Authentication;
-using Mapster;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
@@ -63,7 +62,7 @@ namespace GroceryListHelper.Client.HelperMethods
                 indexViewModel.CartProducts.Clear();
                 foreach (CartProductCollectable item in cartProducts)
                 {
-                    indexViewModel.CartProducts.Add(item.Adapt<CartProductUIModel>());
+                    indexViewModel.CartProducts.Add(new CartProductUIModel() { Id = item.Id, Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice });
                 }
             });
 
@@ -80,7 +79,7 @@ namespace GroceryListHelper.Client.HelperMethods
             indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
             {
                 Console.WriteLine($"Received new item with id {p.Id} and name {p.Name}.");
-                indexViewModel.CartProducts.Add(p.Adapt<CartProductUIModel>());
+                indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice });
             });
 
             indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
