@@ -18,7 +18,7 @@ namespace GroceryListHelper.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            TypeAdapterConfig<CartProductCollectable, CartProductUIModel>.NewConfig().ConstructUsing(x => new CartProductUIModel(ViewModel));
+            TypeAdapterConfig<CartProductCollectable, CartProductUIModel>.NewConfig().ConstructUsing(x => new CartProductUIModel());
             ViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in await CartProductsService.GetCartProducts())
             {

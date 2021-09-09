@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GroceryListHelper.Client.HelperMethods
 {
     public abstract class ObservableObject
     {
-        public BaseViewModel ViewModel { get; set; }
+        public event Action StateChanged;
 
-        public ObservableObject(BaseViewModel viewModel)
+        public void OnPropertyChanged()
         {
-            ViewModel = viewModel;
+            StateChanged?.Invoke();
         }
 
         protected void SetProperty<T>(ref T backingFiled, T value)
@@ -18,11 +19,6 @@ namespace GroceryListHelper.Client.HelperMethods
                 backingFiled = value;
                 OnPropertyChanged();
             }
-        }
-
-        public void OnPropertyChanged()
-        {
-            ViewModel.OnPropertyChanged();
         }
     }
 }

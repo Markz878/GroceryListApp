@@ -29,7 +29,7 @@ namespace GroceryListHelper.Client.Components
 
         protected override void OnInitialized()
         {
-            NewProduct = new CartProductUIModel(ViewModel) { Amount = 1 };
+            NewProduct = new CartProductUIModel() { Amount = 1 };
             base.OnInitialized();
         }
 
@@ -40,7 +40,7 @@ namespace GroceryListHelper.Client.Components
             if (string.IsNullOrEmpty(message))
             {
                 CartProductUIModel newProduct = NewProduct;
-                NewProduct = new CartProductUIModel(ViewModel) { Amount = 1 };
+                NewProduct = new CartProductUIModel() { Amount = 1 };
                 await SaveCartProduct(newProduct);
                 await SaveStoreProduct(newProduct.Name, newProduct.UnitPrice);
                 await NewProductNameBox.FocusAsync();
@@ -71,17 +71,18 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public Task MarkItemCollected(CartProductUIModel product)
+        public async Task MarkItemCollected(CartProductUIModel product)
         {
-            
             if (ViewModel.IsPolling)
             {
-                return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
+                await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
             }
             else
             {
-                return CartProductsService.MarkCartProductCollected(product.Id);
+                await CartProductsService.MarkCartProductCollected(product.Id);
             }
+            await Task.Delay(10);
+            ViewModel.OnPropertyChanged();
         }
 
         public Task SaveStoreProduct(string productName, double unitPrice)
