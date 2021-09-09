@@ -60,7 +60,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.DeleteAsync(uri);
+                await client.DeleteAsync(uri);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace GroceryListHelper.Client.Services
         {
             if (await authenticationStateProvider.IsUserAuthenticated())
             {
-                HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}?price={price}", null);
+                await client.PatchAsync(uri + $"/{id}?price={price}", null);
             }
             else
             {

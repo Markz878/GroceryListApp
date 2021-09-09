@@ -2,8 +2,6 @@
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
-using Mapster;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Threading.Tasks;
@@ -18,11 +16,10 @@ namespace GroceryListHelper.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            TypeAdapterConfig<CartProductCollectable, CartProductUIModel>.NewConfig().ConstructUsing(x => new CartProductUIModel());
             ViewModel.CartProducts.Clear();
-            foreach (CartProductCollectable item in await CartProductsService.GetCartProducts())
+            foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
             {
-                ViewModel.CartProducts.Add(item.Adapt<CartProductUIModel>());
+                ViewModel.CartProducts.Add(item);
             }
             ViewModel.StoreProducts.Clear();
             foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
