@@ -34,9 +34,9 @@
         {
             @if (item != EditingItem)
             {
-                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")">
+                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")" @key=item.Id>
                     <td><button id="reorder-button-@index" class="btn btn-primary @(item==MovingItem ? "moving-button" : "")" title="Move" @onclick="()=>Move(item)"><i class="fas fa-retweet"></i></button></td>
-                    <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" @bind="@item.IsCollected" @onclick=@(()=>MarkItemCollected(item))/></td>
+                    <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item))/></td>
                     <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")">@item.Name</td>
                     <td id="item-amount-@index">@item.Amount</td>
                     <td id="item-unitprice-@index">@item.UnitPrice</td>
@@ -47,7 +47,7 @@
             }
             else
             {
-                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")">
+                <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")" @key=item.Id>
                     <td></td>
                     <td></td>
                     <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")">@item.Name</td>

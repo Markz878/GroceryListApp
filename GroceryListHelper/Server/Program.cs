@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace GroceryListHelper.Server
 {
@@ -13,8 +15,17 @@ namespace GroceryListHelper.Server
             IServiceScopeFactory scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
+                ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-                db.Database.EnsureCreated();
+                try
+                {
+                    db.Database.EnsureCreated();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, ex.Message);
+                    logger.LogError(Environment.CurrentDirectory);
+                }
             }
             host.Run();
         }

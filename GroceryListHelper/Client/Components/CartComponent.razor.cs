@@ -71,18 +71,18 @@ namespace GroceryListHelper.Client.Components
             }
         }
 
-        public async Task MarkItemCollected(CartProductUIModel product)
+        public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
         {
+            product.IsCollected = (bool)e.Value;
+            ViewModel.OnPropertyChanged();
             if (ViewModel.IsPolling)
             {
-                await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
+                return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
             }
             else
             {
-                await CartProductsService.MarkCartProductCollected(product.Id);
+                return CartProductsService.MarkCartProductCollected(product.Id);
             }
-            await Task.Delay(TimeSpan.FromMilliseconds(5));
-            ViewModel.OnPropertyChanged();
         }
 
         public Task SaveStoreProduct(string productName, double unitPrice)
