@@ -53,7 +53,6 @@ namespace GroceryListHelper.Client.Components
 
         public async Task SaveCartProduct(CartProductUIModel product)
         {
-            ViewModel.CartProducts.Add(product);
             try
             {
                 if (ViewModel.IsPolling)
@@ -64,6 +63,7 @@ namespace GroceryListHelper.Client.Components
                 {
                     await CartProductsService.SaveCartProduct(product);
                 }
+                ViewModel.CartProducts.Add(product);
             }
             catch (Exception ex)
             {
