@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GroceryListHelper\Shared\GroceryListHelper.Shared.csproj" />
+    <ProjectReference Include="..\Shared\GroceryListHelper.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GroceryListHelper\Server\GroceryListHelper.Server.csproj" />
+    <ProjectReference Include="..\Server\GroceryListHelper.Server.csproj" />
   </ItemGroup>
 
 </Project>

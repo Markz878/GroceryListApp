@@ -31,8 +31,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\GroceryListHelper.DataAccess\GroceryListHelper.DataAccess.csproj" />
 		<ProjectReference Include="..\Client\GroceryListHelper.Client.csproj" />
+		<ProjectReference Include="..\DataAccess\GroceryListHelper.DataAccess.csproj" />
 		<ProjectReference Include="..\Shared\GroceryListHelper.Shared.csproj" />
 	</ItemGroup>
 
