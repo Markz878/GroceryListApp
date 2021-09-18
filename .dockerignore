@@ -1,5 +1,6 @@
 **/.classpath
 **/.dockerignore
+**/GroceryListHelper.IntegrationTests*
 **/.env
 **/.git
 **/.gitignore

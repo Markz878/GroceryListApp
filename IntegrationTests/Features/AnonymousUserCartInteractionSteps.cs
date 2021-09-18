@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.IntegrationTests.PageObjects;
-using GroceryListHelper.Shared;
 using Microsoft.Playwright;
 using System.Text.Json;
 using System.Threading.Tasks;
