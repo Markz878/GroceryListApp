@@ -6,15 +6,14 @@ using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GroceryListHelper.Server.Installers
+namespace GroceryListHelper.Server.Installers;
+
+public class ValidatorsInstaller : IInstaller
 {
-    public class ValidatorsInstaller : IInstaller
+    public void Install(IServiceCollection services, IConfiguration configuration)
     {
-        public void Install(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddTransient<IValidator<CartProduct>, CartProductValidator>();
-            services.AddTransient<IValidator<StoreProductModel>, StoreProductValidator>();
-            services.AddTransient<IValidator<RegisterRequestModel>, RegisterRequestValidator>();
-        }
+        services.AddTransient<IValidator<CartProduct>, CartProductValidator>();
+        services.AddTransient<IValidator<StoreProductModel>, StoreProductValidator>();
+        services.AddTransient<IValidator<RegisterRequestModel>, RegisterRequestValidator>();
     }
 }

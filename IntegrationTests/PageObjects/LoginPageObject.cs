@@ -1,11 +1,10 @@
 ﻿using Microsoft.Playwright;
 
-namespace GroceryListHelper.IntegrationTests.PageObjects
+namespace GroceryListHelper.IntegrationTests.PageObjects;
+
+public class LoginPageObject : BasePageObject
 {
-    public class LoginPageObject : BasePageObject
+    public LoginPageObject(IBrowserContext browser) : base(browser, "/login")
     {
-        public LoginPageObject(IBrowserContext browser) : base(browser, "/login")
-        {
-        }
     }
 }

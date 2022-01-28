@@ -1,26 +1,25 @@
 using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
 
-namespace GroceryListHelper.Client.Components
+namespace GroceryListHelper.Client.Components;
+
+public class ChooseCartShareOptionComponentBase : BasePage<IndexViewModel>
 {
-    public class ChooseCartShareOptionComponentBase : BasePage<IndexViewModel>
+    public string LeftButtonActive => ViewModel.ShareMode == ShareModeType.Self ? "activeButton" : "";
+    public string RightButtonActive => ViewModel.ShareMode == ShareModeType.Join ? "activeButton" : "";
+
+    public void SelectShareMode(ShareModeType shareMode)
     {
-        public string LeftButtonActive => ViewModel.ShareMode == ShareModeType.Self ? "activeButton" : "";
-        public string RightButtonActive => ViewModel.ShareMode == ShareModeType.Join ? "activeButton" : "";
+        ViewModel.ShareMode = shareMode;
+    }
 
-        public void SelectShareMode(ShareModeType shareMode)
-        {
-            ViewModel.ShareMode = shareMode;
-        }
+    public void SelectSelfShare()
+    {
+        ViewModel.ShareMode = ShareModeType.Self;
+    }
 
-        public void SelectSelfShare()
-        {
-            ViewModel.ShareMode = ShareModeType.Self;
-        }
-
-        public void SelectJoinShare()
-        {
-            ViewModel.ShareMode = ShareModeType.Join;
-        }
+    public void SelectJoinShare()
+    {
+        ViewModel.ShareMode = ShareModeType.Join;
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication
+﻿namespace GroceryListHelper.Shared.Models.Authentication;
+
+public class RegisterRequestModel : UserCredentialsModel
 {
-    public class RegisterRequestModel : UserCredentialsModel
-    {
-        public string ConfirmPassword { get; set; }
-    }
+    public string ConfirmPassword { get; set; }
 }

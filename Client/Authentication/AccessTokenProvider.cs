@@ -1,55 +1,61 @@
 ﻿using GroceryListHelper.Shared.Models.Authentication;
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace GroceryListHelper.Client.Authentication
+namespace GroceryListHelper.Client.Authentication;
+
+public class AccessTokenProvider : IAccessTokenProvider
 {
-    public class AccessTokenProvider : IAccessTokenProvider
+    private readonly HttpClient client;
+    private string accessToken;
+    private readonly SemaphoreSlim semaphore = new(1, 1);
+    private DateTimeOffset previousRefreshTime;
+
+    public AccessTokenProvider(IHttpClientFactory httpClientFactory)
     {
-        private readonly HttpClient client;
-        private string accessToken;
+        client = httpClientFactory.CreateClient("AnonymousClient");
+    }
 
-        public AccessTokenProvider(IHttpClientFactory httpClientFactory)
+    public async ValueTask<string> RequestAccessToken()
+    {
+        await semaphore.WaitAsync();
+        if (previousRefreshTime < DateTimeOffset.UtcNow.AddSeconds(-1) && (string.IsNullOrEmpty(accessToken) || !accessToken.AccessTokenStillValid()))
         {
-            client = httpClientFactory.CreateClient("AnonymousClient");
+            accessToken = await TryToRefreshToken();
+            previousRefreshTime = DateTimeOffset.UtcNow;
         }
+        semaphore.Release();
+        return accessToken;
+    }
 
-        public async ValueTask<string> RequestAccessToken()
+    public async ValueTask<string> TryToRefreshToken()
+    {
+        HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
+        if (response.IsSuccessStatusCode)
         {
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                accessToken = await TryToRefreshToken();
-            }
-            return accessToken;
+            AuthenticationResponseModel loginResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            await SaveToken(loginResponse.AccessToken);
+            return loginResponse.AccessToken;
         }
+        else
+        {
+            return null;
+        }
+    }
 
-        public async ValueTask<string> TryToRefreshToken()
-        {
-            HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
-            if (response.IsSuccessStatusCode)
-            {
-                AuthenticationResponseModel loginResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                await SaveToken(loginResponse.AccessToken);
-                return loginResponse.AccessToken;
-            }
-            else
-            {
-                return null;
-            }
-        }
+    public ValueTask SaveToken(string accessToken)
+    {
+        this.accessToken = accessToken;
+        return ValueTask.CompletedTask;
+    }
 
-        public ValueTask SaveToken(string accessToken)
-        {
-            this.accessToken = accessToken;
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask RemoveToken()
-        {
-            accessToken = string.Empty;
-            return ValueTask.CompletedTask;
-        }
+    public ValueTask RemoveToken()
+    {
+        accessToken = string.Empty;
+        return ValueTask.CompletedTask;
     }
 }

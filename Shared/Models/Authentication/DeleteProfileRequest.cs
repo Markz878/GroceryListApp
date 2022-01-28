@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication
+﻿namespace GroceryListHelper.Shared.Models.Authentication;
+
+public class DeleteProfileRequest
 {
-    public class DeleteProfileRequest
-    {
-        public string Password { get; set; }
-    }
+    public string Password { get; set; }
 }

@@ -5,149 +5,148 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GroceryListHelper.DataAccess.Repositories
+namespace GroceryListHelper.DataAccess.Repositories;
+
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly GroceryStoreDbContext db;
+    private readonly ILogger<UserRepository> logger;
+
+    public UserRepository(GroceryStoreDbContext db, ILogger<UserRepository> logger)
     {
-        private readonly GroceryStoreDbContext db;
-        private readonly ILogger<UserRepository> logger;
+        this.db = db;
+        this.logger = logger;
+    }
 
-        public UserRepository(GroceryStoreDbContext db, ILogger<UserRepository> logger)
+    public async Task<string> RemoveRefreshToken(int id)
+    {
+        try
         {
-            this.db = db;
-            this.logger = logger;
-        }
-
-        public async Task<string> RemoveRefreshToken(int id)
-        {
-            try
+            UserDbModel user = await GetUserFromId(id);
+            if (user == null)
             {
-                UserDbModel user = await GetUserFromId(id);
-                if (user == null)
-                {
-                    return "User not found.";
-                }
-                else
-                {
-                    user.RefreshToken = string.Empty;
-                    await db.SaveChangesAsync();
-                    return null;
-                }
+                return "User not found.";
             }
-            catch (Exception ex)
+            else
             {
-                return ex.Message;
-            }
-        }
-
-        public async Task<UserDbModel> GetUserFromId(int id)
-        {
-            UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Id.Equals(id));
-            return userDbModel;
-        }
-
-        public async Task<UserDbModel> GetUserFromEmail(string email)
-        {
-            UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
-            return userDbModel;
-        }
-
-        public async Task<UserDbModel> AddUser(string email, string password)
-        {
-            try
-            {
-                byte[] salt = PasswordHelper.GenerateSalt();
-                UserDbModel user = new() { Email = email, Salt = salt, PasswordHash = PasswordHelper.HashPassword(password, salt) };
-                db.Users.Add(user);
+                user.RefreshToken = string.Empty;
                 await db.SaveChangesAsync();
-                return user;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error creating user.");
                 return null;
             }
         }
-
-        public async Task<string> ChangeEmail(int id, string newEmail, string password)
+        catch (Exception ex)
         {
-            UserDbModel user = await GetUserFromId(id);
-            if (user == null)
-            {
-                return "User not found";
-            }
-            else
-            {
-                if (user.PasswordHash.Equals(PasswordHelper.HashPassword(password, user.Salt)))
-                {
-                    user.Email = newEmail;
-                    await db.SaveChangesAsync();
-                    return null;
-                }
-                return "Invalid password";
-            }
+            return ex.Message;
         }
+    }
 
-        public async Task<string> ChangePassword(int id, string currentPassword, string newPassword)
+    public async Task<UserDbModel> GetUserFromId(int id)
+    {
+        UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Id.Equals(id));
+        return userDbModel;
+    }
+
+    public async Task<UserDbModel> GetUserFromEmail(string email)
+    {
+        UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+        return userDbModel;
+    }
+
+    public async Task<UserDbModel> AddUser(string email, string password)
+    {
+        try
         {
-            UserDbModel user = await GetUserFromId(id);
-            if (user == null)
-            {
-                return "User not found";
-            }
-            else
-            {
-                if (user.PasswordHash.Equals(PasswordHelper.HashPassword(currentPassword, user.Salt)))
-                {
-                    user.Salt = PasswordHelper.GenerateSalt();
-                    user.PasswordHash = PasswordHelper.HashPassword(newPassword, user.Salt);
-                    await db.SaveChangesAsync();
-                    return null;
-                }
-                return "Invalid password";
-            }
+            byte[] salt = PasswordHelper.GenerateSalt();
+            UserDbModel user = new() { Email = email, Salt = salt, PasswordHash = PasswordHelper.HashPassword(password, salt) };
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+            return user;
         }
-
-        public async Task<string> DeleteUser(int id, string password)
+        catch (Exception ex)
         {
-            UserDbModel user = await GetUserFromId(id);
-            if (user == null)
+            logger.LogError(ex, "Error creating user.");
+            return null;
+        }
+    }
+
+    public async Task<string> ChangeEmail(int id, string newEmail, string password)
+    {
+        UserDbModel user = await GetUserFromId(id);
+        if (user == null)
+        {
+            return "User not found";
+        }
+        else
+        {
+            if (user.PasswordHash.Equals(PasswordHelper.HashPassword(password, user.Salt)))
             {
-                return "User not found";
+                user.Email = newEmail;
+                await db.SaveChangesAsync();
+                return null;
             }
-            else
+            return "Invalid password";
+        }
+    }
+
+    public async Task<string> ChangePassword(int id, string currentPassword, string newPassword)
+    {
+        UserDbModel user = await GetUserFromId(id);
+        if (user == null)
+        {
+            return "User not found";
+        }
+        else
+        {
+            if (user.PasswordHash.Equals(PasswordHelper.HashPassword(currentPassword, user.Salt)))
             {
-                if (user.PasswordHash.Equals(PasswordHelper.HashPassword(password, user.Salt)))
-                {
-                    db.Users.Remove(user);
-                    await db.SaveChangesAsync();
-                    return null;
-                }
+                user.Salt = PasswordHelper.GenerateSalt();
+                user.PasswordHash = PasswordHelper.HashPassword(newPassword, user.Salt);
+                await db.SaveChangesAsync();
+                return null;
             }
             return "Invalid username or password";
         }
+    }
 
-        public async Task<string> UpdateRefreshToken(int id, string refreshToken)
+    public async Task<string> DeleteUser(int id, string password)
+    {
+        UserDbModel user = await GetUserFromId(id);
+        if (user == null)
         {
-            try
+            return "Could not delete user";
+        }
+        else
+        {
+            if (user.PasswordHash.Equals(PasswordHelper.HashPassword(password, user.Salt)))
             {
-                UserDbModel user = await GetUserFromId(id);
-                if (user == null)
-                {
-                    return "User not found.";
-                }
-                else
-                {
-                    user.RefreshToken = refreshToken;
-                    await db.SaveChangesAsync();
-                    return null;
-                }
+                db.Users.Remove(user);
+                await db.SaveChangesAsync();
+                return null;
             }
-            catch (Exception ex)
+        }
+        return "Invalid username or password";
+    }
+
+    public async Task<string> UpdateRefreshToken(int id, string refreshToken)
+    {
+        try
+        {
+            UserDbModel user = await GetUserFromId(id);
+            if (user == null)
             {
-                logger.LogError(ex, "Error renewing refresh token.");
-                return ex.Message;
+                return "User not found.";
             }
+            else
+            {
+                user.RefreshToken = refreshToken;
+                await db.SaveChangesAsync();
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error renewing refresh token.");
+            return ex.Message;
         }
     }
 }

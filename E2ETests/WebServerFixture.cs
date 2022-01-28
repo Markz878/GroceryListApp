@@ -1,56 +1,83 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using GroceryListHelper.Server;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Xunit;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-namespace E2ETests
+namespace E2ETests;
+
+public class WebServerFixture : IAsyncLifetime, IDisposable
 {
-    public class WebServerFixture : IAsyncLifetime, IDisposable
+    private readonly IHost host;
+    public IPlaywright playwright { get; private set; }
+    public IBrowser browser { get; private set; }
+    public IBrowserContext BrowserContext { get; private set; }
+    public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
+
+    public WebServerFixture()
     {
-        private readonly IHost host;
-        private IPlaywright playwright;
-        public IBrowserContext BrowserContext { get; private set; }
-        public string BaseUrl { get; } = $"http://localhost:5000";
-
-        public WebServerFixture()
-        {
-            host = GroceryListHelper.Server.Program
-                .CreateHostBuilder(null)
-                .ConfigureAppConfiguration(c => c.AddUserSecrets("e73b7a0b-29e9-4ce8-ba58-7f7b4393ab50"))
-                .Build();
-        }
-
-        public async Task InitializeAsync()
-        {
-            playwright = await Playwright.CreateAsync();
-            IBrowser browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions()
+        host = GroceryListHelper.Server.Program
+            .CreateHostBuilder(null)
+            .ConfigureWebHostDefaults(webBuilder =>
             {
-                Headless = false,
-                SlowMo = 5000,
-            });
-            BrowserContext = await browser.NewContextAsync(new BrowserNewContextOptions()
+                    //webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls(BaseUrl);
+            })
+            .ConfigureAppConfiguration(c =>
             {
-                IgnoreHTTPSErrors = true,
-                BaseURL = "http://localhost:5000",
-            });
-            await host.StartAsync();
-        }
-
-        public async Task DisposeAsync()
-        {
-            await host.StopAsync();
-            host?.Dispose();
-            playwright?.Dispose();
-        }
-
-        public void Dispose()
-        {
-            host?.Dispose();
-            playwright?.Dispose();
-        }
+                Dictionary<string, string> inMemoryConfiguration = new Dictionary<string, string>
+                {
+                        { "ConnectionStrings:DatabaseConnection", "Data Source=database.db;" },
+                        { "RefreshTokenKey", "qwertyuiopasdfghjkl" },
+                        { "AccessTokenKey", "qwertyuiopasdfghjkl" }
+                };
+                c.AddInMemoryCollection(inMemoryConfiguration);
+            })
+            .Build();
     }
+
+    public async Task InitializeAsync()
+    {
+        playwright = await Playwright.CreateAsync();
+        browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
+        {
+            Headless = false,
+            SlowMo = 5000,
+        });
+        BrowserContext = await browser.NewContextAsync(new BrowserNewContextOptions()
+        {
+            IgnoreHTTPSErrors = true,
+            BaseURL = BaseUrl,
+        });
+        await host.StartAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await host.StopAsync();
+        host?.Dispose();
+        playwright?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        host?.Dispose();
+        playwright?.Dispose();
+    }
+
+    private static int GetRandomUnusedPort()
+    {
+        var listener = new TcpListener(IPAddress.Any, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
+    }
+
 }

@@ -1,13 +1,12 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
 
-namespace GroceryListHelper.Client.Components
+namespace GroceryListHelper.Client.Components;
+
+public class ModalBase : BasePage<ModalViewModel>
 {
-    public class ModalBase : BasePage<ModalViewModel>
+    public void CloseModal()
     {
-        public void CloseModal()
-        {
-            ViewModel.Message = null;
-        }
+        ViewModel.Message = null;
     }
 }

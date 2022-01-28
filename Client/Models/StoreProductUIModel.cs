@@ -1,9 +1,8 @@
 ﻿using GroceryListHelper.Shared.Models.StoreProduct;
 
-namespace GroceryListHelper.Client.Models
+namespace GroceryListHelper.Client.Models;
+
+public class StoreProductUIModel : StoreProductModel
 {
-    public class StoreProductUIModel : StoreProductModel
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

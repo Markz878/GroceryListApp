@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Client.HelperMethods
+﻿namespace GroceryListHelper.Client.HelperMethods;
+
+public enum ShareModeType
 {
-    public enum ShareModeType
-    {
-        Self, Join
-    }
+    Self, Join
 }

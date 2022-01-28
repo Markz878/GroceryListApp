@@ -10,135 +10,134 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace GroceryListHelper.Server.Hubs
+namespace GroceryListHelper.Server.Hubs;
+
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
+    private readonly ICartProductRepository db;
+    private readonly IUserRepository userRepository;
+    private readonly ICartHubService cartHubService;
+
+    public CartHub(ICartProductRepository db, IUserRepository userRepository, ICartHubService cartHubService)
     {
-        private readonly ICartProductRepository db;
-        private readonly IUserRepository userRepository;
-        private readonly ICartHubService cartHubService;
+        this.db = db;
+        this.userRepository = userRepository;
+        this.cartHubService = cartHubService;
+    }
 
-        public CartHub(ICartProductRepository db, IUserRepository userRepository, ICartHubService cartHubService)
+    public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
+    {
+        if (allowedUsers.Count == 0)
         {
-            this.db = db;
-            this.userRepository = userRepository;
-            this.cartHubService = cartHubService;
+            return new HubResponse() { ErrorMessage = "There are no allowed users for your cart" };
         }
+        await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId(Context).ToString());
+        string otherUsers = string.Join(", ", allowedUsers);
+        allowedUsers.Add(GetUserEmail(Context));
+        cartHubService.GroupAllowedEmails[GetUserId(Context)] = allowedUsers;
+        return new HubResponse() { SuccessMessage = $"You are sharing your cart to {otherUsers}." };
+    }
 
-        public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
+    public async Task<HubResponse> JoinGroup(string hostEmail)
+    {
+        UserDbModel user = await userRepository.GetUserFromEmail(hostEmail);
+        if (user == null)
         {
-            if (allowedUsers.Count == 0)
-            {
-                return new HubResponse() { ErrorMessage = "There are no allowed users for your cart" };
-            }
-            await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId(Context).ToString());
-            string otherUsers = string.Join(", ", allowedUsers);
-            allowedUsers.Add(GetUserEmail(Context));
-            cartHubService.GroupAllowedEmails[GetUserId(Context)] = allowedUsers;
-            return new HubResponse() { SuccessMessage = $"You are sharing your cart to {otherUsers}." };
+            return new HubResponse() { ErrorMessage = "No user with that email." };
         }
-
-        public async Task<HubResponse> JoinGroup(string hostEmail)
+        if (cartHubService.GroupAllowedEmails.TryGetValue(user.Id, out List<string> emails))
         {
-            UserDbModel user = await userRepository.GetUserFromEmail(hostEmail);
-            if (user == null)
+            if (emails.Contains(GetUserEmail(Context)))
             {
-                return new HubResponse() { ErrorMessage = "No user with that email." };
-            }
-            if (cartHubService.GroupAllowedEmails.TryGetValue(user.Id, out List<string> emails))
-            {
-                if (emails.Contains(GetUserEmail(Context)))
-                {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, user.Id.ToString());
-                    await Clients.Caller.ReceiveCart((await db.GetCartProductsForUser(user.Id)).ToList());
-                }
-                else
-                {
-                    return new HubResponse() { ErrorMessage = "You are not allowed to join this cart." };
-                }
-                await Clients.OthersInGroup(user.Id.ToString()).GetMessage($"{GetUserEmail(Context)} has joined {hostEmail}'s cart.");
-                return new HubResponse() { SuccessMessage = $"You have joined {hostEmail}'s cart" };
+                await Groups.AddToGroupAsync(Context.ConnectionId, user.Id.ToString());
+                await Clients.Caller.ReceiveCart((await db.GetCartProductsForUser(user.Id)).ToList());
             }
             else
             {
-                return new HubResponse() { ErrorMessage = "There is no cart hosted by that user." };
+                return new HubResponse() { ErrorMessage = "You are not allowed to join this cart." };
             }
+            await Clients.OthersInGroup(user.Id.ToString()).GetMessage($"{GetUserEmail(Context)} has joined {hostEmail}'s cart.");
+            return new HubResponse() { SuccessMessage = $"You have joined {hostEmail}'s cart" };
         }
-
-        private int GetHostId()
+        else
         {
-            string userEmail = GetUserEmail(Context);
-            int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
-            return hostId;
+            return new HubResponse() { ErrorMessage = "There is no cart hosted by that user." };
         }
+    }
 
-        public async Task<int> CartItemAdded(CartProductCollectable product)
-        {
-            int hostId = GetHostId();
-            product.Id = await db.AddCartProduct(product, hostId);
-            await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
-            return product.Id;
-        }
+    private int GetHostId()
+    {
+        string userEmail = GetUserEmail(Context);
+        int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
+        return hostId;
+    }
 
-        public async Task CartItemModified(CartProductCollectable product)
-        {
-            int hostId = GetHostId();
-            await db.UpdateProduct(product.Id, hostId, product);
-            await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
-        }
+    public async Task<int> CartItemAdded(CartProductCollectable product)
+    {
+        int hostId = GetHostId();
+        product.Id = await db.AddCartProduct(product, hostId);
+        await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
+        return product.Id;
+    }
 
-        public async Task CartItemCollected(int id)
-        {
-            int hostId = GetHostId();
-            await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
-            await db.MarkAsCollected(id, hostId);
-        }
+    public async Task CartItemModified(CartProductCollectable product)
+    {
+        int hostId = GetHostId();
+        await db.UpdateProduct(product.Id, hostId, product);
+        await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
+    }
 
-        public async Task CartItemDeleted(int id)
-        {
-            int hostId = GetHostId();
-            await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
-            await db.DeleteItem(id, hostId);
-        }
+    public async Task CartItemCollected(int id)
+    {
+        int hostId = GetHostId();
+        await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
+        await db.MarkAsCollected(id, hostId);
+    }
 
-        public async Task CartItemMoved(int id, int newIndex)
-        {
-            int hostId = GetHostId();
-            await Clients.OthersInGroup(hostId.ToString()).ItemMoved(id, newIndex);
-        }
+    public async Task CartItemDeleted(int id)
+    {
+        int hostId = GetHostId();
+        await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
+        await db.DeleteItem(id, hostId);
+    }
 
-        public async Task<HubResponse> LeaveGroup()
+    public async Task CartItemMoved(int id, int newIndex)
+    {
+        int hostId = GetHostId();
+        await Clients.OthersInGroup(hostId.ToString()).ItemMoved(id, newIndex);
+    }
+
+    public async Task<HubResponse> LeaveGroup()
+    {
+        int hostId = GetHostId();
+        if (hostId >= 0)
         {
-            int hostId = GetHostId();
-            if (hostId >= 0)
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
+            if (hostId == GetUserId(Context))
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-                if (hostId == GetUserId(Context))
-                {
-                    await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail(Context));
-                    cartHubService.GroupAllowedEmails.Remove(hostId);
-                }
-                else
-                {
-                    await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
-                }
-                return new HubResponse() { SuccessMessage = "You have left the group." };
+                await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail(Context));
+                cartHubService.GroupAllowedEmails.Remove(hostId);
             }
             else
             {
-                return new HubResponse() { ErrorMessage = "You are not part of any shopping cart." };
+                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
             }
+            return new HubResponse() { SuccessMessage = "You have left the group." };
         }
-
-        private static int GetUserId(HubCallerContext context)
+        else
         {
-            return int.Parse(context.User.FindFirst("id").Value);
+            return new HubResponse() { ErrorMessage = "You are not part of any shopping cart." };
         }
+    }
 
-        private static string GetUserEmail(HubCallerContext context)
-        {
-            return context.User.FindFirst(ClaimTypes.Email).Value;
-        }
+    private static int GetUserId(HubCallerContext context)
+    {
+        return int.Parse(context.User.FindFirst("id").Value);
+    }
+
+    private static string GetUserEmail(HubCallerContext context)
+    {
+        return context.User.FindFirst(ClaimTypes.Email).Value;
     }
 }

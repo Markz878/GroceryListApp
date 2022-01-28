@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication
+﻿namespace GroceryListHelper.Shared.Models.Authentication;
+
+public class RefreshTokenRequestModel
 {
-    public class RefreshTokenRequestModel
-    {
-        public string AccessToken { get; set; }
-    }
+    public string AccessToken { get; set; }
 }

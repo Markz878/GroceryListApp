@@ -1,10 +1,9 @@
 ﻿using GroceryListHelper.Shared.Models.CartProduct;
 
-namespace GroceryListHelper.Shared
+namespace GroceryListHelper.Shared;
+
+public class CartProductCollectable : CartProduct
 {
-    public class CartProductCollectable : CartProduct
-    {
-        public int Id { get; set; }
-        public bool IsCollected { get; set; }
-    }
+    public int Id { get; set; }
+    public bool IsCollected { get; set; }
 }

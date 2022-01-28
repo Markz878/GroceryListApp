@@ -14,39 +14,36 @@ using Blazored.LocalStorage;
 using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Client.HelperMethods;
 
-namespace GroceryListHelper.Client
+namespace GroceryListHelper.Client;
+
+public class Program
 {
-    public class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
-        {
-            WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
+        WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            builder.Services.AddScoped<ProtectedClientAuthorizationHandler>();
-            builder.Services.AddAuthorizationCore();
+        builder.Services.AddAuthorizationCore();
+        builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+        builder.Services.AddScoped<ProtectedClientAuthorizationHandler>();
 
-            AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
-            AsyncPolicyWrap<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2)).WrapAsync(ciruitBreakerPolicy);
-            AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
+        AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
+        AsyncPolicyWrap<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2)).WrapAsync(ciruitBreakerPolicy);
+        AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
 
-            builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
-            builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-            .AddHttpMessageHandler<ProtectedClientAuthorizationHandler>().AddPolicyHandler(pollyPolicy); ;
+        builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
+        builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+        .AddHttpMessageHandler<ProtectedClientAuthorizationHandler>().AddPolicyHandler(pollyPolicy); ;
 
-            builder.Services.AddScoped<AuthenticationService>();
-            builder.Services.AddScoped<CartProductsService>();
-            builder.Services.AddScoped<StoreProductsService>();
-            builder.Services.AddScoped<ProfileService>();
-            builder.Services.AddScoped<CartHubBuilder>();
-            builder.Services.AddBlazoredLocalStorage();
+        builder.Services.AddScoped<AuthenticationService>();
+        builder.Services.AddScoped<ProfileService>();
+        builder.Services.AddScoped<CartHubBuilder>();
+        builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddSingleton<IndexViewModel>();
-            builder.Services.AddSingleton<ModalViewModel>();
+        builder.Services.AddSingleton<IndexViewModel>();
+        builder.Services.AddSingleton<ModalViewModel>();
 
-            await builder.Build().RunAsync();
-        }
+        await builder.Build().RunAsync();
     }
 }

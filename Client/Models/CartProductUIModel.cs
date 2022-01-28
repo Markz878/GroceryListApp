@@ -1,9 +1,8 @@
 ﻿using GroceryListHelper.Shared;
 
-namespace GroceryListHelper.Client.Models
+namespace GroceryListHelper.Client.Models;
+
+public class CartProductUIModel : CartProductCollectable
 {
-    public class CartProductUIModel : CartProductCollectable
-    {
-        public double Total => UnitPrice * Amount;
-    }
+    public double Total => UnitPrice * Amount;
 }

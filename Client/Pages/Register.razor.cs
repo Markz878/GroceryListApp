@@ -5,40 +5,39 @@ using System;
 using System.Threading.Tasks;
 
 
-namespace GroceryListHelper.Client.Pages
+namespace GroceryListHelper.Client.Pages;
+
+public partial class Register
 {
-    public partial class Register
+    [Inject] public AuthenticationService AuthenticationService { get; set; }
+    [Inject] public NavigationManager Navigation { get; set; }
+
+    private readonly RegisterRequestModel registerRequest = new();
+    public string Message { get; set; } = string.Empty;
+    private bool isBusy;
+
+    private async Task RegisterMethod()
     {
-        [Inject] public AuthenticationService AuthenticationService { get; set; }
-        [Inject] public NavigationManager Navigation { get; set; }
-
-        private readonly RegisterRequestModel registerRequest = new();
-        public string Message { get; set; } = string.Empty;
-        private bool isBusy;
-
-        private async Task RegisterMethod()
+        try
         {
-            try
+            isBusy = true;
+            string error = await AuthenticationService.Register(registerRequest);
+            if (!string.IsNullOrEmpty(error))
             {
-                isBusy = true;
-                string error = await AuthenticationService.Register(registerRequest);
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Message = error;
-                }
-                else
-                {
-                    Navigation.NavigateTo("/", true);
-                }
+                Message = error;
             }
-            catch (Exception ex)
+            else
             {
-                Message = ex.Message;
+                Navigation.NavigateTo("/", true);
             }
-            finally
-            {
-                isBusy = false;
-            }
+        }
+        catch (Exception ex)
+        {
+            Message = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
         }
     }
 }

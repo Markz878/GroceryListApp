@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace GroceryListHelper.Server.Hubs
+namespace GroceryListHelper.Server.Hubs;
+
+public interface ICartHubService
 {
-    public interface ICartHubService
-    {
-        IDictionary<int, List<string>> GroupAllowedEmails { get; }
-    }
+    IDictionary<int, List<string>> GroupAllowedEmails { get; }
 }

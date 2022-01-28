@@ -1,20 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace GroceryListHelper.Server.HelperMethods
-{
-    public class ValidationFilter : IActionFilter
-    {
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            if (!context.ModelState.IsValid)
-            {
-                context.Result = new BadRequestObjectResult(context.ModelState);
-            }
-        }
+namespace GroceryListHelper.Server.HelperMethods;
 
-        public void OnActionExecuted(ActionExecutedContext context)
+public class ValidationFilter : IActionFilter
+{
+    public void OnActionExecuting(ActionExecutingContext context)
+    {
+        if (!context.ModelState.IsValid)
         {
+            context.Result = new BadRequestObjectResult(context.ModelState);
         }
+    }
+
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
     }
 }

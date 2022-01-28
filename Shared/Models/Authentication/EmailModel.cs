@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication
+﻿namespace GroceryListHelper.Shared.Models.Authentication;
+
+public class EmailModel
 {
-    public class EmailModel
-    {
-        public string Email { get; set; }
-    }
+    public string Email { get; set; }
 }

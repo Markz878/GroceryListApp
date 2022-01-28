@@ -1,11 +1,10 @@
 ﻿using Microsoft.Playwright;
 
-namespace GroceryListHelper.IntegrationTests.PageObjects
+namespace GroceryListHelper.IntegrationTests.PageObjects;
+
+public class IndexPageObject : BasePageObject
 {
-    public class IndexPageObject : BasePageObject
+    public IndexPageObject(IBrowserContext browser) : base(browser, "")
     {
-        public IndexPageObject(IBrowserContext browser) : base(browser, "")
-        {
-        }
     }
 }

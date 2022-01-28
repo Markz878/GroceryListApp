@@ -6,101 +6,100 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace GroceryListHelper.Server.Controllers
+namespace GroceryListHelper.Server.Controllers;
+
+[Route("api/[controller]/[action]")]
+[ApiController]
+[Authorize]
+public class ProfileController : ControllerBase
 {
-    [Route("api/[controller]/[action]")]
-    [ApiController]
-    [Authorize]
-    public class ProfileController : ControllerBase
+    private readonly IUserRepository userRepository;
+
+    public ProfileController(IUserRepository userRepository)
     {
-        private readonly IUserRepository userRepository;
+        this.userRepository = userRepository;
+    }
 
-        public ProfileController(IUserRepository userRepository)
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    public async Task<IActionResult> LogOut()
+    {
+        int id = User.GetUserId();
+        string response = await userRepository.RemoveRefreshToken(id);
+        if (string.IsNullOrEmpty(response))
         {
-            this.userRepository = userRepository;
+            return NoContent();
         }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        public async Task<IActionResult> LogOut()
+        else
         {
-            int id = User.GetUserId();
-            string response = await userRepository.RemoveRefreshToken(id);
-            if (string.IsNullOrEmpty(response))
-            {
-                return NoContent();
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            return BadRequest(response);
         }
+    }
 
-        [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        int id = User.GetUserId();
+        string response = await userRepository.ChangePassword(id, request.CurrentPassword, request.NewPassword);
+        if (string.IsNullOrEmpty(response))
         {
-            int id = User.GetUserId();
-            string response = await userRepository.ChangePassword(id, request.CurrentPassword, request.NewPassword);
-            if (string.IsNullOrEmpty(response))
-            {
-                return NoContent();
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            return NoContent();
         }
-
-        [HttpPatch]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
+        else
         {
-            int id = User.GetUserId();
-            string response = await userRepository.ChangeEmail(id, request.NewEmail, request.Password);
-            if (string.IsNullOrEmpty(response))
-            {
-                return NoContent();
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            return BadRequest(response);
         }
+    }
 
-        [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        public async Task<IActionResult> Delete(DeleteProfileRequest request)
+    [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
+    {
+        int id = User.GetUserId();
+        string response = await userRepository.ChangeEmail(id, request.NewEmail, request.Password);
+        if (string.IsNullOrEmpty(response))
         {
-            string response = await userRepository.DeleteUser(User.GetUserId(), request.Password);
-            if (string.IsNullOrEmpty(response))
-            {
-                return NoContent();
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            return NoContent();
         }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserModel))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserInfo()
+        else
         {
-            UserModel user = await userRepository.GetUserFromId(User.GetUserId());
-            if (user!=null)
-            {
-                return Ok(user);
-            }
-            else
-            {
-                return NotFound();
-            }
+            return BadRequest(response);
+        }
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    public async Task<IActionResult> Delete(DeleteProfileRequest request)
+    {
+        string response = await userRepository.DeleteUser(User.GetUserId(), request.Password);
+        if (string.IsNullOrEmpty(response))
+        {
+            return NoContent();
+        }
+        else
+        {
+            return BadRequest(response);
+        }
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUserInfo()
+    {
+        UserModel user = await userRepository.GetUserFromId(User.GetUserId());
+        if (user != null)
+        {
+            return Ok(user);
+        }
+        else
+        {
+            return NotFound();
         }
     }
 }

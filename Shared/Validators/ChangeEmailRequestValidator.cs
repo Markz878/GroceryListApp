@@ -2,14 +2,13 @@
 using GroceryListHelper.Shared.Models.Authentication;
 using System.Linq;
 
-namespace GroceryListHelper.Shared.Validators
+namespace GroceryListHelper.Shared.Validators;
+
+public class ChangeEmailRequestValidator : AbstractValidator<ChangeEmailRequest>
 {
-    public class ChangeEmailRequestValidator : AbstractValidator<ChangeEmailRequest>
+    public ChangeEmailRequestValidator()
     {
-        public ChangeEmailRequestValidator()
-        {
-            RuleFor(x => x.NewEmail).EmailAddress();
-            RuleFor(x => x.Password).NotEmpty().Length(6, 30).Must(x=>x.Any(char.IsDigit)).WithMessage("Password must contain at least one digit");
-        }
+        RuleFor(x => x.NewEmail).EmailAddress();
+        RuleFor(x => x.Password).NotEmpty().Length(6, 30).Must(x => x.Any(char.IsDigit)).WithMessage("Password must contain at least one digit");
     }
 }

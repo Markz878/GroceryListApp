@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.BaseModels
+﻿namespace GroceryListHelper.Shared.Models.BaseModels;
+
+public class BaseResponse
 {
-    public class BaseResponse
-    {
-        public string ErrorMessage { get; set; }
-    }
+    public string ErrorMessage { get; set; }
 }

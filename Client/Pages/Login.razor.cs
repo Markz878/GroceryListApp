@@ -4,40 +4,39 @@ using GroceryListHelper.Client.Services;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components;
 
-namespace GroceryListHelper.Client.Pages
+namespace GroceryListHelper.Client.Pages;
+
+public partial class Login
 {
-    public partial class Login
+    [Inject] public AuthenticationService AuthenticationService { get; set; }
+    [Inject] public NavigationManager Navigation { get; set; }
+
+    private readonly UserCredentialsModel user = new();
+    public string Message { get; set; } = string.Empty;
+    private bool isBusy;
+
+    private async Task LoginMethod()
     {
-        [Inject] public AuthenticationService AuthenticationService { get; set; }
-        [Inject] public NavigationManager Navigation { get; set; } 
-
-        private readonly UserCredentialsModel user = new();
-        public string Message { get; set; } = string.Empty;
-        private bool isBusy;
-
-        private async Task LoginMethod()
+        try
         {
-            try
+            isBusy = true;
+            string error = await AuthenticationService.Login(user);
+            if (!string.IsNullOrEmpty(error))
             {
-                isBusy = true;
-                string error = await AuthenticationService.Login(user);
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Message = error;
-                }
-                else
-                {
-                    Navigation.NavigateTo("/", true);
-                }
+                Message = error;
             }
-            catch (Exception ex)
+            else
             {
-                Message = ex.Message;
+                Navigation.NavigateTo("/", true);
             }
-            finally
-            {
-                isBusy = false;
-            }
+        }
+        catch (Exception ex)
+        {
+            Message = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
         }
     }
 }

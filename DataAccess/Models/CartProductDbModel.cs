@@ -1,9 +1,8 @@
 ﻿using GroceryListHelper.Shared;
 
-namespace GroceryListHelper.DataAccess.Models
+namespace GroceryListHelper.DataAccess.Models;
+
+public class CartProductDbModel : CartProductCollectable
 {
-    public class CartProductDbModel : CartProductCollectable
-    {
-        public int UserId { get; set; }
-    }
+    public int UserId { get; set; }
 }

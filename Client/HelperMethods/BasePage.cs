@@ -1,26 +1,25 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
 
-namespace GroceryListHelper.Client.HelperMethods
+namespace GroceryListHelper.Client.HelperMethods;
+
+public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseViewModel
 {
-    public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseViewModel
+    [Inject] public T ViewModel { get; set; }
+
+    protected override void OnInitialized()
     {
-        [Inject] public T ViewModel { get; set; }
+        ViewModel.StateChanged += PropertyChanged;
+    }
 
-        protected override void OnInitialized()
-        {
-            ViewModel.StateChanged += PropertyChanged;
-        }
+    private void PropertyChanged()
+    {
+        StateHasChanged();
+    }
 
-        private void PropertyChanged()
-        {
-            StateHasChanged();
-        }
-
-        public virtual void Dispose()
-        {
-            ViewModel.StateChanged -= PropertyChanged;
-            GC.SuppressFinalize(this);
-        }
+    public virtual void Dispose()
+    {
+        ViewModel.StateChanged -= PropertyChanged;
+        GC.SuppressFinalize(this);
     }
 }

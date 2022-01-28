@@ -1,9 +1,8 @@
 ﻿using GroceryListHelper.Shared.Models.BaseModels;
 
-namespace GroceryListHelper.Shared
+namespace GroceryListHelper.Shared;
+
+public class HubResponse : BaseResponse
 {
-    public class HubResponse : BaseResponse
-    {
-        public string SuccessMessage { get; set; }
-    }
+    public string SuccessMessage { get; set; }
 }

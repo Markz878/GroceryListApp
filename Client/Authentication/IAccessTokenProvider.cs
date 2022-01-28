@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace GroceryListHelper.Client.Authentication
+namespace GroceryListHelper.Client.Authentication;
+
+public interface IAccessTokenProvider
 {
-    public interface IAccessTokenProvider
-    {
-        ValueTask RemoveToken();
-        ValueTask<string> RequestAccessToken();
-        ValueTask SaveToken(string accessToken);
-        ValueTask<string> TryToRefreshToken();
-    }
+    ValueTask RemoveToken();
+    ValueTask<string> RequestAccessToken();
+    ValueTask SaveToken(string accessToken);
+    ValueTask<string> TryToRefreshToken();
 }

@@ -1,35 +1,43 @@
+using GroceryListHelper.Server;
 using Microsoft.Playwright;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace E2ETests
+namespace E2ETests;
+
+public class WebServerTests : IClassFixture<WebHostServerFixture<Startup>>
 {
-    public class WebServerTests : IClassFixture<WebServerFixture>
+    private readonly WebHostServerFixture<Startup> _server;
+
+    public WebServerTests(WebHostServerFixture<Startup> server)
     {
-        private readonly WebServerFixture fixture;
-
-        public WebServerTests(WebServerFixture fixture)
-        {
-            this.fixture = fixture;
-        }
-
-        [Fact]
-        public async Task Page_title_equals_Welcome()
-        {
-            IPage page = await fixture.BrowserContext.NewPageAsync();
-            await page.GotoAsync(fixture.BaseUrl);
-
-            string actual = await page.ContentAsync();
-
-            Assert.Contains("Grocery List Helper", actual);
-        }
+        _server = server;
     }
 
-    public static class Element
+    [Fact]
+    public async Task Page_title_equals_Welcome()
     {
-        public static string ByName(string name)
+        using IPlaywright playwright = await Playwright.CreateAsync();
+        IBrowser browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
         {
-            return $"[pw-name='{name}']";
-        }
+            //Headless = false,
+            //SlowMo = 1000,
+        });
+        IBrowserContext browserContext = await browser.NewContextAsync(new BrowserNewContextOptions()
+        {
+            IgnoreHTTPSErrors = true,
+        });
+        IPage page = await browserContext.NewPageAsync();
+        IResponse response = await page.GotoAsync(_server.RootUri.AbsoluteUri);
+        string actual = await page.ContentAsync();
+        Assert.Contains("Grocery List Helper", actual);
+    }
+}
+
+public static class Element
+{
+    public static string ByName(string name)
+    {
+        return $"[pw-name='{name}']";
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication
+﻿namespace GroceryListHelper.Shared.Models.Authentication;
+
+public class UserCredentialsModel
 {
-    public class UserCredentialsModel
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    public string Email { get; set; }
+    public string Password { get; set; }
 }

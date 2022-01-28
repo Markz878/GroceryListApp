@@ -7,68 +7,51 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GroceryListHelper.Client.Authentication
+namespace GroceryListHelper.Client.Authentication;
+
+public sealed class ProtectedClientAuthorizationHandler : DelegatingHandler
 {
-    public sealed class ProtectedClientAuthorizationHandler : DelegatingHandler
+    private readonly IAccessTokenProvider tokenProvider;
+    private readonly NavigationManager navigation;
+    private readonly AuthenticationStateProvider authenticationStateProvider;
+    private readonly ModalViewModel modal;
+
+    public ProtectedClientAuthorizationHandler(IAccessTokenProvider tokenProvider,
+                                               NavigationManager navigation,
+                                               AuthenticationStateProvider authenticationStateProvider,
+                                               ModalViewModel modal)
     {
-        private readonly IAccessTokenProvider tokenProvider;
-        private readonly NavigationManager navigation;
-        private readonly AuthenticationStateProvider authenticationStateProvider;
-        private readonly ModalViewModel modal;
+        this.tokenProvider = tokenProvider;
+        this.navigation = navigation;
+        this.authenticationStateProvider = authenticationStateProvider;
+        this.modal = modal;
+    }
 
-        public ProtectedClientAuthorizationHandler(IAccessTokenProvider tokenProvider,
-                                                   NavigationManager navigation,
-                                                   AuthenticationStateProvider authenticationStateProvider,
-                                                   ModalViewModel modal)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        string accessToken = await tokenProvider.RequestAccessToken();
+        HttpResponseMessage response = new(HttpStatusCode.Unauthorized);
+        if (string.IsNullOrEmpty(accessToken))
         {
-            this.tokenProvider = tokenProvider;
-            this.navigation = navigation;
-            this.authenticationStateProvider = authenticationStateProvider;
-            this.modal = modal;
-        }
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            string accessToken = await tokenProvider.RequestAccessToken();
-            bool isStillValid = accessToken.AccessTokenStillValid();
-            HttpResponseMessage response = new(HttpStatusCode.Unauthorized);
-            if (!isStillValid)
-            {
-                accessToken = await tokenProvider.TryToRefreshToken();
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    await HandleSessionExpired();
-                    return response;
-                }
-            }
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            response = await base.SendAsync(request, cancellationToken);
-            if (isStillValid && response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                accessToken = await tokenProvider.TryToRefreshToken();
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    await HandleSessionExpired();
-                    return response;
-                }
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                response = await base.SendAsync(request, cancellationToken);
-                if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    await HandleSessionExpired();
-                    return response;
-                }
-            }
+            await HandleSessionExpired();
             return response;
         }
-
-        private async Task HandleSessionExpired()
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        response = await base.SendAsync(request, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            await tokenProvider.RemoveToken();
-            await authenticationStateProvider.GetAuthenticationStateAsync();
-            modal.Message = "Your session has expired, please login.";
-            await Task.Delay(2000);
-            navigation.NavigateTo("/login", true);
+            await HandleSessionExpired();
+            return response;
         }
+        return response;
+    }
+
+    private async Task HandleSessionExpired()
+    {
+        await tokenProvider.RemoveToken();
+        await authenticationStateProvider.GetAuthenticationStateAsync();
+        modal.Message = "Your session has expired, please login.";
+        await Task.Delay(2000);
+        navigation.NavigateTo("/login", true);
     }
 }

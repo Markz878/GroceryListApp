@@ -1,7 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Models.StoreProduct
+﻿namespace GroceryListHelper.Shared.Models.StoreProduct;
+
+public class StoreProductResponseModel : StoreProductModel
 {
-    public class StoreProductResponseModel : StoreProductModel
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

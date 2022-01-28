@@ -1,9 +1,8 @@
 ﻿using GroceryListHelper.Shared.Models.StoreProduct;
 
-namespace GroceryListHelper.Shared.Models.CartProduct
+namespace GroceryListHelper.Shared.Models.CartProduct;
+
+public class CartProduct : StoreProductModel
 {
-    public class CartProduct : StoreProductModel
-    {
-        public double Amount { get; set; }
-    }
+    public double Amount { get; set; }
 }
