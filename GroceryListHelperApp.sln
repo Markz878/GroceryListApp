@@ -1,13 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{403A6CA4-320D-42EA-A772-0EA5A0D160E1}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Dockerfile = Dockerfile
-		.github\workflows\GroceryListHelper.yml = .github\workflows\GroceryListHelper.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Server", "Server\GroceryListHelper.Server.csproj", "{178F7F39-6CAB-49A4-A15F-7F02C3977E9E}"
@@ -21,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.UnitTests", "UnitTests\GroceryListHelper.UnitTests.csproj", "{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.IntegrationTests", "IntegrationTests\GroceryListHelper.IntegrationTests.csproj", "{76BE5548-8050-4F83-865F-030A3783FE6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2ETests", "E2ETests\E2ETests.csproj", "{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +53,10 @@ Global
 		{76BE5548-8050-4F83-865F-030A3783FE6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76BE5548-8050-4F83-865F-030A3783FE6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76BE5548-8050-4F83-865F-030A3783FE6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

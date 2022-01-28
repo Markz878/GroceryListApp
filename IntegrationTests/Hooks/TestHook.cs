@@ -34,7 +34,7 @@ namespace GroceryListHelper.IntegrationTests.Hooks
                     break;
                 }
             }
-            await Task.Delay(1000);
+            await Task.Delay(3000);
 
             //ExecuteCommand($"docker build -d -p 5000:80 --name {apiContainerName} {apiContainerName} '");
             //ExecuteCommand($"docker run -d -p 5000:80 --name {apiContainerName} {apiContainerName} -e AccessTokenKey='qwertyuiop1234567890' -e RefreshTokenKey='qwertyuiop1234567890'");

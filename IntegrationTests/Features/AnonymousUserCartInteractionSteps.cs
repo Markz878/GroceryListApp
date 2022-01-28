@@ -154,7 +154,7 @@ namespace GroceryListHelper.IntegrationTests.Features
         [Then(@"the all-collected check should say ""(.*)""")]
         public async Task ThenTheAll_CollectedCheckShouldSay(string p0)
         {
-            var collectedInfoElement = await indexPage.Page.QuerySelectorAsync("#cart-collected-info");
+            IElementHandle collectedInfoElement = await indexPage.Page.QuerySelectorAsync("#cart-collected-info");
             string collectedInfoText = await collectedInfoElement.InnerTextAsync();
             Assert.Equal(p0, collectedInfoText);
         }

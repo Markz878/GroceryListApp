@@ -45,12 +45,12 @@ namespace GroceryListHelper.UnitTests.ControllerTests
             RegisterRequestModel validRegisterRequest = new Faker<RegisterRequestModel>()
                 .RuleFor(x => x.Email, f => f.Internet.Email())
                 .RuleFor(x => x.Password, f => f.Random.Replace("????###"))
-                .RuleFor(x => x.Password, (f, r) => r.Password)
+                .RuleFor(x => x.ConfirmPassword, (f, r) => r.Password)
                 .Generate();
             AuthenticationResponseModel expectedResponse = new Faker<AuthenticationResponseModel>()
-                .RuleFor(x => x.AccessToken, f => f.Random.String2(50))
+                .RuleFor(x => x.AccessToken, f => f.Random.Hash())
                 .Generate();
-            string refreshToken = new Faker().Random.String2(50);
+            string refreshToken = new Faker().Random.Hash();
             jwtAuthentication.Register(validRegisterRequest.Email, validRegisterRequest.Password).Returns(Task.FromResult((expectedResponse, refreshToken)));
             // Act
             ActionResult<AuthenticationResponseModel> actionResult = await authenticationController.Register(validRegisterRequest);
@@ -135,8 +135,8 @@ namespace GroceryListHelper.UnitTests.ControllerTests
         {
             // Arrange
             AuthenticationResponseModel expectedResponse = new Faker<AuthenticationResponseModel>()
-                .RuleFor(x => x.AccessToken, f => f.Random.String2(30));
-            jwtAuthentication.RefreshTokens("refresh_token").Returns(Task.FromResult((expectedResponse, new Faker().Random.String2(40))));
+                .RuleFor(x => x.AccessToken, f => f.Random.Hash());
+            jwtAuthentication.RefreshTokens("refresh_token").Returns(Task.FromResult((expectedResponse, new Faker().Random.Hash())));
             StringValues cookie = new(GlobalConstants.XRefreshToken + "=" + "refresh_token");
             authenticationController.ControllerContext.HttpContext.Request.Headers.Add(HeaderNames.Cookie, cookie);
             // Act
