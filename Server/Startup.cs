@@ -26,10 +26,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.InstallAssemblyServices(Configuration);
-        services.AddControllers().AddFluentValidation(options =>
-        {
-            options.RegisterValidatorsFromAssemblyContaining<UserCredentialsValidator>();
-        });
+        services.AddControllers();
         services.AddRazorPages();
     }
 

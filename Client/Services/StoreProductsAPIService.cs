@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.Client.Models;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -22,27 +21,30 @@ public class StoreProductsAPIService : IStoreProductsService
         return await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task SaveStoreProduct(StoreProductUIModel product)
+    public async Task<bool> SaveStoreProduct(StoreProductUIModel product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         if (response.IsSuccessStatusCode)
         {
             string id = await response.Content.ReadAsStringAsync();
             product.Id = int.Parse(id);
+            return response.IsSuccessStatusCode;
         }
         else
         {
-            throw new InvalidOperationException("Could not add product");
+            return response.IsSuccessStatusCode;
         }
     }
 
-    public async Task ClearStoreProducts()
+    public async Task<bool> ClearStoreProducts()
     {
-        await client.DeleteAsync(uri);
+        HttpResponseMessage response = await client.DeleteAsync(uri);
+        return response.IsSuccessStatusCode;
     }
 
-    public async Task UpdateStoreProductPrice(int id, double price)
+    public async Task<bool> UpdateStoreProductPrice(int id, double price)
     {
-        await client.PatchAsync(uri + $"/{id}?price={price}", null);
+        HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}?price={price}", null);
+        return response.IsSuccessStatusCode;
     }
 }

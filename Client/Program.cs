@@ -22,7 +22,11 @@ public class Program
     {
         WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add<App>("#app");
-
+#if (!DEBUG)
+{
+        builder.Logging.ClearProviders();
+}
+#endif
         builder.Services.AddAuthorizationCore();
         builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
@@ -39,6 +43,8 @@ public class Program
         builder.Services.AddScoped<AuthenticationService>();
         builder.Services.AddScoped<ProfileService>();
         builder.Services.AddScoped<CartHubBuilder>();
+        builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
+        builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
         builder.Services.AddBlazoredLocalStorage();
 
         builder.Services.AddSingleton<IndexViewModel>();

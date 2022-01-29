@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mapster;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -18,7 +19,8 @@ public class CartProductRepository : ICartProductRepository
 
     public async Task<int> AddCartProduct(CartProduct cartProduct, int userId)
     {
-        CartProductDbModel cartDbProduct = new() { Amount = cartProduct.Amount, Name = cartProduct.Name, UnitPrice = cartProduct.UnitPrice, UserId = userId };
+        CartProductDbModel cartDbProduct = cartProduct.Adapt<CartProductDbModel>();
+        cartDbProduct.UserId = userId;
         db.CartProducts.Add(cartDbProduct);
         await db.SaveChangesAsync();
         return cartDbProduct.Id;
@@ -30,6 +32,14 @@ public class CartProductRepository : ICartProductRepository
             .Where(x => x.UserId == userId)
             .Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice })
             .ToListAsync();
+    }
+
+    public async Task<CartProductCollectable> GetCartProductForUser(int productId, int userId)
+    {
+        CartProductDbModel cartProduct = await db.CartProducts
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
+        return cartProduct.Adapt<CartProductCollectable>();
     }
 
     public Task RemoveItemsForUser(int userId)

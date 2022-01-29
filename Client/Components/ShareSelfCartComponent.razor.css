@@ -12,3 +12,18 @@
     margin: 5px;
     width: 450px;
 }
+
+.add-user-input {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.add-user-button {
+    height: 36px;
+    margin-left: 5px;
+}
+
+.delete-user-button {
+    height: 36px;
+    margin-left: 5px;
+}

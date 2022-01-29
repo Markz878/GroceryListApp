@@ -1,11 +1,15 @@
-﻿using GroceryListHelper.Server.HelperMethods;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GroceryListHelper.Server.Validators;
 
 namespace GroceryListHelper.Server.Controllers;
 
@@ -15,11 +19,15 @@ public class AuthenticationController : ControllerBase
 {
     private readonly IConfiguration configuration;
     private readonly IJWTAuthenticationManager authenticationManager;
+    private readonly IValidator<RegisterRequestModel> registerValidator;
+    private readonly IValidator<UserCredentialsModel> loginValidator;
 
-    public AuthenticationController(IConfiguration configuration, IJWTAuthenticationManager authenticationManager)
+    public AuthenticationController(IConfiguration configuration, IJWTAuthenticationManager authenticationManager, IValidator<RegisterRequestModel> registerValidator, IValidator<UserCredentialsModel> loginValidator)
     {
         this.configuration = configuration;
         this.authenticationManager = authenticationManager;
+        this.registerValidator = registerValidator;
+        this.loginValidator = loginValidator;
     }
 
     [HttpPost]
@@ -27,6 +35,10 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
     public async Task<ActionResult<AuthenticationResponseModel>> Register([FromBody] RegisterRequestModel user)
     {
+        if (registerValidator.FindsError(user, out string error))
+        {
+            return BadRequest(new AuthenticationResponseModel() { ErrorMessage = error });
+        }
         (AuthenticationResponseModel response, string refreshToken) = await authenticationManager.Register(user.Email, user.Password);
         if (string.IsNullOrEmpty(response?.ErrorMessage) && !string.IsNullOrEmpty(response?.AccessToken) && !string.IsNullOrEmpty(refreshToken))
         {
@@ -41,6 +53,10 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
     public async Task<ActionResult<AuthenticationResponseModel>> Login([FromBody] UserCredentialsModel user)
     {
+        if (loginValidator.FindsError(user, out string error))
+        {
+            return BadRequest(new AuthenticationResponseModel() { ErrorMessage = error });
+        }
         (AuthenticationResponseModel response, string refreshToken) = await authenticationManager.Login(user.Email, user.Password);
         if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.AccessToken) && !string.IsNullOrEmpty(refreshToken))
         {
@@ -77,8 +93,7 @@ public class AuthenticationController : ControllerBase
             HttpOnly = true,
             SecurePolicy = CookieSecurePolicy.Always,
             IsEssential = true,
-            SameSite = SameSiteMode.Strict,
-            Path = "/api/authentication"
+            SameSite = SameSiteMode.Strict
         }.Build(httpContext);
     }
 }

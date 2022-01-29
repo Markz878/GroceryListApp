@@ -1,16 +1,13 @@
-﻿using Blazored.LocalStorage;
-using GroceryListHelper.Client.HelperMethods;
+﻿using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Components;
@@ -18,41 +15,25 @@ namespace GroceryListHelper.Client.Components;
 public class CartComponentBase : BasePage<IndexViewModel>
 {
     [Inject] public ModalViewModel ModalViewModel { get; set; }
-    [Inject] public ILocalStorageService LocalStorage { get; set; } 
-    [Inject] public IHttpClientFactory HttpClientFactory { get; set; }
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    [Inject] public ICartProductsService CartProductsService { get; set; }
+    [Inject] public IStoreProductsService StoreProductsService { get; set; }
 
-    private ICartProductsService cartProductsService;
-    private IStoreProductsService storeProductsService;
     protected CartProductUIModel newProduct;
     protected CartProductUIModel editingItem;
     protected CartProductUIModel movingItem;
-    protected bool isAuthenticated;
     protected ElementReference NewProductNameBox;
     protected ElementReference AddProductButton;
 
     protected override async Task OnInitializedAsync()
     {
         newProduct = new CartProductUIModel() { Amount = 1 };
-        AuthenticationState authenticationState = await AuthenticationStateTask;
-        if (authenticationState.User?.Identity?.IsAuthenticated == true)
-        {
-            isAuthenticated = true;
-            cartProductsService = new CartProductsApiService(HttpClientFactory);
-            storeProductsService = new StoreProductsAPIService(HttpClientFactory);
-        }
-        else
-        {
-            cartProductsService = new CartProductsLocalService(LocalStorage);
-            storeProductsService = new StoreProductsLocalService(LocalStorage);
-        }
         ViewModel.CartProducts.Clear();
-        foreach (CartProductUIModel item in await cartProductsService.GetCartProducts())
+        foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
         {
             ViewModel.CartProducts.Add(item);
         }
         ViewModel.StoreProducts.Clear();
-        foreach (StoreProductUIModel item in await storeProductsService.GetStoreProducts())
+        foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
         {
             ViewModel.StoreProducts.Add(item);
         }
@@ -87,7 +68,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             }
             else
             {
-                await cartProductsService.SaveCartProduct(product);
+                await CartProductsService.SaveCartProduct(product);
             }
             ViewModel.CartProducts.Add(product);
         }
@@ -107,7 +88,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         }
         else
         {
-            return cartProductsService.MarkCartProductCollected(product.Id);
+            return CartProductsService.MarkCartProductCollected(product.Id);
         }
     }
 
@@ -119,7 +100,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (product.UnitPrice != unitPrice)
             {
                 product.UnitPrice = unitPrice;
-                return storeProductsService.UpdateStoreProductPrice(product.Id, unitPrice);
+                return StoreProductsService.UpdateStoreProductPrice(product.Id, unitPrice);
             }
             else
             {
@@ -133,7 +114,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (storeProductValidator.Validate(product).IsValid)
             {
                 ViewModel.StoreProducts.Add(product);
-                return storeProductsService.SaveStoreProduct(product);
+                return StoreProductsService.SaveStoreProduct(product);
             }
             return Task.CompletedTask;
         }
@@ -158,7 +139,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             }
             else
             {
-                await cartProductsService.UpdateCartProduct(product);
+                await CartProductsService.UpdateCartProduct(product);
             }
         }
         ModalViewModel.Message = message;
@@ -209,7 +190,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         }
         else
         {
-            return cartProductsService.DeleteCartProduct(product.Id);
+            return CartProductsService.DeleteCartProduct(product.Id);
         }
     }
 

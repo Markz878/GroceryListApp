@@ -52,7 +52,7 @@ public class CartProductsControllerTests
             .Generate(10);
         cartProductRepository.GetCartProductsForUser(userId).Returns(Task.FromResult(cartProducts));
         // Act
-        IActionResult actionResult = await cartProductsController.Get();
+        IActionResult actionResult = await cartProductsController.GetProducts();
         // Assert
         Assert.True(actionResult is OkObjectResult);
         OkObjectResult objectResult = actionResult as OkObjectResult;

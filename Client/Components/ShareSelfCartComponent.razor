@@ -6,8 +6,8 @@
         <FluentValidationValidator />
         <ValidationSummary />
         <div class="component-row">
-            <InputText type="email" required class="form-control" @bind-Value="AllowEmail.Email" placeholder="User email" />
-            <button type="submit" disabled="@ViewModel.IsPolling" class="btn btn-success">+</button>
+            <InputText type="email" required class="mt-0 form-control" @bind-Value="AllowEmail.Email" placeholder="User email"/>
+            <button type="submit" disabled="@ViewModel.IsPolling" class="btn btn-success add-user-button">+</button>
         </div>
     </EditForm>
     @for (int i = 0; i < ViewModel.AllowedUsers.Count; i++)
@@ -15,7 +15,7 @@
         var index = i;
         <div class="component-row">
             <div class="email-text">@ViewModel.AllowedUsers[index]</div>
-            <button class="btn btn-danger" disabled="@ViewModel.IsPolling" @onclick="()=>DeleteUser(ViewModel.AllowedUsers[index])">X</button>
+            <button class="btn btn-danger delete-user-button" disabled="@ViewModel.IsPolling" @onclick="()=>DeleteUser(ViewModel.AllowedUsers[index])">X</button>
         </div>
     }
 

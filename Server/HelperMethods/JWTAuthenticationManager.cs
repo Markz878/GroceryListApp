@@ -63,17 +63,11 @@ public class JWTAuthenticationManager : IJWTAuthenticationManager
     {
         AuthenticationResponseModel response = new();
         UserDbModel user = await userRepository.GetUserFromEmail(email);
-        if (user == null)
+        if (user == null || !PasswordHelper.CheckPassword(user, password))
         {
-            response.ErrorMessage = "User not found.";
+            response.ErrorMessage = "Invalid email or password.";
             return (response, "");
         }
-        if (!PasswordHelper.CheckPassword(user, password))
-        {
-            response.ErrorMessage = "Invalid password.";
-            return (response, "");
-        }
-
         response.AccessToken = GenerateAccessToken(user);
         string refreshToken = GenerateRefreshToken(user);
         await userRepository.UpdateRefreshToken(user.Id, refreshToken);

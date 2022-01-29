@@ -15,5 +15,6 @@ public class ValidatorsInstaller : IInstaller
         services.AddTransient<IValidator<CartProduct>, CartProductValidator>();
         services.AddTransient<IValidator<StoreProductModel>, StoreProductValidator>();
         services.AddTransient<IValidator<RegisterRequestModel>, RegisterRequestValidator>();
+        services.AddTransient<IValidator<UserCredentialsModel>, UserCredentialValidator>();
     }
 }

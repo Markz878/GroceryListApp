@@ -6,8 +6,8 @@ namespace GroceryListHelper.Client.Services;
 
 public interface IStoreProductsService
 {
-    Task ClearStoreProducts();
+    Task<bool> ClearStoreProducts();
     Task<List<StoreProductUIModel>> GetStoreProducts();
-    Task SaveStoreProduct(StoreProductUIModel product);
-    Task UpdateStoreProductPrice(int id, double price);
+    Task<bool> SaveStoreProduct(StoreProductUIModel product);
+    Task<bool> UpdateStoreProductPrice(int id, double price);
 }

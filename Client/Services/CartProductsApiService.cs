@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -24,10 +25,10 @@ public class CartProductsApiService : ICartProductsService
     public async Task<bool> SaveCartProduct(CartProductUIModel product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
-        string content = await response.Content.ReadAsStringAsync();
         if (response.IsSuccessStatusCode)
         {
-            product.Id = int.Parse(content);
+            CartProductCollectable cartProduct = await response.Content.ReadFromJsonAsync<CartProductCollectable>();
+            product.Id = cartProduct.Id;
             return true;
         }
         return false;

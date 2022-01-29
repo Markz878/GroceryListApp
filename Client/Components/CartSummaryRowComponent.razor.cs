@@ -9,8 +9,8 @@ namespace GroceryListHelper.Client.Components;
 
 public class CartSummaryRowComponentBase : BasePage<IndexViewModel>
 {
-    [Inject] public CartProductsApiService CartProductsService { get; set; }
-    [Inject] public StoreProductsAPIService StoreProductsService { get; set; }
+    [Inject] public ICartProductsService CartProductsService { get; set; }
+    [Inject] public IStoreProductsService StoreProductsService { get; set; }
     public bool AllCollected => ViewModel.CartProducts.All(x => x.IsCollected);
     public double Total => ViewModel.CartProducts.Sum(x => x.Total);
 
