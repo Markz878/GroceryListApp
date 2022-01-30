@@ -21,7 +21,7 @@ public class WebServerTests : IClassFixture<WebHostServerFixture<Startup>>
         IBrowser browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
         {
             //Headless = false,
-            //SlowMo = 1000,
+            //SlowMo = 5000,
         });
         IBrowserContext browserContext = await browser.NewContextAsync(new BrowserNewContextOptions()
         {
@@ -29,8 +29,7 @@ public class WebServerTests : IClassFixture<WebHostServerFixture<Startup>>
         });
         IPage page = await browserContext.NewPageAsync();
         IResponse response = await page.GotoAsync(_server.RootUri.AbsoluteUri);
-        string pageContent = await page.ContentAsync();
-        Assert.Contains("Grocery List Helper", pageContent);
-        Assert.DoesNotContain("An unhandled error has occurred", pageContent);
+        await page.Locator("h2:has-text(\"Grocery List Helper\")").WaitForAsync();
+        Assert.True(response.Ok);
     }
 }

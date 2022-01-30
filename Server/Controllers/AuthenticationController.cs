@@ -1,15 +1,9 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.BaseModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using GroceryListHelper.Server.Validators;
 
 namespace GroceryListHelper.Server.Controllers;
 

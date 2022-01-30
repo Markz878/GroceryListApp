@@ -5,10 +5,7 @@ using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Hubs;
 
@@ -66,16 +63,16 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    private int GetHostId()
+    private string GetHostId()
     {
         string userEmail = GetUserEmail(Context);
-        int hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
+        string hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
         return hostId;
     }
 
-    public async Task<int> CartItemAdded(CartProductCollectable product)
+    public async Task<string> CartItemAdded(CartProductCollectable product)
     {
-        int hostId = GetHostId();
+        string hostId = GetHostId();
         product.Id = await db.AddCartProduct(product, hostId);
         await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
         return product.Id;
@@ -83,35 +80,35 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 
     public async Task CartItemModified(CartProductCollectable product)
     {
-        int hostId = GetHostId();
+        string hostId = GetHostId();
         await db.UpdateProduct(product.Id, hostId, product);
         await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
     }
 
-    public async Task CartItemCollected(int id)
+    public async Task CartItemCollected(string id)
     {
-        int hostId = GetHostId();
+        string hostId = GetHostId();
         await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
         await db.MarkAsCollected(id, hostId);
     }
 
-    public async Task CartItemDeleted(int id)
+    public async Task CartItemDeleted(string id)
     {
-        int hostId = GetHostId();
+        string hostId = GetHostId();
         await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
         await db.DeleteItem(id, hostId);
     }
 
-    public async Task CartItemMoved(int id, int newIndex)
+    public async Task CartItemMoved(string id, int newIndex)
     {
-        int hostId = GetHostId();
+        string hostId = GetHostId();
         await Clients.OthersInGroup(hostId.ToString()).ItemMoved(id, newIndex);
     }
 
     public async Task<HubResponse> LeaveGroup()
     {
-        int hostId = GetHostId();
-        if (hostId >= 0)
+        string hostId = GetHostId();
+        if (hostId != string.Empty)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
             if (hostId == GetUserId(Context))
@@ -131,9 +128,9 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    private static int GetUserId(HubCallerContext context)
+    private static string GetUserId(HubCallerContext context)
     {
-        return int.Parse(context.User.FindFirst("id").Value);
+        return context.User.FindFirst("id").Value;
     }
 
     private static string GetUserEmail(HubCallerContext context)

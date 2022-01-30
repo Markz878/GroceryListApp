@@ -2,9 +2,6 @@
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -42,7 +39,7 @@ public class StoreProductsServiceProvider : IStoreProductsService
         return await actingStoreService.SaveStoreProduct(product);
     }
 
-    public async Task<bool> UpdateStoreProductPrice(int id, double price)
+    public async Task<bool> UpdateStoreProductPrice(string id, double price)
     {
         await SelectProvider();
         return await actingStoreService.UpdateStoreProductPrice(id, price);

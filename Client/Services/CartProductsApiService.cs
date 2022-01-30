@@ -1,9 +1,6 @@
 ﻿using GroceryListHelper.Client.Models;
 using GroceryListHelper.Shared;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -34,7 +31,7 @@ public class CartProductsApiService : ICartProductsService
         return false;
     }
 
-    public async Task<bool> DeleteCartProduct(int id)
+    public async Task<bool> DeleteCartProduct(string id)
     {
         HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
         return response.IsSuccessStatusCode;
@@ -46,7 +43,7 @@ public class CartProductsApiService : ICartProductsService
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> MarkCartProductCollected(int id)
+    public async Task<bool> MarkCartProductCollected(string id)
     {
         HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}", null);
         return response.IsSuccessStatusCode;

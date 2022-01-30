@@ -6,13 +6,8 @@ using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.HelperMethods;
 
@@ -91,20 +86,20 @@ public class CartHubBuilder
             indexViewModel.OnPropertyChanged();
         });
 
-        indexViewModel.CartHub.On<int>(nameof(ICartHubNotifications.ItemCollected), (id) =>
+        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemCollected), (id) =>
         {
             Console.WriteLine($"Item with id {id} was collected.");
             indexViewModel.CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
             indexViewModel.OnPropertyChanged();
         });
 
-        indexViewModel.CartHub.On<int>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
+        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
             Console.WriteLine($"Item with id {id} was deleted.");
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
         });
 
-        indexViewModel.CartHub.On<int, int>(nameof(ICartHubNotifications.ItemMoved), (id, newIndex) =>
+        indexViewModel.CartHub.On<string, int>(nameof(ICartHubNotifications.ItemMoved), (id, newIndex) =>
         {
             Console.WriteLine($"Item with id {id} was moved to {newIndex}.");
             CartProductUIModel item = indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id);

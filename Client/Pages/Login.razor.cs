@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using GroceryListHelper.Client.Services;
+﻿using GroceryListHelper.Client.Services;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components;
 

@@ -3,10 +3,7 @@ using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers;
 
@@ -34,7 +31,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
     public async Task<IActionResult> Post(StoreProductModel product)
     {
-        int id = await db.AddProduct(product, User.GetUserId());
+        string id = await db.AddProduct(product, User.GetUserId());
         return Ok(id);
     }
 
@@ -46,20 +43,20 @@ public class StoreProductsController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(string id)
     {
         bool success = await db.DeleteItem(id, User.GetUserId());
         return success ? NoContent() : NotFound();
     }
 
-    [HttpPatch("{id:int}")]
+    [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdatePrice(int id, [FromQuery] double price)
+    public async Task<IActionResult> UpdatePrice(string id, [FromQuery] double price)
     {
         if (price < 0)
         {

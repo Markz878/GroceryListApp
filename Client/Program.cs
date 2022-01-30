@@ -1,18 +1,14 @@
+using Blazored.LocalStorage;
 using GroceryListHelper.Client.Authentication;
+using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Services;
+using GroceryListHelper.Client.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
 using Polly.Wrap;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Blazored.LocalStorage;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Client.HelperMethods;
 
 namespace GroceryListHelper.Client;
 

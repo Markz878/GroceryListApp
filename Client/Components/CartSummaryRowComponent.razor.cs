@@ -2,8 +2,6 @@ using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.ViewModels;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Components;
 

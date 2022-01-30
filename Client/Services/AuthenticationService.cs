@@ -1,9 +1,7 @@
 ﻿using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 

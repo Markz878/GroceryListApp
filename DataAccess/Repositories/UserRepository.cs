@@ -2,8 +2,6 @@
 using GroceryListHelper.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -18,7 +16,7 @@ public class UserRepository : IUserRepository
         this.logger = logger;
     }
 
-    public async Task<string> RemoveRefreshToken(int id)
+    public async Task<string> RemoveRefreshToken(string id)
     {
         try
         {
@@ -40,7 +38,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<UserDbModel> GetUserFromId(int id)
+    public async Task<UserDbModel> GetUserFromId(string id)
     {
         UserDbModel userDbModel = await db.Users.FirstOrDefaultAsync(u => u.Id.Equals(id));
         return userDbModel;
@@ -69,7 +67,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<string> ChangeEmail(int id, string newEmail, string password)
+    public async Task<string> ChangeEmail(string id, string newEmail, string password)
     {
         UserDbModel user = await GetUserFromId(id);
         if (user == null)
@@ -88,7 +86,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<string> ChangePassword(int id, string currentPassword, string newPassword)
+    public async Task<string> ChangePassword(string id, string currentPassword, string newPassword)
     {
         UserDbModel user = await GetUserFromId(id);
         if (user == null)
@@ -108,7 +106,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<string> DeleteUser(int id, string password)
+    public async Task<string> DeleteUser(string id, string password)
     {
         UserDbModel user = await GetUserFromId(id);
         if (user == null)
@@ -127,7 +125,7 @@ public class UserRepository : IUserRepository
         return "Invalid username or password";
     }
 
-    public async Task<string> UpdateRefreshToken(int id, string refreshToken)
+    public async Task<string> UpdateRefreshToken(string id, string refreshToken)
     {
         try
         {

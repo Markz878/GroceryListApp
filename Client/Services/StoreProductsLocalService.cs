@@ -1,7 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -48,7 +46,7 @@ public class StoreProductsLocalService : IStoreProductsService
         }
     }
 
-    public async Task<bool> UpdateStoreProductPrice(int id, double price)
+    public async Task<bool> UpdateStoreProductPrice(string id, double price)
     {
         try
         {

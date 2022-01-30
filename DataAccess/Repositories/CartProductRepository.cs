@@ -1,11 +1,8 @@
 ﻿using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Models.CartProduct;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -17,7 +14,7 @@ public class CartProductRepository : ICartProductRepository
         this.db = db;
     }
 
-    public async Task<int> AddCartProduct(CartProduct cartProduct, int userId)
+    public async Task<string> AddCartProduct(CartProduct cartProduct, string userId)
     {
         CartProductDbModel cartDbProduct = cartProduct.Adapt<CartProductDbModel>();
         cartDbProduct.UserId = userId;
@@ -26,7 +23,7 @@ public class CartProductRepository : ICartProductRepository
         return cartDbProduct.Id;
     }
 
-    public Task<List<CartProductCollectable>> GetCartProductsForUser(int userId)
+    public Task<List<CartProductCollectable>> GetCartProductsForUser(string userId)
     {
         return db.CartProducts.AsNoTracking()
             .Where(x => x.UserId == userId)
@@ -34,7 +31,7 @@ public class CartProductRepository : ICartProductRepository
             .ToListAsync();
     }
 
-    public async Task<CartProductCollectable> GetCartProductForUser(int productId, int userId)
+    public async Task<CartProductCollectable> GetCartProductForUser(string productId, string userId)
     {
         CartProductDbModel cartProduct = await db.CartProducts
             .AsNoTracking()
@@ -42,15 +39,15 @@ public class CartProductRepository : ICartProductRepository
         return cartProduct.Adapt<CartProductCollectable>();
     }
 
-    public Task RemoveItemsForUser(int userId)
+    public Task RemoveItemsForUser(string userId)
     {
         db.CartProducts.RemoveRange(db.CartProducts.Where(x => x.UserId == userId));
         return db.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteItem(int productId, int userId)
+    public async Task<bool> DeleteItem(string productId, string userId)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId);
+        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         if (product == null || product.UserId != userId)
         {
             return false;
@@ -60,9 +57,9 @@ public class CartProductRepository : ICartProductRepository
         return true;
     }
 
-    public async Task<bool> MarkAsCollected(int productId, int userId)
+    public async Task<bool> MarkAsCollected(string productId, string userId)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId);
+        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         if (product == null || product.UserId != userId)
         {
             return false;
@@ -72,9 +69,9 @@ public class CartProductRepository : ICartProductRepository
         return true;
     }
 
-    public async Task<bool> UpdateProduct(int productId, int userId, CartProduct updatedProduct)
+    public async Task<bool> UpdateProduct(string productId, string userId, CartProduct updatedProduct)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId);
+        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         if (product == null || product.UserId != userId)
         {
             return false;

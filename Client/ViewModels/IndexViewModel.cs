@@ -1,7 +1,6 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Models;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 

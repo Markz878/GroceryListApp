@@ -2,9 +2,6 @@
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -30,7 +27,7 @@ public class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.ClearCartProducts();
     }
 
-    public async Task<bool> DeleteCartProduct(int id)
+    public async Task<bool> DeleteCartProduct(string id)
     {
         await SelectProvider();
         return await actingCartService.DeleteCartProduct(id);
@@ -42,7 +39,7 @@ public class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.GetCartProducts();
     }
 
-    public async Task<bool> MarkCartProductCollected(int id)
+    public async Task<bool> MarkCartProductCollected(string id)
     {
         await SelectProvider();
         return await actingCartService.MarkCartProductCollected(id);

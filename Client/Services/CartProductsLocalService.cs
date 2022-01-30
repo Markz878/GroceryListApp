@@ -1,8 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -24,29 +21,12 @@ public class CartProductsLocalService : ICartProductsService
     public async Task<bool> SaveCartProduct(CartProductUIModel product)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
-        product.Id = GetNextId(products);
         products.Add(product);
         await localStorage.SetItemAsync(cartProductsKey, products);
         return true;
     }
 
-    private static int GetNextId(IEnumerable<CartProductUIModel> products)
-    {
-        int id = 0;
-        while (true)
-        {
-            if (products.Any(x => x.Id == id))
-            {
-                id++;
-            }
-            else
-            {
-                return id;
-            }
-        }
-    }
-
-    public async Task<bool> DeleteCartProduct(int id)
+    public async Task<bool> DeleteCartProduct(string id)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
         products.Remove(products.Find(x => x.Id == id));
@@ -60,7 +40,7 @@ public class CartProductsLocalService : ICartProductsService
         return true;
     }
 
-    public async Task<bool> MarkCartProductCollected(int id)
+    public async Task<bool> MarkCartProductCollected(string id)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
         CartProductUIModel product = products.Find(x => x.Id == id);

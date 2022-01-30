@@ -3,8 +3,6 @@ using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.CartProduct;
 using GroceryListHelper.Shared.Models.StoreProduct;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GroceryListHelper.Server.Installers;
 

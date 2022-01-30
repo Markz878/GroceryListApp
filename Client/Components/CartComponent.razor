@@ -41,8 +41,8 @@
                     <td id="item-amount-@index">@item.Amount</td>
                     <td id="item-unitprice-@index">@item.UnitPrice</td>
                     <td id="item-totalprice-@index">@item.Total.ToString("N2")</td>
-                    <td><button id="edit-product-button-@index" class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product"><i class="fas fa-edit"></i></button></td>
-                    <td><button id="delete-product-button-@index" class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product">X</button></td>
+                    <td><button id="edit-product-button-@index" class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product" disabled=@item.IsCollected><i class="fas fa-edit"></i></button></td>
+                    <td><button id="delete-product-button-@index" class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product" disabled=@item.IsCollected>X</button></td>
                 </tr>
             }
             else
@@ -54,8 +54,8 @@
                     <td><input id="edit-item-amount-input-@index" type="number" step="0.01" min="0" class="form-control text-center" @bind="item.Amount" /></td>
                     <td><input id="edit-item-unitprice-input-@index" type="number" step="0.01" min="0" class="form-control text-center" @bind="item.UnitPrice" /></td>
                     <td id="item-totalprice-@index">@item.Total.ToString("N2")</td>
-                    <td><button id="update-product-button-@index" class="btn btn-success" @onclick="()=>UpdateCartProduct(item)" aria-label="Submit change">Submit</button></td>
-                    <td><button id="cancel-update-button-@index" class="btn btn-danger" @onclick="()=>CancelProductUpdate()" aria-label="Cancel change">Cancel</button></td>
+                    <td><button id="update-product-button-@index" class="btn btn-success" @onclick=@(()=>UpdateCartProduct(item)) aria-label="Submit change" disabled=@item.IsCollected>Submit</button></td>
+                    <td><button id="cancel-update-button-@index" class="btn btn-danger" @onclick=@(()=>CancelProductUpdate()) aria-label="Cancel change" disabled=@item.IsCollected>Cancel</button></td>
                 </tr>
             }
         }

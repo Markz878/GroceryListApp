@@ -1,8 +1,6 @@
 ﻿using GroceryListHelper.Client.Services;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Threading.Tasks;
 
 
 namespace GroceryListHelper.Client.Pages;

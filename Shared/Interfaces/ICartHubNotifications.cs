@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace GroceryListHelper.Shared.Interfaces;
+﻿namespace GroceryListHelper.Shared.Interfaces;
 
 public interface ICartHubNotifications
 {
@@ -9,8 +6,8 @@ public interface ICartHubNotifications
     Task LeaveCart(string hostEmail);
     Task ItemAdded(CartProductCollectable cartProduct);
     Task ItemModified(CartProductCollectable cartProduct);
-    Task ItemCollected(int id);
-    Task ItemDeleted(int id);
-    Task ItemMoved(int id, int newIndex);
+    Task ItemCollected(string id);
+    Task ItemDeleted(string id);
+    Task ItemMoved(string id, int newIndex);
     Task GetMessage(string message);
 }

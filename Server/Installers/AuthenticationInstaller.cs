@@ -1,9 +1,5 @@
 ﻿using GroceryListHelper.Server.HelperMethods;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Installers;
 

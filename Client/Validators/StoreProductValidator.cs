@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
 using GroceryListHelper.Shared.Models.StoreProduct;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GroceryListHelper.Client.Validators;
 

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace GroceryListHelper.Client.Authentication;
+﻿namespace GroceryListHelper.Client.Authentication;
 
 public interface IAccessTokenProvider
 {

@@ -5,9 +5,7 @@ using GroceryListHelper.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace GroceryListHelper.UnitTests.ControllerTests;
@@ -16,12 +14,11 @@ public class CartProductsControllerTests
 {
     private readonly CartProductsController cartProductsController;
     private readonly ICartProductRepository cartProductRepository;
-    private readonly int userId;
+    private readonly string userId = Guid.NewGuid().ToString();
 
     public CartProductsControllerTests()
     {
         cartProductRepository = Substitute.For<ICartProductRepository>();
-        userId = new Faker().Random.Number(0, 100);
         List<Claim> claims = new()
         {
             new Claim("id", userId.ToString())
@@ -44,7 +41,7 @@ public class CartProductsControllerTests
     {
         // Arrange
         List<CartProductCollectable> cartProducts = new Faker<CartProductCollectable>()
-            .RuleFor(x => x.Id, x => x.Random.Int(0, 100))
+            .RuleFor(x => x.Id, x => Guid.NewGuid().ToString())
             .RuleFor(x => x.UnitPrice, x => x.Random.Double(0, 100))
             .RuleFor(x => x.Amount, x => x.Random.Int(0, 100))
             .RuleFor(x => x.Name, x => x.Random.Utf16String(3, 6))

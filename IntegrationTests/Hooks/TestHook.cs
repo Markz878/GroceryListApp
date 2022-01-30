@@ -2,7 +2,6 @@
 using GroceryListHelper.IntegrationTests.PageObjects;
 using Microsoft.Playwright;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace GroceryListHelper.IntegrationTests.Hooks;

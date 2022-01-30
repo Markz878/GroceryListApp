@@ -6,9 +6,6 @@ using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Components;
 
@@ -64,7 +61,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             if (ViewModel.IsPolling)
             {
-                product.Id = await ViewModel.CartHub.InvokeAsync<int>(nameof(ICartHubActions.CartItemAdded), product);
+                product.Id = await ViewModel.CartHub.InvokeAsync<string>(nameof(ICartHubActions.CartItemAdded), product);
             }
             else
             {

@@ -4,10 +4,7 @@ using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers;
 
@@ -30,8 +27,8 @@ public class CartProductsController : ControllerBase
         return Ok(results);
     }
 
-    [HttpGet("{productId:int}")]
-    public async Task<IActionResult> GetProduct(int productId)
+    [HttpGet("{productId}")]
+    public async Task<IActionResult> GetProduct(string productId)
     {
         CartProductCollectable results = await cartProductsRepository.GetCartProductForUser(productId, User.GetUserId());
         return Ok(results);
@@ -42,7 +39,7 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AddProduct(CartProduct product)
     {
-        int id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
+        string id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
         CartProductCollectable createdProduct = product.Adapt<CartProductCollectable>();
         createdProduct.Id = id;
         return Created($"api/cartproducts/productId={id}", createdProduct);
@@ -57,31 +54,31 @@ public class CartProductsController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(string id)
     {
         bool success = await cartProductsRepository.DeleteItem(id, User.GetUserId());
         return success ? NoContent() : NotFound();
     }
 
-    [HttpPatch("{id:int}")]
+    [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> MarkAsCollected(int id)
+    public async Task<IActionResult> MarkAsCollected(string id)
     {
         bool success = await cartProductsRepository.MarkAsCollected(id, User.GetUserId());
         return success ? NoContent() : NotFound();
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProduct(int id, CartProduct updatedProduct)
+    public async Task<IActionResult> UpdateProduct(string id, CartProduct updatedProduct)
     {
         bool success = await cartProductsRepository.UpdateProduct(id, User.GetUserId(), updatedProduct);
         return success ? NoContent() : NotFound();

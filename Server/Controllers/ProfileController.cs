@@ -2,9 +2,7 @@
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.Controllers;
 
@@ -25,7 +23,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> LogOut()
     {
-        int id = User.GetUserId();
+        string id = User.GetUserId();
         string response = await userRepository.RemoveRefreshToken(id);
         if (string.IsNullOrEmpty(response))
         {
@@ -42,7 +40,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
-        int id = User.GetUserId();
+        string id = User.GetUserId();
         string response = await userRepository.ChangePassword(id, request.CurrentPassword, request.NewPassword);
         if (string.IsNullOrEmpty(response))
         {
@@ -59,7 +57,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
     {
-        int id = User.GetUserId();
+        string id = User.GetUserId();
         string response = await userRepository.ChangeEmail(id, request.NewEmail, request.Password);
         if (string.IsNullOrEmpty(response))
         {

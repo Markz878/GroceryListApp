@@ -4,8 +4,6 @@ using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Components;
 

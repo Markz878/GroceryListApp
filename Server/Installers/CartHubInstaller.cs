@@ -1,9 +1,5 @@
 ﻿using GroceryListHelper.Server.Hubs;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 
 namespace GroceryListHelper.Server.Installers;
 

@@ -98,8 +98,7 @@ public class WebHostServerFixture<TStartup> : WebHostServerFixture
 #endif
                 Dictionary<string, string> inMemoryConfiguration = new Dictionary<string, string>
                 {
-                    //{ WebHostDefaults.StaticWebAssetsKey, name },
-                    { "ConnectionStrings:DatabaseConnection", "Data Source=database.db;" },
+                    { "ConnectionStrings:Cosmos", "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==" },
                     { "RefreshTokenKey", "qwertyuiopasdfghjkl" },
                     { "AccessTokenKey", "qwertyuiopasdfghjkl" }
                 };

@@ -2,14 +2,10 @@
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Shared.Models.Authentication;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Server.HelperMethods;
 

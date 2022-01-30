@@ -1,6 +1,8 @@
 using Bogus;
+using FluentValidation;
 using GroceryListHelper.Server.Controllers;
 using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Validators;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.Http;
@@ -9,8 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using NSubstitute;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace GroceryListHelper.UnitTests.ControllerTests;
@@ -29,7 +29,9 @@ public class AuthenticationControllerTests
         };
         configuration = new ConfigurationBuilder().AddInMemoryCollection(configurationValues).Build();
         jwtAuthentication = Substitute.For<IJWTAuthenticationManager>();
-        authenticationController = new AuthenticationController(configuration, jwtAuthentication)
+        IValidator<RegisterRequestModel> registerValidator = new RegisterRequestValidator();
+        IValidator<UserCredentialsModel> userValidator = new UserCredentialValidator();
+        authenticationController = new AuthenticationController(configuration, jwtAuthentication, registerValidator, userValidator)
         {
             ControllerContext = new ControllerContext()
             {
@@ -71,18 +73,14 @@ public class AuthenticationControllerTests
             .RuleFor(x => x.Password, f => f.Random.Replace("????###"))
             .RuleFor(x => x.Password, f => f.Random.Replace("??????###"))
             .Generate();
-        AuthenticationResponseModel expectedResponse = new Faker<AuthenticationResponseModel>()
-            .RuleFor(x => x.ErrorMessage, new Faker().Random.String2(10))
-            .Generate();
-        jwtAuthentication.Register(invalidRegisterRequest.Email, invalidRegisterRequest.Password).Returns(Task.FromResult((expectedResponse, "")));
         // Act
         ActionResult<AuthenticationResponseModel> actionResult = await authenticationController.Register(invalidRegisterRequest);
         // Assert
         Assert.True(actionResult.Result is BadRequestObjectResult);
         BadRequestObjectResult objectResult = actionResult.Result as BadRequestObjectResult;
         Assert.Equal(400, objectResult.StatusCode);
-        Assert.Equal(expectedResponse.AccessToken, (objectResult.Value as AuthenticationResponseModel).AccessToken);
-        Assert.Equal(expectedResponse.ErrorMessage, (objectResult.Value as AuthenticationResponseModel).ErrorMessage);
+        Assert.True(string.IsNullOrWhiteSpace((objectResult.Value as AuthenticationResponseModel).AccessToken));
+        Assert.False(string.IsNullOrWhiteSpace((objectResult.Value as AuthenticationResponseModel).ErrorMessage));
     }
 
     [Fact]
@@ -117,17 +115,13 @@ public class AuthenticationControllerTests
             .RuleFor(x => x.Password, f => f.Random.String2(1, 10))
             .Generate();
 
-        AuthenticationResponseModel expectedResponse = new Faker<AuthenticationResponseModel>()
-            .RuleFor(x => x.ErrorMessage, f => f.Random.String2(30));
-
-        jwtAuthentication.Login(userCredentials.Email, userCredentials.Password).Returns(Task.FromResult((expectedResponse, "")));
         // Act
         ActionResult<AuthenticationResponseModel> actionResult = await authenticationController.Login(userCredentials);
         BadRequestObjectResult objectResult = actionResult.Result as BadRequestObjectResult;
         // Assert
         Assert.Equal(400, objectResult.StatusCode);
-        Assert.Equal(expectedResponse.AccessToken, (objectResult.Value as AuthenticationResponseModel).AccessToken);
-        Assert.Equal(expectedResponse.ErrorMessage, (objectResult.Value as AuthenticationResponseModel).ErrorMessage);
+        Assert.True(string.IsNullOrWhiteSpace((objectResult.Value as AuthenticationResponseModel).AccessToken));
+        Assert.False(string.IsNullOrWhiteSpace((objectResult.Value as AuthenticationResponseModel).ErrorMessage));
     }
 
     [Fact]

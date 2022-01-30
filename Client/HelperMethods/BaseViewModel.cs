@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GroceryListHelper.Client.HelperMethods;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BaseViewModel
 {

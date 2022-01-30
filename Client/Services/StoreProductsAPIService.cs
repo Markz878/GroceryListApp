@@ -1,8 +1,5 @@
 ﻿using GroceryListHelper.Client.Models;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -26,8 +23,7 @@ public class StoreProductsAPIService : IStoreProductsService
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         if (response.IsSuccessStatusCode)
         {
-            string id = await response.Content.ReadAsStringAsync();
-            product.Id = int.Parse(id);
+            product.Id = await response.Content.ReadAsStringAsync();
             return response.IsSuccessStatusCode;
         }
         else
@@ -42,7 +38,7 @@ public class StoreProductsAPIService : IStoreProductsService
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> UpdateStoreProductPrice(int id, double price)
+    public async Task<bool> UpdateStoreProductPrice(string id, double price)
     {
         HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}?price={price}", null);
         return response.IsSuccessStatusCode;

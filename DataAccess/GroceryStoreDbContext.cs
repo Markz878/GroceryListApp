@@ -15,8 +15,8 @@ public class GroceryStoreDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<UserDbModel>(x => x.HasIndex(x => x.Email).IsUnique());
-        builder.Entity<CartProductDbModel>(x => x.HasOne<UserDbModel>().WithMany().HasForeignKey(c => c.UserId));
-        builder.Entity<StoreProductDbModel>(x => x.HasOne<UserDbModel>().WithMany().HasForeignKey(c => c.UserId));
+        builder.Entity<UserDbModel>().ToContainer("Users").HasNoDiscriminator().HasPartitionKey(x => x.Id).Property(x => x.Id).ToJsonProperty("id");
+        builder.Entity<CartProductDbModel>().ToContainer("CartProducts").HasNoDiscriminator().HasPartitionKey(x => x.UserId).HasDefaultTimeToLive(60 * 60 * 24 * 7).Property(x => x.Id).ToJsonProperty("id");
+        builder.Entity<StoreProductDbModel>().ToContainer("StoreProducts").HasNoDiscriminator().HasPartitionKey(x => x.UserId).HasDefaultTimeToLive(60 * 60 * 24 * 60).Property(x => x.Id).ToJsonProperty("id");
     }
 }

@@ -1,14 +1,7 @@
 using AspNetCoreRateLimit;
-using FluentValidation.AspNetCore;
+using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
-using GroceryListHelper.Shared.Validators;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
 
 namespace GroceryListHelper.Server;
 
@@ -40,6 +33,7 @@ public class Startup
             app.UseWebAssemblyDebugging();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryListHelper.Server v1"));
+            app.UseMiddleware<TimerMiddleware>();
         }
         else
         {

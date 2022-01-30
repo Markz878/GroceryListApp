@@ -1,7 +1,6 @@
 ﻿using GroceryListHelper.IntegrationTests.PageObjects;
 using Microsoft.Playwright;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -11,6 +10,9 @@ namespace GroceryListHelper.IntegrationTests.Features;
 public class AnonymousUserCartInteractionSteps
 {
     private readonly IndexPageObject indexPage;
+    private const string inputProductName = "Milk";
+    private const int inputProductValidAmount = 1;
+    private const int inputProductValidPrice = 2;
 
     public AnonymousUserCartInteractionSteps(IndexPageObject indexPage)
     {
@@ -26,15 +28,15 @@ public class AnonymousUserCartInteractionSteps
     [When(@"a valid product's properties are written to the input fields")]
     public async Task WhenTheProductPropertiesAreWrittenToTheInputFields()
     {
-        await indexPage.Page.FillAsync("#newproduct-name-input", "Milk");
-        await indexPage.Page.FillAsync("#newproduct-amount-input", "1");
-        await indexPage.Page.FillAsync("#newproduct-price-input", "2");
+        await indexPage.Page.FillAsync("#newproduct-name-input", inputProductName);
+        await indexPage.Page.FillAsync("#newproduct-amount-input", inputProductValidAmount.ToString());
+        await indexPage.Page.FillAsync("#newproduct-price-input", inputProductValidPrice.ToString());
     }
 
     [When(@"an invalid product's properties are written to the input fields")]
     public async Task WhenAnInvalidProductPropertiesAreWrittenToTheInputFields()
     {
-        await indexPage.Page.FillAsync("#newproduct-name-input", "Milk");
+        await indexPage.Page.FillAsync("#newproduct-name-input", inputProductName);
         await indexPage.Page.FillAsync("#newproduct-amount-input", "-5");
         await indexPage.Page.FillAsync("#newproduct-price-input", "-2");
     }
@@ -59,9 +61,9 @@ public class AnonymousUserCartInteractionSteps
         await Task.Delay(500);
         string cartProductsJson = await indexPage.Page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
         CartProductCollectable[] models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
-        Assert.True(models[0].Id == 0);
-        Assert.True(models[0].Amount == 1);
-        Assert.True(models[0].UnitPrice == 2);
+        Assert.True(models[0].Name == inputProductName);
+        Assert.True(models[0].Amount == inputProductValidAmount);
+        Assert.True(models[0].UnitPrice == inputProductValidPrice);
         Assert.True(models[0].IsCollected == false);
     }
 
@@ -158,6 +160,4 @@ public class AnonymousUserCartInteractionSteps
         string collectedInfoText = await collectedInfoElement.InnerTextAsync();
         Assert.Equal(p0, collectedInfoText);
     }
-
-
 }
