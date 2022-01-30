@@ -1,5 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Models.StoreProduct;
+﻿using GroceryListHelper.Shared.Models.StoreProduct;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
