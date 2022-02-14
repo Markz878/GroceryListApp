@@ -10,18 +10,8 @@ public class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
     //[Inject] public StoreProductsService StoreProductsService { get; set; }
     [Inject] public CartHubBuilder CartHubBuilder { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        //ViewModel.CartProducts.Clear();
-        //foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
-        //{
-        //    ViewModel.CartProducts.Add(item);
-        //}
-        //ViewModel.StoreProducts.Clear();
-        //foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
-        //{
-        //    ViewModel.StoreProducts.Add(item);
-        //}
         CartHubBuilder.BuildCartHubConnection();
     }
 

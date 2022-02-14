@@ -62,7 +62,6 @@ public class AuthenticationController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticationResponseModel))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(AuthenticationResponseModel))]
     public async Task<ActionResult<AuthenticationResponseModel>> Refresh()
     {
         if (Request.Cookies.TryGetValue(GlobalConstants.XRefreshToken, out string refreshToken))
@@ -73,10 +72,10 @@ public class AuthenticationController : ControllerBase
                 Response.Cookies.Append(GlobalConstants.XRefreshToken, newRefreshToken, GetCookieOptions(HttpContext));
                 return Ok(response);
             }
-            return BadRequest(response);
+            return Ok(response);
         }
         AuthenticationResponseModel errorResponse = new() { ErrorMessage = "No refresh token in cookies." };
-        return BadRequest(errorResponse);
+        return Ok(errorResponse);
     }
 
     private CookieOptions GetCookieOptions(HttpContext httpContext)

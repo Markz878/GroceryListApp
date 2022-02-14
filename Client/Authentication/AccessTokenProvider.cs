@@ -28,19 +28,19 @@ public class AccessTokenProvider : IAccessTokenProvider
         return accessToken;
     }
 
-    public async ValueTask<string> TryToRefreshToken()
+    private async ValueTask<string> TryToRefreshToken()
     {
         HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
         if (response.IsSuccessStatusCode)
         {
-            AuthenticationResponseModel loginResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-            await SaveToken(loginResponse.AccessToken);
-            return loginResponse.AccessToken;
+            AuthenticationResponseModel authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            if (!string.IsNullOrWhiteSpace(authResponse?.AccessToken))
+            {
+                await SaveToken(authResponse.AccessToken);
+                return authResponse.AccessToken;
+            }
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     public ValueTask SaveToken(string accessToken)

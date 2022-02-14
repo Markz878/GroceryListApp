@@ -191,7 +191,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         }
     }
 
-    public CartProductUIModel dragTarget;
+    private CartProductUIModel dragTarget;
     public void DragStarted(CartProductUIModel product)
     {
         dragTarget = product;

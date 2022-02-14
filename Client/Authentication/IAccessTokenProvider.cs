@@ -5,5 +5,4 @@ public interface IAccessTokenProvider
     ValueTask RemoveToken();
     ValueTask<string> RequestAccessToken();
     ValueTask SaveToken(string accessToken);
-    ValueTask<string> TryToRefreshToken();
 }
