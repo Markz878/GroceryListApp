@@ -15,7 +15,7 @@ public class CartSummaryRowComponentBase : BasePage<IndexViewModel>
     public Task ClearCartProducts()
     {
         ViewModel.CartProducts.Clear();
-        return CartProductsService.ClearCartProducts();
+        return CartProductsService.DeleteAllCartProducts();
     }
 
     public Task ClearStoreProducts()

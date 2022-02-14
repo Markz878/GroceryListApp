@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Client.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace GroceryListHelper.Client.Services;
@@ -10,27 +11,28 @@ public class CartProductsServiceProvider : ICartProductsService
     private readonly IHttpClientFactory httpClientFactory;
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
+    private readonly IndexViewModel viewModel;
     private bool isAuthenticated;
-    private bool isInitialized;
     private ICartProductsService actingCartService;
 
-    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider)
+    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, IndexViewModel viewModel)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;
         this.authenticationStateProvider = authenticationStateProvider;
+        this.viewModel = viewModel;
     }
 
-    public async Task<bool> ClearCartProducts()
+    public async Task DeleteAllCartProducts()
     {
         await SelectProvider();
-        return await actingCartService.ClearCartProducts();
+        await actingCartService.DeleteAllCartProducts();
     }
 
-    public async Task<bool> DeleteCartProduct(string id)
+    public async Task DeleteCartProduct(string id)
     {
         await SelectProvider();
-        return await actingCartService.DeleteCartProduct(id);
+        await actingCartService.DeleteCartProduct(id);
     }
 
     public async Task<List<CartProductUIModel>> GetCartProducts()
@@ -39,31 +41,38 @@ public class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.GetCartProducts();
     }
 
-    public async Task<bool> MarkCartProductCollected(string id)
+    public async Task SaveCartProduct(CartProductUIModel product)
     {
         await SelectProvider();
-        return await actingCartService.MarkCartProductCollected(id);
+        await actingCartService.SaveCartProduct(product);
     }
 
-    public async Task<bool> SaveCartProduct(CartProductUIModel product)
+    public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
         await SelectProvider();
-        return await actingCartService.SaveCartProduct(product);
-    }
-
-    public async Task<bool> UpdateCartProduct(CartProductUIModel cartProduct)
-    {
-        await SelectProvider();
-        return await actingCartService.UpdateCartProduct(cartProduct);
+        await actingCartService.UpdateCartProduct(cartProduct);
     }
 
     private async ValueTask SelectProvider()
     {
-        if (!isInitialized || actingCartService is null)
+        if (actingCartService is null)
         {
             isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
-            actingCartService = isAuthenticated ? new CartProductsApiService(httpClientFactory) : new CartProductsLocalService(localStorage);
-            isInitialized = true;
+            if (isAuthenticated)
+            {
+                if (viewModel.IsPolling)
+                {
+                    actingCartService = new CartProductsSignalRService(viewModel);
+                }
+                else
+                {
+                    actingCartService = new CartProductsApiService(httpClientFactory);
+                }
+            }
+            else
+            {
+                actingCartService = new CartProductsLocalService(localStorage);
+            }
         }
     }
 }

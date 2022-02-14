@@ -6,6 +6,7 @@ using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.ObjectModel;
 
 namespace GroceryListHelper.Client.Components;
 
@@ -15,7 +16,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
     [Inject] public ICartProductsService CartProductsService { get; set; }
     [Inject] public IStoreProductsService StoreProductsService { get; set; }
 
-    protected CartProductUIModel newProduct;
+    protected CartProductUIModel newProduct = new();
     protected CartProductUIModel editingItem;
     protected CartProductUIModel movingItem;
     protected ElementReference NewProductNameBox;
@@ -23,7 +24,6 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     protected override async Task OnInitializedAsync()
     {
-        newProduct = new CartProductUIModel() { Amount = 1 };
         ViewModel.CartProducts.Clear();
         foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
         {
@@ -34,59 +34,51 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             ViewModel.StoreProducts.Add(item);
         }
-        base.OnInitialized();
+        newProduct = GetNewCartProduct(ViewModel.CartProducts);
+    }
+
+    private static CartProductUIModel GetNewCartProduct(ObservableCollection<CartProductUIModel> cartProducts)
+    {
+        if (cartProducts.Count == 0)
+        {
+            return new CartProductUIModel() { Amount = 1, Order = 1000 };
+        }
+        double order = Math.Round(cartProducts.Max(x=>x.Order) + 1000, 0, MidpointRounding.AwayFromZero);
+        return new CartProductUIModel() { Amount = 1 , Order = order };
     }
 
     public async Task AddNewProduct()
     {
         CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
-        string message = string.Join(" ", cartProductValidator.Validate(newProduct).Errors.Select(x => x.ErrorMessage));
-        if (string.IsNullOrEmpty(message))
+        ModalViewModel.Message = string.Join(" ", cartProductValidator.Validate(newProduct).Errors.Select(x => x.ErrorMessage));
+        if (string.IsNullOrEmpty(ModalViewModel.Message))
         {
-            CartProductUIModel p = newProduct;
-            newProduct = new CartProductUIModel() { Amount = 1 };
-            await SaveCartProduct(p);
-            await SaveStoreProduct(p.Name, p.UnitPrice);
-            await NewProductNameBox.FocusAsync();
-        }
-        else
-        {
-            ModalViewModel.Message = message;
+            try
+            {
+                ViewModel.CartProducts.Add(newProduct);
+                CartProductUIModel p = newProduct;
+                newProduct = GetNewCartProduct(ViewModel.CartProducts);
+                await SaveCartProduct(p);
+                await SaveStoreProduct(p.Name, p.UnitPrice);
+                await NewProductNameBox.FocusAsync();
+            }
+            catch (Exception ex)
+            {
+                ModalViewModel.Message = ex.Message;
+            }
         }
     }
 
     public async Task SaveCartProduct(CartProductUIModel product)
     {
-        try
-        {
-            if (ViewModel.IsPolling)
-            {
-                product.Id = await ViewModel.CartHub.InvokeAsync<string>(nameof(ICartHubActions.CartItemAdded), product);
-            }
-            else
-            {
-                await CartProductsService.SaveCartProduct(product);
-            }
-            ViewModel.CartProducts.Add(product);
-        }
-        catch (Exception ex)
-        {
-            ModalViewModel.Message = ex.Message;
-        }
+        await CartProductsService.SaveCartProduct(product);
     }
 
     public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
     {
         product.IsCollected = (bool)e.Value;
         ViewModel.OnPropertyChanged();
-        if (ViewModel.IsPolling)
-        {
-            return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemCollected), product.Id);
-        }
-        else
-        {
-            return CartProductsService.MarkCartProductCollected(product.Id);
-        }
+        return CartProductsService.UpdateCartProduct(product);
     }
 
     public Task SaveStoreProduct(string productName, double unitPrice)
@@ -125,21 +117,13 @@ public class CartComponentBase : BasePage<IndexViewModel>
     public async Task UpdateCartProduct(CartProductUIModel product)
     {
         CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
-        string message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
-        if (string.IsNullOrEmpty(message))
+        ModalViewModel.Message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
+        if (string.IsNullOrEmpty(ModalViewModel.Message))
         {
             editingItem = null;
             ViewModel.OnPropertyChanged();
-            if (ViewModel.IsPolling)
-            {
-                await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemModified), product);
-            }
-            else
-            {
-                await CartProductsService.UpdateCartProduct(product);
-            }
+            await CartProductsService.UpdateCartProduct(product);
         }
-        ModalViewModel.Message = message;
     }
 
     public void CancelProductUpdate()
@@ -166,48 +150,73 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             if (cartProduct != movingItem)
             {
-                int itemIndex = ViewModel.CartProducts.IndexOf(movingItem);
-                int newIndex = ViewModel.CartProducts.IndexOf(cartProduct);
-                ViewModel.CartProducts.Move(itemIndex, newIndex);
-                if (ViewModel.IsPolling)
+                //int itemIndex = ViewModel.CartProducts.IndexOf(movingItem);
+                //int newIndex = ViewModel.CartProducts.IndexOf(cartProduct);
+                //ViewModel.CartProducts.Move(itemIndex, newIndex);
+                //CartProductUIModel[] orderedModels2 = ViewModel.CartProducts.OrderBy(x => x.Order).SkipWhile(x => x.Order < cartProduct.Order).Take(2).ToArray();
+                //Console.WriteLine(orderedModels2[0].Name + " " + orderedModels2[0].Order);
+                //Console.WriteLine(orderedModels2[1].Name + " " + orderedModels2[1].Order);
+                CartProductUIModel[] orderedModels = ViewModel.CartProducts.OrderBy(x => x.Order).ToArray();
+                int newIndex = Array.IndexOf(orderedModels, cartProduct);
+
+                if (newIndex==0)
                 {
-                    await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), cartProduct.Id, newIndex);
+                    movingItem.Order = orderedModels[0].Order / 2;
+                }
+                else if (newIndex == orderedModels.Length - 1)
+                {
+                    movingItem.Order = orderedModels[^1].Order + 1000;
+                }
+                else
+                {
+                    movingItem.Order = (ViewModel.CartProducts[newIndex - 1].Order + ViewModel.CartProducts[newIndex].Order) / 2;
+                }
+                try
+                {
+                    await CartProductsService.UpdateCartProduct(movingItem);
+                }
+                catch (Exception ex)
+                {
+                    ModalViewModel.Message = ex.Message;
+                }
+                finally
+                {
+                    movingItem = null;
                 }
             }
-            movingItem = null;
         }
     }
 
-    public Task RemoveProduct(CartProductUIModel product)
+    public async Task RemoveProduct(CartProductUIModel product)
     {
         ViewModel.CartProducts.Remove(product);
-        if (ViewModel.IsPolling)
+        try
         {
-            return ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), product.Id);
+            await CartProductsService.DeleteCartProduct(product.Id);
         }
-        else
+        catch (Exception ex)
         {
-            return CartProductsService.DeleteCartProduct(product.Id);
+            ModalViewModel.Message = ex.Message;
         }
     }
 
-    private CartProductUIModel dragTarget;
-    public void DragStarted(CartProductUIModel product)
-    {
-        dragTarget = product;
-    }
+    //private CartProductUIModel dragTarget;
+    //public void DragStarted(CartProductUIModel product)
+    //{
+    //    dragTarget = product;
+    //}
 
-    public async Task OnDrop(CartProductUIModel product)
-    {
-        int dragTargetIndex = ViewModel.CartProducts.IndexOf(dragTarget);
-        int dropTargetIndex = ViewModel.CartProducts.IndexOf(product);
-        if (dragTargetIndex != dropTargetIndex)
-        {
-            ViewModel.CartProducts.Move(dragTargetIndex, dropTargetIndex);
-            if (ViewModel.IsPolling)
-            {
-                await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), dragTarget.Id, dropTargetIndex);
-            }
-        }
-    }
+    //public async Task OnDrop(CartProductUIModel product)
+    //{
+    //    int dragTargetIndex = ViewModel.CartProducts.IndexOf(dragTarget);
+    //    int dropTargetIndex = ViewModel.CartProducts.IndexOf(product);
+    //    if (dragTargetIndex != dropTargetIndex)
+    //    {
+    //        ViewModel.CartProducts.Move(dragTargetIndex, dropTargetIndex);
+    //        if (ViewModel.IsPolling)
+    //        {
+    //            await ViewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemMoved), dragTarget.Id, dropTargetIndex);
+    //        }
+    //    }
+    //}
 }

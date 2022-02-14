@@ -2,11 +2,10 @@
 using GroceryListHelper.Client.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace GroceryListHelper.Client.ViewModels;
 
-public class IndexViewModel : BaseViewModel, IDisposable
+public class IndexViewModel : BaseViewModel
 {
     public ObservableCollection<CartProductUIModel> CartProducts { get; } = new();
     public ObservableCollection<StoreProductUIModel> StoreProducts { get; } = new();
@@ -24,23 +23,4 @@ public class IndexViewModel : BaseViewModel, IDisposable
     private bool isPolling;
     public bool ShowOnlyUncollected { get => showOnlyUncollected; set => SetProperty(ref showOnlyUncollected, value); }
     private bool showOnlyUncollected;
-
-    public IndexViewModel()
-    {
-        CartProducts.CollectionChanged += CollectionChanged;
-        StoreProducts.CollectionChanged += CollectionChanged;
-        AllowedUsers.CollectionChanged += CollectionChanged;
-    }
-
-    private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        OnPropertyChanged();
-    }
-
-    public void Dispose()
-    {
-        CartProducts.CollectionChanged -= CollectionChanged;
-        StoreProducts.CollectionChanged -= CollectionChanged;
-        AllowedUsers.CollectionChanged -= CollectionChanged;
-    }
 }

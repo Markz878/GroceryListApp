@@ -33,19 +33,17 @@ public class CartProductRepository : ICartProductRepository
 
     public async Task<CartProductCollectable> GetCartProductForUser(string productId, string userId)
     {
-        CartProductDbModel cartProduct = await db.CartProducts
-            .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
+        CartProductDbModel cartProduct = await db.CartProducts.FindAsync(productId, userId);
         return cartProduct.Adapt<CartProductCollectable>();
     }
 
-    public Task RemoveItemsForUser(string userId)
+    public Task ClearProductsForUser(string userId)
     {
         db.CartProducts.RemoveRange(db.CartProducts.Where(x => x.UserId == userId));
         return db.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteItem(string productId, string userId)
+    public async Task<bool> DeleteProduct(string productId, string userId)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         if (product == null || product.UserId != userId)
@@ -57,29 +55,45 @@ public class CartProductRepository : ICartProductRepository
         return true;
     }
 
-    public async Task<bool> MarkAsCollected(string productId, string userId)
+    //public async Task<bool> ToggleCollectedStatus(string productId, string userId)
+    //{
+    //    CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
+    //    if (product == null || product.UserId != userId)
+    //    {
+    //        return false;
+    //    }
+    //    product.IsCollected ^= true;
+    //    await db.SaveChangesAsync();
+    //    return true;
+    //}
+
+    public async Task<bool> UpdateProduct(string userId, CartProductCollectable updatedProduct)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
+        CartProductDbModel product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
         if (product == null || product.UserId != userId)
         {
             return false;
         }
-        product.IsCollected ^= true;
+        //product.Name = updatedProduct.Name;
+        //product.Amount = updatedProduct.Amount;
+        //product.UnitPrice = updatedProduct.UnitPrice;
+        //product.IsCollected = updatedProduct.IsCollected;
+        //product.Order = updatedProduct.Order;
+        updatedProduct.Adapt(product);
         await db.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> UpdateProduct(string productId, string userId, CartProduct updatedProduct)
-    {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
-        if (product == null || product.UserId != userId)
-        {
-            return false;
-        }
-        product.Name = updatedProduct.Name;
-        product.Amount = updatedProduct.Amount;
-        product.UnitPrice = updatedProduct.UnitPrice;
-        await db.SaveChangesAsync();
-        return true;
-    }
+    //public async Task<bool> CartProductMoved(string userId, string productId, int newProductIndex)
+    //{
+    //    List<CartProductDbModel> products = await getcar
+    //    CartProductDbModel product = products.FirstOrDefault(x=>x.Id == productId);
+    //    if (product == null)
+    //    {
+    //        return false;
+    //    }
+    //    products.Remove(product);
+    //    products.Insert(newProductIndex, product);
+    //    db.CartProducts.Remove
+    //}
 }

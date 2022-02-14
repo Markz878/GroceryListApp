@@ -81,28 +81,15 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
     public async Task CartItemModified(CartProductCollectable product)
     {
         string hostId = GetHostId();
-        await db.UpdateProduct(product.Id, hostId, product);
+        await db.UpdateProduct(hostId, product);
         await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
-    }
-
-    public async Task CartItemCollected(string id)
-    {
-        string hostId = GetHostId();
-        await Clients.OthersInGroup(hostId.ToString()).ItemCollected(id);
-        await db.MarkAsCollected(id, hostId);
     }
 
     public async Task CartItemDeleted(string id)
     {
         string hostId = GetHostId();
         await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
-        await db.DeleteItem(id, hostId);
-    }
-
-    public async Task CartItemMoved(string id, int newIndex)
-    {
-        string hostId = GetHostId();
-        await Clients.OthersInGroup(hostId.ToString()).ItemMoved(id, newIndex);
+        await db.DeleteProduct(id, hostId);
     }
 
     public async Task<HubResponse> LeaveGroup()
