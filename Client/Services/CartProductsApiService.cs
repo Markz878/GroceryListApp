@@ -41,16 +41,11 @@ public class CartProductsApiService : ICartProductsService
 
     public async Task MarkCartProductCollected(string id)
     {
-        HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}", null);
+        HttpResponseMessage response = await client.PatchAsync(uri, null);
     }
 
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
-        HttpResponseMessage response = await client.PutAsJsonAsync(uri + $"/{cartProduct.Id}", cartProduct);
-    }
-
-    public Task CartItemMoved(CartProductUIModel cartProduct, int newIndex)
-    {
-        throw new NotImplementedException();
+        HttpResponseMessage response = await client.PutAsJsonAsync(uri, cartProduct);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Shared;
 
-public class CartProductCollectable : CartProduct
+public record CartProductCollectable : CartProduct
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public bool IsCollected { get; set; }

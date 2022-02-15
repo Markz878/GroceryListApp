@@ -55,24 +55,24 @@ public class CartProductsServiceProvider : ICartProductsService
 
     private async ValueTask SelectProvider()
     {
-        if (actingCartService is null)
+        //if (actingCartService is null)
+        //{
+        isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
+        if (isAuthenticated)
         {
-            isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
-            if (isAuthenticated)
+            if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
             {
-                if (viewModel.IsPolling)
-                {
-                    actingCartService = new CartProductsSignalRService(viewModel);
-                }
-                else
-                {
-                    actingCartService = new CartProductsApiService(httpClientFactory);
-                }
+                actingCartService = new CartProductsSignalRService(viewModel);
             }
-            else
+            else if(!viewModel.IsPolling && actingCartService is not CartProductsApiService)
             {
-                actingCartService = new CartProductsLocalService(localStorage);
+                actingCartService = new CartProductsApiService(httpClientFactory);
             }
         }
+        else if(actingCartService is not CartProductsLocalService)
+        {
+            actingCartService = new CartProductsLocalService(localStorage);
+        }
+        //}
     }
 }

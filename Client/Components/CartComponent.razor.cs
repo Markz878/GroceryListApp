@@ -3,9 +3,7 @@ using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
 using System.Collections.ObjectModel;
 
 namespace GroceryListHelper.Client.Components;
@@ -34,17 +32,16 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             ViewModel.StoreProducts.Add(item);
         }
-        newProduct = GetNewCartProduct(ViewModel.CartProducts);
     }
 
-    private static CartProductUIModel GetNewCartProduct(ObservableCollection<CartProductUIModel> cartProducts)
+    private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
     {
         if (cartProducts.Count == 0)
         {
-            return new CartProductUIModel() { Amount = 1, Order = 1000 };
+            return 1000;
         }
-        double order = Math.Round(cartProducts.Max(x=>x.Order) + 1000, 0, MidpointRounding.AwayFromZero);
-        return new CartProductUIModel() { Amount = 1 , Order = order };
+        double order = Math.Round(cartProducts.Max(x => x.Order) + 1000, 0, MidpointRounding.AwayFromZero);
+        return order;
     }
 
     public async Task AddNewProduct()
@@ -55,9 +52,10 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             try
             {
+                newProduct.Order = GetNewCartProductOrder(ViewModel.CartProducts);
                 ViewModel.CartProducts.Add(newProduct);
                 CartProductUIModel p = newProduct;
-                newProduct = GetNewCartProduct(ViewModel.CartProducts);
+                newProduct = new CartProductUIModel();
                 await SaveCartProduct(p);
                 await SaveStoreProduct(p.Name, p.UnitPrice);
                 await NewProductNameBox.FocusAsync();
@@ -150,26 +148,10 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             if (cartProduct != movingItem)
             {
-                //int itemIndex = ViewModel.CartProducts.IndexOf(movingItem);
-                //int newIndex = ViewModel.CartProducts.IndexOf(cartProduct);
-                //ViewModel.CartProducts.Move(itemIndex, newIndex);
-                //CartProductUIModel[] orderedModels2 = ViewModel.CartProducts.OrderBy(x => x.Order).SkipWhile(x => x.Order < cartProduct.Order).Take(2).ToArray();
-                //Console.WriteLine(orderedModels2[0].Name + " " + orderedModels2[0].Order);
-                //Console.WriteLine(orderedModels2[1].Name + " " + orderedModels2[1].Order);
-                CartProductUIModel[] orderedModels = ViewModel.CartProducts.OrderBy(x => x.Order).ToArray();
-                int newIndex = Array.IndexOf(orderedModels, cartProduct);
-
-                if (newIndex==0)
+                movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
+                foreach (var item in ViewModel.CartProducts)
                 {
-                    movingItem.Order = orderedModels[0].Order / 2;
-                }
-                else if (newIndex == orderedModels.Length - 1)
-                {
-                    movingItem.Order = orderedModels[^1].Order + 1000;
-                }
-                else
-                {
-                    movingItem.Order = (ViewModel.CartProducts[newIndex - 1].Order + ViewModel.CartProducts[newIndex].Order) / 2;
+                    Console.WriteLine($"{item.Name} {item.Order}");
                 }
                 try
                 {

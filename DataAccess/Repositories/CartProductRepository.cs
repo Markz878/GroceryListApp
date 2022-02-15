@@ -27,7 +27,7 @@ public class CartProductRepository : ICartProductRepository
     {
         return db.CartProducts.AsNoTracking()
             .Where(x => x.UserId == userId)
-            .Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice })
+            .Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice, Order = x.Order })
             .ToListAsync();
     }
 
@@ -55,18 +55,6 @@ public class CartProductRepository : ICartProductRepository
         return true;
     }
 
-    //public async Task<bool> ToggleCollectedStatus(string productId, string userId)
-    //{
-    //    CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
-    //    if (product == null || product.UserId != userId)
-    //    {
-    //        return false;
-    //    }
-    //    product.IsCollected ^= true;
-    //    await db.SaveChangesAsync();
-    //    return true;
-    //}
-
     public async Task<bool> UpdateProduct(string userId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
@@ -74,26 +62,8 @@ public class CartProductRepository : ICartProductRepository
         {
             return false;
         }
-        //product.Name = updatedProduct.Name;
-        //product.Amount = updatedProduct.Amount;
-        //product.UnitPrice = updatedProduct.UnitPrice;
-        //product.IsCollected = updatedProduct.IsCollected;
-        //product.Order = updatedProduct.Order;
         updatedProduct.Adapt(product);
         await db.SaveChangesAsync();
         return true;
     }
-
-    //public async Task<bool> CartProductMoved(string userId, string productId, int newProductIndex)
-    //{
-    //    List<CartProductDbModel> products = await getcar
-    //    CartProductDbModel product = products.FirstOrDefault(x=>x.Id == productId);
-    //    if (product == null)
-    //    {
-    //        return false;
-    //    }
-    //    products.Remove(product);
-    //    products.Insert(newProductIndex, product);
-    //    db.CartProducts.Remove
-    //}
 }

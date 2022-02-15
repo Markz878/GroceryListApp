@@ -1,6 +1,6 @@
 ﻿@page "/profile"
 @inherits ProfileBase
-<Microsoft.AspNetCore.Components.Web.Extensions.Head.Title Value="Profile" />
+<PageTitle>Profile</PageTitle>
 
 <AuthorizeView Context="authContext">
     <h2> Profile settings for @authContext.User.FindFirst("email").Value</h2>

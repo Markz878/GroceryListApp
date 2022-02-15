@@ -2,8 +2,8 @@
 
 namespace GroceryListHelper.Shared.Models.CartProduct;
 
-public class CartProduct : StoreProductModel
+public record CartProduct : StoreProductModel
 {
-    public double Amount { get; set; }
+    public double Amount { get; set; } = 1;
     public double Order { get; set; }
 }

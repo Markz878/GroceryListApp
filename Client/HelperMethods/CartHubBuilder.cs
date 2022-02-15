@@ -53,11 +53,15 @@ public class CartHubBuilder
 
         indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
-            Console.WriteLine($"Received cart from server, items count is {cartProducts.Count}.");
+            Console.WriteLine($"Received cart from server, items count is {cartProducts.Count}. Items are:");
+            foreach (var product in cartProducts)
+            {
+                Console.WriteLine(product.ToString());
+            }
             indexViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in cartProducts)
             {
-                indexViewModel.CartProducts.Add(new CartProductUIModel() { Id = item.Id, Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice });
+                indexViewModel.CartProducts.Add(new CartProductUIModel() { Id = item.Id, Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice, Order = item.Order });
             }
         });
 
@@ -83,13 +87,9 @@ public class CartHubBuilder
             CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
             product.Amount = cartProduct.Amount;
             product.UnitPrice = cartProduct.UnitPrice;
-            indexViewModel.OnPropertyChanged();
-        });
-
-        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemCollected), (id) =>
-        {
-            Console.WriteLine($"Item with id {id} was collected.");
-            indexViewModel.CartProducts.First(x => x.Id.Equals(id)).IsCollected ^= true;
+            product.Order = cartProduct.Order;
+            product.IsCollected = cartProduct.IsCollected;
+            product.Name = cartProduct.Name;
             indexViewModel.OnPropertyChanged();
         });
 
@@ -97,14 +97,6 @@ public class CartHubBuilder
         {
             Console.WriteLine($"Item with id {id} was deleted.");
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
-        });
-
-        indexViewModel.CartHub.On<string, int>(nameof(ICartHubNotifications.ItemMoved), (id, newIndex) =>
-        {
-            Console.WriteLine($"Item with id {id} was moved to {newIndex}.");
-            CartProductUIModel item = indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id);
-            int oldIndex = indexViewModel.CartProducts.IndexOf(item);
-            indexViewModel.CartProducts.Move(oldIndex, newIndex);
         });
     }
 }

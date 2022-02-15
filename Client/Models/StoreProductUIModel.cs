@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Client.Models;
 
-public class StoreProductUIModel : StoreProductModel
+public record StoreProductUIModel : StoreProductModel
 {
     public string Id { get; set; }
 }

@@ -4,6 +4,7 @@ using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Polly;
 using Polly.CircuitBreaker;
@@ -18,6 +19,7 @@ public class Program
     {
         WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add<App>("#app");
+        builder.RootComponents.Add<HeadOutlet>("head::after");
 #if (!DEBUG)
 {
         builder.Logging.ClearProviders();
@@ -43,8 +45,8 @@ public class Program
         builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
         builder.Services.AddBlazoredLocalStorage();
 
-        builder.Services.AddSingleton<IndexViewModel>();
-        builder.Services.AddSingleton<ModalViewModel>();
+        builder.Services.AddScoped<IndexViewModel>();
+        builder.Services.AddScoped<ModalViewModel>();
 
         await builder.Build().RunAsync();
     }

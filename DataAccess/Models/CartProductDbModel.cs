@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.DataAccess.Models;
 
-public class CartProductDbModel : CartProductCollectable
+public record CartProductDbModel : CartProductCollectable
 {
     public string UserId { get; set; }
 }
