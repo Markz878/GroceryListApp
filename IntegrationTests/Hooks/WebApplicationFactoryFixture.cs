@@ -4,9 +4,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
 using System.Threading.Tasks;
 
-namespace E2ETests;
+namespace GroceryListHelper.IntegrationTests.Hooks;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>
+public class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

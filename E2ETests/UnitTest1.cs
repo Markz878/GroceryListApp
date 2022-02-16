@@ -15,19 +15,7 @@ public class WebServerTests : IClassFixture<WebApplicationFactoryFixture>
     [Fact]
     public async Task PageTitleContainsProductName()
     {
-        using IPlaywright playwright = await Playwright.CreateAsync();
-        IBrowser browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
-        {
-            Headless = false,
-            SlowMo = 5000,
-        });
-        IBrowserContext browserContext = await browser.NewContextAsync(new BrowserNewContextOptions()
-        {
-            IgnoreHTTPSErrors = true,
-        });
-        IPage page = await browserContext.NewPageAsync();
-        IResponse response = await page.GotoAsync("https://localhost:5001");
+        IPage page = await WebApplicationFactoryFixture.GetPlaywrightPage();
         await page.Locator("h2:has-text(\"Grocery List Helper\")").WaitForAsync();
-        Assert.True(response.Ok);
     }
 }
