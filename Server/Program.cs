@@ -1,36 +1,86 @@
-﻿using GroceryListHelper.DataAccess;
+﻿//using GroceryListHelper.DataAccess;
 
-namespace GroceryListHelper.Server;
+//namespace GroceryListHelper.Server;
 
-public class Program
+//public class Program
+//{
+//    public static void Main(string[] args)
+//    {
+//        IHost host = CreateHostBuilder(args).Build();
+//        IServiceScopeFactory scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
+//        using (IServiceScope scope = scopeFactory.CreateScope())
+//        {
+//            ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+//            GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+//            try
+//            {
+//                db.Database.EnsureCreated();
+//            }
+//            catch (Exception ex)
+//            {
+//                logger.LogError(ex, ex.Message);
+//                logger.LogError(Environment.CurrentDirectory);
+//            }
+//        }
+//        host.Run();
+//    }
+
+//    public static IHostBuilder CreateHostBuilder(string[] args)
+//    {
+//        return Host.CreateDefaultBuilder(args)
+//        .ConfigureWebHostDefaults(webBuilder =>
+//        {
+//            webBuilder.UseStartup<Startup>();
+//        });
+//    }
+//}
+
+using AspNetCoreRateLimit;
+using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Hubs;
+using GroceryListHelper.Server.Installers;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.InstallAssemblyServices(builder.Configuration);
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+WebApplication app = builder.Build();
+
+app.UseResponseCompression();
+if (app.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        IHost host = CreateHostBuilder(args).Build();
-        IServiceScopeFactory scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
-        using (IServiceScope scope = scopeFactory.CreateScope())
-        {
-            ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-            GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-            try
-            {
-                db.Database.EnsureCreated();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                logger.LogError(Environment.CurrentDirectory);
-            }
-        }
-        host.Run();
-    }
+    app.UseExceptionHandler("/error-local-development");
+    app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryListHelper.Server v1"));
+    app.UseMiddleware<TimerMiddleware>();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webBuilder =>
-        {
-            webBuilder.UseStartup<Startup>();
-        });
-    }
+app.UseHttpsRedirection();
+app.UseIpRateLimiting();
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+app.MapControllers();
+app.MapHub<CartHub>("carthub");
+app.MapFallbackToFile("index.html");
+
+app.Run();
+
+namespace GroceryListHelper.Server
+{
+    public partial class Program { }
 }
