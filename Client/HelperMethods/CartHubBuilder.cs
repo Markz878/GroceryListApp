@@ -18,14 +18,16 @@ public class CartHubBuilder
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
+    private readonly ILogger<CartHubBuilder> logger;
 
-    public CartHubBuilder(IHttpClientFactory httpClientFactory, IAccessTokenProvider accessTokenProvider, NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel)
+    public CartHubBuilder(IHttpClientFactory httpClientFactory, IAccessTokenProvider accessTokenProvider, NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
     {
         client = httpClientFactory.CreateClient("AnonymousClient");
         this.accessTokenProvider = accessTokenProvider;
         this.navigation = navigation;
         this.indexViewModel = indexViewModel;
         this.modalViewModel = modalViewModel;
+        this.logger = logger;
     }
 
     public void BuildCartHubConnection()
@@ -34,7 +36,7 @@ public class CartHubBuilder
         {
             options.AccessTokenProvider = async () =>
             {
-                Console.WriteLine("Authorizing hub connection...");
+                logger.LogInformation("Authorizing hub connection...");
                 HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
                 if (response.IsSuccessStatusCode)
                 {
@@ -47,16 +49,16 @@ public class CartHubBuilder
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
-            Console.WriteLine($"Received message '{message}'.");
+            logger.LogInformation("Received message '{message}'.", message);
             indexViewModel.ShareCartInfo = message;
         });
 
         indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
-            Console.WriteLine($"Received cart from server, items count is {cartProducts.Count}. Items are:");
+            logger.LogInformation("Received cart from server, items count is {cartProductsCount}. Items are:", cartProducts.Count);
             foreach (var product in cartProducts)
             {
-                Console.WriteLine(product.ToString());
+                logger.LogInformation("{product}", product);
             }
             indexViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in cartProducts)
@@ -67,7 +69,7 @@ public class CartHubBuilder
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.LeaveCart), async (hostEmail) =>
         {
-            Console.WriteLine($"Cart session ended by host {hostEmail}.");
+            logger.LogInformation("Cart session ended by host {hostEmail}.", hostEmail);
             modalViewModel.Message = $"Cart session ended by host {hostEmail}.";
             await indexViewModel.CartHub.StopAsync();
             indexViewModel.IsPolling = false;
@@ -77,13 +79,13 @@ public class CartHubBuilder
 
         indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
         {
-            Console.WriteLine($"Received new item with id {p.Id} and name {p.Name}.");
+            logger.LogInformation("Received new item with id {pId} and name {pName}.", p.Id, p.Name);
             indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice });
         });
 
         indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
-            Console.WriteLine($"Item {cartProduct.Name} was modified.");
+            logger.LogInformation("Item {productName} was modified.", cartProduct.Name);
             CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
             product.Amount = cartProduct.Amount;
             product.UnitPrice = cartProduct.UnitPrice;
@@ -95,7 +97,7 @@ public class CartHubBuilder
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
-            Console.WriteLine($"Item with id {id} was deleted.");
+            logger.LogInformation("Item with id {id} was deleted.", id);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
         });
     }

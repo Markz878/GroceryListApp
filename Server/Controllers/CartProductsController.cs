@@ -67,26 +67,6 @@ public class CartProductsController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    //[HttpPatch("{id}")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> MarkAsCollected(string id)
-    //{
-    //    bool success = await cartProductsRepository.ToggleCollectedStatus(id, User.GetUserId());
-    //    return success ? NoContent() : NotFound();
-    //}
-
-    //[HttpPatch("order/{id}")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> PatchOrder(string id)
-    //{
-    //    bool success = await cartProductsRepository.ToggleCollectedStatus(id, User.GetUserId());
-    //    return success ? NoContent() : NotFound();
-    //}
-
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

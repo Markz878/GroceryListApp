@@ -31,7 +31,7 @@ public class AccessTokenProvider : IAccessTokenProvider
     private async ValueTask<string> TryToRefreshToken()
     {
         HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
-        if (response.IsSuccessStatusCode)
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             AuthenticationResponseModel authResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
             if (!string.IsNullOrWhiteSpace(authResponse?.AccessToken))

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 try
 {
     IConfiguration configuration = new ConfigurationBuilder().AddUserSecrets(typeof(Program).Assembly).Build();
-    CosmosClient cosmosClient = new(configuration["CosmosConnectionString"]);
+    CosmosClient cosmosClient = new(configuration["LocalConnectionString"]);
     Database database = await cosmosClient.CreateDatabaseIfNotExistsAsync("GroceryListDb", throughput: 1000);
     Container userContainer = await database.CreateContainerIfNotExistsAsync("Users", "/id");
     Container cartProductsContainer = await database.CreateContainerIfNotExistsAsync("CartProducts", "/UserId");

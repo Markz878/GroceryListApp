@@ -21,9 +21,7 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 #if (!DEBUG)
-{
         builder.Logging.ClearProviders();
-}
 #endif
         builder.Services.AddAuthorizationCore();
         builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
