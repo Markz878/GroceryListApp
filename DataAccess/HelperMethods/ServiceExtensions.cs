@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace GroceryListHelper.DataAccess.HelperMethods;
 
@@ -22,5 +23,12 @@ public static class ServiceExtensions
         services.AddScoped<ICartProductRepository, CartProductRepository>();
         services.AddScoped<IStoreProductRepository, StoreProductRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+    }
+
+    public static void EnsureDatabaseCreated(this IHost app)
+    {
+        using IServiceScope scope = app.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        db.Database.EnsureCreated();
     }
 }

@@ -87,7 +87,7 @@ public class AnonymousUserCartInteractionSteps
     }
 
     [Then(@"the items should be in the order")]
-    public async Task ThenTheFirstItemSShouldSwitchPlaces(Table table)
+    public async Task ThenTheFirstItemsShouldSwitchPlaces(Table table)
     {
         for (int i = 0; i < table.Rows.Count; i++)
         {

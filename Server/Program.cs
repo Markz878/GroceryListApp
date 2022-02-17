@@ -36,6 +36,7 @@
 //}
 
 using AspNetCoreRateLimit;
+using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
@@ -73,11 +74,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<SecurityHeadersMiddleware>();
+app.EnsureDatabaseCreated();
 
 app.MapControllers();
 app.MapHub<CartHub>("carthub");
 app.MapFallbackToFile("index.html");
-
+app.MapHealthChecks("/health");
 app.Run();
 
 namespace GroceryListHelper.Server

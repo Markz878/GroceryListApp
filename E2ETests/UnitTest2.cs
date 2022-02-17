@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 namespace E2ETests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public class WebServerTests
+public class WebServerTests2
 {
-    public WebServerTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
+    public WebServerTests2(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
