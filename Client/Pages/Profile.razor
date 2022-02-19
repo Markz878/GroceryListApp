@@ -3,8 +3,7 @@
 <PageTitle>Profile</PageTitle>
 
 <AuthorizeView Context="authContext">
-    <h2> Profile settings for @authContext.User.FindFirst("email").Value</h2>
-
+    <h2 class="header">Profile settings for @authContext.User.FindFirst("email").Value</h2>
     
     <fieldset>
         <legend>Change email</legend>

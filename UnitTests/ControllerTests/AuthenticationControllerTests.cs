@@ -145,15 +145,10 @@ public class AuthenticationControllerTests
     [Fact]
     public async Task AuthenticationController_Refresh_UserHasNoRefreshtokenCookie_ReturnsBadRequestWithResponse()
     {
-        // Arrange
-        AuthenticationResponseModel expectedResponse = new() { ErrorMessage = "No refresh token in cookies." };
-        jwtAuthentication.RefreshTokens(new Faker().Random.String2(40)).Returns(Task.FromResult((expectedResponse, new Faker().Random.String2(40))));
         // Act
         ActionResult<AuthenticationResponseModel> actionResult = await authenticationController.Refresh();
-        BadRequestObjectResult objectResult = actionResult.Result as BadRequestObjectResult;
+        NoContentResult objectResult = actionResult.Result as NoContentResult;
         // Assert
-        Assert.Equal(400, objectResult.StatusCode);
-        Assert.Equal(expectedResponse.AccessToken, (objectResult.Value as AuthenticationResponseModel).AccessToken);
-        Assert.Equal(expectedResponse.ErrorMessage, (objectResult.Value as AuthenticationResponseModel).ErrorMessage);
+        Assert.Equal(204, objectResult.StatusCode);
     }
 }

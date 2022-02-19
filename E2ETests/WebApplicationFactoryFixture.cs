@@ -1,26 +1,31 @@
 ﻿using GroceryListHelper.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
+using Microsoft.Playwright;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace E2ETests;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>
+public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {
     public ITestOutputHelper TestOutputHelper { get; set; }
+    public IPlaywright PlaywrightInstance { get; set; }
+    public IBrowser BrowserInstance { get; set; }
+    public static string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {
-        hostBuilder.UseUrls("https://localhost:5001");
+        hostBuilder.UseUrls(BaseUrl);
 
         hostBuilder.ConfigureAppConfiguration(config =>
         {
@@ -58,51 +63,31 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
         return fixtureHost;
     }
 
-    //public async Task<IPage> GetPlaywrightPage(string path = "")
-    //{
-    //    PlaywrightInstance ??= await Playwright.CreateAsync();
-    //    BrowserInstance ??= await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
-    //    {
-    //        Headless = false,
-    //        SlowMo = 2500,
-    //    });
-    //    BrowserContext ??= await BrowserInstance.NewContextAsync(new BrowserNewContextOptions()
-    //    {
-    //        IgnoreHTTPSErrors = true,
-    //    });
-    //    IPage page = await BrowserContext.NewPageAsync();
-    //    await page.GotoAsync("https://localhost:5001" + path);
-    //    return page;
-    //}
-
-    public override ValueTask DisposeAsync()
+    public async Task InitializeAsync()
     {
-        //try
-        //{
-        //    CosmosClient cosmosClient = new(configuration.GetConnectionString("Cosmos"));
-        //    QueryDefinition queryDefinition = new("SELECT * FROM c");
-        //    using FeedIterator<DatabaseProperties> feedIterator = cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>(queryDefinition);
-        //    while (feedIterator.HasMoreResults)
-        //    {
-        //        FeedResponse<DatabaseProperties> response = await feedIterator.ReadNextAsync();
-        //        foreach (DatabaseProperties database in response)
-        //        {
-        //            if (database.Id == "TestDb")
-        //            {
-        //                Database db = cosmosClient.GetDatabase(database.Id);
-        //                await db.DeleteAsync();
-        //            }
-        //        }
-        //    }
-        //}
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine(ex.Message);
-        //}
+        PlaywrightInstance = await Playwright.CreateAsync();
+        BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        {
+            Headless = false,
+            SlowMo = 500,
+        });
+    }
+
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        await BrowserInstance.DisposeAsync();
+        PlaywrightInstance.Dispose();
         using IServiceScope scope = Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
         db.Database.EnsureDeleted();
-        GC.SuppressFinalize(this);
-        return base.DisposeAsync();
+    }
+
+    private static int GetRandomUnusedPort()
+    {
+        TcpListener listener = new(IPAddress.Any, 0);
+        listener.Start();
+        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 }

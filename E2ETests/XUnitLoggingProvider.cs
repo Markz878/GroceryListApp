@@ -23,6 +23,7 @@ internal class XUnitLoggingProvider : ILoggerProvider
     {
     }
 }
+
 internal class XUnitLogger<T> : XUnitLogger, ILogger<T>
 {
     public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
