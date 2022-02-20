@@ -2,6 +2,11 @@
     min-width: 150px;
 }
 
+.sort-button {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
 .number-col {
     min-width: 100px;
 }
@@ -14,3 +19,5 @@
 .moving-button {
     background: #3827b4
 }
+
+

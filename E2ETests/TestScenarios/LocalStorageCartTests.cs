@@ -1,6 +1,5 @@
 using GroceryListHelper.Shared;
 using Microsoft.Playwright;
-using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
@@ -68,23 +67,78 @@ public class LocalStorageCartTests
     }
 
     [Theory]
-    [InlineData(4,0)]
-    [InlineData(3,1)]
-    [InlineData(2,3)]
-    [InlineData(1,4)]
-    [InlineData(0,4)]
-    public async Task Add5ValidProducts_ReorderLastTo_ProductsAreInCorrectOrder(int source, int target)
+    [InlineData(5, 4, 0)]
+    [InlineData(5, 3, 1)]
+    [InlineData(5, 2, 3)]
+    [InlineData(5, 1, 4)]
+    [InlineData(5, 0, 4)]
+    public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < productCount; i++)
         {
-            await page.AddProductToCart($"Product{i}", (i+1), i*1.5+0.5);
+            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
         }
-        await page.ClickAsync($"#reorder-button-{source}");
-        await page.ClickAsync($"#reorder-button-{target}");
-        IElementHandle movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{target}");
+        await page.ClickAsync($"#reorder-button-{moveItemIndex}");
+        await page.ClickAsync($"#reorder-button-{toTargetIndex}");
+        IElementHandle movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
         string movedProductName = await movedProductNameElement.InnerTextAsync();
-        Assert.Equal($"Product{source}", movedProductName);
+        Assert.Equal($"Product{moveItemIndex}", movedProductName);
     }
+
+    [Fact]
+    public async Task AddValidProducts_CheckAllCollected_CartSummmaryShowsAllCollected()
+    {
+        int productCount = 3;
+        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        IPage page = await BrowserContext.GotoPage();
+        for (int i = 0; i < productCount; i++)
+        {
+            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+        }
+        for (int i = 0; i < productCount; i++)
+        {
+            await page.CheckAsync($"#item-collected-checkbox-{i}");
+        }
+        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("b:has-text(\"All collected!\")");
+        Assert.NotNull(movedProductNameElement);
+    }
+
+    [Fact]
+    public async Task AddValidProducts_ClickClearCart_CartShouldBeEmpty()
+    {
+        int productCount = 3;
+        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        IPage page = await BrowserContext.GotoPage();
+        for (int i = 0; i < productCount; i++)
+        {
+            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+        }
+        await page.ClickAsync("button:has-text(\"Clear cart\")");
+        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
+        Assert.Null(movedProductNameElement);
+        string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
+        Assert.Null(cartProductsJson);
+    }
+
+    [Fact]
+    public async Task AddProduct_EditProperties_ShouldChangeValues()
+    {
+        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        IPage page = await BrowserContext.GotoPage();
+        await page.AddProductToCart($"Product", 1, 1.5);
+        await page.ClickAsync("#edit-product-button-0");
+        await page.FillAsync("#edit-item-amount-input-0", "2");
+        await page.FillAsync("#edit-item-unitprice-input-0", "2.5");
+        await page.ClickAsync("#update-product-button-0");
+        Assert.Equal("2", await page.InnerTextAsync("#item-amount-0"));
+        Assert.Equal("2.5", await page.InnerTextAsync("#item-unitprice-0"));
+        string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
+        CartProductCollectable[] models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        Assert.Equal(2, models[0].Amount);
+        Assert.Equal(2.5, models[0].UnitPrice);
+    }
+
+
 }
