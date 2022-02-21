@@ -1,6 +1,5 @@
 ﻿using AspNetCoreRateLimit;
 using GroceryListHelper.DataAccess.HelperMethods;
-using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
 

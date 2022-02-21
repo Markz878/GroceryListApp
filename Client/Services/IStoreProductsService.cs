@@ -7,5 +7,5 @@ public interface IStoreProductsService
     Task<bool> ClearStoreProducts();
     Task<List<StoreProductUIModel>> GetStoreProducts();
     Task<bool> SaveStoreProduct(StoreProductUIModel product);
-    Task<bool> UpdateStoreProductPrice(string id, double price);
+    Task<bool> UpdateStoreProductPrice(StoreProductUIModel storeProduct);
 }

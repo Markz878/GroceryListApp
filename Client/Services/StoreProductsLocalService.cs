@@ -27,7 +27,7 @@ public class StoreProductsLocalService : IStoreProductsService
             await localStorage.SetItemAsync(storeProductsKey, products);
             return true;
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             return false;
         }
@@ -46,13 +46,14 @@ public class StoreProductsLocalService : IStoreProductsService
         }
     }
 
-    public async Task<bool> UpdateStoreProductPrice(string id, double price)
+    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel storeProduct)
     {
         try
         {
             List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey);
-            StoreProductUIModel product = products.Find(x => x.Id == id);
-            product.UnitPrice = price;
+            StoreProductUIModel product = products.Find(x => x.Id == storeProduct.Id);
+            product.UnitPrice = storeProduct.UnitPrice;
+            product.Name = storeProduct.Name;
             await localStorage.SetItemAsync(storeProductsKey, products);
             return true;
         }

@@ -38,9 +38,9 @@ public class StoreProductsAPIService : IStoreProductsService
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> UpdateStoreProductPrice(string id, double price)
+    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel storeProduct)
     {
-        HttpResponseMessage response = await client.PatchAsync(uri + $"/{id}?price={price}", null);
+        HttpResponseMessage response = await client.PutAsJsonAsync(uri, storeProduct);
         return response.IsSuccessStatusCode;
     }
 }

@@ -6,6 +6,7 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..</DockerfileContext>
 		<ImplicitUsings>true</ImplicitUsings>
+		<ApplicationInsightsResourceId>/subscriptions/43f3a14a-9e3b-4005-a3ec-e5b3d4f5e564/resourceGroups/GroceryListRG/providers/microsoft.insights/components/GroceryListHelper</ApplicationInsightsResourceId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -18,6 +19,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="7.3.0" />
+		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.2" />
 		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.25.0" />

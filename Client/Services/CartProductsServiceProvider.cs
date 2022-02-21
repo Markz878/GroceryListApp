@@ -55,8 +55,6 @@ public class CartProductsServiceProvider : ICartProductsService
 
     private async ValueTask SelectProvider()
     {
-        //if (actingCartService is null)
-        //{
         isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
         if (isAuthenticated)
         {
@@ -73,6 +71,5 @@ public class CartProductsServiceProvider : ICartProductsService
         {
             actingCartService = new CartProductsLocalService(localStorage);
         }
-        //}
     }
 }

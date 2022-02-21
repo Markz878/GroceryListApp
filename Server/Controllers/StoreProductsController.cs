@@ -21,9 +21,9 @@ public class StoreProductsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel[]))]
-    public IAsyncEnumerable<StoreProductResponseModel> GetProducts()
+    public IAsyncEnumerable<StoreProductServerModel> GetProducts()
     {
-        IAsyncEnumerable<StoreProductResponseModel> result = db.GetStoreProductsForUser(User.GetUserId());
+        IAsyncEnumerable<StoreProductServerModel> result = db.GetStoreProductsForUser(User.GetUserId());
         return result;
     }
 
@@ -52,17 +52,12 @@ public class StoreProductsController : ControllerBase
         return success ? NoContent() : NotFound();
     }
 
-    [HttpPatch("{id}")]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdatePrice(string id, [FromQuery] double price)
+    public async Task<IActionResult> UpdatePrice(StoreProductServerModel storeProduct)
     {
-        if (price < 0)
-        {
-            return BadRequest("Price can't be negative.");
-        }
-        bool success = await db.UpdatePrice(id, User.GetUserId(), price);
+        bool success = await db.UpdatePrice(storeProduct.Id, User.GetUserId(), storeProduct.UnitPrice);
         return success ? NoContent() : NotFound();
     }
 }

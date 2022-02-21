@@ -39,10 +39,10 @@ public class StoreProductsServiceProvider : IStoreProductsService
         return await actingStoreService.SaveStoreProduct(product);
     }
 
-    public async Task<bool> UpdateStoreProductPrice(string id, double price)
+    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel product)
     {
         await SelectProvider();
-        return await actingStoreService.UpdateStoreProductPrice(id, price);
+        return await actingStoreService.UpdateStoreProductPrice(product);
     }
 
     private async ValueTask SelectProvider()

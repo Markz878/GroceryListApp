@@ -87,7 +87,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (product.UnitPrice != unitPrice)
             {
                 product.UnitPrice = unitPrice;
-                return StoreProductsService.UpdateStoreProductPrice(product.Id, unitPrice);
+                return StoreProductsService.UpdateStoreProductPrice(product);
             }
             else
             {
