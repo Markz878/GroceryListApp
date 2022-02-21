@@ -140,5 +140,21 @@ public class LocalStorageCartTests
         Assert.Equal(2.5, models[0].UnitPrice);
     }
 
-
+    [Fact]
+    public async Task AddProducts_ClickProductDeleteButton_ShouldRemoveItem()
+    {
+        int productCount = 3;
+        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        IPage page = await BrowserContext.GotoPage();
+        for (int i = 0; i < productCount; i++)
+        {
+            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+        }
+        await page.ClickAsync($"#delete-product-button-{productCount / 2}");
+        IElementHandle element = await page.QuerySelectorAsync($"td:has-text(\"Product{productCount / 2}\")");
+        Assert.Null(element);
+        string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
+        CartProductCollectable[] models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        Assert.Equal(productCount - 1, models.Length);
+    }
 }

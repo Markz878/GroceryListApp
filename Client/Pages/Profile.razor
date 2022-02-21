@@ -14,7 +14,7 @@
             <CustomValidationMessage Message="@emailMessage" />
             <InputTextComponent DisplayName="New email" @bind-Value="changeEmailRequest.NewEmail " />
             <InputTextComponent DisplayName="Password" Id="password-for-email-change" IsPassword="true" @bind-Value="changeEmailRequest.Password" />
-            <button class="btn btn-primary" type="submit" disabled="@isBusy">Change Email</button>
+            <button id="change-email-btn" class="btn btn-primary" type="submit" disabled="@isBusy">Change email</button>
         </EditForm>
     </fieldset>
 
@@ -28,7 +28,7 @@
             <InputTextComponent DisplayName="Current password" IsPassword="true" @bind-Value="changePasswordRequest.CurrentPassword " />
             <InputTextComponent DisplayName="New password" IsPassword="true" @bind-Value="changePasswordRequest.NewPassword" />
             <InputTextComponent DisplayName="Confirm new password" IsPassword="true" @bind-Value="changePasswordRequest.ConfirmNewPassword" />
-            <button class="btn btn-primary" type="submit" disabled="@isBusy">Change password</button>
+            <button id="change-password-btn" class="btn btn-primary" type="submit" disabled="@isBusy">Change password</button>
         </EditForm>
     </fieldset>
 
@@ -41,7 +41,7 @@
                 <li class="validation-message">@downloadMessage</li>
             </ul>
         }
-        <button class="btn btn-primary" @onclick="DownloadPersonalInfo">Download</button>
+        <button id="download-btn" class="btn btn-primary" @onclick="DownloadPersonalInfo">Download</button>
     </fieldset>
 
     <fieldset>
@@ -52,7 +52,7 @@
             <ValidationSummary />
             <CustomValidationMessage Message="@deleteMessage" />
             <InputTextComponent DisplayName="Password" Id="password-for-account-deletion" IsPassword="true" @bind-Value="deleteProfileRequest.Password" />
-            <button class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
+            <button id="delete-btn" class="btn btn-danger" type="submit" disabled="@isBusy">Delete profile</button>
         </EditForm>
     </fieldset>
 

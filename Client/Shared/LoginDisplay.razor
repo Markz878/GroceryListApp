@@ -2,12 +2,12 @@
 <AuthorizeView>
     <Authorized>
         <NavLink class="nav-link" href="profile">Hello, @context.User.FindFirst("email").Value</NavLink>
-        <button class="nav-link" @onclick="BeginSignOut">Log out</button>
-        <NavLink class="nav-link" href="about">About</NavLink>
+        <button id="logout-btn" class="nav-link" @onclick="BeginSignOut">Log out</button>
+        <NavLink id="about-link" class="nav-link" href="about">About</NavLink>
     </Authorized>
     <NotAuthorized>
-        <NavLink class="nav-link" href="login">Log in</NavLink>
-        <NavLink class="nav-link" href="register">Register</NavLink>
+        <NavLink id="login-link" class="nav-link" href="login">Log in</NavLink>
+        <NavLink id="register-link" class="nav-link" href="register">Register</NavLink>
     </NotAuthorized>
 </AuthorizeView>
 

@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace E2ETests.TestScenarios;
 
-internal class ServerStorageCartTests
+public class ServerStorageCartTests
 {
 }
