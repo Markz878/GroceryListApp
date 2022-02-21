@@ -40,7 +40,10 @@ app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 
 app.MapControllers();
-app.MapHub<CartHub>("carthub");
+app.UseAzureSignalR(routes =>
+{
+    routes.MapHub<CartHub>("/carthub");
+});
 app.MapFallbackToFile("index.html");
 app.MapHealthChecks("/health");
 app.Run();

@@ -68,8 +68,8 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false,
-            SlowMo = 200,
+            //Headless = false,
+            //SlowMo = 200,
         });
     }
 

@@ -29,7 +29,9 @@ public class SharedCartTests
         int productAmount = 2;
         double productPrice = 2.9;
         await page1.AddProductToCart(productName, productAmount, productPrice);
+        await Task.Delay(1000);
         IElementHandle element = await page2.QuerySelectorAsync("#item-name-0");
+        string page2Text = await page2.TextContentAsync("#content");
         Assert.NotNull(element);
     }
 
@@ -45,9 +47,11 @@ public class SharedCartTests
         int productAmount = 2;
         double productPrice = 2.9;
         await page1.AddProductToCart(productName, productAmount, productPrice);
+        await Task.Delay(1000);
         IElementHandle element1 = await page2.QuerySelectorAsync("#item-name-0");
         Assert.NotNull(element1);
         await page1.ClickAsync("#delete-product-button-0");
+        await Task.Delay(1000);
         IElementHandle element2 = await page2.QuerySelectorAsync("#item-name-0");
         Assert.Null(element2);
     }
