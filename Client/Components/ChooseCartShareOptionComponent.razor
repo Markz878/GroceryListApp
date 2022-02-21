@@ -2,8 +2,8 @@
 
 <div class="share-cart-option">
     <b class="text-nowrap">Choose how to share cart with other users:</b>
-    <button class="leftToggleButton toggleButton @LeftButtonActive" disabled="@ViewModel.IsPolling" @onclick="SelectSelfShare">Share your cart</button>
-    <button class="rightToggleButton toggleButton @RightButtonActive" disabled="@ViewModel.IsPolling" @onclick="SelectJoinShare">Join a cart</button>
+    <button id="select-share-own-cart-btn" class="leftToggleButton toggleButton @LeftButtonActive" disabled="@ViewModel.IsPolling" @onclick="SelectSelfShare">Share your cart</button>
+    <button id="select-join-cart-btn" class="rightToggleButton toggleButton @RightButtonActive" disabled="@ViewModel.IsPolling" @onclick="SelectJoinShare">Join a cart</button>
 </div>
 
 

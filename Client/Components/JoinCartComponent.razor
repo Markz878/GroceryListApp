@@ -4,12 +4,12 @@
     <p>Join someone else's cart by giving their email:</p>
 
     <div class="join-email-row">
-        <input type="email" required class="form-control" @bind="ViewModel.CartHostEmail" placeholder="Cart owner email" />
+        <input id="cart-owner-email-input" type="email" required class="form-control" @bind="ViewModel.CartHostEmail" placeholder="Cart owner email" />
     </div>
 
     <div>
-        <button class="btn btn-primary" @onclick="JoinCart" disabled="@ViewModel.IsPolling">Join cart</button>
-        <button class="btn btn-danger" @onclick="ExitCart" disabled="@(!ViewModel.IsPolling)">Exit cart</button>
+        <button id="join-cart-btn" class="btn btn-primary" @onclick="JoinCart" disabled="@ViewModel.IsPolling">Join cart</button>
+        <button id="exit-cart-btn" class="btn btn-danger" @onclick="ExitCart" disabled="@(!ViewModel.IsPolling)">Exit cart</button>
     </div>
 </div>
 
