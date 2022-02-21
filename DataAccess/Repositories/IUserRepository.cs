@@ -12,4 +12,8 @@ public interface IUserRepository
     Task<UserDbModel> GetUserFromId(string id);
     Task<string> RemoveRefreshToken(string id);
     Task<string> UpdateRefreshToken(string id, string refreshToken);
+    Task<List<string>> GetCartHostAllowedEmails(string hostId);
+    Task CreateGroupAllowedEmails(string hostId, List<string> allowedUserIds);
+    Task<string> GetUsersCartHostId(string userEmail);
+    Task RemoveCartGroup(string hostId);
 }

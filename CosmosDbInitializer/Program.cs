@@ -31,6 +31,7 @@ try
     Container userContainer = await database.CreateContainerIfNotExistsAsync("Users", "/id");
     Container cartProductsContainer = await database.CreateContainerIfNotExistsAsync("CartProducts", "/UserId");
     Container storeProductsContainer = await database.CreateContainerIfNotExistsAsync("StoreProducts", "/UserId");
+    Container userCartGroupsContainer = await database.CreateContainerIfNotExistsAsync("UserCartGroups", "/HostId");
 }
 catch (Exception ex)
 {

@@ -96,6 +96,7 @@ public class ServerStorageCartTests
         }
         await page.ClickAsync($"#reorder-button-{moveItemIndex}");
         await page.ClickAsync($"#reorder-button-{toTargetIndex}");
+        await Task.Delay(100);
         IElementHandle movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
         string movedProductName = await movedProductNameElement.InnerTextAsync();
         Assert.Equal($"Product{moveItemIndex}", movedProductName);

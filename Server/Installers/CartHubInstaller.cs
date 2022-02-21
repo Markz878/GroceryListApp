@@ -1,5 +1,4 @@
-﻿using GroceryListHelper.Server.Hubs;
-using Microsoft.AspNetCore.ResponseCompression;
+﻿using Microsoft.AspNetCore.ResponseCompression;
 
 namespace GroceryListHelper.Server.Installers;
 
@@ -12,6 +11,5 @@ public class CartHubInstaller : IInstaller
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
         });
-        services.AddSingleton<ICartHubService, CartHubService>();
     }
 }

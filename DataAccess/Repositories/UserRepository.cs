@@ -147,4 +147,35 @@ public class UserRepository : IUserRepository
             return ex.Message;
         }
     }
+
+    public async Task<List<string>> GetCartHostAllowedEmails(string hostId)
+    {
+        var result = await db.UserCartGroups.Where(x => x.HostId == hostId).Select(x=>x.JoinerEmail).ToListAsync();
+        return result;
+    }
+
+    public async Task CreateGroupAllowedEmails(string hostId, List<string> allowedUserEmails)
+    {
+        foreach (var userEmail in allowedUserEmails)
+        {
+            db.UserCartGroups.Add(new UserCartGroupDbModel()
+            {
+                HostId = hostId,
+                JoinerEmail = userEmail,
+            });
+        }
+        await db.SaveChangesAsync();
+    }
+
+    public async Task<string> GetUsersCartHostId(string email)
+    {
+        UserCartGroupDbModel host = await db.UserCartGroups.FirstOrDefaultAsync(x=>x.JoinerEmail == email);
+        return host?.HostId;
+    }
+
+    public async Task RemoveCartGroup(string hostId)
+    {
+        db.UserCartGroups.RemoveRange(db.UserCartGroups.Where(x => x.HostId == hostId));
+        await db.SaveChangesAsync();
+    }
 }

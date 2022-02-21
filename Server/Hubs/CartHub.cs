@@ -14,13 +14,11 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 {
     private readonly ICartProductRepository db;
     private readonly IUserRepository userRepository;
-    private readonly ICartHubService cartHubService;
 
-    public CartHub(ICartProductRepository db, IUserRepository userRepository, ICartHubService cartHubService)
+    public CartHub(ICartProductRepository db, IUserRepository userRepository)
     {
         this.db = db;
         this.userRepository = userRepository;
-        this.cartHubService = cartHubService;
     }
 
     public async Task<HubResponse> CreateGroup(List<string> allowedUsers)
@@ -32,7 +30,7 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId(Context).ToString());
         string otherUsers = string.Join(", ", allowedUsers);
         allowedUsers.Add(GetUserEmail(Context));
-        cartHubService.GroupAllowedEmails[GetUserId(Context)] = allowedUsers;
+        await userRepository.CreateGroupAllowedEmails(GetUserId(Context), allowedUsers);
         return new HubResponse() { SuccessMessage = $"You are sharing your cart to {otherUsers}." };
     }
 
@@ -43,7 +41,8 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         {
             return new HubResponse() { ErrorMessage = "No user with that email." };
         }
-        if (cartHubService.GroupAllowedEmails.TryGetValue(user.Id, out List<string> emails))
+        List<string> emails = await userRepository.GetCartHostAllowedEmails(user.Id);
+        if (emails.Any())
         {
             if (emails.Contains(GetUserEmail(Context)))
             {
@@ -63,16 +62,16 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    private string GetHostId()
+    private async Task<string> GetHostId()
     {
-        string userEmail = GetUserEmail(Context);
-        string hostId = cartHubService.GroupAllowedEmails.FirstOrDefault(x => x.Value.Contains(userEmail)).Key;
+        string email = GetUserEmail(Context);
+        string hostId = await userRepository.GetUsersCartHostId(email);
         return hostId;
     }
 
     public async Task<string> CartItemAdded(CartProductCollectable product)
     {
-        string hostId = GetHostId();
+        string hostId = await GetHostId();
         product.Id = await db.AddCartProduct(product, hostId);
         await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
         return product.Id;
@@ -80,28 +79,28 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 
     public async Task CartItemModified(CartProductCollectable product)
     {
-        string hostId = GetHostId();
+        string hostId = await GetHostId();
         await db.UpdateProduct(hostId, product);
         await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
     }
 
     public async Task CartItemDeleted(string id)
     {
-        string hostId = GetHostId();
+        string hostId = await GetHostId();
         await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
         await db.DeleteProduct(id, hostId);
     }
 
     public async Task<HubResponse> LeaveGroup()
     {
-        string hostId = GetHostId();
+        string hostId = await GetHostId();
         if (hostId != string.Empty)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
             if (hostId == GetUserId(Context))
             {
                 await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail(Context));
-                cartHubService.GroupAllowedEmails.Remove(hostId);
+                await userRepository.RemoveCartGroup(hostId);
             }
             else
             {

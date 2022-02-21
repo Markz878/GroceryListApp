@@ -50,12 +50,12 @@ public class TestHook
     public async Task BeforeCanAddCartProductScenario(IObjectContainer container)
     {
         IPlaywright playwright = await Playwright.CreateAsync();
-        IBrowser browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions()
+        IBrowser browser = await playwright.Firefox.LaunchAsync(new()
         {
             Headless = false,
-            SlowMo = 500,
+            SlowMo = 200,
         });
-        IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions()
+        IBrowserContext context = await browser.NewContextAsync(new()
         {
             IgnoreHTTPSErrors = true,
             BaseURL = "https://localhost:5001",
