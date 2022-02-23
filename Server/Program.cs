@@ -2,13 +2,21 @@
 using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.UI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.InstallAssemblyServices(builder.Configuration);
-builder.Services.AddControllersWithViews();
+if (builder.Environment.IsDevelopment()) 
+{
+    builder.Services.AddControllersWithViews();// Swagger can't handle AntiForgeryToken validation
+}
+else
+{
+    builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+}
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();
@@ -36,9 +44,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
-
 app.MapRazorPages();
 app.MapControllers();
 //app.UseAzureSignalR(routes =>

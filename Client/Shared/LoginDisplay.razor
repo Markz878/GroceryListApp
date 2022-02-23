@@ -2,10 +2,11 @@
     <Authorized>
         <strong>Hello, @context.User.Identity.Name!</strong>
         <form method="post" action="api/Account/Logout">
-            <button class="nav-link" type="submit">Sign out</button>
+            <AntiForgeryTokenInput/>
+            <button id="signout-btn" class="nav-link" type="submit">Sign out</button>
         </form>
     </Authorized>
     <NotAuthorized>
-        <a class="nav-link" href="api/Account/Login">Log in</a>
+        <a id="login-link" class="nav-link" href="api/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>

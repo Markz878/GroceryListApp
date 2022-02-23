@@ -1,4 +1,6 @@
 ﻿using GroceryListHelper.DataAccess;
+using GroceryListHelper.Server;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace E2ETests;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
+public class AuthorizedWebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {
     public ITestOutputHelper TestOutputHelper { get; set; }
     public IPlaywright PlaywrightInstance { get; set; }
@@ -45,6 +47,9 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), $"TestDb");
             });
 
+            services.AddAuthentication("Test")
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+
             using IServiceScope scope = services.BuildServiceProvider().CreateScope();
             GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
             db.Database.EnsureCreated();
@@ -65,8 +70,8 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            //Headless = false,
-            //SlowMo = 200,
+            Headless = false,
+            SlowMo = 200,
         });
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System.Net;
 
 namespace GroceryListHelper.Client.Authentication;
@@ -8,12 +9,14 @@ public class AuthorizedHandler : DelegatingHandler
 {
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly NavigationManager navigation;
+    private readonly IJSRuntime js;
     private const string LogInPath = "api/Account/Login";
 
-    public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation)
+    public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation, IJSRuntime js)
     {
         _authenticationStateProvider = authenticationStateProvider;
         this.navigation = navigation;
+        this.js = js;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -26,13 +29,16 @@ public class AuthorizedHandler : DelegatingHandler
         }
         else
         {
+            string token = await js.InvokeAsync<string>("getAntiForgeryToken");
+            request.Headers.Add("X-XSRF-TOKEN", token); 
             responseMessage = await base.SendAsync(request, cancellationToken);
         }
         if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
         {
-            string encodedReturnUrl = Uri.EscapeDataString(navigation.Uri);
-            Uri logInUrl = navigation.ToAbsoluteUri($"{LogInPath}?returnUrl={encodedReturnUrl}");
-            navigation.NavigateTo(logInUrl.ToString(), true);
+            throw new InvalidOperationException("This should not happen, check AuthorizedHandler");
+            //string encodedReturnUrl = Uri.EscapeDataString(navigation.Uri);
+            //Uri logInUrl = navigation.ToAbsoluteUri($"{LogInPath}?returnUrl={encodedReturnUrl}");
+            //navigation.NavigateTo(logInUrl.ToString(), true);
         }
         return responseMessage;
     }

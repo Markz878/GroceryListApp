@@ -1,16 +1,15 @@
 ﻿using Microsoft.Playwright;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace E2ETests.TestScenarios;
 
-[Collection(nameof(WebApplicationFactoryCollection))]
+[Collection(nameof(AuthorizedWebApplicationFactoryCollection))]
 public class ServerStorageCartTests
 {
-    private readonly WebApplicationFactoryFixture fixture;
+    private readonly AuthorizedWebApplicationFactoryFixture fixture;
 
-    public ServerStorageCartTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
+    public ServerStorageCartTests(AuthorizedWebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
@@ -22,7 +21,6 @@ public class ServerStorageCartTests
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         string productName = "Maito";
         int productAmount = 2;
         double productPrice = 2.9;
@@ -32,26 +30,10 @@ public class ServerStorageCartTests
     }
 
     [Fact]
-    public async Task AddProductToCart_ReloadPage_ProductStillInCart()
-    {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
-        string productName = "Maito";
-        int productAmount = 2;
-        double productPrice = 2.9;
-        await page.AddProductToCart(productName, productAmount, productPrice);
-        await page.ReloadAsync();
-        IElementHandle element = await page.WaitForSelectorAsync("#item-name-0");
-        Assert.NotNull(element);
-    }
-
-    [Fact]
     public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         await page.AddProductToCart("", 2, 2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Name' must not be empty.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
@@ -62,7 +44,6 @@ public class ServerStorageCartTests
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         await page.AddProductToCart("Maito", -2, 2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Amount' must be greater than or equal to '0'.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -73,7 +54,6 @@ public class ServerStorageCartTests
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         await page.AddProductToCart("Maito", 2, -2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Unit Price' must be greater than or equal to '0'.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -89,7 +69,6 @@ public class ServerStorageCartTests
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -108,7 +87,6 @@ public class ServerStorageCartTests
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -127,7 +105,6 @@ public class ServerStorageCartTests
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -144,7 +121,6 @@ public class ServerStorageCartTests
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
         await page.FillAsync("#edit-item-amount-input-0", "2");
@@ -160,7 +136,6 @@ public class ServerStorageCartTests
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage();
-        await page.CreateUser();
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);

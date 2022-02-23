@@ -19,7 +19,6 @@ public class AccountController : ControllerBase
         return challengeResult;
     }
 
-    // [ValidateAntiForgeryToken] // not needed explicitly due the the Auto global definition.
     [Authorize]
     [HttpPost]
     public IActionResult Logout()

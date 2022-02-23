@@ -8,7 +8,7 @@ public class AuthenticationInstaller : IInstaller
 {
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddMicrosoftIdentityWebAppAuthentication(configuration, subscribeToOpenIdConnectMiddlewareDiagnosticsEvents: true);
+        services.AddMicrosoftIdentityWebAppAuthentication(configuration);
         services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
         {
             options.Events.OnSignedIn = context =>

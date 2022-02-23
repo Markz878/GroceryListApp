@@ -14,11 +14,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="C:\Users\markus.nisula\.nuget\packages\microsoft.azure.cosmos\3.25.0\contentFiles\any\netstandard2.0\ThirdPartyNotice.txt" />
 	  <Content Remove="C:\Users\marku\.nuget\packages\microsoft.azure.cosmos\3.24.0\contentFiles\any\netstandard2.0\ThirdPartyNotice.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="7.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.2" NoWarn="NU1605" />
 		<PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.23.0" />
 		<PackageReference Include="Microsoft.Identity.Web" Version="1.23.0" />
