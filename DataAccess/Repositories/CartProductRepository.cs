@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -43,27 +43,21 @@ public class CartProductRepository : ICartProductRepository
         return db.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteProduct(string productId, string userId)
+    public async Task DeleteProduct(string productId, string userId)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
-        if (product == null || product.UserId != userId)
-        {
-            return false;
-        }
+        NotFoundException.ThrowIfNull(product);
+        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         db.CartProducts.Remove(product);
         await db.SaveChangesAsync();
-        return true;
     }
 
-    public async Task<bool> UpdateProduct(string userId, CartProductCollectable updatedProduct)
+    public async Task UpdateProduct(string userId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
-        if (product == null || product.UserId != userId)
-        {
-            return false;
-        }
+        NotFoundException.ThrowIfNull(product);
+        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         updatedProduct.Adapt(product);
         await db.SaveChangesAsync();
-        return true;
     }
 }

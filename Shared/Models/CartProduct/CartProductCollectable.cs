@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.CartProduct;
-
-namespace GroceryListHelper.Shared;
+﻿namespace GroceryListHelper.Shared.Models.CartProduct;
 
 public record CartProductCollectable : CartProduct
 {

@@ -62,6 +62,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
             }
             catch (Exception ex)
             {
+                ModalViewModel.Header = "Error";
                 ModalViewModel.Message = ex.Message;
             }
         }
@@ -69,7 +70,15 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     public async Task SaveCartProduct(CartProductUIModel product)
     {
-        await CartProductsService.SaveCartProduct(product);
+        try
+        {
+            await CartProductsService.SaveCartProduct(product);
+        }
+        catch (Exception ex)
+        {
+            ModalViewModel.Header = "Error";
+            ModalViewModel.Message = ex.Message;
+        }
     }
 
     public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
@@ -79,7 +88,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         return CartProductsService.UpdateCartProduct(product);
     }
 
-    public Task SaveStoreProduct(string productName, double unitPrice)
+    public async Task SaveStoreProduct(string productName, double unitPrice)
     {
         StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == productName);
         if (product != null)
@@ -87,11 +96,11 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (product.UnitPrice != unitPrice)
             {
                 product.UnitPrice = unitPrice;
-                return StoreProductsService.UpdateStoreProductPrice(product);
-            }
-            else
-            {
-                return Task.CompletedTask;
+                bool success = await StoreProductsService.UpdateStoreProductPrice(product);
+                if (!success)
+                {
+                    ModalViewModel.Message = "Could not update store product.";
+                }
             }
         }
         else
@@ -101,9 +110,12 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (storeProductValidator.Validate(product).IsValid)
             {
                 ViewModel.StoreProducts.Add(product);
-                return StoreProductsService.SaveStoreProduct(product);
+                bool success = await StoreProductsService.SaveStoreProduct(product);
+                if (!success)
+                {
+                    ModalViewModel.Message = "Could not create store product.";
+                }
             }
-            return Task.CompletedTask;
         }
     }
 
@@ -120,7 +132,14 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             editingItem = null;
             ViewModel.OnPropertyChanged();
-            await CartProductsService.UpdateCartProduct(product);
+            try
+            {
+                await CartProductsService.UpdateCartProduct(product);
+            }
+            catch (Exception ex)
+            {
+                ModalViewModel.Message = ex.Message;
+            }
         }
     }
 
@@ -149,10 +168,6 @@ public class CartComponentBase : BasePage<IndexViewModel>
             if (cartProduct != movingItem)
             {
                 movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
-                foreach (var item in ViewModel.CartProducts)
-                {
-                    Console.WriteLine($"{item.Name} {item.Order}");
-                }
                 try
                 {
                     await CartProductsService.UpdateCartProduct(movingItem);

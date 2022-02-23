@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Models.CartProduct;
 
 namespace GroceryListHelper.DataAccess.Models;
 

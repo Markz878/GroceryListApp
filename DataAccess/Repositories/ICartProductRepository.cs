@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared;
+﻿using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.CartProduct;
 
 namespace GroceryListHelper.DataAccess.Repositories;
@@ -13,8 +13,9 @@ public interface ICartProductRepository
     /// <summary>
     /// Delete a product from repository.
     /// </summary>
-    /// <returns>Flag indicating if deletion succeeded.</returns>
-    Task<bool> DeleteProduct(string productId, string userId);
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="ForbiddenException"></exception>
+    Task DeleteProduct(string productId, string userId);
     /// <summary>
     /// Get cart product list for a user.
     /// </summary>
@@ -26,12 +27,11 @@ public interface ICartProductRepository
     /// <summary>
     /// Clear user's cart products.
     /// </summary>
-    /// <param name="userId"></param>
-    /// <returns></returns>
     Task ClearProductsForUser(string userId);
     /// <summary>
     /// Update a user's product info.
     /// </summary>
-    /// <returns>Flag indicating if update succeeded.</returns>
-    Task<bool> UpdateProduct(string userId, CartProductCollectable updatedProduct);
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="ForbiddenException"></exception>
+    Task UpdateProduct(string userId, CartProductCollectable updatedProduct);
 }

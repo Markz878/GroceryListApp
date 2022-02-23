@@ -2,13 +2,14 @@
 using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
+using Microsoft.Identity.Web.UI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.InstallAssemblyServices(builder.Configuration);
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();
 
@@ -35,15 +36,17 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<SecurityHeadersMiddleware>();
+//app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 
+app.MapRazorPages();
 app.MapControllers();
-app.UseAzureSignalR(routes =>
-{
-    routes.MapHub<CartHub>("/carthub");
-});
-app.MapFallbackToFile("index.html");
+//app.UseAzureSignalR(routes =>
+//{
+//    routes.MapHub<CartHub>("/carthub");
+//});
+app.MapHub<CartHub>("/carthub");
+app.MapFallbackToPage("/_Host");
 app.MapHealthChecks("/health");
 app.Run();
 

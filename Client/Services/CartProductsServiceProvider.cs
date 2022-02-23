@@ -60,14 +60,14 @@ public class CartProductsServiceProvider : ICartProductsService
         {
             if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
             {
-                actingCartService = new CartProductsSignalRService(viewModel);
+                actingCartService = new CartProductsSignalRService(viewModel.CartHub);
             }
-            else if(!viewModel.IsPolling && actingCartService is not CartProductsApiService)
+            else if (!viewModel.IsPolling && actingCartService is not CartProductsApiService)
             {
                 actingCartService = new CartProductsApiService(httpClientFactory);
             }
         }
-        else if(actingCartService is not CartProductsLocalService)
+        else if (actingCartService is not CartProductsLocalService)
         {
             actingCartService = new CartProductsLocalService(localStorage);
         }

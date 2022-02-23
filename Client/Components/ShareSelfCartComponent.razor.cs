@@ -1,8 +1,8 @@
 using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.Authentication;
+using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.Components;
@@ -24,26 +24,33 @@ public class ShareSelfCartComponentBase : BasePage<IndexViewModel>
 
     public async Task ShareCart()
     {
-        if (ViewModel.AllowedUsers.Count > 0)
+        try
         {
-            ViewModel.IsPolling = true;
-            await ViewModel.CartHub.StartAsync();
-            HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CreateGroup), ViewModel.AllowedUsers);
+            if (ViewModel.AllowedUsers.Count > 0)
+            {
+                ViewModel.IsPolling = true;
+                await ViewModel.CartHub.StartAsync();
+                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CreateGroup), ViewModel.AllowedUsers);
 
-            if (!string.IsNullOrEmpty(response.ErrorMessage))
-            {
-                ViewModel.IsPolling = false;
-                await ViewModel.CartHub.StopAsync();
-                ViewModel.ShareCartInfo = response.ErrorMessage;
+                if (!string.IsNullOrEmpty(response.ErrorMessage))
+                {
+                    ViewModel.IsPolling = false;
+                    await ViewModel.CartHub.StopAsync();
+                    ViewModel.ShareCartInfo = response.ErrorMessage;
+                }
+                else if (!string.IsNullOrEmpty(response.SuccessMessage))
+                {
+                    ViewModel.ShareCartInfo = response.SuccessMessage;
+                }
             }
-            else if (!string.IsNullOrEmpty(response.SuccessMessage))
+            else
             {
-                ViewModel.ShareCartInfo = response.SuccessMessage;
+                ViewModel.ShareCartInfo = "There are no allowed users for your cart.";
             }
         }
-        else
+        catch (Exception ex)
         {
-            ViewModel.ShareCartInfo = "There are no allowed users for your cart.";
+            ViewModel.ShareCartInfo = ex.Message;
         }
     }
 

@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
@@ -59,20 +59,43 @@ public class CartProductsController : ControllerBase
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct(string id)
     {
-        bool success = await cartProductsRepository.DeleteProduct(id, User.GetUserId());
-        return success ? NoContent() : NotFound();
+        try
+        {
+            await cartProductsRepository.DeleteProduct(id, User.GetUserId());
+            return NoContent();
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(CartProductCollectable updatedProduct)
     {
-        bool success = await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);
-        return success ? NoContent() : NotFound();
+        try
+        {
+            await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);
+            return NoContent();
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
     }
 }

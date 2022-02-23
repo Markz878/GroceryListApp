@@ -6,6 +6,6 @@ public static class ControllerHelpers
 {
     public static string GetUserId(this ClaimsPrincipal user)
     {
-        return user.FindFirstValue("id");
+        return user.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
     }
 }

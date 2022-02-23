@@ -6,6 +6,7 @@
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<ImplicitUsings>true</ImplicitUsings>
+		<UserSecretsId>4004f6bb-70a4-4990-a305-9b6f0a971fb9</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

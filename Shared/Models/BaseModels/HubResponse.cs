@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.BaseModels;
-
-namespace GroceryListHelper.Shared;
+﻿namespace GroceryListHelper.Shared.Models.BaseModels;
 
 public class HubResponse : BaseResponse
 {

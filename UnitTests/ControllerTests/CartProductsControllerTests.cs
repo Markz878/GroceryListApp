@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.Controllers;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;

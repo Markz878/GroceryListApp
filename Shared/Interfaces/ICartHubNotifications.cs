@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Shared.Interfaces;
+﻿using GroceryListHelper.Shared.Models.CartProduct;
+
+namespace GroceryListHelper.Shared.Interfaces;
 
 public interface ICartHubNotifications
 {

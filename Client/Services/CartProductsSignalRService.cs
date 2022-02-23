@@ -1,42 +1,45 @@
 ﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
+using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.Services;
 
 public class CartProductsSignalRService : ICartProductsService
 {
-    private readonly IndexViewModel viewModel;
+    private readonly HubConnection cartHub;
 
-    public CartProductsSignalRService(IndexViewModel viewModel)
+    public CartProductsSignalRService(HubConnection cartHub)
     {
-        this.viewModel = viewModel;
+        this.cartHub = cartHub;
     }
 
     public Task DeleteAllCartProducts()
     {
-        viewModel.CartProducts.Clear();
-        return Task.CompletedTask;
+        throw new NotImplementedException();
     }
 
     public Task DeleteCartProduct(string id)
     {
-        return viewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), id);
+        return cartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), id);
     }
 
     public Task<List<CartProductUIModel>> GetCartProducts()
     {
-        return Task.FromResult(viewModel.CartProducts.ToList());
+        throw new NotImplementedException();
     }
 
     public async Task SaveCartProduct(CartProductUIModel product)
     {
-        product.Id = await viewModel.CartHub.InvokeAsync<string>(nameof(ICartHubActions.CartItemAdded), product);
+        HubResponse response = await cartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CartItemAdded), product);
+        if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage))
+        {
+            product.Id = response.SuccessMessage;
+        }
     }
 
     public Task UpdateCartProduct(CartProductUIModel product)
     {
-        return viewModel.CartHub.SendAsync(nameof(ICartHubActions.CartItemModified), product);
+        return cartHub.SendAsync(nameof(ICartHubActions.CartItemModified), product);
     }
 }

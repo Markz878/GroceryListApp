@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Integrati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2ETests", "E2ETests\E2ETests.csproj", "{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosDbInitializer", "CosmosDbInitializer\CosmosDbInitializer.csproj", "{20FF3FFC-8D9C-4A25-B77D-67F9515261DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDbInitializer", "CosmosDbInitializer\CosmosDbInitializer.csproj", "{20FF3FFC-8D9C-4A25-B77D-67F9515261DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

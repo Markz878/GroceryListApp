@@ -1,0 +1,32 @@
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GroceryListHelper.Server.Controllers;
+
+[Route("api/[controller]/[action]")]
+public class AccountController : ControllerBase
+{
+    [HttpGet]
+    public ActionResult Login(string returnUrl)
+    {
+        ChallengeResult challengeResult = Challenge(new AuthenticationProperties
+        {
+            RedirectUri = !string.IsNullOrEmpty(returnUrl) ? returnUrl : "/"
+        });
+        return challengeResult;
+    }
+
+    // [ValidateAntiForgeryToken] // not needed explicitly due the the Auto global definition.
+    [Authorize]
+    [HttpPost]
+    public IActionResult Logout()
+    {
+        return SignOut(
+            new AuthenticationProperties { RedirectUri = "/" },
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            OpenIdConnectDefaults.AuthenticationScheme);
+    }
+}

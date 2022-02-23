@@ -23,10 +23,11 @@ public class Program
 #if (!DEBUG)
         builder.Logging.ClearProviders();
 #endif
+        builder.Services.AddOptions();
         builder.Services.AddAuthorizationCore();
-        builder.Services.AddScoped<IAccessTokenProvider, AccessTokenProvider>();
-        builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-        builder.Services.AddScoped<ProtectedClientAuthorizationHandler>();
+        builder.Services.AddSingleton<AuthenticationStateProvider, HostAuthenticationStateProvider>();
+        builder.Services.AddSingleton(sp => (HostAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
+        builder.Services.AddTransient<AuthorizedHandler>();
 
         AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
         AsyncPolicyWrap<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2)).WrapAsync(ciruitBreakerPolicy);
@@ -34,10 +35,8 @@ public class Program
 
         builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
         builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-        .AddHttpMessageHandler<ProtectedClientAuthorizationHandler>().AddPolicyHandler(pollyPolicy); ;
+        .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy); ;
 
-        builder.Services.AddScoped<AuthenticationService>();
-        builder.Services.AddScoped<ProfileService>();
         builder.Services.AddScoped<CartHubBuilder>();
         builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
         builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();

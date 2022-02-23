@@ -9,26 +9,26 @@ public class SwaggerInstaller : IInstaller
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "GroceryListHelper", Version = "v1" });
-            OpenApiSecurityScheme securitySchema = new()
-            {
-                Description = "Using the Authorization header with the Bearer scheme.",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            };
+            //OpenApiSecurityScheme securitySchema = new()
+            //{
+            //    Description = "Using the Authorization header with the Bearer scheme.",
+            //    Name = "Authorization",
+            //    In = ParameterLocation.Header,
+            //    Type = SecuritySchemeType.Http,
+            //    Scheme = "bearer",
+            //    Reference = new OpenApiReference
+            //    {
+            //        Type = ReferenceType.SecurityScheme,
+            //        Id = "Bearer"
+            //    }
+            //};
 
-            c.AddSecurityDefinition("Bearer", securitySchema);
+            //c.AddSecurityDefinition("Bearer", securitySchema);
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-            {
-                    { securitySchema, new[] { "Bearer" } }
-            });
+            //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            //{
+            //        { securitySchema, new[] { "Bearer" } }
+            //});
         });
 
     }

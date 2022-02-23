@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Client.Models;
-
-namespace GroceryListHelper.Client.HelperMethods;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public class SortOrderMethods
 {

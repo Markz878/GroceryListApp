@@ -1,29 +1,26 @@
-﻿using GroceryListHelper.Client.Authentication;
-using GroceryListHelper.Client.Models;
+﻿using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
-using GroceryListHelper.Shared.Models.Authentication;
+using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace GroceryListHelper.Client.HelperMethods;
 
 public class CartHubBuilder
 {
     private readonly HttpClient client;
-    private readonly IAccessTokenProvider accessTokenProvider;
+    private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
     private readonly ILogger<CartHubBuilder> logger;
 
-    public CartHubBuilder(IHttpClientFactory httpClientFactory, IAccessTokenProvider accessTokenProvider, NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
+    public CartHubBuilder(IHttpClientFactory httpClientFactory, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
     {
         client = httpClientFactory.CreateClient("AnonymousClient");
-        this.accessTokenProvider = accessTokenProvider;
+        this.authenticationStateProvider = authenticationStateProvider;
         this.navigation = navigation;
         this.indexViewModel = indexViewModel;
         this.modalViewModel = modalViewModel;
@@ -32,20 +29,7 @@ public class CartHubBuilder
 
     public void BuildCartHubConnection()
     {
-        indexViewModel.CartHub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub"), options =>
-        {
-            options.AccessTokenProvider = async () =>
-            {
-                logger.LogInformation("Authorizing hub connection...");
-                HttpResponseMessage response = await client.GetAsync("api/authentication/refresh");
-                if (response.IsSuccessStatusCode)
-                {
-                    AuthenticationResponseModel loginResponse = await response.Content.ReadFromJsonAsync<AuthenticationResponseModel>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-                    return loginResponse.AccessToken;
-                }
-                return null;
-            };
-        }).WithAutomaticReconnect().Build();
+        indexViewModel.CartHub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
@@ -56,7 +40,7 @@ public class CartHubBuilder
         indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
             logger.LogInformation("Received cart from server, items count is {cartProductsCount}. Items are:", cartProducts.Count);
-            foreach (var product in cartProducts)
+            foreach (CartProductCollectable product in cartProducts)
             {
                 logger.LogInformation("{product}", product);
             }

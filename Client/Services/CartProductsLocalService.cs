@@ -37,14 +37,6 @@ public class CartProductsLocalService : ICartProductsService
         await localStorage.RemoveItemAsync(cartProductsKey);
     }
 
-    //public async Task MarkCartProductCollected(string id)
-    //{
-    //    List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-    //    CartProductUIModel product = products.Find(x => x.Id == id);
-    //    product.IsCollected = !product.IsCollected;
-    //    await localStorage.SetItemAsync(cartProductsKey, products);
-    //}
-
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
@@ -56,13 +48,4 @@ public class CartProductsLocalService : ICartProductsService
         product.Order = cartProduct.Order;
         await localStorage.SetItemAsync(cartProductsKey, products);
     }
-
-    //public async Task CartItemMoved(CartProductUIModel cartProduct, int newIndex)
-    //{
-    //    List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-    //    CartProductUIModel product = products.Find(x => x.Id == cartProduct.Id);
-    //    products.Remove(product);
-    //    products.Insert(newIndex, product);
-    //    await localStorage.SetItemAsync(cartProductsKey, products);
-    //}
 }

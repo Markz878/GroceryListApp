@@ -1,9 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.AspNetCore;
-using GroceryListHelper.Server.Validators;
-using GroceryListHelper.Shared.Models.Authentication;
-using GroceryListHelper.Shared.Models.CartProduct;
-using GroceryListHelper.Shared.Models.StoreProduct;
+﻿using FluentValidation.AspNetCore;
 
 namespace GroceryListHelper.Server.Installers;
 

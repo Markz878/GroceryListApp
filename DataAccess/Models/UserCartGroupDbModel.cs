@@ -4,5 +4,6 @@ public class UserCartGroupDbModel
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string HostId { get; set; }
+    public string HostEmail { get; set; }
     public string JoinerEmail { get; set; }
 }

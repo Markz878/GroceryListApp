@@ -1,21 +1,12 @@
 ﻿<NavLink class="nav-link logo" href="">Grocery List Helper</NavLink>
 <AuthorizeView>
     <Authorized>
-        <NavLink class="nav-link" href="profile">Hello, @context.User.FindFirst("email").Value</NavLink>
-        <button id="logout-btn" class="nav-link" @onclick="BeginSignOut">Log out</button>
-        <NavLink id="about-link" class="nav-link" href="about">About</NavLink>
+        <strong>Hello, @context.User.Identity.Name!</strong>
+        <form method="post" action="api/Account/Logout">
+            <button class="nav-link" type="submit">Sign out</button>
+        </form>
     </Authorized>
     <NotAuthorized>
-        <NavLink id="login-link" class="nav-link" href="login">Log in</NavLink>
-        <NavLink id="register-link" class="nav-link" href="register">Register</NavLink>
+        <a class="nav-link" href="api/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
-
-@code{
-    [Inject] public ProfileService ProfileService { get; set; }
-
-    private async Task BeginSignOut()
-    {
-        await ProfileService.LogOut();
-    }
-}

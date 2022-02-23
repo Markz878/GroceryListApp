@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared;
+using GroceryListHelper.Shared.Models.CartProduct;
 using System.Net.Http.Json;
 
 namespace GroceryListHelper.Client.Services;
@@ -31,21 +31,16 @@ public class CartProductsApiService : ICartProductsService
 
     public async Task DeleteCartProduct(string id)
     {
-        HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
+        await client.DeleteAsync(uri + $"/{id}");
     }
 
     public async Task DeleteAllCartProducts()
     {
-        HttpResponseMessage response = await client.DeleteAsync(uri);
-    }
-
-    public async Task MarkCartProductCollected(string id)
-    {
-        HttpResponseMessage response = await client.PatchAsync(uri, null);
+        await client.DeleteAsync(uri);
     }
 
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
-        HttpResponseMessage response = await client.PutAsJsonAsync(uri, cartProduct);
+        await client.PutAsJsonAsync(uri, cartProduct);
     }
 }

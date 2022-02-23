@@ -1,7 +1,7 @@
 using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared;
 using GroceryListHelper.Shared.Interfaces;
+using GroceryListHelper.Shared.Models.BaseModels;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 

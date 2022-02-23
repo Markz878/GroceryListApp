@@ -1,7 +1,6 @@
 ﻿using BoDi;
 using GroceryListHelper.IntegrationTests.PageObjects;
 using Microsoft.Playwright;
-using System.Diagnostics;
 using TechTalk.SpecFlow;
 
 namespace GroceryListHelper.IntegrationTests.Hooks;
