@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace GroceryListHelper.Server;
+namespace E2ETests;
 
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -16,10 +16,10 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Claim[] claims = new[] 
-        { 
-            new Claim(ClaimTypes.Name, "test@email.com"), 
-            new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", Guid.NewGuid().ToString()) 
+        Claim[] claims = new[]
+        {
+            new Claim(ClaimTypes.Name, "Test user"),
+            new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", Guid.NewGuid().ToString())
         };
         ClaimsIdentity identity = new(claims, "Test");
         ClaimsPrincipal principal = new(identity);

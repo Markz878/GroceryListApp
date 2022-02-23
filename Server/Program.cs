@@ -44,7 +44,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<SecurityHeadersMiddleware>();
+//app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 app.MapRazorPages();
 app.MapControllers();

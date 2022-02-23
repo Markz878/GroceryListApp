@@ -4,12 +4,12 @@ using Xunit.Abstractions;
 
 namespace E2ETests.TestScenarios;
 
-[Collection(nameof(AuthorizedWebApplicationFactoryCollection))]
+[Collection(nameof(WebApplicationFactoryCollection))]
 public class ServerStorageCartTests
 {
-    private readonly AuthorizedWebApplicationFactoryFixture fixture;
+    private readonly WebApplicationFactoryFixture fixture;
 
-    public ServerStorageCartTests(AuthorizedWebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
+    public ServerStorageCartTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
