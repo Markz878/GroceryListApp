@@ -1,39 +1,39 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Net;
 
 namespace GroceryListHelper.Client.Authentication;
 
-// orig src https://github.com/berhir/BlazorWebAssemblyCookieAuth
 public class AuthorizedHandler : DelegatingHandler
 {
-    private readonly HostAuthenticationStateProvider _authenticationStateProvider;
+    private readonly AuthenticationStateProvider _authenticationStateProvider;
+    private readonly NavigationManager navigation;
+    private const string LogInPath = "api/Account/Login";
 
-    public AuthorizedHandler(HostAuthenticationStateProvider authenticationStateProvider)
+    public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation)
     {
         _authenticationStateProvider = authenticationStateProvider;
+        this.navigation = navigation;
     }
 
-    protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request,
-        CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        Microsoft.AspNetCore.Components.Authorization.AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         HttpResponseMessage responseMessage;
         if (!authState.User.Identity.IsAuthenticated)
         {
-            // if user is not authenticated, immediately set response status to 401 Unauthorized
             responseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }
         else
         {
             responseMessage = await base.SendAsync(request, cancellationToken);
         }
-
         if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
         {
-            // if server returned 401 Unauthorized, redirect to login page
-            _authenticationStateProvider.SignIn();
+            string encodedReturnUrl = Uri.EscapeDataString(navigation.Uri);
+            Uri logInUrl = navigation.ToAbsoluteUri($"{LogInPath}?returnUrl={encodedReturnUrl}");
+            navigation.NavigateTo(logInUrl.ToString(), true);
         }
-
         return responseMessage;
     }
 }

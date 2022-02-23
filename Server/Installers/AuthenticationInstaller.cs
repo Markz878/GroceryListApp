@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Web;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 
 namespace GroceryListHelper.Server.Installers;
 
@@ -7,5 +9,19 @@ public class AuthenticationInstaller : IInstaller
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
         services.AddMicrosoftIdentityWebAppAuthentication(configuration, subscribeToOpenIdConnectMiddlewareDiagnosticsEvents: true);
+        services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.Events.OnSignedIn = context =>
+            {
+                return Task.CompletedTask;
+            };
+        });
+        services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+        {
+            options.Events.OnTokenValidated = context =>
+            {
+                return Task.CompletedTask;
+            };
+        });
     }
 }

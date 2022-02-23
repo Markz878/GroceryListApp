@@ -26,7 +26,6 @@ public class Program
         builder.Services.AddOptions();
         builder.Services.AddAuthorizationCore();
         builder.Services.AddSingleton<AuthenticationStateProvider, HostAuthenticationStateProvider>();
-        builder.Services.AddSingleton(sp => (HostAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
         builder.Services.AddTransient<AuthorizedHandler>();
 
         AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));

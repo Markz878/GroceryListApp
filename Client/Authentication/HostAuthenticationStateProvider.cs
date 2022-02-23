@@ -1,29 +1,20 @@
 ﻿using GroceryListHelper.Shared.Models.Authentication;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Json;
 using System.Security.Claims;
 
 namespace GroceryListHelper.Client.Authentication;
 
-// orig src https://github.com/berhir/BlazorWebAssemblyCookieAuth
 public class HostAuthenticationStateProvider : AuthenticationStateProvider
 {
     private static readonly TimeSpan _userCacheRefreshInterval = TimeSpan.FromSeconds(60);
-
-    private const string LogInPath = "api/Account/Login";
-    private const string LogOutPath = "api/Account/Logout";
-
-    private readonly NavigationManager _navigation;
     private readonly HttpClient _client;
     private readonly ILogger<HostAuthenticationStateProvider> _logger;
-
     private DateTimeOffset _userLastCheck = DateTimeOffset.FromUnixTimeSeconds(0);
     private ClaimsPrincipal _cachedUser = new(new ClaimsIdentity());
 
-    public HostAuthenticationStateProvider(NavigationManager navigation, IHttpClientFactory clientFactory, ILogger<HostAuthenticationStateProvider> logger)
+    public HostAuthenticationStateProvider(IHttpClientFactory clientFactory, ILogger<HostAuthenticationStateProvider> logger)
     {
-        _navigation = navigation;
         _client = clientFactory.CreateClient("AnonymousClient");
         _logger = logger;
     }
@@ -31,14 +22,6 @@ public class HostAuthenticationStateProvider : AuthenticationStateProvider
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         return new AuthenticationState(await GetUser(useCache: true));
-    }
-
-    public void SignIn(string customReturnUrl = null)
-    {
-        string returnUrl = customReturnUrl != null ? _navigation.ToAbsoluteUri(customReturnUrl).ToString() : null;
-        string encodedReturnUrl = Uri.EscapeDataString(returnUrl ?? _navigation.Uri);
-        Uri logInUrl = _navigation.ToAbsoluteUri($"{LogInPath}?returnUrl={encodedReturnUrl}");
-        _navigation.NavigateTo(logInUrl.ToString(), true);
     }
 
     private async ValueTask<ClaimsPrincipal> GetUser(bool useCache = false)
@@ -75,7 +58,7 @@ public class HostAuthenticationStateProvider : AuthenticationStateProvider
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
 
-        ClaimsIdentity identity = new ClaimsIdentity(
+        ClaimsIdentity identity = new(
             nameof(HostAuthenticationStateProvider),
             user.NameClaimType,
             user.RoleClaimType);
