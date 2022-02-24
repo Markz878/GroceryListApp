@@ -36,7 +36,7 @@ public class ServerStorageCartTests
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("", 2, 2.9);
-        await page.WaitForSelectorAsync("h4:has-text(\"'Name' must not be empty.\")");
+        await page.WaitForSelectorAsync("text='Name' must not be empty.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
     }
 
@@ -46,7 +46,7 @@ public class ServerStorageCartTests
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", -2, 2.9);
-        await page.WaitForSelectorAsync("h4:has-text(\"'Amount' must be greater than or equal to '0'.\")");
+        await page.WaitForSelectorAsync("text='Amount' must be greater than or equal to '0'.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
     }
 
@@ -56,7 +56,7 @@ public class ServerStorageCartTests
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", 2, -2.9);
-        await page.WaitForSelectorAsync("h4:has-text(\"'Unit Price' must be greater than or equal to '0'.\")");
+        await page.WaitForSelectorAsync("text='Unit Price' must be greater than or equal to '0'.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
     }
 
@@ -96,7 +96,7 @@ public class ServerStorageCartTests
         {
             await page.CheckAsync($"#item-collected-checkbox-{i}");
         }
-        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("b:has-text(\"All collected!\")");
+        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("text = All collected!");
         Assert.NotNull(movedProductNameElement);
     }
 
@@ -110,7 +110,7 @@ public class ServerStorageCartTests
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
         }
-        await page.ClickAsync("button:has-text(\"Clear cart\")");
+        await page.ClickAsync("text=Clear cart");
         IElementHandle movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
         Assert.Null(movedProductNameElement);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
@@ -142,7 +142,7 @@ public class ServerStorageCartTests
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
         }
         await page.ClickAsync($"#delete-product-button-{productCount / 2}");
-        IElementHandle element = await page.QuerySelectorAsync($"td:has-text(\"Product{productCount / 2}\")");
+        IElementHandle element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
     }
 }

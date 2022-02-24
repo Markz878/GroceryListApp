@@ -88,8 +88,8 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false,
-            SlowMo = 200,
+            //Headless = false,
+            //SlowMo = 200,
         });
     }
 
