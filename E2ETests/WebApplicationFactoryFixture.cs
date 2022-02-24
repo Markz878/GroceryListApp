@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.DataAccess;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -45,9 +44,6 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
             {
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), $"TestDb");
             });
-
-            services.AddAuthentication("Test")
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
 
             using IServiceScope scope = services.BuildServiceProvider().CreateScope();
             GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();

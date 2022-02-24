@@ -13,10 +13,10 @@ internal static class PlaywrightHelpers
         });
     }
 
-    internal static async Task<IPage> GotoPage(this IBrowserContext browserContext, string path = "")
+    internal static async Task<IPage> GotoPage(this IBrowserContext browserContext, string url)
     {
         IPage page = await browserContext.NewPageAsync();
-        await page.GotoAsync(WebApplicationFactoryFixture.BaseUrl);
+        await page.GotoAsync(url);
         return page;
     }
 }

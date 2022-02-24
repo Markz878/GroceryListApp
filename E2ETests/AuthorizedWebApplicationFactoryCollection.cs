@@ -1,8 +1,8 @@
-﻿//using Xunit;
+﻿using Xunit;
 
-//namespace E2ETests;
+namespace E2ETests;
 
-//[CollectionDefinition(nameof(AuthorizedWebApplicationFactoryCollection))]
-//public class AuthorizedWebApplicationFactoryCollection : ICollectionFixture<AuthorizedWebApplicationFactoryFixture>
-//{
-//}
+[CollectionDefinition(nameof(AuthorizedWebApplicationFactoryCollection))]
+public class AuthorizedWebApplicationFactoryCollection : ICollectionFixture<AuthorizedWebApplicationFactoryFixture>
+{
+}
