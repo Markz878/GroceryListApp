@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +14,29 @@ using Xunit.Abstractions;
 
 namespace E2ETests;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
+public class AuthorizedWebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
+{
+    public AuthorizedWebApplicationFactoryFixture()
+    {
+        AddFakeAuthentication = true;
+    }
+}
+
+public class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
+{
+    public WebApplicationFactoryFixture()
+    {
+
+    }
+}
+
+public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {
     public ITestOutputHelper TestOutputHelper { get; set; }
     public IPlaywright PlaywrightInstance { get; set; }
     public IBrowser BrowserInstance { get; set; }
-    public static string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
+    public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
+    public bool AddFakeAuthentication { get; set; }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {
@@ -44,6 +62,11 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHel
             {
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), $"TestDb");
             });
+
+            if (AddFakeAuthentication)
+            {
+                services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+            }
 
             using IServiceScope scope = services.BuildServiceProvider().CreateScope();
             GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();

@@ -14,13 +14,14 @@ public class ServerStorageCartTests
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         fixture = server;
+        fixture.AddFakeAuthentication = true;
     }
 
     [Fact]
     public async Task AddValidProductToCart()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         string productName = "Maito";
         int productAmount = 2;
         double productPrice = 2.9;
@@ -33,7 +34,7 @@ public class ServerStorageCartTests
     public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("", 2, 2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Name' must not be empty.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
@@ -43,7 +44,7 @@ public class ServerStorageCartTests
     public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", -2, 2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Amount' must be greater than or equal to '0'.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -53,7 +54,7 @@ public class ServerStorageCartTests
     public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", 2, -2.9);
         await page.WaitForSelectorAsync("h4:has-text(\"'Unit Price' must be greater than or equal to '0'.\")");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -68,7 +69,7 @@ public class ServerStorageCartTests
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -86,7 +87,7 @@ public class ServerStorageCartTests
     {
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -104,7 +105,7 @@ public class ServerStorageCartTests
     {
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
@@ -120,7 +121,7 @@ public class ServerStorageCartTests
     public async Task AddProduct_EditProperties_ShouldChangeValues()
     {
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
         await page.FillAsync("#edit-item-amount-input-0", "2");
@@ -135,7 +136,7 @@ public class ServerStorageCartTests
     {
         int productCount = 3;
         await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
-        IPage page = await BrowserContext.GotoPage(AuthorizedWebApplicationFactoryFixture.BaseUrl);
+        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);

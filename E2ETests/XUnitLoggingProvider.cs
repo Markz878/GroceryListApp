@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Text;
 using Xunit.Abstractions;
 namespace E2ETests;
