@@ -6,7 +6,7 @@ namespace GroceryListHelper.Server.Installers;
 
 public class AuthenticationInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, IConfiguration configuration)
+    public void Install(IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddMicrosoftIdentityWebAppAuthentication(configuration);
         services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>

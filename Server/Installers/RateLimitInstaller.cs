@@ -4,7 +4,7 @@ namespace GroceryListHelper.Server.Installers;
 
 public class RateLimitInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, IConfiguration configuration)
+    public void Install(IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddOptions();
         services.AddMemoryCache();

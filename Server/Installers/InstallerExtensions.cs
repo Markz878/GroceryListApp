@@ -2,7 +2,7 @@
 
 public static class InstallerExtensions
 {
-    public static void InstallAssemblyServices(this IServiceCollection services, IConfiguration configuration)
+    public static void InstallAssemblyServices(this IServiceCollection services, ConfigurationManager configuration)
     {
         IEnumerable<IInstaller> installers = typeof(Program).Assembly.ExportedTypes
             .Where(x => typeof(IInstaller).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)

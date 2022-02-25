@@ -7,9 +7,8 @@ using Microsoft.Identity.Web.UI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.InstallAssemblyServices(builder.Configuration);
-if (builder.Environment.IsDevelopment()) 
+if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddControllersWithViews();// Swagger can't handle AntiForgeryToken validation
 }
@@ -40,11 +39,10 @@ app.UseHttpsRedirection();
 app.UseIpRateLimiting();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 app.MapRazorPages();
 app.MapControllers();

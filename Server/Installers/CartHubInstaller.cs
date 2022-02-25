@@ -4,7 +4,7 @@ namespace GroceryListHelper.Server.Installers;
 
 public class CartHubInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, IConfiguration configuration)
+    public void Install(IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddSignalR();//.AddAzureSignalR();
         services.AddResponseCompression(opts =>
