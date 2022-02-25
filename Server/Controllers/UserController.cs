@@ -6,7 +6,6 @@ using System.Security.Claims;
 
 namespace GroceryListHelper.Server.Controllers;
 
-// orig src https://github.com/berhir/BlazorWebAssemblyCookieAuth
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ControllerBase
