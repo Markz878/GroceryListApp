@@ -30,6 +30,7 @@ internal class DbHealthCheck : IHealthCheck
     {
         try
         {
+            logger.LogInformation("Starting health check...");
             if (!_connections.TryGetValue(connectionString, out CosmosClient cosmosClient))
             {
                 cosmosClient = new CosmosClient(connectionString);
@@ -41,7 +42,8 @@ internal class DbHealthCheck : IHealthCheck
             }
             await cosmosClient.ReadAccountAsync();
             Database database = cosmosClient.GetDatabase(databaseName);
-            await database.ReadAsync(cancellationToken: cancellationToken);
+            DatabaseResponse databaseResponse = await database.ReadAsync(cancellationToken: cancellationToken);
+            logger.LogInformation("Got database response for database id {id}.", databaseResponse.Database.Id);
             foreach (string container in containers)
             {
                 ContainerResponse containerResponse = await database.GetContainer(container).ReadContainerAsync(cancellationToken: cancellationToken);
