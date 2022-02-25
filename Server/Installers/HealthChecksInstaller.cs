@@ -18,10 +18,12 @@ internal class DbHealthCheck : IHealthCheck
     private readonly string connectionString;
     private readonly string databaseName = "GroceryListDb";
     private readonly string[] containers = new[] { "UserCartGroups", "CartProducts", "StoreProducts" };
+    private readonly ILogger<DbHealthCheck> logger;
 
-    public DbHealthCheck(IConfiguration configuration)
+    public DbHealthCheck(IConfiguration configuration, ILogger<DbHealthCheck> logger)
     {
         connectionString = configuration.GetConnectionString("Cosmos");
+        this.logger = logger;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
@@ -42,12 +44,14 @@ internal class DbHealthCheck : IHealthCheck
             await database.ReadAsync(cancellationToken: cancellationToken);
             foreach (string container in containers)
             {
-                await database.GetContainer(container).ReadContainerAsync(cancellationToken: cancellationToken);
+                ContainerResponse containerResponse = await database.GetContainer(container).ReadContainerAsync(cancellationToken: cancellationToken);
+                logger.LogInformation("Got container {container} response in health check.", container);
             }
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Health check failed.");
             return HealthCheckResult.Unhealthy("Could not connect to cosmos db and find all containers.", ex);
         }
     }
