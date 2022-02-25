@@ -17,7 +17,7 @@ internal class DbHealthCheck : IHealthCheck
     private static readonly ConcurrentDictionary<string, CosmosClient> _connections = new();
     private readonly string connectionString;
     private readonly string databaseName = "GroceryListDb";
-    private readonly string[] containers = new[] { "Users", "CartProducts", "StoreProducts" };
+    private readonly string[] containers = new[] { "UserCartGroups", "CartProducts", "StoreProducts" };
 
     public DbHealthCheck(IConfiguration configuration)
     {
