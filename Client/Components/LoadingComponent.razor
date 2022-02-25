@@ -1,6 +1,18 @@
-﻿<div class="message">@Message</div>
-<div class="loader"></div>
+﻿@if (IsLarge)
+{
+    <div class="message">@Message</div>
+    <div class="loader"></div>
+}
+else
+{
+    <div style="display: flex; justify-content: center;">
+        <div class="small-loader"></div>
+        <div class="small-message">@Message</div>
+    </div>
+}
+
 
 @code {
-    [Parameter] public string Message { get; set; } 
+    [Parameter] public string Message { get; set; }
+    [Parameter] public bool IsLarge { get; set; }
 }

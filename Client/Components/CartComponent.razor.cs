@@ -22,6 +22,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     protected override async Task OnInitializedAsync()
     {
+        ViewModel.IsBusy = true;
         ViewModel.CartProducts.Clear();
         foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
         {
@@ -32,6 +33,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             ViewModel.StoreProducts.Add(item);
         }
+        ViewModel.IsBusy = false;
     }
 
     private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
