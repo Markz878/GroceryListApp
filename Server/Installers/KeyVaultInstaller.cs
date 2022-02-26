@@ -6,6 +6,6 @@ public class KeyVaultInstaller : IInstaller
 {
     public void Install(IServiceCollection services, ConfigurationManager configuration)
     {
-        configuration.AddAzureKeyVault(new Uri("https://grocery-list-keyvault.vault.azure.net/"), new DefaultAzureCredential());
+        configuration.AddAzureKeyVault(new Uri($"https://{configuration["KeyVaultName"]}.vault.azure.net/"), new DefaultAzureCredential());
     }
 }
