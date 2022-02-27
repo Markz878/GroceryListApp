@@ -39,7 +39,16 @@ else
 app.UseHttpsRedirection();
 app.UseIpRateLimiting();
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        if (ctx.Context.Request.Path.Value?.Contains("images") == true)
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={60 * 60 * 24 * 7}");
+        }
+    }
+});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

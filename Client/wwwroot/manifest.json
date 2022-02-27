@@ -8,8 +8,8 @@
   "description": "Grocery List Helper App - Helps you remember!",
   "icons": [
     {
-      "src": "store.png",
-      "type": "image/png",
+      "src": "store.webp",
+      "type": "image/webp",
       "sizes": "512x512"
     }
   ]
