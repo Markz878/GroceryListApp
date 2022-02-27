@@ -51,7 +51,10 @@ app.MapControllers();
 //{
 //    routes.MapHub<CartHub>("/carthub");
 //});
-app.MapHub<CartHub>("/carthub");
+app.MapHub<CartHub>("/carthub", options =>
+{
+    options.WebSockets.CloseTimeout = TimeSpan.FromMinutes(30);
+});
 app.MapFallbackToPage("/_Host");
 app.MapHealthChecks("/health");
 app.Run();

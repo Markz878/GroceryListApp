@@ -9,7 +9,7 @@ public class AntiForgeryTokenInstaller : IInstaller
             options.HeaderName = "X-XSRF-TOKEN";
             options.Cookie.Name = "__Host-X-XSRF-TOKEN";
             options.Cookie.SameSite = SameSiteMode.Strict;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
     }
 }
