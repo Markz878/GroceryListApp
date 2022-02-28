@@ -8,19 +8,15 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.HelperMethods;
 
-public class CartHubBuilder
+public class CartHubBuilder : IDisposable
 {
-    private readonly HttpClient client;
-    private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
     private readonly ILogger<CartHubBuilder> logger;
 
-    public CartHubBuilder(IHttpClientFactory httpClientFactory, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
+    public CartHubBuilder(NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
     {
-        client = httpClientFactory.CreateClient("AnonymousClient");
-        this.authenticationStateProvider = authenticationStateProvider;
         this.navigation = navigation;
         this.indexViewModel = indexViewModel;
         this.modalViewModel = modalViewModel;
@@ -30,6 +26,10 @@ public class CartHubBuilder
     public void BuildCartHubConnection()
     {
         indexViewModel.CartHub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
+
+        indexViewModel.CartHub.Closed += CartHub_Closed;
+        indexViewModel.CartHub.Reconnected += CartHub_Reconnected;
+        indexViewModel.CartHub.Reconnecting += CartHub_Reconnecting;
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
@@ -84,5 +84,31 @@ public class CartHubBuilder
             logger.LogInformation("Item with id {id} was deleted.", id);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
         });
+    }
+
+    private Task CartHub_Reconnecting(Exception arg)
+    {
+        modalViewModel.Message = $"Cart sharing reconnecting, reason: {arg.Message}";
+        return Task.CompletedTask;
+    }
+
+    private Task CartHub_Reconnected(string arg)
+    {
+        modalViewModel.Message = $"Cart sharing reconnected, reason: {arg}";
+        return Task.CompletedTask;
+    }
+
+    private Task CartHub_Closed(Exception arg)
+    {
+        modalViewModel.Message = $"Cart sharing connection closed unexpectedly, reason: {arg.Message}";
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        indexViewModel.CartHub.Closed -= CartHub_Closed;
+        indexViewModel.CartHub.Reconnected -= CartHub_Reconnected;
+        indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting;
+        GC.SuppressFinalize(this);
     }
 }

@@ -49,7 +49,7 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
             if (emails.Contains(GetUserEmail(Context)))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, hostId);
-                await Clients.Caller.ReceiveCart((await db.GetCartProductsForUser(hostId)).ToList());
+                await Clients.Caller.ReceiveCart(await db.GetCartProductsForUser(hostId));
             }
             else
             {

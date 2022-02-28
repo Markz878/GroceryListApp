@@ -19,6 +19,7 @@ public class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await ViewModel?.CartHub?.StopAsync();
+        CartHubBuilder.Dispose();
         GC.SuppressFinalize(this);
     }
 }

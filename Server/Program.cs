@@ -43,10 +43,7 @@ app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
     {
-        if (ctx.Context.Request.Path.Value?.Contains("images") == true)
-        {
-            ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={60 * 60 * 24 * 7}");
-        }
+        ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={60 * 60 * 24 * 7}");
     }
 });
 app.UseRouting();
@@ -60,10 +57,7 @@ app.MapControllers();
 //{
 //    routes.MapHub<CartHub>("/carthub");
 //});
-app.MapHub<CartHub>("/carthub", options =>
-{
-    options.WebSockets.CloseTimeout = TimeSpan.FromMinutes(30);
-});
+app.MapHub<CartHub>("/carthub");
 app.MapFallbackToPage("/_Host");
 app.MapHealthChecks("/health");
 app.Run();
