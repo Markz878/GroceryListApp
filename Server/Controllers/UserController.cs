@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.Shared.Models.Authentication;
-using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -36,8 +35,8 @@ public class UserController : ControllerBase
         }
         else
         {
-            userInfo.NameClaimType = JwtClaimTypes.Name;
-            userInfo.RoleClaimType = JwtClaimTypes.Role;
+            userInfo.NameClaimType = "name";
+            userInfo.RoleClaimType = "role";
         }
 
         if (claimsPrincipal.Claims.Any())
@@ -50,10 +49,10 @@ public class UserController : ControllerBase
             }
 
             // Uncomment this code if you want to send additional claims to the client.
-            //foreach (var claim in claimsPrincipal.Claims.Except(nameClaims))
-            //{
-            //    claims.Add(new ClaimValue(claim.Type, claim.Value));
-            //}
+            foreach (var claim in claimsPrincipal.Claims.Except(nameClaims))
+            {
+                claims.Add(new ClaimValue(claim.Type, claim.Value));
+            }
 
             userInfo.Claims = claims;
         }
