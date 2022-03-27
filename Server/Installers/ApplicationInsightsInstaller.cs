@@ -2,9 +2,9 @@
 {
     public class ApplicationInsightsInstaller : IInstaller
     {
-        public void Install(IServiceCollection services, ConfigurationManager configuration)
+        public void Install(WebApplicationBuilder builder)
         {
-            services.AddApplicationInsightsTelemetry();
+            builder.Services.AddApplicationInsightsTelemetry();
         }
     }
 }

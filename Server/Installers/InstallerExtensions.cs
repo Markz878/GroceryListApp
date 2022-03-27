@@ -2,7 +2,7 @@
 
 public static class InstallerExtensions
 {
-    public static void InstallAssemblyServices(this IServiceCollection services, ConfigurationManager configuration)
+    public static void InstallAssemblyServices(this WebApplicationBuilder builder)
     {
         IEnumerable<IInstaller> installers = typeof(Program).Assembly.ExportedTypes
             .Where(x => typeof(IInstaller).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
@@ -10,7 +10,7 @@ public static class InstallerExtensions
             .Cast<IInstaller>();
         foreach (IInstaller installer in installers)
         {
-            installer.Install(services, configuration);
+            installer.Install(builder);
         }
     }
 }

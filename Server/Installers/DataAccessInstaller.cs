@@ -4,8 +4,8 @@ namespace GroceryListHelper.Server.Installers;
 
 public class DataAccessInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddDataAccessServices(configuration);
+        builder.Services.AddDataAccessServices(builder.Configuration);
     }
 }

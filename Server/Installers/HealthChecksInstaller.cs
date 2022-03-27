@@ -6,9 +6,9 @@ namespace GroceryListHelper.Server.Installers;
 
 public class HealthChecksInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddHealthChecks().AddCheck<DbHealthCheck>("db_health_check", HealthStatus.Unhealthy, new[] { "service", "database" }, TimeSpan.FromSeconds(10));
+        builder.Services.AddHealthChecks().AddCheck<DbHealthCheck>("db_health_check", HealthStatus.Unhealthy, new[] { "service", "database" }, TimeSpan.FromSeconds(10));
     }
 }
 

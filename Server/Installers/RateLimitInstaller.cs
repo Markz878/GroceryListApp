@@ -4,12 +4,12 @@ namespace GroceryListHelper.Server.Installers;
 
 public class RateLimitInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddOptions();
-        services.AddMemoryCache();
-        services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
-        services.AddInMemoryRateLimiting();
-        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        builder.Services.AddOptions();
+        builder.Services.AddMemoryCache();
+        builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+        builder.Services.AddInMemoryRateLimiting();
+        builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
     }
 }

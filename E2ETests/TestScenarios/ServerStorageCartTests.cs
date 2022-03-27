@@ -14,7 +14,6 @@ public class ServerStorageCartTests
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         fixture = server;
-        fixture.AddFakeAuthentication = true;
     }
 
     [Fact]

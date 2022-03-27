@@ -4,9 +4,9 @@ namespace GroceryListHelper.Server.Installers;
 
 public class SwaggerInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddSwaggerGen(c =>
+        builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "GroceryListHelper", Version = "v1" });
         });

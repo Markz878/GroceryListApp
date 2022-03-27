@@ -4,8 +4,11 @@ namespace GroceryListHelper.Server.Installers;
 
 public class KeyVaultInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        configuration.AddAzureKeyVault(new Uri($"https://{configuration["KeyVaultName"]}.vault.azure.net/"), new DefaultAzureCredential());
+        if (!builder.Environment.IsDevelopment())
+        {
+            builder.Configuration.AddAzureKeyVault(new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"), new DefaultAzureCredential());
+        }
     }
 }

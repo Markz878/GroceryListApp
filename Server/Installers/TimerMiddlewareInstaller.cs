@@ -4,9 +4,12 @@ namespace GroceryListHelper.Server.Installers;
 
 public class TimerMiddlewareInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddTransient<TimerMiddleware>();
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddTransient<TimerMiddleware>();
+        }
     }
 }
 

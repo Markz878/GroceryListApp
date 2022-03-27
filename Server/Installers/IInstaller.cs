@@ -2,5 +2,5 @@
 
 public interface IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration);
+    public void Install(WebApplicationBuilder builder);
 }

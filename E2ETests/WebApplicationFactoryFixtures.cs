@@ -16,17 +16,15 @@ namespace E2ETests;
 
 public class AuthorizedWebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
-    public AuthorizedWebApplicationFactoryFixture()
+    public AuthorizedWebApplicationFactoryFixture() : base(true)
     {
-        AddFakeAuthentication = true;
     }
 }
 
 public class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
-    public WebApplicationFactoryFixture()
+    public WebApplicationFactoryFixture() : base(false)
     {
-
     }
 }
 
@@ -36,7 +34,12 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
     public IPlaywright PlaywrightInstance { get; set; }
     public IBrowser BrowserInstance { get; set; }
     public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
-    public bool AddFakeAuthentication { get; set; }
+    public bool AddFakeAuthentication { get; }
+
+    public BaseWebApplicationFactoryFixture(bool addFakeAuthentication)
+    {
+        AddFakeAuthentication = addFakeAuthentication;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {

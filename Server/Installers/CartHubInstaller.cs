@@ -4,10 +4,10 @@ namespace GroceryListHelper.Server.Installers;
 
 public class CartHubInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddSignalR();//.AddAzureSignalR();
-        services.AddResponseCompression(opts =>
+        builder.Services.AddSignalR();//.AddAzureSignalR();
+        builder.Services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
         });

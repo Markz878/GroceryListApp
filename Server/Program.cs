@@ -8,15 +8,15 @@ using Microsoft.Identity.Web.UI;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
-builder.Services.InstallAssemblyServices(builder.Configuration);
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddControllersWithViews();// Swagger can't handle AntiForgeryToken validation
-}
-else
-{
+builder.InstallAssemblyServices();
+//if (builder.Environment.IsDevelopment())
+//{
+//    builder.Services.AddControllersWithViews();// Swagger can't handle AntiForgeryToken validation
+//}
+//else
+//{
     builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
-}
+//}
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();

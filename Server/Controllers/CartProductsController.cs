@@ -79,11 +79,13 @@ public class CartProductsController : ControllerBase
     }
 
     [HttpPut]
+    [ValidateAntiForgeryToken]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(CartProductCollectable updatedProduct)
     {
+        HttpContext context = HttpContext;
         try
         {
             await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);

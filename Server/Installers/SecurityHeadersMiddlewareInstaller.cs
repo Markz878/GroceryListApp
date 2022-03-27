@@ -4,9 +4,9 @@ namespace GroceryListHelper.Server.Installers;
 
 public class SecurityHeadersMiddlewareInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddSingleton<SecurityHeadersMiddleware>();
+        builder.Services.AddSingleton<SecurityHeadersMiddleware>();
     }
 }
 

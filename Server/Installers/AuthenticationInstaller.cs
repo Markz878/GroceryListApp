@@ -6,17 +6,17 @@ namespace GroceryListHelper.Server.Installers;
 
 public class AuthenticationInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddMicrosoftIdentityWebAppAuthentication(configuration);
-        services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
+        builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
         {
             options.Events.OnSignedIn = context =>
             {
                 return Task.CompletedTask;
             };
         });
-        services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+        builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
         {
             options.Events.OnTokenValidated = context =>
             {

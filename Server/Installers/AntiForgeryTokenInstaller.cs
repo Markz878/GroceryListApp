@@ -2,9 +2,9 @@
 
 public class AntiForgeryTokenInstaller : IInstaller
 {
-    public void Install(IServiceCollection services, ConfigurationManager configuration)
+    public void Install(WebApplicationBuilder builder)
     {
-        services.AddAntiforgery(options =>
+        builder.Services.AddAntiforgery(options =>
         {
             options.HeaderName = "X-XSRF-TOKEN";
             options.Cookie.Name = "__Host-X-XSRF-TOKEN";
