@@ -1,7 +1,6 @@
 using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.Playwright;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 

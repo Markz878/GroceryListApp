@@ -2,6 +2,8 @@ using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.BaseModels;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 
@@ -9,10 +11,20 @@ namespace GroceryListHelper.Client.Components;
 
 public class JoinCartComponentBase : BasePage<IndexViewModel>
 {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    [Inject] public ModalViewModel ModalViewModel { get; set; }
+
     public async Task JoinCart()
     {
         if (!string.IsNullOrEmpty(ViewModel.CartHostEmail))
         {
+            AuthenticationState authState = await AuthenticationStateTask;
+            if (ViewModel.CartHostEmail == authState.User.Identity.Name)
+            {
+                ModalViewModel.Header = "Error";
+                ModalViewModel.Message = "Can't join your own cart.";
+                return;
+            }
             ViewModel.IsPolling = true;
             await ViewModel.CartHub.StartAsync();
             HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.JoinGroup), ViewModel.CartHostEmail);

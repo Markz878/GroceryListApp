@@ -3,12 +3,11 @@ using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.HelperMethods;
 
-public class CartHubBuilder : IDisposable
+public partial class CartHubBuilder : IDisposable
 {
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
@@ -33,17 +32,13 @@ public class CartHubBuilder : IDisposable
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
-            logger.LogInformation("Received message '{message}'.", message);
+            LogGetMessage(message);
             indexViewModel.ShareCartInfo = message;
         });
 
         indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
-            logger.LogInformation("Received cart from server, items count is {cartProductsCount}. Items are:", cartProducts.Count);
-            foreach (CartProductCollectable product in cartProducts)
-            {
-                logger.LogInformation("{product}", product);
-            }
+            LogReceiveCart(cartProducts.Count);
             indexViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in cartProducts)
             {
@@ -53,7 +48,6 @@ public class CartHubBuilder : IDisposable
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.LeaveCart), async (hostEmail) =>
         {
-            logger.LogInformation("Cart session ended by host {hostEmail}.", hostEmail);
             modalViewModel.Message = $"Cart session ended by host {hostEmail}.";
             await indexViewModel.CartHub.StopAsync();
             indexViewModel.IsPolling = false;
@@ -63,13 +57,13 @@ public class CartHubBuilder : IDisposable
 
         indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
         {
-            logger.LogInformation("Received new item with id {pId} and name {pName}.", p.Id, p.Name);
+            LogItemAdded(p.Id, p.Name);
             indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice, Order = p.Order });
         });
 
         indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
-            logger.LogInformation("Item {productName} was modified.", cartProduct.Name);
+            LogItemModified(cartProduct.Id, cartProduct.Name);
             CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
             product.Amount = cartProduct.Amount;
             product.UnitPrice = cartProduct.UnitPrice;
@@ -81,7 +75,7 @@ public class CartHubBuilder : IDisposable
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
-            logger.LogInformation("Item with id {id} was deleted.", id);
+            LogItemDeleted(id);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
         });
     }
@@ -111,4 +105,19 @@ public class CartHubBuilder : IDisposable
         indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting;
         GC.SuppressFinalize(this);
     }
+
+    [LoggerMessage(0, LogLevel.Information, "Received message '{message}'")]
+    partial void LogGetMessage(string message);
+
+    [LoggerMessage(1, LogLevel.Information, "Received cart from server, items count is {cartProductsCount}.")]
+    partial void LogReceiveCart(int cartProductsCount);
+
+    [LoggerMessage(2, LogLevel.Information, "Received new item with id {id} and name {name}.")]
+    partial void LogItemAdded(string id, string name);
+
+    [LoggerMessage(3, LogLevel.Information, "Item with id {id} and name {name} was modified.")]
+    partial void LogItemModified(string id, string name);
+
+    [LoggerMessage(4, LogLevel.Information, "Item with id {id} was deleted.")]
+    partial void LogItemDeleted(string id);
 }

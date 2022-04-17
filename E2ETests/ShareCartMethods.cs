@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
-using Microsoft.Playwright;
-using System.Threading.Tasks;
+﻿using Microsoft.Playwright;
 
 namespace E2ETests;
 

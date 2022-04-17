@@ -7,6 +7,7 @@ public class ModalBase : BasePage<ModalViewModel>
 {
     public void CloseModal()
     {
-        ViewModel.Message = null;
+        ViewModel.Header = "";
+        ViewModel.Message = "";
     }
 }

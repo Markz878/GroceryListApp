@@ -21,7 +21,7 @@ public class CartProductsControllerTests
         cartProductRepository = Substitute.For<ICartProductRepository>();
         List<Claim> claims = new()
         {
-            new Claim("id", userId.ToString())
+            new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", userId)
         };
         ClaimsIdentity claimsIdentity = new(claims);
         cartProductsController = new CartProductsController(cartProductRepository)

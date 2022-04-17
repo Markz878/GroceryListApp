@@ -136,12 +136,14 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 
     private static string GetUserId(HubCallerContext context)
     {
-        return context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+        string id = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+        return id;
     }
 
     private static string GetUserEmail(HubCallerContext context)
     {
-        return context.User.FindFirst("preferred_username").Value;
+        string email = context.User.FindFirst("preferred_username").Value;
+        return email;
     }
 
     private async Task<string> GetHostId()

@@ -6,10 +6,10 @@
         <div class="modal-content" @onmousedown:stopPropagation="true">
             <div class="modal-header">
                 <span class="close" @onmousedown="CloseModal">&times;</span>
-                <h2>@ViewModel.Header</h2>
+                <h2 class="header-text">@ViewModel.Header</h2>
             </div>
             <div class="modal-body">
-                <h4>@ViewModel.Message</h4>
+                <h4 class="body-text">@ViewModel.Message</h4>
             </div>
         </div>
     </div>

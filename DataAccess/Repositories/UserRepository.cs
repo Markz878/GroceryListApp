@@ -49,7 +49,8 @@ public class UserRepository : IUserRepository
 
     public async Task RemoveCartGroup(string hostId)
     {
-        db.UserCartGroups.RemoveRange(db.UserCartGroups.Where(x => x.HostId == hostId));
+        List<UserCartGroupDbModel> groups = await db.UserCartGroups.Where(x => x.HostId == hostId).ToListAsync();
+        db.UserCartGroups.RemoveRange(groups);
         await db.SaveChangesAsync();
     }
 }

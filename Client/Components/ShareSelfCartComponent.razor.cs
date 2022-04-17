@@ -3,16 +3,27 @@ using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.BaseModels;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.Components;
 
 public class ShareSelfCartComponentBase : BasePage<IndexViewModel>
 {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    [Inject] public ModalViewModel ModalViewModel { get; set; }
     public EmailModel AllowEmail { get; set; } = new EmailModel();
 
-    public void AddUser()
+    public async Task AddUser()
     {
+        AuthenticationState authState = await AuthenticationStateTask;
+        if (AllowEmail.Email == authState.User.Identity.Name)
+        {
+            ModalViewModel.Header = "Error";
+            ModalViewModel.Message = "Can't share cart with your self.";
+            return;
+        }
         ViewModel.AllowedUsers.Add(AllowEmail.Email);
         AllowEmail = new EmailModel();
     }

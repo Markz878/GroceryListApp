@@ -16,6 +16,7 @@ public class UserController : ControllerBase
         return Ok(User.Identity.IsAuthenticated ? CreateUserInfo(User) : UserInfo.Anonymous);
     }
 
+    private static readonly string[] returnClaimTypes = new[] { "name", "preferred_username", "http://schemas.microsoft.com/identity/claims/objectidentifier" };
     private static UserInfo CreateUserInfo(ClaimsPrincipal claimsPrincipal)
     {
         if (!claimsPrincipal.Identity.IsAuthenticated)
@@ -41,20 +42,13 @@ public class UserController : ControllerBase
 
         if (claimsPrincipal.Claims.Any())
         {
-            List<ClaimValue> claims = new();
-            IEnumerable<Claim> nameClaims = claimsPrincipal.FindAll(userInfo.NameClaimType);
-            foreach (Claim claim in nameClaims)
+            List<ClaimValue> userInfoClaims = new();
+            IEnumerable<Claim> returnClaims = claimsPrincipal.FindAll(x => returnClaimTypes.Contains(x.Type));
+            foreach (Claim claim in returnClaims)
             {
-                claims.Add(new ClaimValue(userInfo.NameClaimType, claim.Value));
+                userInfoClaims.Add(new ClaimValue(claim.Type, claim.Value));
             }
-
-            // Uncomment this code if you want to send additional claims to the client.
-            foreach (var claim in claimsPrincipal.Claims.Except(nameClaims))
-            {
-                claims.Add(new ClaimValue(claim.Type, claim.Value));
-            }
-
-            userInfo.Claims = claims;
+            userInfo.Claims = userInfoClaims;
         }
 
         return userInfo;

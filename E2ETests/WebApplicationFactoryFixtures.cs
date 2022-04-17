@@ -31,14 +31,15 @@ public class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {
     public ITestOutputHelper TestOutputHelper { get; set; }
-    public IPlaywright PlaywrightInstance { get; set; }
-    public IBrowser BrowserInstance { get; set; }
+    public IPlaywright PlaywrightInstance { get; private set; }
+    public IBrowser BrowserInstance { get; private set; }
     public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
-    public bool AddFakeAuthentication { get; }
+
+    private readonly bool addFakeAuthentication;
 
     public BaseWebApplicationFactoryFixture(bool addFakeAuthentication)
     {
-        AddFakeAuthentication = addFakeAuthentication;
+        this.addFakeAuthentication = addFakeAuthentication;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
@@ -66,7 +67,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), $"TestDb");
             });
 
-            if (AddFakeAuthentication)
+            if (addFakeAuthentication)
             {
                 services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
             }
@@ -91,8 +92,8 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            //Headless = false,
-            //SlowMo = 200,
+            Headless = false,
+            SlowMo = 200,
         });
     }
 

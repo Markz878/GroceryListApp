@@ -37,7 +37,7 @@ public class StoreProductsController : ControllerBase
 
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteAll()
+    public async Task<IActionResult> DeleteAllForUser()
     {
         await db.DeleteAll(User.GetUserId());
         return NoContent();
