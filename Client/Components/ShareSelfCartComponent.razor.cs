@@ -21,7 +21,7 @@ public class ShareSelfCartComponentBase : BasePage<IndexViewModel>
         if (AllowEmail.Email == authState.User.Identity.Name)
         {
             ModalViewModel.Header = "Error";
-            ModalViewModel.Message = "Can't share cart with your self.";
+            ModalViewModel.Message = "Can't share cart with yourself.";
             return;
         }
         ViewModel.AllowedUsers.Add(AllowEmail.Email);
