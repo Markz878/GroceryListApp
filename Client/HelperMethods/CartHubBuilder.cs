@@ -73,7 +73,7 @@ public partial class CartHubBuilder : IDisposable
             indexViewModel.OnPropertyChanged();
         });
 
-        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
+        indexViewModel.CartHub.On<Guid>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
             LogItemDeleted(id);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
@@ -113,11 +113,11 @@ public partial class CartHubBuilder : IDisposable
     partial void LogReceiveCart(int cartProductsCount);
 
     [LoggerMessage(2, LogLevel.Information, "Received new item with id {id} and name {name}.")]
-    partial void LogItemAdded(string id, string name);
+    partial void LogItemAdded(Guid id, string name);
 
     [LoggerMessage(3, LogLevel.Information, "Item with id {id} and name {name} was modified.")]
-    partial void LogItemModified(string id, string name);
+    partial void LogItemModified(Guid id, string name);
 
     [LoggerMessage(4, LogLevel.Information, "Item with id {id} was deleted.")]
-    partial void LogItemDeleted(string id);
+    partial void LogItemDeleted(Guid id);
 }

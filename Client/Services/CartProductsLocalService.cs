@@ -19,7 +19,7 @@ public class CartProductsLocalService : ICartProductsService
         return await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
     }
 
-    public async Task<string> SaveCartProduct(CartProduct product)
+    public async Task<Guid> SaveCartProduct(CartProduct product)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
         CartProductUIModel newProduct = new()
@@ -34,7 +34,7 @@ public class CartProductsLocalService : ICartProductsService
         return newProduct.Id;
     }
 
-    public async Task DeleteCartProduct(string id)
+    public async Task DeleteCartProduct(Guid id)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
         products.Remove(products.Find(x => x.Id == id));

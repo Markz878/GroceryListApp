@@ -20,7 +20,7 @@ public class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public Task DeleteCartProduct(string id)
+    public Task DeleteCartProduct(Guid id)
     {
         return cartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), id);
     }
@@ -30,12 +30,12 @@ public class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public async Task<string> SaveCartProduct(CartProduct product)
+    public async Task<Guid> SaveCartProduct(CartProduct product)
     {
         HubResponse response = await cartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CartItemAdded), product);
         if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage))
         {
-            return response.SuccessMessage;
+            return Guid.Parse(response.SuccessMessage);
         }
         throw new Exception(response.ErrorMessage);
     }

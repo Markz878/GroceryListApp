@@ -2,7 +2,6 @@
 using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.CartProduct;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,27 +21,27 @@ public class CartProductsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CartProductCollectable>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CartProductCollectable>))]
     public async Task<IActionResult> GetProducts()
     {
-        IEnumerable<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(User.GetUserId());
+        List<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(User.GetUserId());
         return Ok(results);
     }
 
     [HttpGet("{productId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CartProductCollectable))]
-    public async Task<IActionResult> GetProduct(string productId)
+    public async Task<IActionResult> GetProduct(Guid productId)
     {
         CartProductCollectable results = await cartProductsRepository.GetCartProductForUser(productId, User.GetUserId());
         return Ok(results);
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Guid))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AddProduct(CartProduct product)
     {
-        string id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
+        Guid id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
         return Created($"api/cartproducts/{id}", id);
     }
 
@@ -59,7 +58,7 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteProduct(string id)
+    public async Task<IActionResult> DeleteProduct(Guid id)
     {
         try
         {

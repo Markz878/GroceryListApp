@@ -30,7 +30,7 @@ public class CartProductsServiceProvider : ICartProductsService
         await actingCartService.DeleteAllCartProducts();
     }
 
-    public async Task DeleteCartProduct(string id)
+    public async Task DeleteCartProduct(Guid id)
     {
         await SelectProvider();
         await actingCartService.DeleteCartProduct(id);
@@ -42,10 +42,10 @@ public class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.GetCartProducts();
     }
 
-    public async Task<string> SaveCartProduct(CartProduct product)
+    public async Task<Guid> SaveCartProduct(CartProduct product)
     {
         await SelectProvider();
-        string id = await actingCartService.SaveCartProduct(product);
+        Guid id = await actingCartService.SaveCartProduct(product);
         return id;
     }
 

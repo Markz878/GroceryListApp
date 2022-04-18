@@ -69,7 +69,7 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         try
         {
             string hostId = await GetHostId();
-            string id = await db.AddCartProduct(product, hostId);
+            Guid id = await db.AddCartProduct(product, hostId);
             CartProductCollectable cartProduct = new()
             {
                 Id = id,
@@ -79,7 +79,7 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
                 UnitPrice = product.UnitPrice
             };
             await Clients.OthersInGroup(hostId.ToString()).ItemAdded(cartProduct);
-            return new HubResponse() { SuccessMessage = id };
+            return new HubResponse() { SuccessMessage = id.ToString() };
         }
         catch (Exception ex)
         {
@@ -103,7 +103,7 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    public async Task<HubResponse> CartItemDeleted(string id)
+    public async Task<HubResponse> CartItemDeleted(Guid id)
     {
         try
         {

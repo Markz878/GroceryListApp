@@ -2,5 +2,5 @@
 
 public record StoreProductServerModel : StoreProductModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public Guid Id { get; set; } = Guid.NewGuid();
 }

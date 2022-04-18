@@ -14,7 +14,7 @@ public class CartProductRepository : ICartProductRepository
         this.db = db;
     }
 
-    public async Task<string> AddCartProduct(CartProduct cartProduct, string userId)
+    public async Task<Guid> AddCartProduct(CartProduct cartProduct, string userId)
     {
         CartProductDbModel cartDbProduct = cartProduct.Adapt<CartProductDbModel>();
         cartDbProduct.UserId = userId;
@@ -31,7 +31,7 @@ public class CartProductRepository : ICartProductRepository
             .ToListAsync();
     }
 
-    public async Task<CartProductCollectable> GetCartProductForUser(string productId, string userId)
+    public async Task<CartProductCollectable> GetCartProductForUser(Guid productId, string userId)
     {
         CartProductDbModel cartProduct = await db.CartProducts.FindAsync(productId, userId);
         return cartProduct.Adapt<CartProductCollectable>();
@@ -43,7 +43,7 @@ public class CartProductRepository : ICartProductRepository
         return db.SaveChangesAsync();
     }
 
-    public async Task DeleteProduct(string productId, string userId)
+    public async Task DeleteProduct(Guid productId, string userId)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         NotFoundException.ThrowIfNull(product);

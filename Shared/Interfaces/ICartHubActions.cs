@@ -10,5 +10,5 @@ public interface ICartHubActions
     Task<HubResponse> LeaveGroup();
     Task<HubResponse> CartItemAdded(CartProduct product);
     Task<HubResponse> CartItemModified(CartProductCollectable product);
-    Task<HubResponse> CartItemDeleted(string id);
+    Task<HubResponse> CartItemDeleted(Guid id);
 }

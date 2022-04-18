@@ -2,6 +2,6 @@
 
 public record CartProductCollectable : CartProduct
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public bool IsCollected { get; set; }
 }

@@ -8,6 +8,6 @@ public interface ICartHubNotifications
     Task LeaveCart(string hostEmail);
     Task ItemAdded(CartProductCollectable cartProduct);
     Task ItemModified(CartProductCollectable cartProduct);
-    Task ItemDeleted(string id);
+    Task ItemDeleted(Guid id);
     Task GetMessage(string message);
 }

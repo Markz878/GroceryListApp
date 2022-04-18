@@ -9,13 +9,13 @@ public interface ICartProductRepository
     /// Add a product to the repository.
     /// </summary>
     /// <returns>The added item's id.</returns>
-    Task<string> AddCartProduct(CartProduct cartProduct, string userId);
+    Task<Guid> AddCartProduct(CartProduct cartProduct, string userId);
     /// <summary>
     /// Delete a product from repository.
     /// </summary>
     /// <exception cref="NotFoundException"></exception>
     /// <exception cref="ForbiddenException"></exception>
-    Task DeleteProduct(string productId, string userId);
+    Task DeleteProduct(Guid productId, string userId);
     /// <summary>
     /// Get cart product list for a user.
     /// </summary>
@@ -23,7 +23,7 @@ public interface ICartProductRepository
     /// <summary>
     /// Get a cart product for a user.
     /// </summary>
-    Task<CartProductCollectable> GetCartProductForUser(string productId, string userId);
+    Task<CartProductCollectable> GetCartProductForUser(Guid productId, string userId);
     /// <summary>
     /// Clear user's cart products.
     /// </summary>
