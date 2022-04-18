@@ -21,18 +21,27 @@ public class StoreProductsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel[]))]
-    public IAsyncEnumerable<StoreProductServerModel> GetProducts()
+    public async Task<List<StoreProductServerModel>> GetProducts()
     {
-        IAsyncEnumerable<StoreProductServerModel> result = db.GetStoreProductsForUser(User.GetUserId());
+        List<StoreProductServerModel> result = await db.GetStoreProductsForUser(User.GetUserId());
         return result;
     }
 
+    [HttpGet("id")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProduct(string id)
+    {
+        StoreProductServerModel result = await db.GetStoreProductForUser(id, User.GetUserId());
+        return result == null ? NotFound() : Ok(result);
+    }
+
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(string))]
     public async Task<IActionResult> Post(StoreProductModel product)
     {
         string id = await db.AddProduct(product, User.GetUserId());
-        return Ok(id);
+        return Created($"api/storeproducts/{id}", id);
     }
 
     [HttpDelete]

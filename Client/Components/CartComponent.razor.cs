@@ -1,8 +1,11 @@
-﻿using GroceryListHelper.Client.HelperMethods;
+﻿using FluentValidation.Results;
+using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
 using GroceryListHelper.Client.ViewModels;
+using GroceryListHelper.Shared.Models.CartProduct;
+using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.AspNetCore.Components;
 using System.Collections.ObjectModel;
 
@@ -14,7 +17,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
     [Inject] public ICartProductsService CartProductsService { get; set; }
     [Inject] public IStoreProductsService StoreProductsService { get; set; }
 
-    protected CartProductUIModel newProduct = new();
+    protected CartProduct newProduct = new();
     protected CartProductUIModel editingItem;
     protected CartProductUIModel movingItem;
     protected ElementReference NewProductNameBox;
@@ -48,38 +51,46 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     public async Task AddNewProduct()
     {
-        CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
-        ModalViewModel.Message = string.Join(" ", cartProductValidator.Validate(newProduct).Errors.Select(x => x.ErrorMessage));
-        if (string.IsNullOrEmpty(ModalViewModel.Message))
-        {
-            try
-            {
-                newProduct.Order = GetNewCartProductOrder(ViewModel.CartProducts);
-                ViewModel.CartProducts.Add(newProduct);
-                CartProductUIModel p = newProduct;
-                newProduct = new CartProductUIModel();
-                await SaveCartProduct(p);
-                await SaveStoreProduct(p.Name, p.UnitPrice);
-                await NewProductNameBox.FocusAsync();
-            }
-            catch (Exception ex)
-            {
-                ModalViewModel.Header = "Error";
-                ModalViewModel.Message = ex.Message;
-            }
-        }
-    }
-
-    public async Task SaveCartProduct(CartProductUIModel product)
-    {
         try
         {
-            await CartProductsService.SaveCartProduct(product);
+            CartProduct product = newProduct with { };
+            newProduct = new();
+            await SaveCartProduct(product);
+            await SaveStoreProduct(product);
+            await NewProductNameBox.FocusAsync();
         }
         catch (Exception ex)
         {
             ModalViewModel.Header = "Error";
             ModalViewModel.Message = ex.Message;
+        }
+    }
+
+    public async Task SaveCartProduct(CartProduct product)
+    {
+        CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
+        ValidationResult validationResult = cartProductValidator.Validate(product);
+        if (!validationResult.IsValid)
+        {
+            throw new Exception(string.Join(" ", validationResult.Errors.Select(x => x.ErrorMessage)));
+        }
+        product.Order = GetNewCartProductOrder(ViewModel.CartProducts);
+        CartProductUIModel newCartProductUIModel = new()
+        {
+            Amount = product.Amount,
+            Name = product.Name,
+            Order = product.Order,
+            UnitPrice = product.UnitPrice
+        };
+        ViewModel.CartProducts.Add(newCartProductUIModel);
+        try
+        {
+            newCartProductUIModel.Id = await CartProductsService.SaveCartProduct(product);
+        }
+        catch
+        {
+            ViewModel.CartProducts.Remove(newCartProductUIModel);
+            throw;
         }
     }
 
@@ -90,15 +101,15 @@ public class CartComponentBase : BasePage<IndexViewModel>
         return CartProductsService.UpdateCartProduct(product);
     }
 
-    public async Task SaveStoreProduct(string productName, double unitPrice)
+    public async Task SaveStoreProduct(StoreProductModel storeProduct)
     {
-        StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == productName);
+        StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == storeProduct.Name);
         if (product != null)
         {
-            if (product.UnitPrice != unitPrice)
+            if (product.UnitPrice != storeProduct.UnitPrice)
             {
-                product.UnitPrice = unitPrice;
-                bool success = await StoreProductsService.UpdateStoreProductPrice(product);
+                product.UnitPrice = storeProduct.UnitPrice;
+                bool success = await StoreProductsService.UpdateStoreProduct(product);
                 if (!success)
                 {
                     ModalViewModel.Message = "Could not update store product.";
@@ -108,15 +119,25 @@ public class CartComponentBase : BasePage<IndexViewModel>
         else
         {
             StoreProductValidator storeProductValidator = new(ViewModel.StoreProducts);
-            product = new StoreProductUIModel() { Name = productName, UnitPrice = unitPrice };
-            if (storeProductValidator.Validate(product).IsValid)
+            ValidationResult validationResult = storeProductValidator.Validate(storeProduct);
+            if (!validationResult.IsValid)
             {
-                ViewModel.StoreProducts.Add(product);
-                bool success = await StoreProductsService.SaveStoreProduct(product);
-                if (!success)
+                throw new Exception(string.Join(", ", validationResult.Errors.Select(x => x.ErrorMessage)));
+            }
+            try
+            {
+                string id = await StoreProductsService.SaveStoreProduct(storeProduct);
+                product = new()
                 {
-                    ModalViewModel.Message = "Could not create store product.";
-                }
+                    Id = id,
+                    Name = storeProduct.Name,
+                    UnitPrice = storeProduct.UnitPrice
+                };
+                ViewModel.StoreProducts.Add(product);
+            }
+            catch
+            {
+                throw;
             }
         }
     }

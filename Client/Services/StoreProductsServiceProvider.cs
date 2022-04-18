@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace GroceryListHelper.Client.Services;
@@ -33,16 +34,16 @@ public class StoreProductsServiceProvider : IStoreProductsService
         return await actingStoreService.GetStoreProducts();
     }
 
-    public async Task<bool> SaveStoreProduct(StoreProductUIModel product)
+    public async Task<string> SaveStoreProduct(StoreProductModel product)
     {
         await SelectProvider();
         return await actingStoreService.SaveStoreProduct(product);
     }
 
-    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel product)
+    public async Task<bool> UpdateStoreProduct(StoreProductUIModel product)
     {
         await SelectProvider();
-        return await actingStoreService.UpdateStoreProductPrice(product);
+        return await actingStoreService.UpdateStoreProduct(product);
     }
 
     private async ValueTask SelectProvider()

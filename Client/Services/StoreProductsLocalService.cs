@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared.Models.StoreProduct;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -18,19 +19,17 @@ public class StoreProductsLocalService : IStoreProductsService
         return await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task<bool> SaveStoreProduct(StoreProductUIModel product)
+    public async Task<string> SaveStoreProduct(StoreProductModel product)
     {
-        try
+        List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
+        StoreProductUIModel newProduct = new()
         {
-            List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
-            products.Add(product);
-            await localStorage.SetItemAsync(storeProductsKey, products);
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+            Name = product.Name,
+            UnitPrice = product.UnitPrice
+        };
+        products.Add(newProduct);
+        await localStorage.SetItemAsync(storeProductsKey, products);
+        return newProduct.Id;
     }
 
     public async Task<bool> ClearStoreProducts()
@@ -46,7 +45,7 @@ public class StoreProductsLocalService : IStoreProductsService
         }
     }
 
-    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel storeProduct)
+    public async Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct)
     {
         try
         {

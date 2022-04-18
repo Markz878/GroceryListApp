@@ -69,7 +69,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
 
             if (addFakeAuthentication)
             {
-                services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+                services.AddAuthentication("FakeAuth").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("FakeAuth", null);
             }
 
             using IServiceScope scope = services.BuildServiceProvider().CreateScope();

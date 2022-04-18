@@ -1,6 +1,7 @@
 ﻿using GroceryListHelper.Client.Models;
 using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.BaseModels;
+using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.Services;
@@ -29,13 +30,14 @@ public class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public async Task SaveCartProduct(CartProductUIModel product)
+    public async Task<string> SaveCartProduct(CartProduct product)
     {
         HubResponse response = await cartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CartItemAdded), product);
         if (string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage))
         {
-            product.Id = response.SuccessMessage;
+            return response.SuccessMessage;
         }
+        throw new Exception(response.ErrorMessage);
     }
 
     public Task UpdateCartProduct(CartProductUIModel product)

@@ -18,12 +18,13 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     {
         Claim[] claims = new[]
         {
-            new Claim(ClaimTypes.Name, "Test user"),
+            new Claim("name", "Test user"),
+            new Claim("preferred_username", "test_user@email.com"),
             new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", Guid.NewGuid().ToString())
         };
-        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsIdentity identity = new(claims, "FakeAuth", "preferred_username", "role");
         ClaimsPrincipal principal = new(identity);
-        AuthenticationTicket ticket = new(principal, "Test");
+        AuthenticationTicket ticket = new(principal, "FakeAuth");
 
         AuthenticateResult result = AuthenticateResult.Success(ticket);
 

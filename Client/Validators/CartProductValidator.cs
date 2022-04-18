@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared.Models.CartProduct;
 
 namespace GroceryListHelper.Client.Validators;
 
-public class CartProductValidator : AbstractValidator<CartProductUIModel>
+public class CartProductValidator : AbstractValidator<CartProduct>
 {
     private readonly IEnumerable<CartProductUIModel> productList;
 
@@ -15,9 +16,9 @@ public class CartProductValidator : AbstractValidator<CartProductUIModel>
         RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
     }
 
-    private bool BeUnique(CartProductUIModel product, string name)
+    private bool BeUnique(CartProduct product, string name)
     {
-        foreach (CartProductUIModel item in productList)
+        foreach (CartProduct item in productList)
         {
             if (product.Equals(item))
             {

@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared.Models.CartProduct;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -18,11 +19,19 @@ public class CartProductsLocalService : ICartProductsService
         return await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
     }
 
-    public async Task SaveCartProduct(CartProductUIModel product)
+    public async Task<string> SaveCartProduct(CartProduct product)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
-        products.Add(product);
+        CartProductUIModel newProduct = new()
+        {
+            Amount = product.Amount,
+            Name = product.Name,
+            Order = product.Order,
+            UnitPrice = product.UnitPrice
+        };
+        products.Add(newProduct);
         await localStorage.SetItemAsync(cartProductsKey, products);
+        return newProduct.Id;
     }
 
     public async Task DeleteCartProduct(string id)

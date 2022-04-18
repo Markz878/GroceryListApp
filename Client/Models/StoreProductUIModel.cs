@@ -4,5 +4,5 @@ namespace GroceryListHelper.Client.Models;
 
 public record StoreProductUIModel : StoreProductModel
 {
-    public string Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 }

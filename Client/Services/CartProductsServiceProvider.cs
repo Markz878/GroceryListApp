@@ -2,6 +2,7 @@
 using GroceryListHelper.Client.Authentication;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Client.ViewModels;
+using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace GroceryListHelper.Client.Services;
@@ -41,10 +42,11 @@ public class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.GetCartProducts();
     }
 
-    public async Task SaveCartProduct(CartProductUIModel product)
+    public async Task<string> SaveCartProduct(CartProduct product)
     {
         await SelectProvider();
-        await actingCartService.SaveCartProduct(product);
+        string id = await actingCartService.SaveCartProduct(product);
+        return id;
     }
 
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)

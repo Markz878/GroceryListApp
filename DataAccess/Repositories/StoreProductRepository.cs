@@ -13,14 +13,25 @@ public class StoreProductRepository : IStoreProductRepository
         this.db = db;
     }
 
-    public IAsyncEnumerable<StoreProductServerModel> GetStoreProductsForUser(string userId)
+    public async Task<StoreProductServerModel> GetStoreProductForUser(string productId, string userId)
     {
-        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
+        StoreProductDbModel dbProduct = await db.StoreProducts.SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
+        return new StoreProductServerModel()
+        {
+            Id = dbProduct.Id,
+            Name = dbProduct.Name,
+            UnitPrice = dbProduct.UnitPrice,
+        };
+    }
+
+    public async Task<List<StoreProductServerModel>> GetStoreProductsForUser(string userId)
+    {
+        return await db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
         {
             Id = x.Id,
             Name = x.Name,
             UnitPrice = x.UnitPrice,
-        }).AsAsyncEnumerable();
+        }).ToListAsync();
     }
 
     public async Task<string> AddProduct(StoreProductModel product, string userId)

@@ -38,14 +38,12 @@ public class CartProductsController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CartProductCollectable))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AddProduct(CartProduct product)
     {
         string id = await cartProductsRepository.AddCartProduct(product, User.GetUserId());
-        CartProductCollectable createdProduct = product.Adapt<CartProductCollectable>();
-        createdProduct.Id = id;
-        return Created($"api/cartproducts/productId={id}", createdProduct);
+        return Created($"api/cartproducts/{id}", id);
     }
 
     [HttpDelete]

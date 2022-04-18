@@ -64,14 +64,22 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    public async Task<HubResponse> CartItemAdded(CartProductCollectable product)
+    public async Task<HubResponse> CartItemAdded(CartProduct product)
     {
         try
         {
             string hostId = await GetHostId();
-            product.Id = await db.AddCartProduct(product, hostId);
-            await Clients.OthersInGroup(hostId.ToString()).ItemAdded(product);
-            return new HubResponse() { SuccessMessage = product.Id };
+            string id = await db.AddCartProduct(product, hostId);
+            CartProductCollectable cartProduct = new()
+            {
+                Id = id,
+                Amount = product.Amount,
+                Name = product.Name,
+                Order = product.Order,
+                UnitPrice = product.UnitPrice
+            };
+            await Clients.OthersInGroup(hostId.ToString()).ItemAdded(cartProduct);
+            return new HubResponse() { SuccessMessage = id };
         }
         catch (Exception ex)
         {

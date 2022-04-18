@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Client.Models;
+using GroceryListHelper.Shared.Models.StoreProduct;
 using System.Net.Http.Json;
 
 namespace GroceryListHelper.Client.Services;
@@ -18,18 +19,15 @@ public class StoreProductsAPIService : IStoreProductsService
         return await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task<bool> SaveStoreProduct(StoreProductUIModel product)
+    public async Task<string> SaveStoreProduct(StoreProductModel product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         if (response.IsSuccessStatusCode)
         {
-            product.Id = await response.Content.ReadAsStringAsync();
-            return response.IsSuccessStatusCode;
+            string id = await response.Content.ReadAsStringAsync();
+            return id;
         }
-        else
-        {
-            return response.IsSuccessStatusCode;
-        }
+        throw new Exception("Could not save store product.");
     }
 
     public async Task<bool> ClearStoreProducts()
@@ -38,7 +36,7 @@ public class StoreProductsAPIService : IStoreProductsService
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> UpdateStoreProductPrice(StoreProductUIModel storeProduct)
+    public async Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct)
     {
         HttpResponseMessage response = await client.PutAsJsonAsync(uri, storeProduct);
         return response.IsSuccessStatusCode;
