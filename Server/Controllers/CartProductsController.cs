@@ -1,6 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,19 +59,8 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
-        try
-        {
-            await cartProductsRepository.DeleteProduct(id, User.GetUserId());
-            return NoContent();
-        }
-        catch (ForbiddenException)
-        {
-            return Forbid();
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        await cartProductsRepository.DeleteProduct(id, User.GetUserId());
+        return NoContent();
     }
 
     [HttpPut]
@@ -82,18 +70,7 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(CartProductCollectable updatedProduct)
     {
-        try
-        {
-            await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);
-            return NoContent();
-        }
-        catch (ForbiddenException)
-        {
-            return Forbid();
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);
+        return NoContent();
     }
 }

@@ -57,8 +57,8 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool success = await db.DeleteItem(id, User.GetUserId());
-        return success ? NoContent() : NotFound();
+        await db.DeleteItem(id, User.GetUserId());
+        return NoContent();
     }
 
     [HttpPut]
@@ -66,7 +66,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdatePrice(StoreProductServerModel storeProduct)
     {
-        bool success = await db.UpdatePrice(storeProduct.Id, User.GetUserId(), storeProduct.UnitPrice);
-        return success ? NoContent() : NotFound();
+        await db.UpdatePrice(storeProduct.Id, User.GetUserId(), storeProduct.UnitPrice);
+        return NoContent();
     }
 }

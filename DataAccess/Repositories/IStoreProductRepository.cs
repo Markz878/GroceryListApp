@@ -8,6 +8,6 @@ public interface IStoreProductRepository
     Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId);
     Task<Guid> AddProduct(StoreProductModel product, Guid userId);
     Task DeleteAll(Guid userId);
-    Task<bool> DeleteItem(Guid productId, Guid userId);
-    Task<bool> UpdatePrice(Guid productId, Guid userId, double price);
+    Task DeleteItem(Guid productId, Guid userId);
+    Task UpdatePrice(Guid productId, Guid userId, double price);
 }

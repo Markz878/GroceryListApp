@@ -1,5 +1,6 @@
 ﻿using AspNetCoreRateLimit;
 using GroceryListHelper.DataAccess.HelperMethods;
+using GroceryListHelper.Server.HelperMethods;
 using GroceryListHelper.Server.Hubs;
 using GroceryListHelper.Server.Installers;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,16 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 builder.InstallAssemblyServices();
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddControllersWithViews();// Swagger can't handle AntiForgeryToken validation
+    builder.Services.AddControllersWithViews(options => 
+        options.Filters.Add(new ServiceExceptionFilter()));
 }
 else
 {
-    builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+    builder.Services.AddControllersWithViews(options =>
+    {
+        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        options.Filters.Add(new ServiceExceptionFilter());
+    });
 }
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 

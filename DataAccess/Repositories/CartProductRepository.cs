@@ -25,7 +25,8 @@ public class CartProductRepository : ICartProductRepository
 
     public Task<List<CartProductCollectable>> GetCartProductsForUser(Guid userId)
     {
-        return db.CartProducts.AsNoTracking()
+        return db.CartProducts
+            .AsNoTracking()
             .Where(x => x.UserId == userId)
             .Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice, Order = x.Order })
             .ToListAsync();

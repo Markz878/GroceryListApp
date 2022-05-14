@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Models;
+using GroceryListHelper.Shared.Exceptions;
 using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,25 +49,21 @@ public class StoreProductRepository : IStoreProductRepository
         return db.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteItem(Guid productId, Guid userId)
+    public async Task DeleteItem(Guid productId, Guid userId)
     {
         StoreProductDbModel product = db.StoreProducts.Find(productId, userId);
-        if (product == null || product.UserId != userId)
-        {
-            return false;
-        }
+        NotFoundException.ThrowIfNull(product);
+        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         db.StoreProducts.Remove(product);
-        return await db.SaveChangesAsync() > 0;
+        await db.SaveChangesAsync();
     }
 
-    public async Task<bool> UpdatePrice(Guid productId, Guid userId, double price)
+    public async Task UpdatePrice(Guid productId, Guid userId, double price)
     {
         StoreProductDbModel product = await db.StoreProducts.FindAsync(productId, userId);
-        if (product == null || product.UserId != userId)
-        {
-            return false;
-        }
+        NotFoundException.ThrowIfNull(product);
+        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         product.UnitPrice = price;
-        return await db.SaveChangesAsync() > 0;
+        await db.SaveChangesAsync();
     }
 }
