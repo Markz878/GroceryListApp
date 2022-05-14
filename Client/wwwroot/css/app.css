@@ -1,6 +1,7 @@
 ﻿:root {
     --disabled-btn-background: #D2D2D2;
     --disabled-btn-color: #ABABAB;
+    --content-max-width: 60rem;
 }
 
 html, body {
@@ -21,21 +22,35 @@ html, body {
     background-image: url("../store-transparent.webp");
 }
 
+#top-row {
+    display: flex;
+    justify-content: center;
+    background-color: whitesmoke;
+    border-bottom: 1px solid #d6d5d5;
+    height: 3.5rem;
+}
+
+#top-row-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--content-max-width);
+    width: 100%;
+}
+
 #content {
-    padding: 1rem;
+    padding-bottom: 0.1rem;
     margin: auto;
-    max-width: 60rem;
+    max-width: var(--content-max-width);
     background-color: white;
     opacity: 0.95;
 }
 
-#top-row {
+#logo {
+    margin-left: 1rem;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    background-color: whitesmoke;
-    border-bottom: 1px solid #d6d5d5;
-    height: 3.5rem;
 }
 
 .mt-0 {

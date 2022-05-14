@@ -1,5 +1,5 @@
 ﻿.share-cart-option {
-    margin: var(--left-margin);
+    margin: 1rem;
     width: max(100%, 650px);
     display: flex;
     align-items: center;
