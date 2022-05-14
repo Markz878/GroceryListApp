@@ -4,8 +4,10 @@ namespace GroceryListHelper.Server.HelperMethods;
 
 public static class ControllerHelpers
 {
-    public static string GetUserId(this ClaimsPrincipal user)
+    public static Guid GetUserId(this ClaimsPrincipal user)
     {
-        return user.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
+        string textId = user.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
+        Guid guidId = Guid.Parse(textId.Trim('"'));
+        return guidId;
     }
 }

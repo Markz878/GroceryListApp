@@ -4,5 +4,5 @@ namespace GroceryListHelper.DataAccess.Models;
 
 public record CartProductDbModel : CartProductCollectable
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
 }

@@ -82,7 +82,6 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(CartProductCollectable updatedProduct)
     {
-        HttpContext context = HttpContext;
         try
         {
             await cartProductsRepository.UpdateProduct(User.GetUserId(), updatedProduct);

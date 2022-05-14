@@ -15,19 +15,19 @@ public class UserRepository : IUserRepository
         this.logger = logger;
     }
 
-    public async Task<string> GetHostIdFromHostEmail(string hostEmail)
+    public async Task<Guid> GetHostIdFromHostEmail(string hostEmail)
     {
-        string hostId = await db.UserCartGroups.AsNoTracking().Where(u => u.HostEmail.Equals(hostEmail)).Select(x => x.HostId).FirstOrDefaultAsync();
+        Guid hostId = await db.UserCartGroups.AsNoTracking().Where(u => u.HostEmail.Equals(hostEmail)).Select(x => x.HostId).FirstOrDefaultAsync();
         return hostId;
     }
 
-    public async Task<List<string>> GetCartHostAllowedEmails(string hostId)
+    public async Task<List<string>> GetCartHostAllowedEmails(Guid hostId)
     {
         List<string> result = await db.UserCartGroups.AsNoTracking().Where(x => x.HostId == hostId).Select(x => x.JoinerEmail).ToListAsync();
         return result;
     }
 
-    public async Task CreateGroupAllowedEmails(string hostId, string hostEmail, List<string> allowedUserEmails)
+    public async Task CreateGroupAllowedEmails(Guid hostId, string hostEmail, List<string> allowedUserEmails)
     {
         foreach (string userEmail in allowedUserEmails)
         {
@@ -41,13 +41,13 @@ public class UserRepository : IUserRepository
         await db.SaveChangesAsync();
     }
 
-    public async Task<string> GetUsersCartHostId(string email)
+    public async Task<Guid> GetUsersCartHostId(string email)
     {
-        string hostId = await db.UserCartGroups.AsNoTracking().Where(x => x.JoinerEmail == email).Select(x => x.HostId).FirstOrDefaultAsync();
+        Guid hostId = await db.UserCartGroups.AsNoTracking().Where(x => x.JoinerEmail == email).Select(x => x.HostId).FirstOrDefaultAsync();
         return hostId;
     }
 
-    public async Task RemoveCartGroup(string hostId)
+    public async Task RemoveCartGroup(Guid hostId)
     {
         List<UserCartGroupDbModel> groups = await db.UserCartGroups.Where(x => x.HostId == hostId).ToListAsync();
         db.UserCartGroups.RemoveRange(groups);

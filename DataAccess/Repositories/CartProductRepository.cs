@@ -14,7 +14,7 @@ public class CartProductRepository : ICartProductRepository
         this.db = db;
     }
 
-    public async Task<Guid> AddCartProduct(CartProduct cartProduct, string userId)
+    public async Task<Guid> AddCartProduct(CartProduct cartProduct, Guid userId)
     {
         CartProductDbModel cartDbProduct = cartProduct.Adapt<CartProductDbModel>();
         cartDbProduct.UserId = userId;
@@ -23,7 +23,7 @@ public class CartProductRepository : ICartProductRepository
         return cartDbProduct.Id;
     }
 
-    public Task<List<CartProductCollectable>> GetCartProductsForUser(string userId)
+    public Task<List<CartProductCollectable>> GetCartProductsForUser(Guid userId)
     {
         return db.CartProducts.AsNoTracking()
             .Where(x => x.UserId == userId)
@@ -31,19 +31,19 @@ public class CartProductRepository : ICartProductRepository
             .ToListAsync();
     }
 
-    public async Task<CartProductCollectable> GetCartProductForUser(Guid productId, string userId)
+    public async Task<CartProductCollectable> GetCartProductForUser(Guid productId, Guid userId)
     {
         CartProductDbModel cartProduct = await db.CartProducts.FindAsync(productId, userId);
         return cartProduct.Adapt<CartProductCollectable>();
     }
 
-    public Task ClearProductsForUser(string userId)
+    public Task ClearProductsForUser(Guid userId)
     {
         db.CartProducts.RemoveRange(db.CartProducts.Where(x => x.UserId == userId));
         return db.SaveChangesAsync();
     }
 
-    public async Task DeleteProduct(Guid productId, string userId)
+    public async Task DeleteProduct(Guid productId, Guid userId)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
         NotFoundException.ThrowIfNull(product);
@@ -52,7 +52,7 @@ public class CartProductRepository : ICartProductRepository
         await db.SaveChangesAsync();
     }
 
-    public async Task UpdateProduct(string userId, CartProductCollectable updatedProduct)
+    public async Task UpdateProduct(Guid userId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
         NotFoundException.ThrowIfNull(product);

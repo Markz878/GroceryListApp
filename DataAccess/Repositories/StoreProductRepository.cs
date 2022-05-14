@@ -13,7 +13,7 @@ public class StoreProductRepository : IStoreProductRepository
         this.db = db;
     }
 
-    public async Task<StoreProductServerModel> GetStoreProductForUser(Guid productId, string userId)
+    public async Task<StoreProductServerModel> GetStoreProductForUser(Guid productId, Guid userId)
     {
         StoreProductDbModel dbProduct = await db.StoreProducts.SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
         return new StoreProductServerModel()
@@ -24,7 +24,7 @@ public class StoreProductRepository : IStoreProductRepository
         };
     }
 
-    public async Task<List<StoreProductServerModel>> GetStoreProductsForUser(string userId)
+    public async Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId)
     {
         return await db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
         {
@@ -34,7 +34,7 @@ public class StoreProductRepository : IStoreProductRepository
         }).ToListAsync();
     }
 
-    public async Task<Guid> AddProduct(StoreProductModel product, string userId)
+    public async Task<Guid> AddProduct(StoreProductModel product, Guid userId)
     {
         StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, UserId = userId };
         db.StoreProducts.Add(storeProduct);
@@ -42,13 +42,13 @@ public class StoreProductRepository : IStoreProductRepository
         return storeProduct.Id;
     }
 
-    public Task DeleteAll(string userId)
+    public Task DeleteAll(Guid userId)
     {
         db.StoreProducts.RemoveRange(db.StoreProducts.Where(x => x.UserId == userId));
         return db.SaveChangesAsync();
     }
 
-    public async Task<bool> DeleteItem(Guid productId, string userId)
+    public async Task<bool> DeleteItem(Guid productId, Guid userId)
     {
         StoreProductDbModel product = db.StoreProducts.Find(productId, userId);
         if (product == null || product.UserId != userId)
@@ -59,7 +59,7 @@ public class StoreProductRepository : IStoreProductRepository
         return await db.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> UpdatePrice(Guid productId, string userId, double price)
+    public async Task<bool> UpdatePrice(Guid productId, Guid userId, double price)
     {
         StoreProductDbModel product = await db.StoreProducts.FindAsync(productId, userId);
         if (product == null || product.UserId != userId)
