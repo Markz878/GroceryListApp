@@ -1,6 +1,3 @@
-using GroceryListHelper.Client.HelperMethods;
-using GroceryListHelper.Client.ViewModels;
-
 namespace GroceryListHelper.Client.Components;
 
 public class ChooseCartShareOptionComponentBase : BasePage<IndexViewModel>

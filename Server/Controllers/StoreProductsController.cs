@@ -1,9 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.DataAccess.Repositories;
-using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Shared.Models.StoreProduct;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GroceryListHelper.Server.Controllers;
 
@@ -23,7 +19,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel[]))]
     public async Task<List<StoreProductServerModel>> GetProducts()
     {
-        List<StoreProductServerModel> result = await db.GetStoreProductsForUser(User.GetUserId());
+        List<StoreProductServerModel> result = await db.GetStoreProductsForUser(User.GetUserId().GetValueOrDefault());
         return result;
     }
 
@@ -32,7 +28,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProduct(Guid id)
     {
-        StoreProductServerModel result = await db.GetStoreProductForUser(id, User.GetUserId());
+        StoreProductServerModel result = await db.GetStoreProductForUser(id, User.GetUserId().GetValueOrDefault());
         return result == null ? NotFound() : Ok(result);
     }
 
@@ -40,7 +36,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Guid))]
     public async Task<IActionResult> Post(StoreProductModel product)
     {
-        Guid id = await db.AddProduct(product, User.GetUserId());
+        Guid id = await db.AddProduct(product, User.GetUserId().GetValueOrDefault());
         return Created($"api/storeproducts/{id}", id);
     }
 
@@ -48,7 +44,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteAllForUser()
     {
-        await db.DeleteAll(User.GetUserId());
+        await db.DeleteAll(User.GetUserId().GetValueOrDefault());
         return NoContent();
     }
 
@@ -57,7 +53,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await db.DeleteItem(id, User.GetUserId());
+        await db.DeleteItem(id, User.GetUserId().GetValueOrDefault());
         return NoContent();
     }
 
@@ -66,7 +62,7 @@ public class StoreProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdatePrice(StoreProductServerModel storeProduct)
     {
-        await db.UpdatePrice(storeProduct.Id, User.GetUserId(), storeProduct.UnitPrice);
+        await db.UpdatePrice(storeProduct.Id, User.GetUserId().GetValueOrDefault(), storeProduct.UnitPrice);
         return NoContent();
     }
 }

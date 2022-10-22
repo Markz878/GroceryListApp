@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.IntegrationTests.Features;
+﻿namespace GroceryListHelper.IntegrationTests.Models;
 
 internal class CartProductCollectable
 {

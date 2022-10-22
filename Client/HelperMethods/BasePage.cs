@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace GroceryListHelper.Client.HelperMethods;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseViewModel
 {
-    [Inject] public T ViewModel { get; set; }
+    [Inject] public T ViewModel { get; set; } = default!;
 
     protected override void OnInitialized()
     {

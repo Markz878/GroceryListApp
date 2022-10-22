@@ -9,7 +9,7 @@ namespace GroceryListHelper.IntegrationTests.Hooks;
 public class TestHook
 {
     //private const string apiContainerName = "grocerylisthelper";
-    private static readonly WebApplicationFactoryFixture webApplicationFactoryFixture = new WebApplicationFactoryFixture();
+    private static readonly WebApplicationFactoryFixture webApplicationFactoryFixture = new();
 
     [BeforeTestRun]
     public static async Task StartSiteInDocker()

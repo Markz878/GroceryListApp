@@ -1,19 +1,16 @@
 ﻿using GroceryListHelper.Shared.Models.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Json;
-using System.Security.Claims;
 
 namespace GroceryListHelper.Client.Authentication;
 
-public class HostAuthenticationStateProvider : AuthenticationStateProvider
+public class ClientAuthenticationStateProvider : AuthenticationStateProvider
 {
     private static readonly TimeSpan _userCacheRefreshInterval = TimeSpan.FromSeconds(60);
     private readonly HttpClient _client;
-    private readonly ILogger<HostAuthenticationStateProvider> _logger;
+    private readonly ILogger<ClientAuthenticationStateProvider> _logger;
     private DateTimeOffset _userLastCheck = DateTimeOffset.FromUnixTimeSeconds(0);
     private ClaimsPrincipal _cachedUser = new(new ClaimsIdentity());
 
-    public HostAuthenticationStateProvider(IHttpClientFactory clientFactory, ILogger<HostAuthenticationStateProvider> logger)
+    public ClientAuthenticationStateProvider(IHttpClientFactory clientFactory, ILogger<ClientAuthenticationStateProvider> logger)
     {
         _client = clientFactory.CreateClient("AnonymousClient");
         _logger = logger;
@@ -42,7 +39,7 @@ public class HostAuthenticationStateProvider : AuthenticationStateProvider
 
     private async Task<ClaimsPrincipal> FetchUser()
     {
-        UserInfo user = null;
+        UserInfo? user = null;
 
         try
         {
@@ -59,7 +56,7 @@ public class HostAuthenticationStateProvider : AuthenticationStateProvider
         }
 
         ClaimsIdentity identity = new(
-            nameof(HostAuthenticationStateProvider),
+            nameof(ClientAuthenticationStateProvider),
             user.NameClaimType,
             user.RoleClaimType);
 

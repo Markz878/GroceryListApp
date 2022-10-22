@@ -1,23 +1,17 @@
-using GroceryListHelper.Client.HelperMethods;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.Authentication;
 using GroceryListHelper.Shared.Models.BaseModels;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GroceryListHelper.Client.Components;
 
 public class ShareSelfCartComponentBase : BasePage<IndexViewModel>
 {
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
-    [Inject] public ModalViewModel ModalViewModel { get; set; }
+    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+    [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
     public EmailModel AllowEmail { get; set; } = new EmailModel();
 
     public async Task AddUser()
     {
-        AuthenticationState authState = await AuthenticationStateTask;
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (AllowEmail.Email == authState.User.Identity.Name)
         {
             ModalViewModel.Header = "Error";

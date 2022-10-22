@@ -25,11 +25,7 @@ public class SortOrderMethods
             double nextLargestOrder = GetNextSmallerOrder(orders.Where(x => x != movingOrder), movingToOrder);
             result = (nextLargestOrder + movingToOrder) / 2;
         }
-        if (result == -1)
-        {
-            throw new InvalidOperationException("Could not get new order");
-        }
-        return result;
+        return result == -1 ? throw new InvalidOperationException("Could not get new order") : result;
     }
 
     private static double GetNextLargerOrder(IEnumerable<double> enumerable, double movingToOrder)

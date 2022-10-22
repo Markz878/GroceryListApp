@@ -1,6 +1,4 @@
-﻿using AspNetCoreRateLimit;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class RateLimitInstaller : IInstaller
 {

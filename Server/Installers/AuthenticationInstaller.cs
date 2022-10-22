@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web;
+﻿using Microsoft.Identity.Web;
 
 namespace GroceryListHelper.Server.Installers;
 
@@ -9,6 +7,8 @@ public class AuthenticationInstaller : IInstaller
     public void Install(WebApplicationBuilder builder)
     {
         builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
+        builder.Services.AddScoped<AuthenticationStateProvider, HostAuthenticationStateProvider>();
+
         //builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
         //{
         //    options.Events.OnSignedIn = context =>

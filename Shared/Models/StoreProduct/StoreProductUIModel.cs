@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.StoreProduct;
-
-namespace GroceryListHelper.Client.Models;
+﻿namespace GroceryListHelper.Shared.Models.StoreProduct;
 
 public record StoreProductUIModel : StoreProductModel
 {

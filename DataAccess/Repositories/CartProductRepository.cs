@@ -26,7 +26,6 @@ public class CartProductRepository : ICartProductRepository
     public Task<List<CartProductCollectable>> GetCartProductsForUser(Guid userId)
     {
         return db.CartProducts
-            .AsNoTracking()
             .Where(x => x.UserId == userId)
             .Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Id = x.Id, UnitPrice = x.UnitPrice, Order = x.Order })
             .ToListAsync();
@@ -34,7 +33,8 @@ public class CartProductRepository : ICartProductRepository
 
     public async Task<CartProductCollectable> GetCartProductForUser(Guid productId, Guid userId)
     {
-        CartProductDbModel cartProduct = await db.CartProducts.FindAsync(productId, userId);
+        CartProductDbModel? cartProduct = await db.CartProducts.FindAsync(productId, userId);
+        NotFoundException.ThrowIfNull(cartProduct);
         return cartProduct.Adapt<CartProductCollectable>();
     }
 
@@ -46,7 +46,7 @@ public class CartProductRepository : ICartProductRepository
 
     public async Task DeleteProduct(Guid productId, Guid userId)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(productId, userId);
+        CartProductDbModel? product = await db.CartProducts.FindAsync(productId, userId);
         NotFoundException.ThrowIfNull(product);
         ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         db.CartProducts.Remove(product);
@@ -55,7 +55,7 @@ public class CartProductRepository : ICartProductRepository
 
     public async Task UpdateProduct(Guid userId, CartProductCollectable updatedProduct)
     {
-        CartProductDbModel product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
+        CartProductDbModel? product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
         NotFoundException.ThrowIfNull(product);
         ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         updatedProduct.Adapt(product);

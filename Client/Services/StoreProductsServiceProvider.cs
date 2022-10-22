@@ -1,10 +1,4 @@
-﻿using Blazored.LocalStorage;
-using GroceryListHelper.Client.Authentication;
-using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.StoreProduct;
-using Microsoft.AspNetCore.Components.Authorization;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class StoreProductsServiceProvider : IStoreProductsService
 {
@@ -12,8 +6,7 @@ public class StoreProductsServiceProvider : IStoreProductsService
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
     private bool isAuthenticated;
-    private bool isInitialized;
-    private IStoreProductsService actingStoreService;
+    private IStoreProductsService? actingStoreService;
 
     public StoreProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider)
     {
@@ -46,13 +39,13 @@ public class StoreProductsServiceProvider : IStoreProductsService
         return await actingStoreService.UpdateStoreProduct(product);
     }
 
+    [MemberNotNull(nameof(actingStoreService))]
     private async ValueTask SelectProvider()
     {
-        if (!isInitialized || actingStoreService is null)
+        if (actingStoreService is null)
         {
             isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
             actingStoreService = isAuthenticated ? new StoreProductsAPIService(httpClientFactory) : new StoreProductsLocalService(localStorage);
-            isInitialized = true;
         }
     }
 }

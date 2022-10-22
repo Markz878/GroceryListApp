@@ -1,8 +1,4 @@
-﻿using FluentValidation;
-using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.CartProduct;
-
-namespace GroceryListHelper.Client.Validators;
+﻿namespace GroceryListHelper.Client.Validators;
 
 public class CartProductValidator : AbstractValidator<CartProduct>
 {

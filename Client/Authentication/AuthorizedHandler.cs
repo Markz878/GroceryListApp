@@ -1,34 +1,22 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using System.Net;
+﻿using System.Net;
 
 namespace GroceryListHelper.Client.Authentication;
 
 public class AuthorizedHandler : DelegatingHandler
 {
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly IJSRuntime js;
+    private readonly AuthenticationStateProvider authenticationStateProvider;
 
-    public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider, IJSRuntime js)
+    public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider)
     {
-        _authenticationStateProvider = authenticationStateProvider;
-        this.js = js;
+        this.authenticationStateProvider = authenticationStateProvider;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        HttpResponseMessage responseMessage;
-        if (!authState.User.Identity.IsAuthenticated)
-        {
-            responseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-        }
-        else
-        {
-            string token = await js.InvokeAsync<string>("getAntiForgeryToken");
-            request.Headers.Add("X-XSRF-TOKEN", token);
-            responseMessage = await base.SendAsync(request, cancellationToken);
-        }
+        AuthenticationState authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        HttpResponseMessage responseMessage = !authState.User.Identity.IsAuthenticated
+            ? new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            : await base.SendAsync(request, cancellationToken);
         return responseMessage;
     }
 }

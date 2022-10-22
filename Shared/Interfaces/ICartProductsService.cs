@@ -1,7 +1,6 @@
-﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.CartProduct;
+﻿using GroceryListHelper.Shared.Models.CartProduct;
 
-namespace GroceryListHelper.Client.Services;
+namespace GroceryListHelper.Shared.Interfaces;
 
 public interface ICartProductsService
 {

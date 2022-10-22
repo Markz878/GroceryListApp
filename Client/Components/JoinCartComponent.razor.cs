@@ -1,25 +1,18 @@
-using GroceryListHelper.Client.HelperMethods;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.BaseModels;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
 
 namespace GroceryListHelper.Client.Components;
 
 public class JoinCartComponentBase : BasePage<IndexViewModel>
 {
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
-    [Inject] public ModalViewModel ModalViewModel { get; set; }
+    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+    [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
 
     public async Task JoinCart()
     {
         if (!string.IsNullOrEmpty(ViewModel.CartHostEmail))
         {
-            AuthenticationState authState = await AuthenticationStateTask;
-            if (ViewModel.CartHostEmail == authState.User.Identity.Name)
+            AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (ViewModel.CartHostEmail == authState.User?.Identity?.Name)
             {
                 ModalViewModel.Header = "Error";
                 ModalViewModel.Message = "Can't join your own cart.";

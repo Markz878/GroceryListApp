@@ -1,7 +1,5 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
-using GroceryListHelper.Shared.Interfaces;
+﻿using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.BaseModels;
-using GroceryListHelper.Shared.Models.CartProduct;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 

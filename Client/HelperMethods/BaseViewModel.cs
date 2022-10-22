@@ -5,7 +5,7 @@ namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BaseViewModel : IDisposable
 {
-    public event Action StateChanged;
+    public event Action? StateChanged;
     public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
     private bool isBusy;
 
@@ -13,7 +13,10 @@ public abstract class BaseViewModel : IDisposable
     {
         foreach (PropertyInfo observableCollection in GetType().GetProperties().Where(x => typeof(INotifyCollectionChanged).IsAssignableFrom(x.PropertyType)))
         {
-            (observableCollection.GetValue(this) as INotifyCollectionChanged).CollectionChanged += CollectionChanged;
+            if (observableCollection.GetValue(this) is INotifyCollectionChanged property)
+            {
+                property.CollectionChanged += CollectionChanged!;
+            }
         }
     }
 

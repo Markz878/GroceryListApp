@@ -6,17 +6,16 @@
 
 <CartSummaryRowComponent />
 
-<AuthorizeView>
-    <Authorized>
-        <ChooseCartShareOptionComponent />
-        @if (ViewModel.ShareMode == ShareModeType.Self)
-        {
-            <ShareSelfCartComponent />
-        }
-        else
-        {
-            <JoinCartComponent />
-        }
-        <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
-    </Authorized>
-</AuthorizeView>
+@if (userInfo?.IsAuthenticated == true)
+{
+    <ChooseCartShareOptionComponent />
+    @if (ViewModel.ShareMode == ShareModeType.Self)
+    {
+        <ShareSelfCartComponent />
+    }
+    else
+    {
+        <JoinCartComponent />
+    }
+    <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
+}

@@ -71,7 +71,7 @@ public class ServerStorageCartTests
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
-            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync($"#reorder-button-{moveItemIndex}");
         await page.ClickAsync($"#reorder-button-{toTargetIndex}");
@@ -89,7 +89,7 @@ public class ServerStorageCartTests
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
-            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         for (int i = 0; i < productCount; i++)
         {
@@ -107,7 +107,7 @@ public class ServerStorageCartTests
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
-            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync("text=Clear cart");
         IElementHandle movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
@@ -138,7 +138,7 @@ public class ServerStorageCartTests
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
-            await page.AddProductToCart($"Product{i}", (i + 1), i * 1.5 + 0.5);
+            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync($"#delete-product-button-{productCount / 2}");
         IElementHandle element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");

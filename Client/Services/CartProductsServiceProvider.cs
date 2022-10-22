@@ -1,11 +1,4 @@
-﻿using Blazored.LocalStorage;
-using GroceryListHelper.Client.Authentication;
-using GroceryListHelper.Client.Models;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Models.CartProduct;
-using Microsoft.AspNetCore.Components.Authorization;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class CartProductsServiceProvider : ICartProductsService
 {

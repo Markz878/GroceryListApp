@@ -1,15 +1,26 @@
-using Blazored.LocalStorage;
-using GroceryListHelper.Client.Authentication;
-using GroceryListHelper.Client.HelperMethods;
-using GroceryListHelper.Client.Services;
-using GroceryListHelper.Client.ViewModels;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Polly;
-using Polly.CircuitBreaker;
-using Polly.Extensions.Http;
-using Polly.Wrap;
+global using Blazored.LocalStorage;
+global using FluentValidation;
+global using GroceryListHelper.Client.Authentication;
+global using GroceryListHelper.Client.HelperMethods;
+global using GroceryListHelper.Client.Services;
+global using GroceryListHelper.Client.ViewModels;
+global using GroceryListHelper.Shared.Interfaces;
+global using GroceryListHelper.Shared.Models.CartProduct;
+global using GroceryListHelper.Shared.Models.StoreProduct;
+global using Microsoft.AspNetCore.Components;
+global using Microsoft.AspNetCore.Components.Authorization;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Microsoft.AspNetCore.SignalR.Client;
+global using Microsoft.JSInterop;
+global using Polly;
+global using Polly.CircuitBreaker;
+global using Polly.Extensions.Http;
+global using Polly.Wrap;
+global using System.Collections.ObjectModel;
+global using System.Diagnostics.CodeAnalysis;
+global using System.Net.Http;
+global using System.Net.Http.Json;
+global using System.Security.Claims;
 
 namespace GroceryListHelper.Client;
 
@@ -18,14 +29,10 @@ public class Program
     public static async Task Main(string[] args)
     {
         WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
-        builder.RootComponents.Add<App>("#app");
-        builder.RootComponents.Add<HeadOutlet>("head::after");
-#if (!DEBUG)
-        builder.Logging.ClearProviders();
-#endif
+
         builder.Services.AddOptions();
         builder.Services.AddAuthorizationCore();
-        builder.Services.AddSingleton<AuthenticationStateProvider, HostAuthenticationStateProvider>();
+        builder.Services.AddSingleton<AuthenticationStateProvider, ClientAuthenticationStateProvider>();
         builder.Services.AddTransient<AuthorizedHandler>();
 
         AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
@@ -36,7 +43,7 @@ public class Program
         builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
         .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy); ;
 
-        builder.Services.AddScoped<CartHubBuilder>();
+        builder.Services.AddScoped<ICartHubBuilder, CartHubBuilder>();
         builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
         builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
         builder.Services.AddBlazoredLocalStorage();

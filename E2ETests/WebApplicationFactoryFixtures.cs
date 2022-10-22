@@ -64,7 +64,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
 
             services.AddDbContext<GroceryStoreDbContext>(options =>
             {
-                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), $"TestDb");
+                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), "TestDb");
             });
 
             if (addFakeAuthentication)
@@ -92,7 +92,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = true,
+            Headless = false,
             SlowMo = 200,
         });
     }

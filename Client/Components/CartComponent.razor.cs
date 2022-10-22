@@ -1,42 +1,58 @@
 ﻿using FluentValidation.Results;
-using GroceryListHelper.Client.HelperMethods;
-using GroceryListHelper.Client.Models;
-using GroceryListHelper.Client.Services;
 using GroceryListHelper.Client.Validators;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Models.CartProduct;
-using GroceryListHelper.Shared.Models.StoreProduct;
-using Microsoft.AspNetCore.Components;
-using System.Collections.ObjectModel;
 
 namespace GroceryListHelper.Client.Components;
 
 public class CartComponentBase : BasePage<IndexViewModel>
 {
-    [Inject] public ModalViewModel ModalViewModel { get; set; }
-    [Inject] public ICartProductsService CartProductsService { get; set; }
-    [Inject] public IStoreProductsService StoreProductsService { get; set; }
+    [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
+    [Inject] public ICartProductsService CartProductsService { get; set; } = default!;
+    [Inject] public IStoreProductsService StoreProductsService { get; set; } = default!;
+    [Inject] public PersistentComponentState ApplicationState { get; set; } = default!;
+    private PersistingComponentStateSubscription stateSubscription;
 
     protected CartProduct newProduct = new();
-    protected CartProductUIModel editingItem;
-    protected CartProductUIModel movingItem;
+    protected CartProductUIModel? editingItem;
+    protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
     protected ElementReference AddProductButton;
 
     protected override async Task OnInitializedAsync()
     {
-        ViewModel.IsBusy = true;
-        ViewModel.CartProducts.Clear();
-        foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
+        stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
+        if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0 && ApplicationState.TryTakeFromJson(nameof(ViewModel.StoreProducts), out IList<StoreProductUIModel>? storeProducts) && storeProducts is not null)
         {
-            ViewModel.CartProducts.Add(item);
+            foreach (CartProductUIModel item in cartProducts)
+            {
+                ViewModel.CartProducts.Add(item);
+            }
+            foreach (StoreProductUIModel item in storeProducts)
+            {
+                ViewModel.StoreProducts.Add(item);
+            }
         }
-        ViewModel.StoreProducts.Clear();
-        foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
+        else
         {
-            ViewModel.StoreProducts.Add(item);
+            ViewModel.IsBusy = true;
+            ViewModel.CartProducts.Clear();
+            foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
+            {
+                ViewModel.CartProducts.Add(item);
+            }
+            ViewModel.StoreProducts.Clear();
+            foreach (StoreProductUIModel item in await StoreProductsService.GetStoreProducts())
+            {
+                ViewModel.StoreProducts.Add(item);
+            }
+            ViewModel.IsBusy = false;
         }
-        ViewModel.IsBusy = false;
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState?.PersistAsJson(nameof(ViewModel.CartProducts), ViewModel.CartProducts);
+        ApplicationState?.PersistAsJson(nameof(ViewModel.StoreProducts), ViewModel.StoreProducts);
+        return Task.CompletedTask;
     }
 
     private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
@@ -218,6 +234,12 @@ public class CartComponentBase : BasePage<IndexViewModel>
         {
             ModalViewModel.Message = ex.Message;
         }
+    }
+
+    public override void Dispose()
+    {
+        stateSubscription.Dispose();
+        base.Dispose();
     }
 
     //private CartProductUIModel dragTarget;

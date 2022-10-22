@@ -14,14 +14,14 @@ public class CartProductsControllerTests
 {
     private readonly CartProductsController cartProductsController;
     private readonly ICartProductRepository cartProductRepository;
-    private readonly string userId = Guid.NewGuid().ToString();
+    private readonly Guid userId = Guid.NewGuid();
 
     public CartProductsControllerTests()
     {
         cartProductRepository = Substitute.For<ICartProductRepository>();
         List<Claim> claims = new()
         {
-            new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", userId)
+            new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", userId.ToString())
         };
         ClaimsIdentity claimsIdentity = new(claims);
         cartProductsController = new CartProductsController(cartProductRepository)
@@ -41,7 +41,7 @@ public class CartProductsControllerTests
     {
         // Arrange
         List<CartProductCollectable> cartProducts = new Faker<CartProductCollectable>()
-            .RuleFor(x => x.Id, x => Guid.NewGuid().ToString())
+            .RuleFor(x => x.Id, x => Guid.NewGuid())
             .RuleFor(x => x.UnitPrice, x => x.Random.Double(0, 100))
             .RuleFor(x => x.Amount, x => x.Random.Int(0, 100))
             .RuleFor(x => x.Name, x => x.Random.Utf16String(3, 6))
@@ -52,8 +52,8 @@ public class CartProductsControllerTests
         IActionResult actionResult = await cartProductsController.GetProducts();
         // Assert
         Assert.True(actionResult is OkObjectResult);
-        OkObjectResult objectResult = actionResult as OkObjectResult;
-        Assert.Equal(200, objectResult.StatusCode);
-        Assert.Equal(cartProducts, objectResult.Value);
+        OkObjectResult? objectResult = actionResult as OkObjectResult;
+        Assert.Equal(200, objectResult?.StatusCode);
+        Assert.Equal(cartProducts, objectResult?.Value);
     }
 }

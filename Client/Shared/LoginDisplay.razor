@@ -1,12 +1,11 @@
-﻿<AuthorizeView>
-    <Authorized>
-        <strong>Hello, @context.User.Identity.Name!</strong>
-        <form method="post" action="api/Account/Logout">
-            <AntiForgeryTokenInput/>
-            <button id="signout-btn" class="nav-link" type="submit">Sign out</button>
-        </form>
-    </Authorized>
-    <NotAuthorized>
-        <a id="login-link" class="nav-link" href="api/Account/Login">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>
+﻿@if (loggedInUserInfo?.IsAuthenticated == true)
+{
+    <strong>Hello, @loggedInUserInfo.Claims.First(x=>x.Type == "name").Value</strong>
+    <form method="post" action="api/Account/Logout">
+        <button id="signout-btn" class="nav-link" type="submit">Sign out</button>
+    </form>
+}
+else 
+{
+    <a id="login-link" class="nav-link" href="api/Account/Login">Log in</a>
+}

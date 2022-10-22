@@ -1,8 +1,4 @@
-﻿using Blazored.LocalStorage;
-using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.CartProduct;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class CartProductsLocalService : ICartProductsService
 {

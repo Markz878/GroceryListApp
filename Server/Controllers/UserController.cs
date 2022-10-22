@@ -1,7 +1,5 @@
 ﻿using GroceryListHelper.Shared.Models.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace GroceryListHelper.Server.Controllers;
 

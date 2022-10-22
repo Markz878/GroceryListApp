@@ -1,13 +1,6 @@
-﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Shared.Interfaces;
-using GroceryListHelper.Shared.Models.CartProduct;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
-namespace GroceryListHelper.Client.HelperMethods;
-
-public partial class CartHubBuilder : IDisposable
+public partial class CartHubBuilder : ICartHubBuilder
 {
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
@@ -26,9 +19,9 @@ public partial class CartHubBuilder : IDisposable
     {
         indexViewModel.CartHub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
 
-        indexViewModel.CartHub.Closed += CartHub_Closed;
-        indexViewModel.CartHub.Reconnected += CartHub_Reconnected;
-        indexViewModel.CartHub.Reconnecting += CartHub_Reconnecting;
+        indexViewModel.CartHub.Closed += CartHub_Closed!;
+        indexViewModel.CartHub.Reconnected += CartHub_Reconnected!;
+        indexViewModel.CartHub.Reconnecting += CartHub_Reconnecting!;
 
         indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
@@ -76,7 +69,7 @@ public partial class CartHubBuilder : IDisposable
         indexViewModel.CartHub.On<Guid>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
             LogItemDeleted(id);
-            indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.FirstOrDefault(x => x.Id == id));
+            indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Id == id));
         });
     }
 
@@ -100,9 +93,9 @@ public partial class CartHubBuilder : IDisposable
 
     public void Dispose()
     {
-        indexViewModel.CartHub.Closed -= CartHub_Closed;
-        indexViewModel.CartHub.Reconnected -= CartHub_Reconnected;
-        indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting;
+        indexViewModel.CartHub.Closed -= CartHub_Closed!;
+        indexViewModel.CartHub.Reconnected -= CartHub_Reconnected!;
+        indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting!;
         GC.SuppressFinalize(this);
     }
 

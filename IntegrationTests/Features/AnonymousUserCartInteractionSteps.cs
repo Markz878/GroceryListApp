@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.IntegrationTests.PageObjects;
+﻿using GroceryListHelper.IntegrationTests.Models;
+using GroceryListHelper.IntegrationTests.PageObjects;
 using Microsoft.Playwright;
 using System.Text.Json;
 using TechTalk.SpecFlow;

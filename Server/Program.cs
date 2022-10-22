@@ -1,28 +1,23 @@
-﻿using AspNetCoreRateLimit;
-using GroceryListHelper.DataAccess.HelperMethods;
-using GroceryListHelper.Server.HelperMethods;
-using GroceryListHelper.Server.Hubs;
-using GroceryListHelper.Server.Installers;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.UI;
+﻿global using AspNetCoreRateLimit;
+global using FluentValidation;
+global using GroceryListHelper.DataAccess.HelperMethods;
+global using GroceryListHelper.DataAccess.Repositories;
+global using GroceryListHelper.Server.HelperMethods;
+global using GroceryListHelper.Server.Hubs;
+global using GroceryListHelper.Server.Installers;
+global using GroceryListHelper.Shared.Models.CartProduct;
+global using GroceryListHelper.Shared.Models.StoreProduct;
+global using Microsoft.AspNetCore.Components.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Identity.Web.UI;
+global using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.InstallAssemblyServices();
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddControllersWithViews(options => 
-        options.Filters.Add(new ServiceExceptionFilter()));
-}
-else
-{
-    builder.Services.AddControllersWithViews(options =>
-    {
-        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-        options.Filters.Add(new ServiceExceptionFilter());
-    });
-}
+builder.Services.AddControllersWithViews(options => options.Filters.Add(new ServiceExceptionFilter()));
+
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();

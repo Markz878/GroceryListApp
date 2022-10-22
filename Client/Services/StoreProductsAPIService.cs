@@ -1,8 +1,4 @@
-﻿using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.StoreProduct;
-using System.Net.Http.Json;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class StoreProductsAPIService : IStoreProductsService
 {

@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.Shared.Exceptions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GroceryListHelper.Server.HelperMethods;
