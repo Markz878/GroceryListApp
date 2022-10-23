@@ -1,12 +1,8 @@
-﻿using System.Collections.ObjectModel;
-
-namespace GroceryListHelper.Client.HelperMethods;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BaseViewModel : IDisposable
 {
     public event Action? StateChanged;
-    public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
-    private bool isBusy;
 
     public BaseViewModel()
     {

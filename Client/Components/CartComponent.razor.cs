@@ -16,7 +16,6 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     protected override async Task OnInitializedAsync()
     {
-        ViewModel.IsBusy = true;
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
         if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0 && ApplicationState.TryTakeFromJson(nameof(ViewModel.StoreProducts), out IList<StoreProductUIModel>? storeProducts) && storeProducts is not null)
         {
@@ -42,7 +41,6 @@ public class CartComponentBase : BasePage<IndexViewModel>
                 ViewModel.StoreProducts.Add(item);
             }
         }
-        ViewModel.IsBusy = false;
     }
 
     private Task PersistData()
