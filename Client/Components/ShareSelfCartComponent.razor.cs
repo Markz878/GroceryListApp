@@ -1,6 +1,3 @@
-using GroceryListHelper.Shared.Models.Authentication;
-using GroceryListHelper.Shared.Models.BaseModels;
-
 namespace GroceryListHelper.Client.Components;
 
 public class ShareSelfCartComponentBase : BasePage<IndexViewModel>

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class TimerMiddlewareInstaller : IInstaller
 {

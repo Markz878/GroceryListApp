@@ -1,6 +1,4 @@
-﻿using FluentValidation.Results;
-
-namespace GroceryListHelper.Server.Validators;
+﻿namespace GroceryListHelper.Server.Validators;
 
 public static class ValidatorExtensions
 {

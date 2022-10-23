@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
-namespace GroceryListHelper.Server.Controllers;
+﻿namespace GroceryListHelper.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -65,6 +63,7 @@ public class CartProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(CartProductCollectable updatedProduct)
     {
+        var ctx = HttpContext;
         await cartProductsRepository.UpdateProduct(User.GetUserId().GetValueOrDefault(), updatedProduct);
         return NoContent();
     }

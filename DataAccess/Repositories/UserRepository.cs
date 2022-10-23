@@ -7,12 +7,10 @@ namespace GroceryListHelper.DataAccess.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly GroceryStoreDbContext db;
-    private readonly ILogger<UserRepository> logger;
 
-    public UserRepository(GroceryStoreDbContext db, ILogger<UserRepository> logger)
+    public UserRepository(GroceryStoreDbContext db)
     {
         this.db = db;
-        this.logger = logger;
     }
 
     public async Task<Guid> GetHostIdFromHostEmail(string hostEmail)

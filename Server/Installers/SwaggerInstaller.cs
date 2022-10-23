@@ -1,6 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class SwaggerInstaller : IInstaller
 {

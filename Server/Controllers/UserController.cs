@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
-using Microsoft.AspNetCore.Authorization;
-
+﻿
 namespace GroceryListHelper.Server.Controllers;
 
 [Route("api/[controller]")]
@@ -11,13 +9,13 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public IActionResult GetCurrentUser()
     {
-        return Ok(User.Identity.IsAuthenticated ? CreateUserInfo(User) : UserInfo.Anonymous);
+        return Ok(User.Identity?.IsAuthenticated == true ? CreateUserInfo(User) : UserInfo.Anonymous);
     }
 
     private static readonly string[] returnClaimTypes = new[] { "name", "preferred_username", "http://schemas.microsoft.com/identity/claims/objectidentifier" };
     private static UserInfo CreateUserInfo(ClaimsPrincipal claimsPrincipal)
     {
-        if (!claimsPrincipal.Identity.IsAuthenticated)
+        if (claimsPrincipal.Identity?.IsAuthenticated == false)
         {
             return UserInfo.Anonymous;
         }

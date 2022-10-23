@@ -1,8 +1,4 @@
-﻿using GroceryListHelper.Server.Services;
-using GroceryListHelper.Shared.Interfaces;
-using Microsoft.AspNetCore.ResponseCompression;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class CartHubInstaller : IInstaller
 {

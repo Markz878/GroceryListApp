@@ -9,7 +9,7 @@ public class DataAccessInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddDataAccessServices(builder.Configuration);
+        builder.Services.AddDataAccessServices(builder.Configuration, builder.Environment.IsDevelopment());
         builder.Services.AddScoped<ICartHubBuilder, CartHubBuilder>();
         builder.Services.AddScoped<ICartProductsService, HostCartProductsServiceProvider>();
         builder.Services.AddScoped<IStoreProductsService, HostStoreProductsServiceProvider>();

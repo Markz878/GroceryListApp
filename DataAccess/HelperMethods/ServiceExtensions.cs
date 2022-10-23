@@ -8,17 +8,18 @@ namespace GroceryListHelper.DataAccess.HelperMethods;
 
 public static class ServiceExtensions
 {
-    public static void AddDataAccessServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDataAccessServices(this IServiceCollection services, IConfiguration configuration, bool addSensitiveLogging)
     {
         services.AddDbContext<GroceryStoreDbContext>(options =>
         {
             options.UseCosmos(configuration.GetConnectionString("Cosmos"), "GroceryListDb");
             options.EnableThreadSafetyChecks(false);
-#if DEBUG
-            options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
-            options.EnableDetailedErrors();
-            options.EnableSensitiveDataLogging(true);
-#endif
+            if (addSensitiveLogging)
+            {
+                options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging(true);
+            }
         });
         services.AddScoped<ICartProductRepository, CartProductRepository>();
         services.AddScoped<IStoreProductRepository, StoreProductRepository>();

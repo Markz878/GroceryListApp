@@ -1,5 +1,3 @@
-using GroceryListHelper.Shared.Models.BaseModels;
-
 namespace GroceryListHelper.Client.Components;
 
 public class JoinCartComponentBase : BasePage<IndexViewModel>

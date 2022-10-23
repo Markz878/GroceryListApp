@@ -1,22 +1,52 @@
 ﻿global using AspNetCoreRateLimit;
+global using Azure.Identity;
 global using FluentValidation;
+global using FluentValidation.AspNetCore;
+global using FluentValidation.Results;
 global using GroceryListHelper.DataAccess.HelperMethods;
 global using GroceryListHelper.DataAccess.Repositories;
 global using GroceryListHelper.Server.HelperMethods;
 global using GroceryListHelper.Server.Hubs;
 global using GroceryListHelper.Server.Installers;
+global using GroceryListHelper.Server.Services;
+global using GroceryListHelper.Shared.Exceptions;
+global using GroceryListHelper.Shared.Interfaces;
+global using GroceryListHelper.Shared.Models.Authentication;
 global using GroceryListHelper.Shared.Models.CartProduct;
+global using GroceryListHelper.Shared.Models.RenderLocation;
 global using GroceryListHelper.Shared.Models.StoreProduct;
+global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Filters;
+global using Microsoft.AspNetCore.ResponseCompression;
+global using Microsoft.Azure.Cosmos;
+global using Microsoft.Extensions.Diagnostics.HealthChecks;
+global using Microsoft.Extensions.Primitives;
 global using Microsoft.Identity.Web.UI;
+global using Microsoft.OpenApi.Models;
+global using System.Collections.Concurrent;
+global using System.Diagnostics;
 global using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.InstallAssemblyServices();
-builder.Services.AddControllersWithViews(options => options.Filters.Add(new ServiceExceptionFilter()));
+builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
+//if (builder.Environment.IsDevelopment())
+//{
+//    builder.Services.AddControllersWithViews(options =>
+//        options.Filters.Add(new ServiceExceptionFilter()));
+//}
+//else
+//{
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.Add(new ServiceExceptionFilter());
+});
+//}
 
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 

@@ -16,7 +16,8 @@ public class StoreProductRepository : IStoreProductRepository
 
     public async Task<StoreProductServerModel> GetStoreProductForUser(Guid productId, Guid userId)
     {
-        StoreProductDbModel dbProduct = await db.StoreProducts.SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
+        StoreProductDbModel? dbProduct = await db.StoreProducts.SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
+        NotFoundException.ThrowIfNull(dbProduct);
         return new StoreProductServerModel()
         {
             Id = dbProduct.Id,
@@ -25,9 +26,9 @@ public class StoreProductRepository : IStoreProductRepository
         };
     }
 
-    public async Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId)
+    public Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId)
     {
-        return await db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
+        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
         {
             Id = x.Id,
             Name = x.Name,
@@ -49,18 +50,18 @@ public class StoreProductRepository : IStoreProductRepository
         return db.SaveChangesAsync();
     }
 
-    public async Task DeleteItem(Guid productId, Guid userId)
+    public Task DeleteItem(Guid productId, Guid userId)
     {
-        StoreProductDbModel product = db.StoreProducts.Find(productId, userId);
+        StoreProductDbModel? product = db.StoreProducts.Find(productId, userId);
         NotFoundException.ThrowIfNull(product);
         ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         db.StoreProducts.Remove(product);
-        await db.SaveChangesAsync();
+        return db.SaveChangesAsync();
     }
 
     public async Task UpdatePrice(Guid productId, Guid userId, double price)
     {
-        StoreProductDbModel product = await db.StoreProducts.FindAsync(productId, userId);
+        StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
         NotFoundException.ThrowIfNull(product);
         ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
         product.UnitPrice = price;

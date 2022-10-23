@@ -1,6 +1,4 @@
-﻿using Azure.Identity;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class KeyVaultInstaller : IInstaller
 {

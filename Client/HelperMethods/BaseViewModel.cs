@@ -1,7 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Reflection;
-
-namespace GroceryListHelper.Client.HelperMethods;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BaseViewModel : IDisposable
 {

@@ -1,7 +1,4 @@
-﻿using FluentValidation.Results;
-using GroceryListHelper.Client.Validators;
-
-namespace GroceryListHelper.Client.Components;
+﻿namespace GroceryListHelper.Client.Components;
 
 public class CartComponentBase : BasePage<IndexViewModel>
 {
@@ -19,6 +16,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     protected override async Task OnInitializedAsync()
     {
+        ViewModel.IsBusy = true;
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
         if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0 && ApplicationState.TryTakeFromJson(nameof(ViewModel.StoreProducts), out IList<StoreProductUIModel>? storeProducts) && storeProducts is not null)
         {
@@ -33,7 +31,6 @@ public class CartComponentBase : BasePage<IndexViewModel>
         }
         else
         {
-            ViewModel.IsBusy = true;
             ViewModel.CartProducts.Clear();
             foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
             {
@@ -44,8 +41,8 @@ public class CartComponentBase : BasePage<IndexViewModel>
             {
                 ViewModel.StoreProducts.Add(item);
             }
-            ViewModel.IsBusy = false;
         }
+        ViewModel.IsBusy = false;
     }
 
     private Task PersistData()
@@ -112,14 +109,14 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
     {
-        product.IsCollected = (bool)e.Value;
+        product.IsCollected = (bool)e.Value!;
         ViewModel.OnPropertyChanged();
         return CartProductsService.UpdateCartProduct(product);
     }
 
     public async Task SaveStoreProduct(StoreProductModel storeProduct)
     {
-        StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == storeProduct.Name);
+        StoreProductUIModel? product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == storeProduct.Name);
         if (product != null)
         {
             if (product.UnitPrice != storeProduct.UnitPrice)
@@ -189,7 +186,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
 
     public void GetItemPrice()
     {
-        StoreProductUIModel product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == newProduct.Name);
+        StoreProductUIModel? product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == newProduct.Name);
         if (product?.UnitPrice > 0)
         {
             newProduct.UnitPrice = product.UnitPrice;

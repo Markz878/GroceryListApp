@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Models;
-using Microsoft.AspNetCore.Authorization;
-
-namespace GroceryListHelper.Server.Controllers;
+﻿namespace GroceryListHelper.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,7 +13,7 @@ public class StoreProductsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel[]))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<StoreProductServerModel>))]
     public async Task<List<StoreProductServerModel>> GetProducts()
     {
         List<StoreProductServerModel> result = await db.GetStoreProductsForUser(User.GetUserId().GetValueOrDefault());
@@ -24,7 +21,7 @@ public class StoreProductsController : ControllerBase
     }
 
     [HttpGet("id")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductDbModel))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreProductServerModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProduct(Guid id)
     {

@@ -1,8 +1,4 @@
-﻿using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Collections.Concurrent;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class HealthChecksInstaller : IInstaller
 {

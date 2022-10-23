@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.Shared.Exceptions;
-using Microsoft.AspNetCore.Mvc.Filters;
-
-namespace GroceryListHelper.Server.HelperMethods;
+﻿namespace GroceryListHelper.Server.HelperMethods;
 
 public class ServiceExceptionFilter : IExceptionFilter
 {

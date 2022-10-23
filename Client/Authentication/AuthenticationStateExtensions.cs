@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
-
-namespace GroceryListHelper.Client.Authentication;
+﻿namespace GroceryListHelper.Client.Authentication;
 
 public static class AuthenticationStateExtensions
 {

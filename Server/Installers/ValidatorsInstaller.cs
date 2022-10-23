@@ -1,6 +1,4 @@
-﻿using FluentValidation.AspNetCore;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class ValidatorsInstaller : IInstaller
 {
