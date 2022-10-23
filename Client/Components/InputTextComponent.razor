@@ -4,16 +4,16 @@
     <input id="@id" class="form-control" type="@type" @bind="@CurrentValueAsString" required placeholder="@DisplayName" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"/>
 </div>
 @code {
-    [Parameter] public string Id { get; set; }
+    [Parameter] public string Id { get; set; } = string.Empty;
     [Parameter] public bool IsPassword { get; set; }
 
-    private string id => Id ?? DisplayName.Replace(" ", "-").ToLowerInvariant();
+    private string id => Id ?? DisplayName?.Replace(" ", "-").ToLowerInvariant() ?? "";
     public string type => IsPassword ? "password" : "text";
 
     protected override bool TryParseValueFromString(string value, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out string result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string validationErrorMessage)
     {
         result = value;
-        validationErrorMessage = null;
+        validationErrorMessage = "";
         return true;
     }
 }

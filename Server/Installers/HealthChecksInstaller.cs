@@ -27,7 +27,7 @@ internal class DbHealthCheck : IHealthCheck
         try
         {
             logger.LogInformation("Starting health check...");
-            if (!_connections.TryGetValue(connectionString, out CosmosClient cosmosClient))
+            if (!_connections.TryGetValue(connectionString, out CosmosClient? cosmosClient))
             {
                 cosmosClient = new CosmosClient(connectionString);
                 if (!_connections.TryAdd(connectionString, cosmosClient))

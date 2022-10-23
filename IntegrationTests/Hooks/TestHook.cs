@@ -51,7 +51,7 @@ public class TestHook
         IPlaywright playwright = await Playwright.CreateAsync();
         IBrowser browser = await playwright.Firefox.LaunchAsync(new()
         {
-            Headless = false,
+            Headless = true,
             SlowMo = 200,
         });
         IBrowserContext context = await browser.NewContextAsync(new()

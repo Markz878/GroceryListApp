@@ -9,9 +9,9 @@ public class GroceryStoreDbContext : DbContext
     {
     }
 
-    public DbSet<CartProductDbModel> CartProducts { get; set; }
-    public DbSet<StoreProductDbModel> StoreProducts { get; set; }
-    public DbSet<UserCartGroupDbModel> UserCartGroups { get; set; }
+    public DbSet<CartProductDbModel> CartProducts { get; set; } = default!;
+    public DbSet<StoreProductDbModel> StoreProducts { get; set; } = default!;
+    public DbSet<UserCartGroupDbModel> UserCartGroups { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

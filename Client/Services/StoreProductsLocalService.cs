@@ -46,11 +46,15 @@ public class StoreProductsLocalService : IStoreProductsService
         try
         {
             List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey);
-            StoreProductUIModel product = products.Find(x => x.Id == storeProduct.Id);
-            product.UnitPrice = storeProduct.UnitPrice;
-            product.Name = storeProduct.Name;
-            await localStorage.SetItemAsync(storeProductsKey, products);
-            return true;
+            StoreProductUIModel? product = products.Find(x => x.Id == storeProduct.Id);
+            if (product != null)
+            {
+                product.UnitPrice = storeProduct.UnitPrice;
+                product.Name = storeProduct.Name;
+                await localStorage.SetItemAsync(storeProductsKey, products);
+                return true;
+            }
+            return false;
         }
         catch
         {

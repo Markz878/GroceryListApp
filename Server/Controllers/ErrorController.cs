@@ -14,8 +14,8 @@ public class ErrorController : ControllerBase
         {
             throw new InvalidOperationException("This shouldn't be invoked in non-development environments.");
         }
-        IExceptionHandlerFeature context = HttpContext.Features.Get<IExceptionHandlerFeature>();
-        return Problem(detail: context.Error.StackTrace, title: context.Error.Message);
+        IExceptionHandlerFeature? context = HttpContext.Features.Get<IExceptionHandlerFeature>();
+        return Problem(detail: context?.Error.StackTrace, title: context?.Error.Message);
     }
 
     [Route("/error")]

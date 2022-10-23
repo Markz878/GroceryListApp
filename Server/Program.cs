@@ -12,6 +12,7 @@ global using GroceryListHelper.Server.Services;
 global using GroceryListHelper.Shared.Exceptions;
 global using GroceryListHelper.Shared.Interfaces;
 global using GroceryListHelper.Shared.Models.Authentication;
+global using GroceryListHelper.Shared.Models.BaseModels;
 global using GroceryListHelper.Shared.Models.CartProduct;
 global using GroceryListHelper.Shared.Models.RenderLocation;
 global using GroceryListHelper.Shared.Models.StoreProduct;
@@ -34,19 +35,19 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.InstallAssemblyServices();
 builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
-//if (builder.Environment.IsDevelopment())
-//{
-//    builder.Services.AddControllersWithViews(options =>
-//        options.Filters.Add(new ServiceExceptionFilter()));
-//}
-//else
-//{
-builder.Services.AddControllersWithViews(options =>
+if (builder.Environment.IsDevelopment())
 {
-    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-    options.Filters.Add(new ServiceExceptionFilter());
-});
-//}
+    builder.Services.AddControllersWithViews(options =>
+        options.Filters.Add(new ServiceExceptionFilter()));
+}
+else
+{
+    builder.Services.AddControllersWithViews(options =>
+    {
+        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        options.Filters.Add(new ServiceExceptionFilter());
+    });
+}
 
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 

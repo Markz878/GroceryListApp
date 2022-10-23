@@ -13,7 +13,7 @@ public static class AuthenticationStateExtensions
         AuthenticationState authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
         return new UserInfo()
         {
-            IsAuthenticated = authenticationState?.User?.Identity?.IsAuthenticated == true,
+            IsAuthenticated = authenticationState.User.Identity?.IsAuthenticated == true,
             Claims = authenticationState.User.Claims.Select(x => new ClaimValue(x.Type, x.Value)).ToList(),
         };
     }

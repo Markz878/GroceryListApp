@@ -21,6 +21,7 @@ internal static class PlaywrightHelpers
         {
             await page.Locator("#signout-btn").WaitForAsync();
         }
+        await Task.Delay(1000);
         return page;
     }
 

@@ -1,5 +1,4 @@
-﻿
-namespace GroceryListHelper.Server.Controllers;
+﻿namespace GroceryListHelper.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -24,17 +23,6 @@ public class UserController : ControllerBase
         {
             IsAuthenticated = true
         };
-
-        if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
-        {
-            userInfo.NameClaimType = claimsIdentity.NameClaimType;
-            userInfo.RoleClaimType = claimsIdentity.RoleClaimType;
-        }
-        else
-        {
-            userInfo.NameClaimType = "name";
-            userInfo.RoleClaimType = "role";
-        }
 
         if (claimsPrincipal.Claims.Any())
         {

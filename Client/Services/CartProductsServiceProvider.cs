@@ -6,8 +6,7 @@ public class CartProductsServiceProvider : ICartProductsService
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly IndexViewModel viewModel;
-    private bool isAuthenticated;
-    private ICartProductsService actingCartService;
+    private ICartProductsService? actingCartService;
 
     public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, IndexViewModel viewModel)
     {
@@ -48,9 +47,10 @@ public class CartProductsServiceProvider : ICartProductsService
         await actingCartService.UpdateCartProduct(cartProduct);
     }
 
+    [MemberNotNull(nameof(actingCartService))]
     private async ValueTask SelectProvider()
     {
-        isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
+        bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
         if (isAuthenticated)
         {
             if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)

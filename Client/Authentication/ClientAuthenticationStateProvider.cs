@@ -53,10 +53,7 @@ public class ClientAuthenticationStateProvider : AuthenticationStateProvider
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
 
-        ClaimsIdentity identity = new(
-            nameof(ClientAuthenticationStateProvider),
-            user.NameClaimType,
-            user.RoleClaimType);
+        ClaimsIdentity identity = new("Cookies", "name", "role");
 
         if (user.Claims != null)
         {

@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.HelperMethods;
+﻿using System.Collections.ObjectModel;
+
+namespace GroceryListHelper.Client.HelperMethods;
 
 public abstract class BaseViewModel : IDisposable
 {
@@ -38,9 +40,12 @@ public abstract class BaseViewModel : IDisposable
 
     public void Dispose()
     {
-        foreach (PropertyInfo obsCollection in GetType().GetProperties().Where(x => typeof(INotifyCollectionChanged).IsAssignableFrom(x.PropertyType)))
+        foreach (PropertyInfo observableCollection in GetType().GetProperties().Where(x => typeof(INotifyCollectionChanged).IsAssignableFrom(x.PropertyType)))
         {
-            (obsCollection.GetValue(this) as INotifyCollectionChanged).CollectionChanged -= CollectionChanged;
+            if (observableCollection.GetValue(this) is INotifyCollectionChanged property)
+            {
+                property.CollectionChanged -= CollectionChanged!;
+            }
         }
         GC.SuppressFinalize(this);
     }

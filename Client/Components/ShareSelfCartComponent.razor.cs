@@ -9,7 +9,7 @@ public class ShareSelfCartComponentBase : BasePage<IndexViewModel>
     public async Task AddUser()
     {
         AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (AllowEmail.Email == authState.User.Identity.Name)
+        if (AllowEmail.Email == authState.User.Identity?.Name)
         {
             ModalViewModel.Header = "Error";
             ModalViewModel.Message = "Can't share cart with yourself.";

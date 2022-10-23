@@ -2,20 +2,20 @@
 
 public class AuthorizedHandler : DelegatingHandler
 {
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
+    private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly IJSRuntime js;
 
     public AuthorizedHandler(AuthenticationStateProvider authenticationStateProvider, IJSRuntime js)
     {
-        _authenticationStateProvider = authenticationStateProvider;
+        this.authenticationStateProvider = authenticationStateProvider;
         this.js = js;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        AuthenticationState authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         HttpResponseMessage responseMessage;
-        if (!authState.User.Identity.IsAuthenticated)
+        if (!authState.User.Identity?.IsAuthenticated == true)
         {
             responseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }

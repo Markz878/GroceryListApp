@@ -10,9 +10,9 @@ public class CartProductsApiService : ICartProductsService
         client = clientFactory.CreateClient("ProtectedClient");
     }
 
-    public Task<List<CartProductUIModel>> GetCartProducts()
+    public async Task<List<CartProductUIModel>> GetCartProducts()
     {
-        return client.GetFromJsonAsync<List<CartProductUIModel>>(uri) ?? Task.FromResult(new List<CartProductUIModel>());
+        return await client.GetFromJsonAsync<List<CartProductUIModel>>(uri) ?? new List<CartProductUIModel>();
     }
 
     public async Task<Guid> SaveCartProduct(CartProduct product)

@@ -33,8 +33,12 @@ public class CartProductsLocalService : ICartProductsService
     public async Task DeleteCartProduct(Guid id)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-        products.Remove(products.Find(x => x.Id == id));
-        await localStorage.SetItemAsync(cartProductsKey, products);
+        CartProductUIModel? product = products.Find(x => x.Id == id);
+        if (product is not null)
+        {
+            products.Remove(product);
+            await localStorage.SetItemAsync(cartProductsKey, products);
+        }
     }
 
     public async Task DeleteAllCartProducts()
@@ -45,12 +49,15 @@ public class CartProductsLocalService : ICartProductsService
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
         List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-        CartProductUIModel product = products.Find(x => x.Id == cartProduct.Id);
-        product.Name = cartProduct.Name;
-        product.Amount = cartProduct.Amount;
-        product.UnitPrice = cartProduct.UnitPrice;
-        product.IsCollected = cartProduct.IsCollected;
-        product.Order = cartProduct.Order;
-        await localStorage.SetItemAsync(cartProductsKey, products);
+        CartProductUIModel? product = products.Find(x => x.Id == cartProduct.Id);
+        if (product is not null)
+        {
+            product.Name = cartProduct.Name;
+            product.Amount = cartProduct.Amount;
+            product.UnitPrice = cartProduct.UnitPrice;
+            product.IsCollected = cartProduct.IsCollected;
+            product.Order = cartProduct.Order;
+            await localStorage.SetItemAsync(cartProductsKey, products);
+        }
     }
 }

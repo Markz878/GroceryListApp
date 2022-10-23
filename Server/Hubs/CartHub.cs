@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.Shared.Interfaces;
-using GroceryListHelper.Shared.Models.BaseModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace GroceryListHelper.Server.Hubs;
 
@@ -142,14 +139,15 @@ public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 
     private static Guid GetUserId(HubCallerContext context)
     {
-        string stringId = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
-        Guid id = Guid.Parse(stringId.Trim('"'));
+        string? stringId = context.User?.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+        Guid id = Guid.Parse(stringId?.Trim('"') ?? "");
         return id;
     }
 
     private static string GetUserEmail(HubCallerContext context)
     {
-        string email = context.User.FindFirst("preferred_username").Value;
+        string? email = context.User?.FindFirst("preferred_username")?.Value;
+        ArgumentNullException.ThrowIfNull(email);
         return email;
     }
 

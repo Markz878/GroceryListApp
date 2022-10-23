@@ -18,5 +18,6 @@ public abstract class BasePageObject
     {
         Page = await Browser.NewPageAsync();
         await Page.GotoAsync(PagePath);
+        await Task.Delay(1000);
     }
 }

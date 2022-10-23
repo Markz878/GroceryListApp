@@ -1,6 +1,6 @@
 ﻿@if (loggedInUserInfo?.IsAuthenticated == true)
 {
-    <strong>Hello, @loggedInUserInfo.Claims.First(x=>x.Type == "preferred_username").Value</strong>
+    <strong>Hello, @loggedInUserInfo?.Claims?.FirstOrDefault(x=>x.Type == "preferred_username")?.Value</strong>
     <form method="post" action="api/Account/Logout">
         <AntiForgeryTokenInput/>
         <button id="signout-btn" class="nav-link" type="submit">Sign out</button>
