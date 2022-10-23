@@ -7,7 +7,7 @@ public class CartProductValidator : AbstractValidator<CartProduct>
     public CartProductValidator(IEnumerable<CartProductUIModel> productList)
     {
         this.productList = productList;
-        RuleFor(x => x.Name).NotEmpty().Must(BeUnique).WithMessage("Product name must be unique");
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(30).Must(BeUnique).WithMessage("Product name must be unique");
         RuleFor(x => x.Amount).GreaterThanOrEqualTo(0);
         RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
     }

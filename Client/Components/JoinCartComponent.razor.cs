@@ -33,7 +33,7 @@ public class JoinCartComponentBase : BasePage<IndexViewModel>
         }
         else
         {
-            ViewModel.ShareCartInfo = "Give cart host username/email.";
+            ViewModel.ShareCartInfo = "Give cart host email.";
         }
     }
 

@@ -7,7 +7,7 @@ public class StoreProductValidator : AbstractValidator<StoreProductModel>
     public StoreProductValidator(IEnumerable<StoreProductModel> productList)
     {
         this.productList = productList;
-        RuleFor(x => x.Name).NotEmpty().Must(BeUnique).WithMessage("Product name must be unique");
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(30).Must(BeUnique).WithMessage("Product name must be unique");
         RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
     }
 
