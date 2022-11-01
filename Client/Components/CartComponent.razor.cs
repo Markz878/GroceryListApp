@@ -13,23 +13,27 @@ public class CartComponentBase : BasePage<IndexViewModel>
     protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
     protected ElementReference AddProductButton;
+    protected bool isBusy;
 
     protected override async Task OnInitializedAsync()
     {
-        stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
         if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0 && ApplicationState.TryTakeFromJson(nameof(ViewModel.StoreProducts), out IList<StoreProductUIModel>? storeProducts) && storeProducts is not null)
         {
+            ViewModel.CartProducts.Clear();
             foreach (CartProductUIModel item in cartProducts)
             {
                 ViewModel.CartProducts.Add(item);
             }
+            ViewModel.StoreProducts.Clear();
             foreach (StoreProductUIModel item in storeProducts)
             {
                 ViewModel.StoreProducts.Add(item);
             }
+            isBusy = false;
         }
         else
         {
+            isBusy = true;
             ViewModel.CartProducts.Clear();
             foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
             {
@@ -40,6 +44,16 @@ public class CartComponentBase : BasePage<IndexViewModel>
             {
                 ViewModel.StoreProducts.Add(item);
             }
+        }
+        stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isBusy = false;
+            StateHasChanged();
         }
     }
 
