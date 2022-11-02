@@ -5,7 +5,7 @@ namespace GroceryListHelper.IntegrationTests.PageObjects;
 public abstract class BasePageObject
 {
     public string PagePath { get; }
-    public IPage Page { get; set; }
+    public IPage Page { get; set; } = default!;
     public IBrowserContext Browser { get; set; }
 
     public BasePageObject(IBrowserContext browser, string path)

@@ -10,7 +10,7 @@
     private string id => Id ?? DisplayName?.Replace(" ", "-").ToLowerInvariant() ?? "";
     public string type => IsPassword ? "password" : "text";
 
-    protected override bool TryParseValueFromString(string value, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out string result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string validationErrorMessage)
+    protected override bool TryParseValueFromString(string? value, out string? result, out string validationErrorMessage)
     {
         result = value;
         validationErrorMessage = "";
