@@ -25,17 +25,17 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build
-          run: |
-            dir
-            cd Server
-            dotnet build --configuration Release --no-restore
-            dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+        run: |
+          dir
+          cd Server
+          dotnet build --configuration Release
+          dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
 
       - name: Test
-          run: |
-            dir
-            cd UnitTests
-            dotnet test
+        run: |
+          dir
+          cd UnitTests
+          dotnet test
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
