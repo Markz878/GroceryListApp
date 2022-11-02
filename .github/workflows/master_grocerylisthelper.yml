@@ -7,47 +7,35 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
+  env:
+    AZURE_WEBAPP_NAME: DotNetWeb
+    AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
+    DOTNET_VERSION: '6.0.402' # The .NET SDK version to use
+
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build
-        run: dotnet build --configuration Release
+          run: |
+            dir
+            cd Server
+            dotnet build --configuration Release --no-restore
+            dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
 
       - name: Test
-        run: dotnet test UnitTests\GroceryListHelper.UnitTests.csproj --no-restore --verbosity normal
-
-      - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: .net-app
+          run: |
+            dir
+            cd UnitTests
+            dotnet test
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -56,4 +44,4 @@ jobs:
           app-name: 'GroceryListHelper'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C99403358B7E4954BCBAE0769BA6A9BB }}
-          package: .
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dotnet-webapp'
