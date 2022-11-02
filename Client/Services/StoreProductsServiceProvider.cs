@@ -17,35 +17,35 @@ public class StoreProductsServiceProvider : IStoreProductsService
 
     public async Task<bool> ClearStoreProducts()
     {
-        await SelectProvider();
+        actingStoreService = await SelectProvider();
         return await actingStoreService.ClearStoreProducts();
     }
 
     public async Task<List<StoreProductUIModel>> GetStoreProducts()
     {
-        await SelectProvider();
+        actingStoreService = await SelectProvider();
         return await actingStoreService.GetStoreProducts();
     }
 
     public async Task<string> SaveStoreProduct(StoreProductModel product)
     {
-        await SelectProvider();
+        actingStoreService = await SelectProvider();
         return await actingStoreService.SaveStoreProduct(product);
     }
 
     public async Task<bool> UpdateStoreProduct(StoreProductUIModel product)
     {
-        await SelectProvider();
+        actingStoreService = await SelectProvider();
         return await actingStoreService.UpdateStoreProduct(product);
     }
 
-    [MemberNotNull(nameof(actingStoreService))]
-    private async ValueTask SelectProvider()
+    private async ValueTask<IStoreProductsService> SelectProvider()
     {
         if (actingStoreService is null)
         {
             isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
             actingStoreService = isAuthenticated ? new StoreProductsAPIService(httpClientFactory) : new StoreProductsLocalService(localStorage);
         }
+        return actingStoreService;
     }
 }
