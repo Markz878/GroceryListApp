@@ -7,11 +7,10 @@ on:
   push:
     branches:
       - master
-  env:
-    AZURE_WEBAPP_NAME: DotNetWeb
-    AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
-    DOTNET_VERSION: '6.0.402' # The .NET SDK version to use
-
+env:
+  AZURE_WEBAPP_NAME: DotNetWeb
+  AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
+  DOTNET_VERSION: '6.0.402' # The .NET SDK version to use
 
 jobs:
   publish:
