@@ -2,6 +2,6 @@
 
 public record StoreProductModel
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public double UnitPrice { get; set; }
 }

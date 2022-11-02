@@ -18,37 +18,36 @@ public class CartProductsServiceProvider : ICartProductsService
 
     public async Task DeleteAllCartProducts()
     {
-        await SelectProvider();
+        actingCartService = await SelectProvider();
         await actingCartService.DeleteAllCartProducts();
     }
 
     public async Task DeleteCartProduct(Guid id)
     {
-        await SelectProvider();
+        actingCartService = await SelectProvider();
         await actingCartService.DeleteCartProduct(id);
     }
 
     public async Task<List<CartProductUIModel>> GetCartProducts()
     {
-        await SelectProvider();
+        actingCartService = await SelectProvider();
         return await actingCartService.GetCartProducts();
     }
 
     public async Task<Guid> SaveCartProduct(CartProduct product)
     {
-        await SelectProvider();
+        actingCartService = await SelectProvider();
         Guid id = await actingCartService.SaveCartProduct(product);
         return id;
     }
 
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
-        await SelectProvider();
+        actingCartService = await SelectProvider();
         await actingCartService.UpdateCartProduct(cartProduct);
     }
 
-    [MemberNotNull(nameof(actingCartService))]
-    private async ValueTask SelectProvider()
+    private async ValueTask<ICartProductsService> SelectProvider()
     {
         bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
         if (isAuthenticated)
@@ -66,5 +65,7 @@ public class CartProductsServiceProvider : ICartProductsService
         {
             actingCartService = new CartProductsLocalService(localStorage);
         }
+        ArgumentNullException.ThrowIfNull(actingCartService);
+        return actingCartService;
     }
 }

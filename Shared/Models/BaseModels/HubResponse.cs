@@ -2,6 +2,6 @@
 
 public class HubResponse
 {
-    public string SuccessMessage { get; set; }
-    public string ErrorMessage { get; set; }
+    public string SuccessMessage { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; } = string.Empty;
 }

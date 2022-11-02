@@ -45,7 +45,8 @@ public class AnonymousUserCartInteractionSteps
     [Then(@"an error message should be shown")]
     public async Task ThenAnErrorMessageShouldBeShown()
     {
-        IElementHandle modalBody = await indexPage.Page.QuerySelectorAsync(".modal-body");
+        IElementHandle? modalBody = await indexPage.Page.QuerySelectorAsync(".modal-body");
+        ArgumentNullException.ThrowIfNull(modalBody);
         string modalBodyText = await modalBody.InnerTextAsync();
         Assert.Equal("'Amount' must be greater than or equal to '0'. 'Unit Price' must be greater than or equal to '0'.", modalBodyText);
     }
@@ -61,7 +62,8 @@ public class AnonymousUserCartInteractionSteps
     {
         await Task.Delay(500);
         string cartProductsJson = await indexPage.Page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[] models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        ArgumentNullException.ThrowIfNull(models);
         Assert.True(models[0].Name == inputProductName);
         Assert.True(models[0].Amount == inputProductValidAmount);
         Assert.True(models[0].UnitPrice == inputProductValidPrice);
@@ -92,7 +94,8 @@ public class AnonymousUserCartInteractionSteps
     {
         for (int i = 0; i < table.Rows.Count; i++)
         {
-            IElementHandle item = await indexPage.Page.QuerySelectorAsync($"#item-name-{i}");
+            IElementHandle? item = await indexPage.Page.QuerySelectorAsync($"#item-name-{i}");
+            ArgumentNullException.ThrowIfNull(item);
             string itemName = await item.InnerTextAsync();
             Assert.Equal(itemName, table.Rows[i][0]);
         }
@@ -113,7 +116,8 @@ public class AnonymousUserCartInteractionSteps
     [Then(@"the cart total should be (.*)")]
     public async Task ThenTheCartTotalShouldBe(int p0)
     {
-        IElementHandle cartTotalElement = await indexPage.Page.QuerySelectorAsync($"#cart-total");
+        IElementHandle? cartTotalElement = await indexPage.Page.QuerySelectorAsync($"#cart-total");
+        ArgumentNullException.ThrowIfNull(cartTotalElement);
         string cartTotalString = await cartTotalElement.InnerTextAsync();
         Assert.Contains(p0.ToString(), cartTotalString);
     }
@@ -135,10 +139,12 @@ public class AnonymousUserCartInteractionSteps
     [Then(@"the item amount should be (.*) and price (.*)")]
     public async Task ThenTheItemAmountShouldBeAndPrice(int amount, int price)
     {
-        IElementHandle amountElement = await indexPage.Page.QuerySelectorAsync("#item-amount-0");
+        IElementHandle? amountElement = await indexPage.Page.QuerySelectorAsync("#item-amount-0");
+        ArgumentNullException.ThrowIfNull(amountElement);
         string amountText = await amountElement.InnerTextAsync();
 
-        IElementHandle priceElement = await indexPage.Page.QuerySelectorAsync("#item-unitprice-0");
+        IElementHandle? priceElement = await indexPage.Page.QuerySelectorAsync("#item-unitprice-0");
+        ArgumentNullException.ThrowIfNull(priceElement);
         string priceText = await priceElement.InnerTextAsync();
 
         Assert.Equal(amount.ToString(), amountText);
@@ -157,7 +163,8 @@ public class AnonymousUserCartInteractionSteps
     [Then(@"the all-collected check should say ""(.*)""")]
     public async Task ThenTheAll_CollectedCheckShouldSay(string p0)
     {
-        IElementHandle collectedInfoElement = await indexPage.Page.QuerySelectorAsync("#cart-collected-info");
+        IElementHandle? collectedInfoElement = await indexPage.Page.QuerySelectorAsync("#cart-collected-info");
+        ArgumentNullException.ThrowIfNull(collectedInfoElement);
         string collectedInfoText = await collectedInfoElement.InnerTextAsync();
         Assert.Equal(p0, collectedInfoText);
     }
