@@ -18,7 +18,7 @@ internal class DbHealthCheck : IHealthCheck
 
     public DbHealthCheck(IConfiguration configuration, ILogger<DbHealthCheck> logger)
     {
-        connectionString = configuration.GetConnectionString("Cosmos");
+        connectionString = configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string");
         this.logger = logger;
     }
 

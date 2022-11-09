@@ -12,7 +12,7 @@ public static class ServiceExtensions
     {
         services.AddDbContext<GroceryStoreDbContext>(options =>
         {
-            options.UseCosmos(configuration.GetConnectionString("Cosmos"), "GroceryListDb");
+            options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb");
             options.EnableThreadSafetyChecks(false);
             if (addSensitiveLogging)
             {

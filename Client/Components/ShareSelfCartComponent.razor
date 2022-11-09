@@ -3,7 +3,6 @@
 <div class="component">
     <p>Share your cart with these users:</p>
     <EditForm Model="AllowEmail" OnValidSubmit="AddUser">
-        <FluentValidationValidator />
         <ValidationSummary />
         <div class="component-row">
             <InputText id="share-cart-email-input" type="email" required class="mt-0 form-control" @bind-Value="AllowEmail.Email" placeholder="User email"/>
