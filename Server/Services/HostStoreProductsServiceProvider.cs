@@ -1,7 +1,4 @@
-﻿
-
-using GroceryListHelper.Shared.Interfaces;
-using Mapster;
+﻿using Mapster;
 
 namespace GroceryListHelper.Server.Services;
 

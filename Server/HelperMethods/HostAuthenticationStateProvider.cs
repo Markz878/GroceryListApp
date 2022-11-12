@@ -1,6 +1,4 @@
-﻿
-
-namespace GroceryListHelper.Server.HelperMethods;
+﻿namespace GroceryListHelper.Server.HelperMethods;
 
 public class HostAuthenticationStateProvider : AuthenticationStateProvider
 {

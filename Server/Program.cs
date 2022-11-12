@@ -29,25 +29,26 @@ global using Microsoft.OpenApi.Models;
 global using System.Collections.Concurrent;
 global using System.Diagnostics;
 global using System.Security.Claims;
+using GroceryListHelper.Server.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.InstallAssemblyServices();
 builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddControllersWithViews(options =>
-        options.Filters.Add(new ServiceExceptionFilter()));
-}
-else
-{
-    builder.Services.AddControllersWithViews(options =>
-    {
-        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-        options.Filters.Add(new ServiceExceptionFilter());
-    });
-}
+//if (builder.Environment.IsDevelopment())
+//{
+//    builder.Services.AddControllersWithViews(options =>
+//        options.Filters.Add(new ServiceExceptionFilter()));
+//}
+//else
+//{
+//    builder.Services.AddControllersWithViews(options =>
+//    {
+//        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+//        options.Filters.Add(new ServiceExceptionFilter());
+//    });
+//}
 
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
@@ -69,7 +70,7 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseIpRateLimiting();
+//app.UseIpRateLimiting();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -81,10 +82,12 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 app.MapRazorPages();
 app.MapControllers();
+app.MapAPIEndpoints();
 //app.UseAzureSignalR(routes =>
 //{
 //    routes.MapHub<CartHub>("/carthub");

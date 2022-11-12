@@ -4,6 +4,6 @@ public class ValidatorsInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
     }
 }
