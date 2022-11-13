@@ -17,25 +17,25 @@ public static class CartProductsEndpointsMapper
         group.MapPut("", UpdateProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProductCollectable>);
     }
 
-    internal static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         List<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
-    internal static async Task<Created<Guid>> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Created<Guid>> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         Guid id = await cartProductsRepository.AddCartProduct(product, user.GetUserId().GetValueOrDefault());
         return TypedResults.Created($"api/cartproducts", id);
     }
 
-    internal static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         await cartProductsRepository.ClearProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.NoContent();
     }
 
-    internal static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         Exception? ex = await cartProductsRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
         return ex switch

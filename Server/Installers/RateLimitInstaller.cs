@@ -7,12 +7,6 @@ public class RateLimitInstaller : IInstaller
     public const string PolicyName = "JwtRateLimitPolicy";
     public void Install(WebApplicationBuilder builder)
     {
-        //builder.Services.AddOptions();
-        //builder.Services.AddMemoryCache();
-        //builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-        //builder.Services.AddInMemoryRateLimiting();
-        //builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
         RateLimitOptions rateLimitOptions = new();
         builder.Configuration.GetSection(nameof(RateLimitOptions)).Bind(rateLimitOptions);
         builder.Services.AddRateLimiter(opt =>

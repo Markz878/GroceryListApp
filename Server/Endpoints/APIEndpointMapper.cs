@@ -6,9 +6,10 @@ public static class APIEndpointMapper
 {
     public static void MapAPIEndpoints(this WebApplication app)
     {
-        RouteGroupBuilder apiGroup = app.MapGroup("api").RequireRateLimiting(RateLimitInstaller.PolicyName).WithOpenApi();
+        RouteGroupBuilder apiGroup = app.MapGroup("api").WithOpenApi();
         if (app.Environment.IsProduction())
         {
+            apiGroup.RequireRateLimiting(RateLimitInstaller.PolicyName);
             apiGroup.AddEndpointFilter<AntiForgeryTokenFilter>();
         }
         apiGroup.AddAccountEndpoints();

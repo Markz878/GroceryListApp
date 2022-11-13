@@ -15,25 +15,25 @@ public static class StoreProductsEndpointsMapper
         group.MapPut("", UpdateProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<StoreProductServerModel>);
     }
 
-    private static async Task<Ok<List<StoreProductServerModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Ok<List<StoreProductServerModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         List<StoreProductServerModel> results = await storeProductsRepository.GetStoreProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
-    private static async Task<Created<Guid>> AddProduct(StoreProductModel product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Created<Guid>> AddProduct(StoreProductModel product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         Guid id = await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
         return TypedResults.Created($"api/storeProducts", id);
     }
 
-    private static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         await storeProductsRepository.DeleteAll(user.GetUserId().GetValueOrDefault());
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProductServerModel updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProductServerModel updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         Exception? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Id, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
         return ex switch
