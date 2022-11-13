@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Endpoints;
+﻿using GroceryListHelper.Server.Filters;
+
+namespace GroceryListHelper.Server.Endpoints;
 
 public static class APIEndpointMapper
 {
@@ -10,7 +12,6 @@ public static class APIEndpointMapper
             apiGroup.AddEndpointFilter<AntiForgeryTokenFilter>();
         }
         apiGroup.AddAccountEndpoints();
-        apiGroup.AddUserEndpoints();
         apiGroup.AddCartProductEndpoints();
         apiGroup.AddStoreProductEndpoints();
     }

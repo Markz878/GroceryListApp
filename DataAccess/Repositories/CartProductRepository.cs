@@ -1,5 +1,5 @@
-﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Exceptions;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -31,34 +31,41 @@ public class CartProductRepository : ICartProductRepository
             .ToListAsync();
     }
 
-    public async Task<CartProductCollectable> GetCartProductForUser(Guid productId, Guid userId)
-    {
-        CartProductDbModel? cartProduct = await db.CartProducts.FindAsync(productId, userId);
-        NotFoundException.ThrowIfNull(cartProduct);
-        return cartProduct.Adapt<CartProductCollectable>();
-    }
-
     public Task ClearProductsForUser(Guid userId)
     {
         db.CartProducts.RemoveRange(db.CartProducts.Where(x => x.UserId == userId));
         return db.SaveChangesAsync();
     }
 
-    public async Task DeleteProduct(Guid productId, Guid userId)
+    public async Task<Exception?> DeleteProduct(Guid productId, Guid userId)
     {
         CartProductDbModel? product = await db.CartProducts.FindAsync(productId, userId);
-        NotFoundException.ThrowIfNull(product);
-        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
+        if (product is null)
+        {
+            return NotFoundException.ForType<CartProduct>();
+        }
+        if (product.UserId != userId)
+        {
+            return ForbiddenException.Instance;
+        }
         db.CartProducts.Remove(product);
         await db.SaveChangesAsync();
+        return null;
     }
 
-    public async Task UpdateProduct(Guid userId, CartProductCollectable updatedProduct)
+    public async Task<Exception?> UpdateProduct(Guid userId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel? product = await db.CartProducts.FindAsync(updatedProduct.Id, userId);
-        NotFoundException.ThrowIfNull(product);
-        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
+        if (product is null)
+        {
+            return NotFoundException.ForType<CartProduct>();
+        }
+        if (product.UserId != userId)
+        {
+            return ForbiddenException.Instance;
+        }
         updatedProduct.Adapt(product);
         await db.SaveChangesAsync();
+        return null;
     }
 }

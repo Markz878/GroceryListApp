@@ -37,7 +37,7 @@ public class ClientAuthenticationStateProvider : AuthenticationStateProvider
     {
         try
         {
-            UserInfo? user = await _client.GetFromJsonAsync<UserInfo>("api/User");
+            UserInfo? user = await _client.GetFromJsonAsync<UserInfo>("api/account/user");
             if (user == null || !user.IsAuthenticated)
             {
                 return new ClaimsPrincipal(new ClaimsIdentity());

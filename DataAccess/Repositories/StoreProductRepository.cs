@@ -1,6 +1,8 @@
-﻿using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Exceptions;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.HelperMethods;
+using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.StoreProduct;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess.Repositories;
@@ -14,26 +16,9 @@ public class StoreProductRepository : IStoreProductRepository
         this.db = db;
     }
 
-    public async Task<StoreProductServerModel> GetStoreProductForUser(Guid productId, Guid userId)
-    {
-        StoreProductDbModel? dbProduct = await db.StoreProducts.SingleOrDefaultAsync(x => x.Id == productId && x.UserId == userId);
-        NotFoundException.ThrowIfNull(dbProduct);
-        return new StoreProductServerModel()
-        {
-            Id = dbProduct.Id,
-            Name = dbProduct.Name,
-            UnitPrice = dbProduct.UnitPrice,
-        };
-    }
-
     public Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId)
     {
-        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => new StoreProductServerModel()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            UnitPrice = x.UnitPrice,
-        }).ToListAsync();
+        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => x.Adapt<StoreProductServerModel>()).ToListAsync();
     }
 
     public async Task<Guid> AddProduct(StoreProductModel product, Guid userId)
@@ -50,21 +35,23 @@ public class StoreProductRepository : IStoreProductRepository
         return db.SaveChangesAsync();
     }
 
-    public Task DeleteItem(Guid productId, Guid userId)
-    {
-        StoreProductDbModel? product = db.StoreProducts.Find(productId, userId);
-        NotFoundException.ThrowIfNull(product);
-        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
-        db.StoreProducts.Remove(product);
-        return db.SaveChangesAsync();
-    }
-
-    public async Task UpdatePrice(Guid productId, Guid userId, double price)
+    public async Task<Exception?> DeleteItem(Guid productId, Guid userId)
     {
         StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
-        NotFoundException.ThrowIfNull(product);
-        ForbiddenException.ThrowIfNotAuthorized(product.UserId == userId);
+        if (product is null) return NotFoundException.ForType<StoreProductDbModel>();
+        if (product.UserId != userId) return ForbiddenException.Instance;
+        db.StoreProducts.Remove(product);
+        await db.SaveChangesAsync();
+        return null;
+    }
+
+    public async Task<Exception?> UpdatePrice(Guid productId, Guid userId, double price)
+    {
+        StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
+        if (product is null) return NotFoundException.ForType<StoreProductDbModel>();
+        if (product.UserId != userId) return ForbiddenException.Instance;
         product.UnitPrice = price;
         await db.SaveChangesAsync();
+        return null;
     }
 }

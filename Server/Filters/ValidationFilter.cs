@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.Server.Endpoints;
+﻿namespace GroceryListHelper.Server.Filters;
 
 public class ValidationFilter<T> : IEndpointFilter where T : class
 {

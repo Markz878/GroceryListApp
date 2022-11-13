@@ -1,7 +1,5 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.Server.Services;
-using GroceryListHelper.Shared.Interfaces;
 
 namespace GroceryListHelper.Server.Installers;
 

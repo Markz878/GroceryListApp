@@ -1,37 +1,49 @@
-﻿namespace GroceryListHelper.Server.Endpoints;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Server.Filters;
+using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace GroceryListHelper.Server.Endpoints;
 
 public static class CartProductsEndpointsMapper
 {
     public static void AddCartProductEndpoints(this RouteGroupBuilder builder)
     {
-        RouteGroupBuilder group = builder.MapGroup("cartproducts").RequireAuthorization();
-        group.MapGet("", GetAll);
-        group.MapPost("", AddProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProduct>);
+        RouteGroupBuilder group = builder.MapGroup("cartproducts").RequireAuthorization().WithTags("Cart Products");
+        group.MapGet("", GetAll).WithName("Get cart products");
+        group.MapPost("", AddProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProduct>)
+            .WithSummary("Add a cart product")
+            .WithDescription("Add a cart product to your cart.");
         group.MapDelete("", DeleteAllProducts);
         group.MapPut("", UpdateProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProductCollectable>);
     }
 
-    private static async Task<IResult> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    internal static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         List<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
-    private static async Task<IResult> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    internal static async Task<Created<Guid>> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         Guid id = await cartProductsRepository.AddCartProduct(product, user.GetUserId().GetValueOrDefault());
         return TypedResults.Created($"api/cartproducts", id);
     }
 
-    private static async Task<IResult> DeleteAllProducts(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    internal static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
         await cartProductsRepository.ClearProductsForUser(user.GetUserId().GetValueOrDefault());
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
-    private static async Task<IResult> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    internal static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        await cartProductsRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
-        return Results.NoContent();
+        Exception? ex = await cartProductsRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
+        return ex switch
+        {
+            NotFoundException => TypedResults.NotFound(),
+            ForbiddenException => TypedResults.Forbid(),
+            null => TypedResults.NoContent(),
+            _ => throw new UnreachableException()
+        };
     }
 }

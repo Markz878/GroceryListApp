@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 
-namespace GroceryListHelper.Server.Endpoints;
+namespace GroceryListHelper.Server.Filters;
 
 public class AntiForgeryTokenFilter : IEndpointFilter
 {

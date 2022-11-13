@@ -1,6 +1,4 @@
-﻿using Swashbuckle.AspNetCore.SwaggerGen;
-
-namespace GroceryListHelper.Server.Installers;
+﻿namespace GroceryListHelper.Server.Installers;
 
 public class SwaggerInstaller : IInstaller
 {

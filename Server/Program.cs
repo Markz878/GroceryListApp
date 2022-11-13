@@ -1,7 +1,5 @@
-﻿global using AspNetCoreRateLimit;
-global using Azure.Identity;
+﻿global using Azure.Identity;
 global using FluentValidation;
-global using FluentValidation.AspNetCore;
 global using FluentValidation.Results;
 global using GroceryListHelper.DataAccess.HelperMethods;
 global using GroceryListHelper.DataAccess.Repositories;
@@ -9,7 +7,6 @@ global using GroceryListHelper.Server.HelperMethods;
 global using GroceryListHelper.Server.Hubs;
 global using GroceryListHelper.Server.Installers;
 global using GroceryListHelper.Server.Services;
-global using GroceryListHelper.Shared.Exceptions;
 global using GroceryListHelper.Shared.Interfaces;
 global using GroceryListHelper.Shared.Models.Authentication;
 global using GroceryListHelper.Shared.Models.BaseModels;
@@ -19,7 +16,6 @@ global using GroceryListHelper.Shared.Models.StoreProduct;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.ResponseCompression;
 global using Microsoft.Azure.Cosmos;
 global using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -86,7 +82,6 @@ app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.EnsureDatabaseCreated();
 app.MapRazorPages();
-app.MapControllers();
 app.MapAPIEndpoints();
 //app.UseAzureSignalR(routes =>
 //{
