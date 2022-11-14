@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.Components;
+﻿using System.Drawing;
+
+namespace GroceryListHelper.Client.Components;
 
 public class CartComponentBase : BasePage<IndexViewModel>
 {
@@ -9,6 +11,7 @@ public class CartComponentBase : BasePage<IndexViewModel>
     private PersistingComponentStateSubscription stateSubscription;
 
     protected CartProduct newProduct = new();
+    protected CartProductUIModel? checkedItem;
     protected CartProductUIModel? editingItem;
     protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
@@ -119,11 +122,30 @@ public class CartComponentBase : BasePage<IndexViewModel>
         }
     }
 
-    public Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
+    public string GetRowClass(CartProductUIModel cartProduct)
     {
+        if (cartProduct == checkedItem)
+        {
+            return "animate-background";
+        }
+        if (cartProduct.IsCollected)
+        {
+            return "checked-item";
+        }
+        return "";
+    }
+
+    public async Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
+    {
+        if ((bool)e.Value! && ViewModel.ShowOnlyUncollected)
+        {
+            checkedItem = product;
+            await Task.Delay(900);
+        }
         product.IsCollected = (bool)e.Value!;
+        checkedItem = null;
         ViewModel.OnPropertyChanged();
-        return CartProductsService.UpdateCartProduct(product);
+        await CartProductsService.UpdateCartProduct(product);
     }
 
     public async Task SaveStoreProduct(StoreProductModel storeProduct)

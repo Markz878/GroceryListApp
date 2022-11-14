@@ -42,7 +42,7 @@
             {
                 @if (item != editingItem)
                 {
-                    <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")" @key=item.Id>
+                    <tr class="@GetRowClass(item)" @key=item.Id>
                         <td><button id="reorder-button-@index" class="btn btn-primary sort-button @(item==movingItem ? "moving-button" : "")" title="Move" aria-label="Move" @onclick="()=>Move(item)"><i class="fas fa-sort"></i></button></td>
                         <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item)) /></td>
                         <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
@@ -55,7 +55,7 @@
                 }
                 else
                 {
-                    <tr style="background-color: @(item.IsCollected ? "lightgray" : "white")" @key=item.Id>
+                    <tr class="@GetRowClass(item)" @key=item.Id>
                         <td></td>
                         <td></td>
                         <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
