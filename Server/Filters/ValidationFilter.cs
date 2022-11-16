@@ -1,33 +1,42 @@
-﻿namespace GroceryListHelper.Server.Filters;
+﻿using System.Reflection;
+
+namespace GroceryListHelper.Server.Filters;
 
 public static class ValidatorFactory
 {
-    public static EndpointFilterDelegate Validator<T>(EndpointFilterFactoryContext handlerContext, EndpointFilterDelegate next)
+    public static RouteGroupBuilder AddFluentValidation(this RouteGroupBuilder builder)
     {
-        int parameterIndex = -1;
-        var parameters = handlerContext.MethodInfo.GetParameters();
+        return builder.AddEndpointFilterFactory(ValidationFilter);
+    }
+
+    private static EndpointFilterDelegate ValidationFilter(EndpointFilterFactoryContext handlerContext, EndpointFilterDelegate next)
+    {
+        ParameterInfo[] parameters = handlerContext.MethodInfo.GetParameters();
         for (int i = 0; i < parameters.Length; i++)
         {
-            if (parameters[i].ParameterType == typeof(T))
+            Type validatorType = typeof(IValidator<>).MakeGenericType(parameters[i].ParameterType);
+            IValidator? validator = handlerContext.ApplicationServices.GetService(validatorType) as IValidator;
+            if (validator is not null)
             {
-                parameterIndex = i;
-                break;
+                ValidationDescriptor validationDescriptor = new(i, parameters[i].ParameterType, validator);
+                return invocationContext =>
+                {
+                    object? argument = invocationContext.Arguments[validationDescriptor.ArgumentIndex];
+                    if (argument is not null)
+                    {
+                        ValidationResult validationResult = validationDescriptor.Validator.Validate(new ValidationContext<object>(argument));
+                        if (!validationResult.IsValid)
+                        {
+                            return ValueTask.FromResult<object?>(Results.ValidationProblem(validationResult.ToDictionary()));
+                        }
+                    }
+                    return next(invocationContext);
+                };
             }
         }
-        if (parameterIndex == -1)
-        {
-            throw new ArgumentException($"No parameter of type {typeof(T).Name} given in endpoint.");
-        }
-        IValidator<T> validator = handlerContext.ApplicationServices.GetRequiredService<IValidator<T>>();
-        return invocationContext =>
-        {
-            ValidationResult validationResult = validator.Validate(invocationContext.GetArgument<T>(parameterIndex));
-            if (!validationResult.IsValid)
-            {
-                return ValueTask.FromResult<object?>(Results.ValidationProblem(validationResult.ToDictionary()));
-            }
-            return next(invocationContext);
-        };
+        return invocationContext => next(invocationContext);
     }
+
+    private record ValidationDescriptor(int ArgumentIndex, Type ArgumentType, IValidator Validator);
 }
 

@@ -10,9 +10,9 @@ public static class StoreProductsEndpointsMapper
     {
         RouteGroupBuilder group = builder.MapGroup("storeproducts").RequireAuthorization().WithTags("Store Products");
         group.MapGet("", GetAll);
-        group.MapPost("", AddProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<StoreProductModel>);
+        group.MapPost("", AddProduct);
         group.MapDelete("", DeleteAllProducts);
-        group.MapPut("", UpdateProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<StoreProductServerModel>);
+        group.MapPut("", UpdateProduct);
     }
 
     public static async Task<Ok<List<StoreProductServerModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)

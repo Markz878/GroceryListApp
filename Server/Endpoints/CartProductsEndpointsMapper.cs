@@ -10,11 +10,11 @@ public static class CartProductsEndpointsMapper
     {
         RouteGroupBuilder group = builder.MapGroup("cartproducts").RequireAuthorization().WithTags("Cart Products");
         group.MapGet("", GetAll).WithName("Get cart products");
-        group.MapPost("", AddProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProduct>)
+        group.MapPost("", AddProduct)
             .WithSummary("Add a cart product")
             .WithDescription("Add a cart product to your cart.");
         group.MapDelete("", DeleteAllProducts);
-        group.MapPut("", UpdateProduct).AddEndpointFilterFactory(ValidatorFactory.Validator<CartProductCollectable>);
+        group.MapPut("", UpdateProduct);
     }
 
     public static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)

@@ -6,7 +6,7 @@ public static class APIEndpointMapper
 {
     public static void MapAPIEndpoints(this WebApplication app)
     {
-        RouteGroupBuilder apiGroup = app.MapGroup("api").WithOpenApi();
+        RouteGroupBuilder apiGroup = app.MapGroup("api").AddFluentValidation().WithOpenApi();
         if (app.Environment.IsProduction())
         {
             apiGroup.RequireRateLimiting(RateLimitInstaller.PolicyName);
