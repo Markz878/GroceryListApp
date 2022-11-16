@@ -1,29 +1,5 @@
 ﻿namespace GroceryListHelper.Server.Filters;
 
-public class ValidationFilter<T> : IEndpointFilter where T : class
-{
-    private readonly IValidator<T> validator;
-
-    public ValidationFilter(IValidator<T> validator)
-    {
-        this.validator = validator;
-    }
-
-    public ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
-    {
-        if (context.Arguments.FirstOrDefault(x => x?.GetType() == typeof(T)) is not T parameter)
-        {
-            throw new ArgumentException($"No parameter of type {typeof(T).Name} given in endpoint {context.HttpContext.Request.Path}.");
-        }
-        ValidationResult validationResult = validator.Validate(parameter);
-        if (!validationResult.IsValid)
-        {
-            return ValueTask.FromResult<object?>(Results.ValidationProblem(validationResult.ToDictionary()));
-        }
-        return next(context);
-    }
-}
-
 public static class ValidatorFactory
 {
     public static EndpointFilterDelegate Validator<T>(EndpointFilterFactoryContext handlerContext, EndpointFilterDelegate next)
@@ -42,7 +18,7 @@ public static class ValidatorFactory
         {
             throw new ArgumentException($"No parameter of type {typeof(T).Name} given in endpoint.");
         }
-        var validator = handlerContext.ApplicationServices.GetRequiredService<IValidator<T>>();
+        IValidator<T> validator = handlerContext.ApplicationServices.GetRequiredService<IValidator<T>>();
         return invocationContext =>
         {
             ValidationResult validationResult = validator.Validate(invocationContext.GetArgument<T>(parameterIndex));
