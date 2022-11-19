@@ -30,6 +30,7 @@ jobs:
       - name: Start Cosmos Db emulator
         run: |
           cd "C:\Program Files\Azure Cosmos DB Emulator"
+          dir
           Microsoft.Azure.Cosmos.Emulator.exe
 
       - name: Test
