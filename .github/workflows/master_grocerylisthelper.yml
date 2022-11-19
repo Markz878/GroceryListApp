@@ -28,10 +28,7 @@ jobs:
           dotnet build --configuration Release
           dotnet publish -c Release -o ../dotnet-webapp
       - name: Start Cosmos Db emulator
-        run: |
-          cd "C:\Program Files\Azure Cosmos DB Emulator"
-          dir
-          Microsoft.Azure.Cosmos.Emulator.exe
+        uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Test
         run: |
