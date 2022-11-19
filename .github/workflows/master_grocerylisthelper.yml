@@ -31,16 +31,14 @@ jobs:
       - name: Start Cosmos Db emulator
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
-      - name: Test
+      - name: Unit Tests
         run: |
           cd UnitTests
           dotnet test
 
       - name: Integration Tests
         run: |
-          cd E2ETests
-          dotnet build 
-          pwsh bin/Debug/net7.0/playwright.ps1 install
+          cd ApiIntegrationTests
           dotnet test
 
       - name: Deploy to Azure Web App

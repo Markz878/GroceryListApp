@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace E2ETests;
+namespace ApiIntegrationTests;
 
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -27,9 +27,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         ClaimsIdentity identity = new(claims, "FakeAuth", "preferred_username", "role");
         ClaimsPrincipal principal = new(identity);
         AuthenticationTicket ticket = new(principal, "FakeAuth");
-
         AuthenticateResult result = AuthenticateResult.Success(ticket);
-
         return Task.FromResult(result);
     }
 }
