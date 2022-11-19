@@ -38,8 +38,9 @@ jobs:
 
       - name: Integration Tests
         run: |
-          cd IntegrationTests
+          cd E2ETests
           dotnet build 
+          dotnet dev-certs https --trust
           pwsh bin/Debug/net7.0/playwright.ps1 install
           dotnet test
 
