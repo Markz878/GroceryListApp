@@ -13,7 +13,7 @@ env:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -27,7 +27,9 @@ jobs:
           cd Server
           dotnet build --configuration Release
           dotnet publish -c Release -o ../dotnet-webapp
-
+      - name: Start Cosmos Db emulator
+        run:  Microsoft.Azure.Cosmos.Emulator.exe
+        
       - name: Test
         run: |
           cd UnitTests
