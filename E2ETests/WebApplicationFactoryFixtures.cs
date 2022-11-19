@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
 using System.Net;
@@ -57,24 +58,16 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
 
         hostBuilder.ConfigureServices((ctx, services) =>
         {
-            ServiceDescriptor descriptor = services.SingleOrDefault(d => d.ServiceType ==
-                typeof(DbContextOptions<GroceryStoreDbContext>));
-
-            services.Remove(descriptor);
-
+            services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
             services.AddDbContext<GroceryStoreDbContext>(options =>
             {
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), "TestDb");
             });
-
             if (addFakeAuthentication)
             {
                 services.AddAuthentication("FakeAuth").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("FakeAuth", null);
             }
 
-            using IServiceScope scope = services.BuildServiceProvider().CreateScope();
-            GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-            db.Database.EnsureCreated();
         });
     }
 
@@ -89,6 +82,9 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
 
     public async Task InitializeAsync()
     {
+        using IServiceScope scope = Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        await db.Database.EnsureCreatedAsync();
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {

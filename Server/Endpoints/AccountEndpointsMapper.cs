@@ -15,7 +15,7 @@ public static class AccountEndpointsMapper
         accountGroup.MapGet("user", GetUserInfo);
     }
 
-    internal static ChallengeHttpResult Login(string? returnUrl)
+    public static ChallengeHttpResult Login(string? returnUrl)
     {
         return TypedResults.Challenge(new AuthenticationProperties
         {
@@ -23,17 +23,17 @@ public static class AccountEndpointsMapper
         });
     }
 
-    internal static SignOutHttpResult Logout()
+    public static SignOutHttpResult Logout()
     {
         return TypedResults.SignOut(new AuthenticationProperties { RedirectUri = "/" }, new List<string>()
-            {
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                OpenIdConnectDefaults.AuthenticationScheme
-            });
+        {
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            OpenIdConnectDefaults.AuthenticationScheme
+        });
     }
 
     private static readonly string[] returnClaimTypes = new[] { "name", "preferred_username", "http://schemas.microsoft.com/identity/claims/objectidentifier" };
-    internal static Ok<UserInfo> GetUserInfo(ClaimsPrincipal claimsPrincipal)
+    public static Ok<UserInfo> GetUserInfo(ClaimsPrincipal claimsPrincipal)
     {
         if (claimsPrincipal.Identity?.IsAuthenticated == false)
         {

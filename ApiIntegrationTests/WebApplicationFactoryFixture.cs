@@ -1,14 +1,4 @@
-﻿using GroceryListHelper.DataAccess;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Xunit.Abstractions;
-
-namespace ApiIntegrationTests;
+﻿namespace ApiIntegrationTests;
 
 public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {

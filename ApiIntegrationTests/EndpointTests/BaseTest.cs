@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.DataAccess;
-using GroceryListHelper.DataAccess.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
+﻿using System.Text.Json;
 
 namespace ApiIntegrationTests.EndpointTests;
 
@@ -10,37 +7,76 @@ public abstract class BaseTest : IDisposable
 {
     protected readonly WebApplicationFactoryFixture _factory;
     protected readonly HttpClient _client;
-    protected readonly IServiceScope _scope;
+    protected static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     public BaseTest(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper)
     {
         _factory = factory;
         factory.TestOutputHelper = testOutputHelper;
         _client = factory.CreateClient();
-        _scope = _factory.Services.CreateScope();
     }
 
-    protected GroceryStoreDbContext GetDbContext() => _scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-
-    public static IEnumerable<CartProductDbModel> GenerateCartProducts(int n)
+    public CartProductDbModel GetRandomDbCartProduct(int order = 0)
     {
+        return new CartProductDbModel()
+        {
+            Id = Guid.NewGuid(),
+            Amount = Random.Shared.NextDouble() * 10,
+            Name = "Product" + Random.Shared.Next(0, 10000),
+            Order = order,
+            UnitPrice = Random.Shared.NextDouble() * 10,
+            UserId = TestAuthHandler.UserId,
+        };
+    }
+
+    public StoreProductDbModel GetRandomDbStoreProduct()
+    {
+        return new StoreProductDbModel()
+        {
+            Id = Guid.NewGuid(),
+            Name = "Product" + Random.Shared.Next(0, 10000),
+            UnitPrice = Random.Shared.NextDouble() * 10,
+            UserId = TestAuthHandler.UserId,
+        };
+    }
+
+    public async Task<List<CartProductDbModel>> SaveCartProducts(int n)
+    {
+        List<CartProductDbModel> result = new(n);
         for (int i = 0; i < n; i++)
         {
-            yield return new CartProductDbModel()
-            {
-                Id = Guid.NewGuid(),
-                Amount = Random.Shared.NextDouble() * 10,
-                Name = "Product" + Random.Shared.Next(0, 10000),
-                Order = i * 1000,
-                UnitPrice = Random.Shared.NextDouble() * 10,
-                UserId = TestAuthHandler.UserId,
-            };
+            result.Add(GetRandomDbCartProduct(i*1000));
         }
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        db.CartProducts.AddRange(result);
+        await db.SaveChangesAsync();
+        return result;
+    }
+
+    public async Task<List<StoreProductDbModel>> SaveStoreProducts(int n)
+    {
+        List<StoreProductDbModel> result = new(n);
+        for (int i = 0; i < n; i++)
+        {
+            result.Add(GetRandomDbStoreProduct());
+        }
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        db.StoreProducts.AddRange(result);
+        await db.SaveChangesAsync();
+        return result;
     }
 
     public void Dispose()
     {
-        _scope.Dispose();
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        List<CartProductDbModel> cartProducts = db.CartProducts.ToList();
+        db.CartProducts.RemoveRange(cartProducts);
+        List<StoreProductDbModel> storeProducts = db.StoreProducts.ToList();
+        db.StoreProducts.RemoveRange(storeProducts);
+        db.SaveChanges();
         GC.SuppressFinalize(this);
     }
 }

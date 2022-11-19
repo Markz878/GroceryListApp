@@ -26,8 +26,7 @@
 
 .animate-background {
     animation-name: example;
-    animation-duration: 0.3s;
-    animation-iteration-count: 3;
+    animation-duration: 0.8s;
 }
 
 @keyframes example {

@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Text;
-using Xunit.Abstractions;
-
-namespace ApiIntegrationTests;
+﻿namespace ApiIntegrationTests;
 
 internal class XUnitLoggingProvider : ILoggerProvider
 {

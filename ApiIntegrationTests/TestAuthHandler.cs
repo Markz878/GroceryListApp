@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
-
-namespace ApiIntegrationTests;
+﻿namespace ApiIntegrationTests;
 
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
