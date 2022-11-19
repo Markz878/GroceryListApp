@@ -31,9 +31,7 @@ jobs:
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Test
-        run: |
-          cd UnitTests
-          dotnet test
+        run: dotnet test
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
