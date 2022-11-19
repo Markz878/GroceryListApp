@@ -31,7 +31,15 @@ jobs:
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Test
-        run: dotnet test
+        run: |
+          dotnet test
+
+      - name: Integration Tests
+        run: |
+          cd IntegrationTests
+          dotnet build 
+          pwsh bin/Debug/netX/playwright.ps1 install
+          dotnet test
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
