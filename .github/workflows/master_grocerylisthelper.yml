@@ -27,18 +27,20 @@ jobs:
           cd Server
           dotnet build --configuration Release
           dotnet publish -c Release -o ../dotnet-webapp
+
       - name: Start Cosmos Db emulator
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Test
         run: |
+          cd UnitTests
           dotnet test
 
       - name: Integration Tests
         run: |
           cd IntegrationTests
           dotnet build 
-          pwsh bin/Debug/netX/playwright.ps1 install
+          pwsh bin/Debug/net7.0/playwright.ps1 install
           dotnet test
 
       - name: Deploy to Azure Web App
