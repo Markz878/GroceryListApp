@@ -11,23 +11,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\GroceryListHelper.Server.csproj", "{178F7F39-6CAB-49A4-A15F-7F02C3977E9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Server", "Server\GroceryListHelper.Server.csproj", "{178F7F39-6CAB-49A4-A15F-7F02C3977E9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\GroceryListHelper.Client.csproj", "{F1803283-2016-491B-B6F7-26EEC326E9A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Client", "Client\GroceryListHelper.Client.csproj", "{F1803283-2016-491B-B6F7-26EEC326E9A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\GroceryListHelper.DataAccess.csproj", "{CB0993B0-1004-4699-B7A1-EE5ACC03D8E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.DataAccess", "DataAccess\GroceryListHelper.DataAccess.csproj", "{CB0993B0-1004-4699-B7A1-EE5ACC03D8E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\GroceryListHelper.Shared.csproj", "{EAA6A733-4F4B-4A65-A806-CE20B0759A4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Shared", "Shared\GroceryListHelper.Shared.csproj", "{EAA6A733-4F4B-4A65-A806-CE20B0759A4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\GroceryListHelper.UnitTests.csproj", "{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.UnitTests", "UnitTests\GroceryListHelper.UnitTests.csproj", "{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\GroceryListHelper.IntegrationTests.csproj", "{76BE5548-8050-4F83-865F-030A3783FE6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.IntegrationTests", "IntegrationTests\GroceryListHelper.IntegrationTests.csproj", "{76BE5548-8050-4F83-865F-030A3783FE6F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2ETests", "E2ETests\E2ETests.csproj", "{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDbInitializer", "CosmosDbInitializer\CosmosDbInitializer.csproj", "{20FF3FFC-8D9C-4A25-B77D-67F9515261DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiIntegrationTests", "ApiIntegrationTests\ApiIntegrationTests.csproj", "{BC4C045E-CB15-4501-BF25-0D3BBFB2F77A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiIntegrationTests", "ApiIntegrationTests\ApiIntegrationTests.csproj", "{BC4C045E-CB15-4501-BF25-0D3BBFB2F77A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

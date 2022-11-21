@@ -39,6 +39,12 @@
     text-decoration: none;
 }
 
+@media (prefers-color-scheme: dark) {
+    .toggleButton:focus {
+        border: 2px solid #ccc;
+    }
+}
+
 .activeButton {
     background-color: rgb(30, 121, 255);
     text-align: center;

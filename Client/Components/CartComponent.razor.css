@@ -17,24 +17,46 @@
 }
 
 .moving-button {
-    background: #3827b4
+    background-color: #3827b4
 }
 
 .checked-item {
-    background-color: lightgray;
+    background-color: var(--color-light-gray);
+}
+
+@media (prefers-color-scheme: dark) {
+    .checked-item {
+        background-color: var(--color-dark-gray);
+    }
 }
 
 .animate-background {
-    animation-name: example;
+    animation-name: light-animation;
     animation-duration: 0.8s;
 }
 
-@keyframes example {
+@media (prefers-color-scheme: dark) {
+    .animate-background {
+        animation-name: dark-animation;
+    }
+}
+
+@keyframes light-animation {
     0% {
-        background-color: white;
+        background-color: var(--color-light);
     }
     100% {
-        background-color: lightgray;
+        background-color: var(--color-light-gray);
+    }
+}
+
+@keyframes dark-animation {
+    0% {
+        background-color: var(--color-dark);
+    }
+
+    100% {
+        background-color: var(--color-dark-gray);
     }
 }
 

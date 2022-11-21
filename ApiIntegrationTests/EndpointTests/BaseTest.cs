@@ -72,10 +72,8 @@ public abstract class BaseTest : IDisposable
     {
         using IServiceScope scope = _factory.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        List<CartProductDbModel> cartProducts = db.CartProducts.ToList();
-        db.CartProducts.RemoveRange(cartProducts);
-        List<StoreProductDbModel> storeProducts = db.StoreProducts.ToList();
-        db.StoreProducts.RemoveRange(storeProducts);
+        db.CartProducts.RemoveRange(db.CartProducts);
+        db.StoreProducts.RemoveRange(db.StoreProducts);
         db.SaveChanges();
         GC.SuppressFinalize(this);
     }

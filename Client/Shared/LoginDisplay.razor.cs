@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
-
-namespace GroceryListHelper.Client.Shared;
+﻿namespace GroceryListHelper.Client.Shared;
 
 public partial class LoginDisplay : IDisposable
 {
