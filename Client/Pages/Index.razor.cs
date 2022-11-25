@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
-
-namespace GroceryListHelper.Client.Pages;
+﻿namespace GroceryListHelper.Client.Pages;
 
 public class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
 {

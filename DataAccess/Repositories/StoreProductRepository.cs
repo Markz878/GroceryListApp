@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
-using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.StoreProduct;
 using Mapster;
@@ -38,8 +37,16 @@ public class StoreProductRepository : IStoreProductRepository
     public async Task<Exception?> DeleteItem(Guid productId, Guid userId)
     {
         StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
-        if (product is null) return NotFoundException.ForType<StoreProductDbModel>();
-        if (product.UserId != userId) return ForbiddenException.Instance;
+        if (product is null)
+        {
+            return NotFoundException.ForType<StoreProductDbModel>();
+        }
+
+        if (product.UserId != userId)
+        {
+            return ForbiddenException.Instance;
+        }
+
         db.StoreProducts.Remove(product);
         await db.SaveChangesAsync();
         return null;
@@ -48,8 +55,16 @@ public class StoreProductRepository : IStoreProductRepository
     public async Task<Exception?> UpdatePrice(Guid productId, Guid userId, double price)
     {
         StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
-        if (product is null) return NotFoundException.ForType<StoreProductDbModel>();
-        if (product.UserId != userId) return ForbiddenException.Instance;
+        if (product is null)
+        {
+            return NotFoundException.ForType<StoreProductDbModel>();
+        }
+
+        if (product.UserId != userId)
+        {
+            return ForbiddenException.Instance;
+        }
+
         product.UnitPrice = price;
         await db.SaveChangesAsync();
         return null;

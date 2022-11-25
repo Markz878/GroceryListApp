@@ -74,7 +74,7 @@ public class StoreProductsTests : BaseTest
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        StoreProductDbModel product = await db.StoreProducts.FirstAsync(x=>x.Id == insertedProducts[0].Id);
+        StoreProductDbModel product = await db.StoreProducts.FirstAsync(x => x.Id == insertedProducts[0].Id);
         Assert.Equal(storeProduct.Id, product.Id);
         Assert.Equal(storeProduct.Name, product.Name);
         Assert.Equal(storeProduct.UnitPrice, product.UnitPrice);

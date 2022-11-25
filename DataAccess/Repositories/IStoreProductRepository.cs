@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.DataAccess.HelperMethods;
-using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Models.StoreProduct;
+﻿using GroceryListHelper.Shared.Models.StoreProduct;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 

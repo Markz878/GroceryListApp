@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.HelperMethods;
 
-public static class ControllerHelpers
+public static class AuthenticationHelpers
 {
     public static Guid? GetUserId(this ClaimsPrincipal user)
     {

@@ -3,6 +3,7 @@ global using FluentValidation;
 global using FluentValidation.Results;
 global using GroceryListHelper.DataAccess.HelperMethods;
 global using GroceryListHelper.DataAccess.Repositories;
+global using GroceryListHelper.Server.Endpoints;
 global using GroceryListHelper.Server.HelperMethods;
 global using GroceryListHelper.Server.Hubs;
 global using GroceryListHelper.Server.Installers;
@@ -25,7 +26,6 @@ global using Microsoft.OpenApi.Models;
 global using System.Collections.Concurrent;
 global using System.Diagnostics;
 global using System.Security.Claims;
-global using GroceryListHelper.Server.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
@@ -51,7 +51,6 @@ else
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles(new StaticFileOptions

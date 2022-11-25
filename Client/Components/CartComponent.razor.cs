@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace GroceryListHelper.Client.Components;
+﻿namespace GroceryListHelper.Client.Components;
 
 public class CartComponentBase : BasePage<IndexViewModel>
 {

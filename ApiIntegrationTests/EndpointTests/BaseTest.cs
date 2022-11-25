@@ -45,7 +45,7 @@ public abstract class BaseTest : IDisposable
         List<CartProductDbModel> result = new(n);
         for (int i = 0; i < n; i++)
         {
-            result.Add(GetRandomDbCartProduct(i*1000));
+            result.Add(GetRandomDbCartProduct(i * 1000));
         }
         using IServiceScope scope = _factory.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();

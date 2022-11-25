@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Interfaces;
-
-namespace GroceryListHelper.Server.Services;
+﻿namespace GroceryListHelper.Server.Services;
 
 public class HostCartHubBuilder : ICartHubBuilder
 {

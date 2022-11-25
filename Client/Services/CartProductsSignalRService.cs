@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.BaseModels;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class CartProductsSignalRService : ICartProductsService
 {

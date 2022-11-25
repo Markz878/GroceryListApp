@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
-using GroceryListHelper.Server.Filters;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GroceryListHelper.Server.Endpoints;

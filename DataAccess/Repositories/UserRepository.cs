@@ -1,6 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 

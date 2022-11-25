@@ -46,7 +46,7 @@ public class RateLimitInstaller : IInstaller
     }
 }
 
-class RateLimitOptions
+internal class RateLimitOptions
 {
     public int AnonTokenLimit { get; set; }
     public int AnonQueueLimit { get; set; }

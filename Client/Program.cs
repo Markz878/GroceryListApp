@@ -24,7 +24,6 @@ global using Polly.Retry;
 global using Polly.Wrap;
 global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
-global using System.Diagnostics.CodeAnalysis;
 global using System.Net;
 global using System.Net.Http;
 global using System.Net.Http.Json;

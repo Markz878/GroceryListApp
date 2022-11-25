@@ -6,5 +6,8 @@ public class NotFoundException : Exception
     {
     }
 
-    public static NotFoundException ForType<T>() => new(nameof(T));
+    public static NotFoundException ForType<T>()
+    {
+        return new(nameof(T));
+    }
 }

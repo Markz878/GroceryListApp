@@ -23,13 +23,14 @@ public static class AccountEndpointsMapper
         });
     }
 
+    private static readonly IList<string> authSchemes = new[]
+    {
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        OpenIdConnectDefaults.AuthenticationScheme
+    };
     public static SignOutHttpResult Logout()
     {
-        return TypedResults.SignOut(new AuthenticationProperties { RedirectUri = "/" }, new List<string>()
-        {
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            OpenIdConnectDefaults.AuthenticationScheme
-        });
+        return TypedResults.SignOut(new AuthenticationProperties { RedirectUri = "/" }, authSchemes);
     }
 
     private static readonly string[] returnClaimTypes = new[] { "name", "preferred_username", "http://schemas.microsoft.com/identity/claims/objectidentifier" };

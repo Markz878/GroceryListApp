@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.CartProduct;
-
-namespace ApiIntegrationTests.EndpointTests;
+﻿namespace ApiIntegrationTests.EndpointTests;
 
 public class CartProductsTests : BaseTest
 {
@@ -83,7 +81,7 @@ public class CartProductsTests : BaseTest
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        CartProductDbModel product = await db.CartProducts.FirstAsync(x=>x.Id == insertedProducts[0].Id);
+        CartProductDbModel product = await db.CartProducts.FirstAsync(x => x.Id == insertedProducts[0].Id);
         Assert.Equal(cartProduct.Id, product.Id);
         Assert.Equal(cartProduct.Amount, product.Amount);
         Assert.Equal(cartProduct.Name, product.Name);
