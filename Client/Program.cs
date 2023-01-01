@@ -30,36 +30,28 @@ global using System.Net.Http.Json;
 global using System.Reflection;
 global using System.Security.Claims;
 
-namespace GroceryListHelper.Client;
+WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-public class Program
-{
-    public static async Task Main(string[] args)
-    {
-        WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, ClientAuthenticationStateProvider>();
+builder.Services.AddTransient<AuthorizedHandler>();
 
-        builder.Services.AddOptions();
-        builder.Services.AddAuthorizationCore();
-        builder.Services.AddScoped<AuthenticationStateProvider, ClientAuthenticationStateProvider>();
-        builder.Services.AddTransient<AuthorizedHandler>();
+AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
+AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2));
+AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
 
-        AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(15));
-        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2));
-        AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
+builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
+builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy);
 
-        builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
-        builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-            .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy); ;
+builder.Services.AddScoped<ICartHubBuilder, CartHubBuilder>();
+builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
+builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
 
-        builder.Services.AddScoped<ICartHubBuilder, CartHubBuilder>();
-        builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
-        builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
-        builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
+builder.Services.AddScoped<IndexViewModel>();
+builder.Services.AddScoped<ModalViewModel>();
 
-        builder.Services.AddScoped<IndexViewModel>();
-        builder.Services.AddScoped<ModalViewModel>();
-
-        await builder.Build().RunAsync();
-    }
-}
+await builder.Build().RunAsync();
