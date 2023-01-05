@@ -61,7 +61,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
             services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
             services.AddDbContext<GroceryStoreDbContext>(options =>
             {
-                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), "TestDb");
+                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), "E2ETestDb");
             });
             if (addFakeAuthentication)
             {
