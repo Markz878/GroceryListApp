@@ -42,7 +42,7 @@ jobs:
 
       - name: Install Playwright
         run: |
-          cd E2ETests/bin/Debug/net7.0
+          cd E2ETests/bin/Release/net7.0
           pwsh playwright.ps1 install
 
       - name: Run Playwright Tests
