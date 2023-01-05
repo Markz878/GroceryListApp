@@ -42,8 +42,8 @@ jobs:
 
       - name: Install Playwright
         run: |
-          cd E2ETests/bin/Release/net7.0
-          pwsh playwright.ps1 install
+          dotnet build E2ETests -c Release
+          pwsh E2ETests/bin/Release/net7.0/playwright.ps1 install
 
       - name: Run Playwright Tests
         run: dotnet test E2ETests -c Release
