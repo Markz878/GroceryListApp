@@ -6,7 +6,6 @@ on:
       - master
 env:
   AZURE_WEBAPP_PACKAGE_PATH: 'publish' # Set this to the path to your web app project, defaults to the repository root:
-  DOTNET_VERSION: '7.0.100' # The .NET SDK version to use
 
 jobs:
   remove-old-artifacts:
@@ -16,8 +15,7 @@ jobs:
     - name: Remove old artifacts
       uses: c-hive/gha-remove-artifacts@v1
       with:
-        age: '5 days' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
-        skip-recent: 2
+        age: '2 days' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
 
   publish:
     needs: remove-old-artifacts
@@ -28,7 +26,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: '7.x'
 
       - name: Build
         run: dotnet build Server --configuration Release
@@ -36,16 +34,21 @@ jobs:
       - name: Start Cosmos Db emulator
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
-      - name: Unit Tests
+      - name: Run Unit Tests
         run: dotnet test UnitTests -c Release
 
-      - name: API Integration Tests
+      - name: Run API Integration Tests
         run: dotnet test ApiIntegrationTests -c Release
 
-      - name: Playwright Tests
+      - name: Install Playwright
+        run: |
+          cd E2ETests/bin/Debug/net7
+          pwsh playwright.ps1 install
+
+      - name: Run Playwright Tests
         run: dotnet test E2ETests -c Release
 
-      - name: dotnet publish
+      - name: Publish app
         run: dotnet publish Server -c Release -o "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
 
       - name: Deploy to Azure Web App
