@@ -67,7 +67,6 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
             {
                 services.AddAuthentication("FakeAuth").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("FakeAuth", null);
             }
-
         });
     }
 
@@ -82,14 +81,11 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
 
     public async Task InitializeAsync()
     {
-        using IServiceScope scope = Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        await db.Database.EnsureCreatedAsync();
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
             Headless = true,
-            SlowMo = 200,
+            SlowMo = 100,
         });
     }
 
@@ -97,9 +93,6 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
     {
         await BrowserInstance.DisposeAsync();
         PlaywrightInstance.Dispose();
-        using IServiceScope scope = Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        db.Database.EnsureDeleted();
     }
 
     private static int GetRandomUnusedPort()

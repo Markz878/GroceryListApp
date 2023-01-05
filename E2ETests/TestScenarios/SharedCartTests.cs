@@ -6,7 +6,7 @@
 //namespace E2ETests.TestScenarios;
 
 //[Collection(nameof(WebApplicationFactoryCollection))]
-//public class SharedCartTests
+//public sealed class SharedCartTests
 //{
 //    private readonly WebApplicationFactoryFixture fixture;
 

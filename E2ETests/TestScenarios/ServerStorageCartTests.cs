@@ -1,17 +1,18 @@
-﻿using Microsoft.Playwright;
+﻿using GroceryListHelper.DataAccess;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace E2ETests.TestScenarios;
 
 [Collection(nameof(AuthorizedWebApplicationFactoryCollection))]
-public class ServerStorageCartTests
+public sealed class ServerStorageCartTests : IAsyncLifetime
 {
     private readonly AuthorizedWebApplicationFactoryFixture fixture;
 
     public ServerStorageCartTests(AuthorizedWebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
-        server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         fixture = server;
     }
@@ -143,5 +144,18 @@ public class ServerStorageCartTests
         await page.ClickAsync($"#delete-product-button-{productCount / 2}");
         IElementHandle element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
+    }
+
+    public async Task InitializeAsync()
+    {
+        using IServiceScope scope = fixture.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        await db.Database.EnsureCreatedAsync();
+    }
+    public async Task DisposeAsync()
+    {
+        using IServiceScope scope = fixture.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        await db.Database.EnsureDeletedAsync();
     }
 }

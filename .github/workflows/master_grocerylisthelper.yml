@@ -5,11 +5,22 @@ on:
     branches:
       - master
 env:
-  AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish' # Set this to the path to your web app project, defaults to the repository root:
   DOTNET_VERSION: '7.0.100' # The .NET SDK version to use
 
 jobs:
+  remove-old-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Remove old artifacts
+      uses: c-hive/gha-remove-artifacts@v1
+      with:
+        age: '5 days' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
+        skip-recent: 2
+
   publish:
+    needs: remove-old-artifacts
     runs-on: windows-latest
 
     steps:
@@ -20,28 +31,26 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build
-        run: |
-          cd Server
-          dotnet build --configuration Release
-          dotnet publish -c Release -o ../dotnet-webapp
+        run: dotnet build Server --configuration Release
 
       - name: Start Cosmos Db emulator
         uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Unit Tests
-        run: |
-          cd UnitTests
-          dotnet test
+        run: dotnet test UnitTests -c Release
 
       - name: API Integration Tests
-        run: |
-          cd ApiIntegrationTests
-          dotnet test
+        run: dotnet test ApiIntegrationTests -c Release
+
+      - name: Playwright Tests
+        run: dotnet test E2ETests -c Release
+
+      - name: dotnet publish
+        run: dotnet publish Server -c Release -o "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'GroceryListHelper'
-          slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C99403358B7E4954BCBAE0769BA6A9BB }}
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dotnet-webapp'
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

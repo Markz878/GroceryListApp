@@ -65,7 +65,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
-app.EnsureDatabaseCreated();
 app.MapRazorPages();
 app.MapAPIEndpoints();
 //app.UseAzureSignalR(routes =>

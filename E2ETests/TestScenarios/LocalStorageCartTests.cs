@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 namespace E2ETests.TestScenarios;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public class LocalStorageCartTests
+public sealed class LocalStorageCartTests
 {
     private readonly WebApplicationFactoryFixture fixture;
 
