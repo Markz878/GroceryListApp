@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.DataAccess.Models;
 
-public class UserCartGroupDbModel
+public sealed class UserCartGroupDbModel
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public Guid HostId { get; set; }

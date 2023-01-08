@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Server.Filters;
 
-public class AntiForgeryTokenFilter : IEndpointFilter
+public sealed class AntiForgeryTokenFilter : IEndpointFilter
 {
     private readonly IAntiforgery antiforgery;
     public AntiForgeryTokenFilter(IAntiforgery antiforgery)

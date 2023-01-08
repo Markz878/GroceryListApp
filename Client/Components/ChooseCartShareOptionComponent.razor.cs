@@ -1,6 +1,6 @@
 namespace GroceryListHelper.Client.Components;
 
-public class ChooseCartShareOptionComponentBase : BasePage<IndexViewModel>
+public abstract class ChooseCartShareOptionComponentBase : BasePage<IndexViewModel>
 {
     public string LeftButtonActive => ViewModel.ShareMode == ShareModeType.Self ? "activeButton" : "";
     public string RightButtonActive => ViewModel.ShareMode == ShareModeType.Join ? "activeButton" : "";

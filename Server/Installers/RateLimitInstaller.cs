@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Server.Installers;
 
-public class RateLimitInstaller : IInstaller
+public sealed class RateLimitInstaller : IInstaller
 {
     public const string PolicyName = "JwtRateLimitPolicy";
     public void Install(WebApplicationBuilder builder)

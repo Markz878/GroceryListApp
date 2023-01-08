@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class KeyVaultInstaller : IInstaller
+public sealed class KeyVaultInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

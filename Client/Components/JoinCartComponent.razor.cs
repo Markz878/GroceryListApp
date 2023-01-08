@@ -1,6 +1,6 @@
 namespace GroceryListHelper.Client.Components;
 
-public class JoinCartComponentBase : BasePage<IndexViewModel>
+public abstract class JoinCartComponentBase : BasePage<IndexViewModel>
 {
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;

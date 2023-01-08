@@ -2,12 +2,12 @@
 
 namespace GroceryListHelper.Server.Installers;
 
-public class AuthenticationInstaller : IInstaller
+public sealed class AuthenticationInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
         builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
-        builder.Services.AddScoped<AuthenticationStateProvider, HostAuthenticationStateProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 
         //builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
         //{

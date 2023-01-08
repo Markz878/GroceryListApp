@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Services;
 
-public class CartProductsSignalRService : ICartProductsService
+public sealed class CartProductsSignalRService : ICartProductsService
 {
     private readonly HubConnection cartHub;
 

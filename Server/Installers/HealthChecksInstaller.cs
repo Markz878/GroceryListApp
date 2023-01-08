@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class HealthChecksInstaller : IInstaller
+public sealed class HealthChecksInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

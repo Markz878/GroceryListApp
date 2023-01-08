@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.IntegrationTests.PageObjects;
 
-public class IndexPageObject : BasePageObject
+public sealed class IndexPageObject : BasePageObject
 {
     public IndexPageObject(IBrowserContext browser) : base(browser, "")
     {

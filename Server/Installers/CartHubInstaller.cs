@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class CartHubInstaller : IInstaller
+public sealed class CartHubInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

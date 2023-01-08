@@ -1,6 +1,6 @@
 ﻿namespace ApiIntegrationTests;
 
 [CollectionDefinition(nameof(WebApplicationFactoryCollection))]
-public class WebApplicationFactoryCollection : ICollectionFixture<WebApplicationFactoryFixture>
+public sealed class WebApplicationFactoryCollection : ICollectionFixture<WebApplicationFactoryFixture>
 {
 }

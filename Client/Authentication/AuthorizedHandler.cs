@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Authentication;
 
-public class AuthorizedHandler : DelegatingHandler
+public sealed class AuthorizedHandler : DelegatingHandler
 {
     private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly IJSRuntime js;

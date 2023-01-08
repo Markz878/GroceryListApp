@@ -1,6 +1,6 @@
 ﻿namespace ApiIntegrationTests;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
+public sealed class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
 {
     public required ITestOutputHelper TestOutputHelper { get; set; }
 

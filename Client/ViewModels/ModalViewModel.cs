@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.ViewModels;
 
-public class ModalViewModel : BaseViewModel
+public sealed class ModalViewModel : BaseViewModel
 {
     public string Message { get => message; set => SetProperty(ref message, value); }
     private string message = string.Empty;

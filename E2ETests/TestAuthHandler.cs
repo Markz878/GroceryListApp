@@ -6,7 +6,7 @@ using System.Text.Encodings.Web;
 
 namespace E2ETests;
 
-public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public static Guid UserId { get; } = Guid.NewGuid();
 

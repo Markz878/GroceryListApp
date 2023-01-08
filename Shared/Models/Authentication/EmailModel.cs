@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Shared.Models.Authentication;
 
-public class EmailModel
+public sealed class EmailModel
 {
     public string Email { get; set; } = string.Empty;
 }

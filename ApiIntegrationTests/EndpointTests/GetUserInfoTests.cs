@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace ApiIntegrationTests.EndpointTests;
 
-public class GetUserInfoTests : BaseTest
+public sealed class GetUserInfoTests : BaseTest
 {
     public GetUserInfoTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
     {

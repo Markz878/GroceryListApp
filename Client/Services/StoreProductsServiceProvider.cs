@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Services;
 
-public class StoreProductsServiceProvider : IStoreProductsService
+public sealed class StoreProductsServiceProvider : IStoreProductsService
 {
     private readonly IHttpClientFactory httpClientFactory;
     private readonly ILocalStorageService localStorage;

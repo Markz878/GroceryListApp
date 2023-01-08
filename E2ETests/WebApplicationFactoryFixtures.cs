@@ -15,14 +15,14 @@ using Xunit.Abstractions;
 
 namespace E2ETests;
 
-public class AuthorizedWebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
+public sealed class AuthorizedWebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
     public AuthorizedWebApplicationFactoryFixture() : base(true)
     {
     }
 }
 
-public class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
+public sealed class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
     public WebApplicationFactoryFixture() : base(false)
     {

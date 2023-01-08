@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Authentication;
 
-public class ClientAuthenticationStateProvider : AuthenticationStateProvider
+public sealed class ClientAuthenticationStateProvider : AuthenticationStateProvider
 {
     private static readonly TimeSpan _userCacheRefreshInterval = TimeSpan.FromSeconds(60);
     private readonly HttpClient _client;

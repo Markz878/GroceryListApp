@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Services;
 
-public class CartProductsLocalService : ICartProductsService
+public sealed class CartProductsLocalService : ICartProductsService
 {
     private readonly ILocalStorageService localStorage;
     private const string cartProductsKey = "cartProducts";

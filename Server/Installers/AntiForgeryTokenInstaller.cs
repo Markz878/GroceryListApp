@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class AntiForgeryTokenInstaller : IInstaller
+public sealed class AntiForgeryTokenInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

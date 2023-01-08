@@ -8,7 +8,7 @@ using Xunit;
 namespace GroceryListHelper.IntegrationTests.Features;
 
 [Binding]
-public class AnonymousUserCartInteractionSteps
+public sealed class AnonymousUserCartInteractionSteps
 {
     private readonly IndexPageObject indexPage;
     private const string inputProductName = "Milk";

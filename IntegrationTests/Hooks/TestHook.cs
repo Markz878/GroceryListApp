@@ -6,7 +6,7 @@ using TechTalk.SpecFlow;
 namespace GroceryListHelper.IntegrationTests.Hooks;
 
 [Binding]
-public class TestHook
+public sealed class TestHook
 {
     //private const string apiContainerName = "grocerylisthelper";
     private static readonly WebApplicationFactoryFixture webApplicationFactoryFixture = new();

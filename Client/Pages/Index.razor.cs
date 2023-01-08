@@ -1,10 +1,11 @@
 ﻿namespace GroceryListHelper.Client.Pages;
 
-public class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
+public abstract class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
 {
     [Inject] public ICartHubBuilder CartHubBuilder { get; set; } = default!;
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] public PersistentComponentState ApplicationState { get; set; } = default!;
+    [Inject] public required RenderLocation RenderLocation { get; set; }
     private PersistingComponentStateSubscription stateSubscription;
     protected UserInfo? userInfo;
 
@@ -15,8 +16,10 @@ public class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
         {
             userInfo = await AuthenticationStateProvider.GetUserInfo();
         }
-        CartHubBuilder.BuildCartHubConnection();
-        base.OnInitialized();
+        if (RenderLocation is ClientRenderLocation)
+        {
+            CartHubBuilder.BuildCartHubConnection();
+        }
     }
 
     private Task PersistData()

@@ -3,7 +3,7 @@ using GroceryListHelper.Client.ViewModels;
 
 namespace GroceryListHelper.Server.Installers;
 
-public class DataAccessInstaller : IInstaller
+public sealed class DataAccessInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
@@ -13,5 +13,6 @@ public class DataAccessInstaller : IInstaller
         builder.Services.AddScoped<IStoreProductsService, HostStoreProductsServiceProvider>();
         builder.Services.AddScoped<IndexViewModel>();
         builder.Services.AddScoped<ModalViewModel>();
+        builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
     }
 }

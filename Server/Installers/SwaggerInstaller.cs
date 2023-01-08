@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class SwaggerInstaller : IInstaller
+public sealed class SwaggerInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

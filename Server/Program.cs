@@ -28,10 +28,8 @@ global using System.Diagnostics;
 global using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.InstallAssemblyServices();
-builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
 
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 

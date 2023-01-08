@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
-public class CartProductRepository : ICartProductRepository
+public sealed class CartProductRepository : ICartProductRepository
 {
     private readonly GroceryStoreDbContext db;
     public CartProductRepository(GroceryStoreDbContext db)

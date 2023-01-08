@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.HelperMethods;
 
-public class SortOrderMethods
+public sealed class SortOrderMethods
 {
     public static double GetNewOrder(IEnumerable<double> orders, double movingOrder, double movingToOrder)
     {

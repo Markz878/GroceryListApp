@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
-public class UserRepository : IUserRepository
+public sealed class UserRepository : IUserRepository
 {
     private readonly GroceryStoreDbContext db;
 

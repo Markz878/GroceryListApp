@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess;
 
-public class GroceryStoreDbContext : DbContext
+public sealed class GroceryStoreDbContext : DbContext
 {
     public GroceryStoreDbContext(DbContextOptions<GroceryStoreDbContext> options) : base(options)
     {

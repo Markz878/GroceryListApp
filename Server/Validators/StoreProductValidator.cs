@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Validators;
 
-public class StoreProductValidator : AbstractValidator<StoreProductModel>
+public sealed class StoreProductValidator : AbstractValidator<StoreProductModel>
 {
     public StoreProductValidator()
     {

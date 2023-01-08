@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Services;
 
-public class HostCartHubBuilder : ICartHubBuilder
+public sealed class HostCartHubBuilder : ICartHubBuilder
 {
     public void BuildCartHubConnection()
     {

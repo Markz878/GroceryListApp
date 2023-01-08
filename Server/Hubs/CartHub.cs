@@ -3,7 +3,7 @@
 namespace GroceryListHelper.Server.Hubs;
 
 [Authorize]
-public class CartHub : Hub<ICartHubNotifications>, ICartHubActions
+public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
 {
     private readonly ICartProductRepository db;
     private readonly IUserRepository userRepository;

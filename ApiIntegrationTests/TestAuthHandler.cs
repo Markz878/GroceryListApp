@@ -1,6 +1,6 @@
 ﻿namespace ApiIntegrationTests;
 
-public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public static Guid UserId { get; } = Guid.NewGuid();
 

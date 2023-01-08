@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Components;
 
-public class CartComponentBase : BasePage<IndexViewModel>
+public abstract class CartComponentBase : BasePage<IndexViewModel>
 {
     [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
     [Inject] public ICartProductsService CartProductsService { get; set; } = default!;

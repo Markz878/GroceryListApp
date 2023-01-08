@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.DataAccess.Exceptions;
 
-public class NotFoundException : Exception
+public sealed class NotFoundException : Exception
 {
     public NotFoundException(string entityName) : base($"{entityName} was not found with the given key.")
     {

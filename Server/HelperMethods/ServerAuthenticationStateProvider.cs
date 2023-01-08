@@ -1,10 +1,10 @@
 ﻿namespace GroceryListHelper.Server.HelperMethods;
 
-public class HostAuthenticationStateProvider : AuthenticationStateProvider
+public sealed class ServerAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly IHttpContextAccessor httpContextAccessor;
 
-    public HostAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor)
+    public ServerAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor)
     {
         this.httpContextAccessor = httpContextAccessor;
     }

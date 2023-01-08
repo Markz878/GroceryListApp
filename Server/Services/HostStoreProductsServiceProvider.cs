@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Server.Services;
 
-public class HostStoreProductsServiceProvider : IStoreProductsService
+public sealed class HostStoreProductsServiceProvider : IStoreProductsService
 {
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly IStoreProductRepository storeProductRepository;

@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Validators;
 
-public class StoreProductValidator : AbstractValidator<StoreProductModel>
+public sealed class StoreProductValidator : AbstractValidator<StoreProductModel>
 {
     private readonly IEnumerable<StoreProductModel> productList;
 

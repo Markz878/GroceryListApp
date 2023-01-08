@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.DataAccess.Exceptions;
 
-public class ForbiddenException : Exception
+public sealed class ForbiddenException : Exception
 {
     public ForbiddenException() : base("User is not authorized to perform this action")
     {

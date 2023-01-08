@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class TimerMiddlewareInstaller : IInstaller
+public sealed class TimerMiddlewareInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

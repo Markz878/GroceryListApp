@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace GroceryListHelper.IntegrationTests.Hooks;
 
-public class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>
+public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

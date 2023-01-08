@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.Services;
 
-public class StoreProductsAPIService : IStoreProductsService
+public sealed class StoreProductsAPIService : IStoreProductsService
 {
     private readonly HttpClient client;
     private const string uri = "api/storeproducts";

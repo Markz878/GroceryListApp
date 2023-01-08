@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.ViewModels;
 
-public class IndexViewModel : BaseViewModel
+public sealed class IndexViewModel : BaseViewModel
 {
     public ObservableCollection<CartProductUIModel> CartProducts { get; } = new();
     public ObservableCollection<StoreProductUIModel> StoreProducts { get; } = new();

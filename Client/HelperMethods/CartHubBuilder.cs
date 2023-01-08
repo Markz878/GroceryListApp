@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.HelperMethods;
 
-public partial class CartHubBuilder : ICartHubBuilder
+public sealed partial class CartHubBuilder : ICartHubBuilder
 {
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
@@ -93,10 +93,12 @@ public partial class CartHubBuilder : ICartHubBuilder
 
     public void Dispose()
     {
-        indexViewModel.CartHub.Closed -= CartHub_Closed!;
-        indexViewModel.CartHub.Reconnected -= CartHub_Reconnected!;
-        indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting!;
-        GC.SuppressFinalize(this);
+        if (indexViewModel.CartHub is not null)
+        {
+            indexViewModel.CartHub.Closed -= CartHub_Closed!;
+            indexViewModel.CartHub.Reconnected -= CartHub_Reconnected!;
+            indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting!;
+        }
     }
 
     [LoggerMessage(0, LogLevel.Information, "Received message '{message}'")]

@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class ValidatorsInstaller : IInstaller
+public sealed class ValidatorsInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace GroceryListHelper.UnitTests.UnitTests;
 
-public class MoveItemOrderTests
+public sealed class MoveItemOrderTests
 {
     [Theory]
     [InlineData(new double[] { 1000, 2000, 3000, 4000, 5000 }, 1000, 3000, 3500)]

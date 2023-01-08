@@ -1,14 +1,15 @@
 ﻿namespace GroceryListHelper.Server.Installers;
 
-public class SecurityHeadersMiddlewareInstaller : IInstaller
+public sealed class SecurityHeadersMiddlewareInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
+        builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
         builder.Services.AddSingleton<SecurityHeadersMiddleware>();
     }
 }
 
-public class SecurityHeadersMiddleware : IMiddleware
+public sealed class SecurityHeadersMiddleware : IMiddleware
 {
     public Task InvokeAsync(HttpContext context, RequestDelegate next)
     {

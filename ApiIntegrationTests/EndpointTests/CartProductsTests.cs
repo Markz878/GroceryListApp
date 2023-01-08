@@ -1,6 +1,6 @@
 ﻿namespace ApiIntegrationTests.EndpointTests;
 
-public class CartProductsTests : BaseTest
+public sealed class CartProductsTests : BaseTest
 {
     public CartProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
     {

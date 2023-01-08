@@ -2,7 +2,7 @@
 
 namespace ApiIntegrationTests.EndpointTests;
 
-public class StoreProductsTests : BaseTest
+public sealed class StoreProductsTests : BaseTest
 {
     public StoreProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
     {
