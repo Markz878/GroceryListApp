@@ -4,7 +4,7 @@ public abstract class JoinCartComponentBase : BasePage<IndexViewModel>
 {
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
-
+    [Inject] public required ICartHubClient CartHubClient { get; set; }
     public async Task JoinCart()
     {
         if (!string.IsNullOrEmpty(ViewModel.CartHostEmail))
@@ -17,13 +17,13 @@ public abstract class JoinCartComponentBase : BasePage<IndexViewModel>
                 return;
             }
             ViewModel.IsPolling = true;
-            await ViewModel.CartHub.StartAsync();
-            HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.JoinGroup), ViewModel.CartHostEmail);
+            await CartHubClient.Start();
+            HubResponse response = await CartHubClient.JoinGroup(ViewModel.CartHostEmail);
 
             if (!string.IsNullOrEmpty(response.ErrorMessage))
             {
                 ViewModel.IsPolling = false;
-                await ViewModel.CartHub.StopAsync();
+                await CartHubClient.Stop();
                 ViewModel.ShareCartInfo = response.ErrorMessage;
             }
             else if (!string.IsNullOrEmpty(response.SuccessMessage))
@@ -41,7 +41,7 @@ public abstract class JoinCartComponentBase : BasePage<IndexViewModel>
     {
         try
         {
-            HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.LeaveGroup));
+            HubResponse response = await CartHubClient.LeaveGroup();
             ViewModel.ShareCartInfo = response.ErrorMessage;
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public abstract class JoinCartComponentBase : BasePage<IndexViewModel>
         }
         finally
         {
-            await ViewModel.CartHub.StopAsync();
+            await CartHubClient.Stop();
             ViewModel.IsPolling = false;
         }
     }

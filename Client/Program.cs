@@ -45,7 +45,7 @@ builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress =
 builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy);
 
-builder.Services.AddScoped<ICartHubBuilder, CartHubBuilder>();
+builder.Services.AddScoped<ICartHubClient, CartHubClient>();
 builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
 builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
 builder.Services.AddBlazoredLocalStorage();

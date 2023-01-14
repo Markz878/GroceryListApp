@@ -4,6 +4,7 @@ public abstract class ShareSelfCartComponentBase : BasePage<IndexViewModel>
 {
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] public ModalViewModel ModalViewModel { get; set; } = default!;
+    [Inject] public required ICartHubClient CartHubClient { get; set; }
     public EmailModel AllowEmail { get; set; } = new EmailModel();
 
     public async Task AddUser()
@@ -31,13 +32,13 @@ public abstract class ShareSelfCartComponentBase : BasePage<IndexViewModel>
             if (ViewModel.AllowedUsers.Count > 0)
             {
                 ViewModel.IsPolling = true;
-                await ViewModel.CartHub.StartAsync();
-                HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CreateGroup), ViewModel.AllowedUsers);
+                await CartHubClient.Start();
+                HubResponse response = await CartHubClient.CreateGroup(ViewModel.AllowedUsers.ToList());
 
                 if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
                     ViewModel.IsPolling = false;
-                    await ViewModel.CartHub.StopAsync();
+                    await CartHubClient.Stop();
                     ViewModel.ShareCartInfo = response.ErrorMessage;
                 }
                 else if (!string.IsNullOrEmpty(response.SuccessMessage))
@@ -60,7 +61,7 @@ public abstract class ShareSelfCartComponentBase : BasePage<IndexViewModel>
     {
         try
         {
-            HubResponse response = await ViewModel.CartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.LeaveGroup));
+            HubResponse response = await CartHubClient.LeaveGroup();
             ViewModel.ShareCartInfo = response.ErrorMessage;
         }
         catch (Exception ex)
@@ -69,7 +70,7 @@ public abstract class ShareSelfCartComponentBase : BasePage<IndexViewModel>
         }
         finally
         {
-            await ViewModel.CartHub.StopAsync();
+            await CartHubClient.Stop();
             ViewModel.IsPolling = false;
             ViewModel.AllowedUsers.Clear();
         }

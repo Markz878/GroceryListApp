@@ -9,6 +9,6 @@ public sealed class CartHubInstaller : IInstaller
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
         });
-        builder.Services.AddScoped<ICartHubBuilder, HostCartHubBuilder>();
+        builder.Services.AddScoped<ICartHubClient, ServerCartHubClient>();
     }
 }

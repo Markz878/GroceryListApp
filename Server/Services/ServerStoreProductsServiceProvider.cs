@@ -2,12 +2,12 @@
 
 namespace GroceryListHelper.Server.Services;
 
-public sealed class HostStoreProductsServiceProvider : IStoreProductsService
+public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
 {
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly IStoreProductRepository storeProductRepository;
 
-    public HostStoreProductsServiceProvider(IHttpContextAccessor httpContextAccessor, IStoreProductRepository storeProductRepository)
+    public ServerStoreProductsServiceProvider(IHttpContextAccessor httpContextAccessor, IStoreProductRepository storeProductRepository)
     {
         this.httpContextAccessor = httpContextAccessor;
         this.storeProductRepository = storeProductRepository;

@@ -3,7 +3,7 @@
 namespace GroceryListHelper.Server.Hubs;
 
 [Authorize]
-public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
+public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
 {
     private readonly ICartProductRepository db;
     private readonly IUserRepository userRepository;
@@ -22,8 +22,8 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         {
             return new HubResponse() { ErrorMessage = "There are no allowed users for your cart" };
         }
-        Guid hostId = GetUserId(Context);
-        string hostEmail = GetUserEmail(Context);
+        Guid hostId = GetUserId();
+        string hostEmail = GetUserEmail();
         string otherUsers = string.Join(", ", allowedUserEmails);
         await Groups.AddToGroupAsync(Context.ConnectionId, hostId.ToString());
         allowedUserEmails.Add(hostEmail);
@@ -41,7 +41,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         List<string> emails = await userRepository.GetCartHostAllowedEmails(hostId);
         if (emails.Any())
         {
-            if (emails.Contains(GetUserEmail(Context)))
+            if (emails.Contains(GetUserEmail()))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, hostId.ToString());
                 await Clients.Caller.ReceiveCart(await db.GetCartProductsForUser(hostId));
@@ -50,7 +50,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
             {
                 return new HubResponse() { ErrorMessage = "You are not allowed to join this cart." };
             }
-            await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has joined {hostEmail}'s cart.");
+            await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail()} has joined {hostEmail}'s cart.");
             return new HubResponse() { SuccessMessage = $"You have joined {hostEmail}'s cart" };
         }
         else
@@ -93,7 +93,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating item in cart hub with id {id}, host id {hostId} and user email {userId}", product.Id, await GetHostId(), GetUserEmail(Context));
+            logger.LogError(ex, "Error updating item in cart hub with id {id}, host id {hostId} and user email {userId}", product.Id, await GetHostId(), GetUserEmail());
             return new HubResponse() { ErrorMessage = ex.Message };
         }
     }
@@ -109,7 +109,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting item from cart hub with id {id}, host id {hostId} and user email {userId}", id, await GetHostId(), GetUserEmail(Context));
+            logger.LogError(ex, "Error deleting item from cart hub with id {id}, host id {hostId} and user email {userId}", id, await GetHostId(), GetUserEmail());
             return new HubResponse() { ErrorMessage = ex.Message };
         }
     }
@@ -120,14 +120,14 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         if (hostId != Guid.Empty)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-            if (hostId == GetUserId(Context))
+            if (hostId == GetUserId())
             {
-                await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail(Context));
+                await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail());
                 await userRepository.RemoveCartGroup(hostId);
             }
             else
             {
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail(Context)} has left the group.");
+                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail()} has left the group.");
             }
             return new HubResponse() { SuccessMessage = "You have left the group." };
         }
@@ -137,23 +137,23 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubActions
         }
     }
 
-    private static Guid GetUserId(HubCallerContext context)
+    private Guid GetUserId()
     {
-        string? stringId = context.User?.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+        string? stringId = Context.User?.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
         Guid id = Guid.Parse(stringId?.Trim('"') ?? "");
         return id;
     }
 
-    private static string GetUserEmail(HubCallerContext context)
+    private string GetUserEmail()
     {
-        string? email = context.User?.FindFirst("preferred_username")?.Value;
+        string? email = Context.User?.FindFirst("preferred_username")?.Value;
         ArgumentNullException.ThrowIfNull(email);
         return email;
     }
 
     private async Task<Guid> GetHostId()
     {
-        string email = GetUserEmail(Context);
+        string email = GetUserEmail();
         Guid hostId = await userRepository.GetUsersCartHostId(email);
         return hostId;
     }

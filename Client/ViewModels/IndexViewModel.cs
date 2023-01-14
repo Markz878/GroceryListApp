@@ -13,7 +13,6 @@ public sealed class IndexViewModel : BaseViewModel
     private string allowEmail = string.Empty;
     public string ShareCartInfo { get => shareCartInfo; set => SetProperty(ref shareCartInfo, value); }
     private string shareCartInfo = string.Empty;
-    public HubConnection CartHub { get; set; } = default!;
     public bool IsPolling { get => isPolling; set => SetProperty(ref isPolling, value); }
     private bool isPolling;
     public bool ShowOnlyUncollected { get => showOnlyUncollected; set => SetProperty(ref showOnlyUncollected, value); }

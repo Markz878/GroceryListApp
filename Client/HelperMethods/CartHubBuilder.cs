@@ -1,35 +1,37 @@
 ﻿namespace GroceryListHelper.Client.HelperMethods;
 
-public sealed partial class CartHubBuilder : ICartHubBuilder
+public sealed partial class CartHubClient : ICartHubClient
 {
     private readonly NavigationManager navigation;
     private readonly IndexViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
-    private readonly ILogger<CartHubBuilder> logger;
+    private readonly ILogger<CartHubClient> logger;
+    private readonly HubConnection hub;
 
-    public CartHubBuilder(NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubBuilder> logger)
+    public CartHubClient(NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubClient> logger)
     {
         this.navigation = navigation;
         this.indexViewModel = indexViewModel;
         this.modalViewModel = modalViewModel;
         this.logger = logger;
+        hub = BuildCartHubConnection();
     }
 
-    public void BuildCartHubConnection()
+    private HubConnection BuildCartHubConnection()
     {
-        indexViewModel.CartHub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
+        HubConnection hub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
 
-        indexViewModel.CartHub.Closed += CartHub_Closed!;
-        indexViewModel.CartHub.Reconnected += CartHub_Reconnected!;
-        indexViewModel.CartHub.Reconnecting += CartHub_Reconnecting!;
+        hub.Closed += CartHub_Closed!;
+        hub.Reconnected += CartHub_Reconnected!;
+        hub.Reconnecting += CartHub_Reconnecting!;
 
-        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
+        hub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
             LogGetMessage(message);
             indexViewModel.ShareCartInfo = message;
         });
 
-        indexViewModel.CartHub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
+        hub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
             LogReceiveCart(cartProducts.Count);
             indexViewModel.CartProducts.Clear();
@@ -39,22 +41,22 @@ public sealed partial class CartHubBuilder : ICartHubBuilder
             }
         });
 
-        indexViewModel.CartHub.On<string>(nameof(ICartHubNotifications.LeaveCart), async (hostEmail) =>
+        hub.On<string>(nameof(ICartHubNotifications.LeaveCart), async (hostEmail) =>
         {
             modalViewModel.Message = $"Cart session ended by host {hostEmail}.";
-            await indexViewModel.CartHub.StopAsync();
+            await hub.StopAsync();
             indexViewModel.IsPolling = false;
             await Task.Delay(2000);
             navigation.NavigateTo("/", true);
         });
 
-        indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
+        hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
         {
             LogItemAdded(p.Id, p.Name);
             indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice, Order = p.Order });
         });
 
-        indexViewModel.CartHub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
+        hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
             LogItemModified(cartProduct.Id, cartProduct.Name);
             CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
@@ -66,11 +68,12 @@ public sealed partial class CartHubBuilder : ICartHubBuilder
             indexViewModel.OnPropertyChanged();
         });
 
-        indexViewModel.CartHub.On<Guid>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
+        hub.On<Guid>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
         {
             LogItemDeleted(id);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Id == id));
         });
+        return hub;
     }
 
     private Task CartHub_Reconnecting(Exception arg)
@@ -91,14 +94,58 @@ public sealed partial class CartHubBuilder : ICartHubBuilder
         return Task.CompletedTask;
     }
 
-    public void Dispose()
+    public async ValueTask Start()
     {
-        if (indexViewModel.CartHub is not null)
+        if (hub.State == 0)
         {
-            indexViewModel.CartHub.Closed -= CartHub_Closed!;
-            indexViewModel.CartHub.Reconnected -= CartHub_Reconnected!;
-            indexViewModel.CartHub.Reconnecting -= CartHub_Reconnecting!;
+            await hub.StartAsync();
         }
+    }
+
+    public async ValueTask Stop()
+    {
+        if (hub.State > 0)
+        {
+            await hub.StopAsync();
+        }
+    }
+
+    public Task<HubResponse> JoinGroup(string cartHostEmail)
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(JoinGroup), cartHostEmail);
+    }
+
+    public Task<HubResponse> CreateGroup(List<string> allowedUserEmails)
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(CreateGroup), allowedUserEmails);
+    }
+
+    public Task<HubResponse> LeaveGroup()
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(LeaveGroup));
+    }
+
+    public Task<HubResponse> CartItemAdded(CartProduct product)
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(CartItemAdded), product);
+    }
+
+    public Task<HubResponse> CartItemModified(CartProductCollectable product)
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(CartItemModified), product);
+    }
+
+    public Task<HubResponse> CartItemDeleted(Guid id)
+    {
+        return hub.InvokeAsync<HubResponse>(nameof(CartItemDeleted), id);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        hub.Closed -= CartHub_Closed!;
+        hub.Reconnected -= CartHub_Reconnected!;
+        hub.Reconnecting -= CartHub_Reconnecting!;
+        return hub.DisposeAsync();
     }
 
     [LoggerMessage(0, LogLevel.Information, "Received message '{message}'")]

@@ -2,23 +2,19 @@
 
 public abstract class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
 {
-    [Inject] public ICartHubBuilder CartHubBuilder { get; set; } = default!;
+    [Inject] public ICartHubClient CartHubClient { get; set; } = default!;
     [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] public PersistentComponentState ApplicationState { get; set; } = default!;
     [Inject] public required RenderLocation RenderLocation { get; set; }
     private PersistingComponentStateSubscription stateSubscription;
     protected UserInfo? userInfo;
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
         if (!ApplicationState.TryTakeFromJson(nameof(userInfo), out userInfo))
         {
             userInfo = await AuthenticationStateProvider.GetUserInfo();
-        }
-        if (RenderLocation is ClientRenderLocation)
-        {
-            CartHubBuilder.BuildCartHubConnection();
         }
     }
 
@@ -30,12 +26,8 @@ public abstract class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (ViewModel.CartHub is not null)
-        {
-            await ViewModel.CartHub.StopAsync();
-            CartHubBuilder.Dispose();
-        }
         stateSubscription.Dispose();
+        await CartHubClient.DisposeAsync();
         GC.SuppressFinalize(this);
     }
 }

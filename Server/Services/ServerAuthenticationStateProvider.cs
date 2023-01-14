@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.Server.HelperMethods;
+﻿namespace GroceryListHelper.Server.Services;
 
 public sealed class ServerAuthenticationStateProvider : AuthenticationStateProvider
 {

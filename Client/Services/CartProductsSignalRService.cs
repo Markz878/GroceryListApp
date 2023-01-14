@@ -2,11 +2,11 @@
 
 public sealed class CartProductsSignalRService : ICartProductsService
 {
-    private readonly HubConnection cartHub;
+    private readonly ICartHubClient cartHubClient;
 
-    public CartProductsSignalRService(HubConnection cartHub)
+    public CartProductsSignalRService(ICartHubClient cartHubClient)
     {
-        this.cartHub = cartHub;
+        this.cartHubClient = cartHubClient;
     }
 
     public Task DeleteAllCartProducts()
@@ -16,7 +16,7 @@ public sealed class CartProductsSignalRService : ICartProductsService
 
     public Task DeleteCartProduct(Guid id)
     {
-        return cartHub.SendAsync(nameof(ICartHubActions.CartItemDeleted), id);
+        return cartHubClient.CartItemDeleted(id);
     }
 
     public Task<List<CartProductUIModel>> GetCartProducts()
@@ -26,7 +26,7 @@ public sealed class CartProductsSignalRService : ICartProductsService
 
     public async Task<Guid> SaveCartProduct(CartProduct product)
     {
-        HubResponse response = await cartHub.InvokeAsync<HubResponse>(nameof(ICartHubActions.CartItemAdded), product);
+        HubResponse response = await cartHubClient.CartItemAdded(product);
         return string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage)
             ? Guid.Parse(response.SuccessMessage)
             : throw new Exception(response.ErrorMessage);
@@ -34,6 +34,6 @@ public sealed class CartProductsSignalRService : ICartProductsService
 
     public Task UpdateCartProduct(CartProductUIModel product)
     {
-        return cartHub.SendAsync(nameof(ICartHubActions.CartItemModified), product);
+        return cartHubClient.CartItemModified(product);
     }
 }

@@ -6,14 +6,16 @@ public sealed class CartProductsServiceProvider : ICartProductsService
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly IndexViewModel viewModel;
+    private readonly ICartHubClient cartHubClient;
     private ICartProductsService? actingCartService;
 
-    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, IndexViewModel viewModel)
+    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, IndexViewModel viewModel, ICartHubClient cartHubClient)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;
         this.authenticationStateProvider = authenticationStateProvider;
         this.viewModel = viewModel;
+        this.cartHubClient = cartHubClient;
     }
 
     public async Task DeleteAllCartProducts()
@@ -54,7 +56,7 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         {
             if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
             {
-                actingCartService = new CartProductsSignalRService(viewModel.CartHub);
+                actingCartService = new CartProductsSignalRService(cartHubClient);
             }
             else if (!viewModel.IsPolling && actingCartService is not CartProductsApiService)
             {

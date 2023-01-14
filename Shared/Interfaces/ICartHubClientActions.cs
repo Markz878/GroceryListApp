@@ -3,7 +3,7 @@ using GroceryListHelper.Shared.Models.CartProduct;
 
 namespace GroceryListHelper.Shared.Interfaces;
 
-public interface ICartHubActions
+public interface ICartHubClientActions
 {
     Task<HubResponse> CreateGroup(List<string> allowedUserEmails);
     Task<HubResponse> JoinGroup(string hostEmail);
