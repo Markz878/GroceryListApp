@@ -13,6 +13,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
 
     public ServerStorageCartTests(AuthorizedWebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
+        server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         fixture = server;
     }

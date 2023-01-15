@@ -13,7 +13,7 @@ public sealed class AntiForgeryTokenFilter : IEndpointFilter
     {
         try
         {
-            if (context.HttpContext.Request.Method is "POST" or "PUT" or "DELETE")
+            if (context.HttpContext.Request.Method is not "GET" and not "HEAD")
             {
                 await antiforgery.ValidateRequestAsync(context.HttpContext);
             }

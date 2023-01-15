@@ -11,3 +11,8 @@ public sealed class WebApplicationFactoryCollection : ICollectionFixture<WebAppl
 public sealed class AuthorizedWebApplicationFactoryCollection : ICollectionFixture<AuthorizedWebApplicationFactoryFixture>
 {
 }
+
+[CollectionDefinition(nameof(SharedWebApplicationFactoryCollection))]
+public sealed class SharedWebApplicationFactoryCollection : ICollectionFixture<SharedWebApplicationFactoryFixture>
+{
+}

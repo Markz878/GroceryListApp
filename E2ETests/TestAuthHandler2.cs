@@ -6,11 +6,11 @@ using System.Text.Encodings.Web;
 
 namespace E2ETests;
 
-public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public sealed class TestAuthHandler2 : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public static Guid UserId { get; } = Guid.NewGuid();
-    public static string Email { get; } = "test_user@email.com";
-    public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+    public static string Email { get; } = "test_user2@email.com";
+    public TestAuthHandler2(IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
         : base(options, logger, encoder, clock)
     {
@@ -20,7 +20,7 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
     {
         Claim[] claims = new[]
         {
-            new Claim("name", "Test user"),
+            new Claim("name", "Test user 2"),
             new Claim("preferred_username", Email),
             new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", UserId.ToString())
         };

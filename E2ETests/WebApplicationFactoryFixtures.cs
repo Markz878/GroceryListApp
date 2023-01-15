@@ -15,16 +15,41 @@ using Xunit.Abstractions;
 
 namespace E2ETests;
 
+public class SharedWebApplicationFactoryFixture : IAsyncLifetime
+{
+    public AuthorizedWebApplicationFactoryFixture Server1 { get; } = new AuthorizedWebApplicationFactoryFixture();
+    public AuthorizedWebApplicationFactoryFixture2 Server2 { get; } = new AuthorizedWebApplicationFactoryFixture2();
+
+    public async Task InitializeAsync()
+    {
+        await Server1.InitializeAsync();
+        await Server2.InitializeAsync();
+    }
+
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        await Server1.DisposeAsync();
+        await Server2.DisposeAsync();
+    }
+}
+
+public sealed class AuthorizedWebApplicationFactoryFixture2 : BaseWebApplicationFactoryFixture
+{
+    public AuthorizedWebApplicationFactoryFixture2() : base(2)
+    {
+    }
+}
+
 public sealed class AuthorizedWebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
-    public AuthorizedWebApplicationFactoryFixture() : base(true)
+    public AuthorizedWebApplicationFactoryFixture() : base(1)
     {
     }
 }
 
 public sealed class WebApplicationFactoryFixture : BaseWebApplicationFactoryFixture
 {
-    public WebApplicationFactoryFixture() : base(false)
+    public WebApplicationFactoryFixture() : base(0)
     {
     }
 }
@@ -36,11 +61,11 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
     public IBrowser BrowserInstance { get; private set; }
     public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
 
-    private readonly bool addFakeAuthentication;
+    private readonly int userId;
 
-    public BaseWebApplicationFactoryFixture(bool addFakeAuthentication)
+    public BaseWebApplicationFactoryFixture(int userId)
     {
-        this.addFakeAuthentication = addFakeAuthentication;
+        this.userId = userId;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
@@ -51,7 +76,6 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
         {
             config.AddInMemoryCollection(new Dictionary<string, string>()
             {
-                { "IpRateLimiting:EnableEndpointRateLimiting", "false" },
                 { "Logging:LogLevel:Microsoft.EntityFrameworkCore", "Warning" }
             });
         });
@@ -63,9 +87,13 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
             {
                 options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos"), "E2ETestDb");
             });
-            if (addFakeAuthentication)
+            if (userId == 1)
             {
                 services.AddAuthentication("FakeAuth").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("FakeAuth", null);
+            }
+            else if(userId == 2)
+            {
+                services.AddAuthentication("FakeAuth").AddScheme<AuthenticationSchemeOptions, TestAuthHandler2>("FakeAuth", null);
             }
         });
     }
@@ -84,7 +112,7 @@ public abstract class BaseWebApplicationFactoryFixture : WebApplicationFactory<G
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = true,
+            Headless = false,
             SlowMo = 100,
         });
     }
