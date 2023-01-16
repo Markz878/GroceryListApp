@@ -6,7 +6,7 @@ public sealed class TimerMiddlewareInstaller : IInstaller
     {
         if (builder.Environment.IsDevelopment())
         {
-            builder.Services.AddTransient<TimerMiddleware>();
+            builder.Services.AddScoped<TimerMiddleware>();
         }
     }
 }
@@ -24,10 +24,10 @@ internal class TimerMiddleware : IMiddleware
     {
         if (context.Request.Path.StartsWithSegments(new PathString("/api")))
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            long timestamp = Stopwatch.GetTimestamp();
             await next(context);
-            stopwatch.Stop();
-            logger.LogInformation("Request to {path} took {elapsedMilliseconds} ms.", context.Request.Path, stopwatch.ElapsedMilliseconds);
+            TimeSpan elapsedTime = Stopwatch.GetElapsedTime(timestamp);
+            logger.LogInformation("Request to {path} took {elapsedMilliseconds} ms.", context.Request.Path, elapsedTime.TotalMilliseconds);
         }
         else
         {

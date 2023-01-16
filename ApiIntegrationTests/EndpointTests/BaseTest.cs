@@ -16,7 +16,7 @@ public abstract class BaseTest : IDisposable
         _client = factory.CreateClient();
     }
 
-    public CartProductDbModel GetRandomDbCartProduct(int order = 0)
+    public CartProductDbModel GetRandomDbCartProduct(int order = 0, bool randomUser = false)
     {
         return new CartProductDbModel()
         {
@@ -25,7 +25,7 @@ public abstract class BaseTest : IDisposable
             Name = "Product" + Random.Shared.Next(0, 10000),
             Order = order,
             UnitPrice = Random.Shared.NextDouble() * 10,
-            UserId = TestAuthHandler.UserId,
+            UserId = randomUser ? Guid.NewGuid() : TestAuthHandler.UserId
         };
     }
 
@@ -40,12 +40,12 @@ public abstract class BaseTest : IDisposable
         };
     }
 
-    public async Task<List<CartProductDbModel>> SaveCartProducts(int n)
+    public async Task<List<CartProductDbModel>> SaveCartProducts(int n, bool randomUser = false)
     {
         List<CartProductDbModel> result = new(n);
         for (int i = 0; i < n; i++)
         {
-            result.Add(GetRandomDbCartProduct(i * 1000));
+            result.Add(GetRandomDbCartProduct(i * 1000, randomUser));
         }
         using IServiceScope scope = _factory.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();

@@ -34,7 +34,6 @@ builder.InstallAssemblyServices();
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();
-
 app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
@@ -60,6 +59,10 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.UseRouting();
 app.UseAuthentication();
+if (app.Environment.IsDevelopment())
+{
+    app.UseMiddleware<FakeAuthenticationMiddleware>();
+}
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();

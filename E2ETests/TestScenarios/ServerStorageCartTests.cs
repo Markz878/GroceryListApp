@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.DataAccess;
+﻿using E2ETests.Infrastructure;
+using GroceryListHelper.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Xunit;
@@ -6,35 +7,37 @@ using Xunit.Abstractions;
 
 namespace E2ETests.TestScenarios;
 
-[Collection(nameof(AuthorizedWebApplicationFactoryCollection))]
+[Collection(nameof(WebApplicationFactoryCollection))]
 public sealed class ServerStorageCartTests : IAsyncLifetime
 {
-    private readonly AuthorizedWebApplicationFactoryFixture fixture;
+    private readonly WebApplicationFactoryFixture fixture;
+    private readonly FakeAuthInfo fakeAuth = new("Test User", "test_user@email.com", Guid.NewGuid());
 
-    public ServerStorageCartTests(AuthorizedWebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
+    public ServerStorageCartTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         fixture = server;
+        ArgumentNullException.ThrowIfNull(fixture.BrowserInstance);
     }
 
     [Fact]
     public async Task AddValidProductToCart()
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         string productName = "Maito";
         int productAmount = 2;
         double productPrice = 2.9;
         await page.AddProductToCart(productName, productAmount, productPrice);
-        IElementHandle element = await page.QuerySelectorAsync("#item-name-0");
+        IElementHandle? element = await page.QuerySelectorAsync("#item-name-0");
         Assert.NotNull(element);
     }
 
     [Fact]
     public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("", 2, 2.9);
         await page.WaitForSelectorAsync("text='Name' must not be empty.");
@@ -44,7 +47,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", -2, 2.9);
         await page.WaitForSelectorAsync("text='Amount' must be greater than or equal to '0'.");
@@ -54,7 +57,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", 2, -2.9);
         await page.WaitForSelectorAsync("text='Unit Price' must be greater than or equal to '0'.");
@@ -69,7 +72,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [InlineData(5, 0, 4)]
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
@@ -78,7 +81,8 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         await page.ClickAsync($"#reorder-button-{moveItemIndex}");
         await page.ClickAsync($"#reorder-button-{toTargetIndex}");
         await Task.Delay(100);
-        IElementHandle movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
+        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
+        ArgumentNullException.ThrowIfNull(movedProductNameElement);
         string movedProductName = await movedProductNameElement.InnerTextAsync();
         Assert.Equal($"Product{moveItemIndex}", movedProductName);
     }
@@ -87,7 +91,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddValidProducts_CheckAllCollected_CartSummmaryShowsAllCollected()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
@@ -97,7 +101,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         {
             await page.CheckAsync($"#item-collected-checkbox-{i}");
         }
-        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("text = All collected!");
+        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("text = All collected!");
         Assert.NotNull(movedProductNameElement);
     }
 
@@ -105,14 +109,14 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddValidProducts_ClickClearCart_CartShouldBeEmpty()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync("text=Clear cart");
-        IElementHandle movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
+        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
         Assert.Null(movedProductNameElement);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
         Assert.Null(cartProductsJson);
@@ -121,7 +125,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddProduct_EditProperties_ShouldChangeValues()
     {
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
@@ -136,14 +140,14 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddProducts_ClickProductDeleteButton_ShouldRemoveItem()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.BrowserInstance.GetNewBrowserContext();
+        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
         IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync($"#delete-product-button-{productCount / 2}");
-        IElementHandle element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
+        IElementHandle? element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
     }
 

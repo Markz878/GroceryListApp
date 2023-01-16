@@ -29,7 +29,8 @@ public sealed class CartProductsApiService : ICartProductsService
 
     public async Task DeleteCartProduct(Guid id)
     {
-        await client.DeleteAsync(uri + $"/{id}");
+        HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteAllCartProducts()

@@ -1,16 +1,28 @@
-﻿using Microsoft.Playwright;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Playwright;
 using System.Globalization;
 
-namespace E2ETests;
+namespace E2ETests.Infrastructure;
 
 internal static class PlaywrightHelpers
 {
-    internal static async Task<IBrowserContext> GetNewBrowserContext(this IBrowser browser)
+    internal static async Task<IBrowserContext> GetNewBrowserContext(this WebApplicationFactoryFixture factory, FakeAuthInfo? fakeAuth = null)
     {
-        return await browser.NewContextAsync(new BrowserNewContextOptions()
+        ArgumentNullException.ThrowIfNull(factory.BrowserInstance);
+        IBrowserContext browserContext = await factory.BrowserInstance.NewContextAsync(new BrowserNewContextOptions()
         {
             IgnoreHTTPSErrors = true,
         });
+        if (fakeAuth != null)
+        {
+            await browserContext.SetExtraHTTPHeadersAsync(new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("fake-username", fakeAuth.UserName),
+                new KeyValuePair<string, string>("fake-email", fakeAuth.Email),
+                new KeyValuePair<string, string>("fake-userid", fakeAuth.Guid.ToString())
+            });
+        }
+        return browserContext;
     }
 
     internal static async Task<IPage> GotoPage(this IBrowserContext browserContext, string url, bool checkIfAuthenticated = false)

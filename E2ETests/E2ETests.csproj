@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
 	<ImplicitUsings>true</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <UserSecretsId>e73b7a0b-29e9-4ce8-ba58-7f7b4393ab50</UserSecretsId>
   </PropertyGroup>

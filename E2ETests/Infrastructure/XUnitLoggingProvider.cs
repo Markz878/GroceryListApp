@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text;
 using Xunit.Abstractions;
-namespace E2ETests;
+namespace E2ETests.Infrastructure;
 
 internal class XUnitLoggingProvider : ILoggerProvider
 {
@@ -26,7 +26,7 @@ internal class XUnitLoggingProvider : ILoggerProvider
 internal class XUnitLogger<T> : XUnitLogger, ILogger<T>
 {
     public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-    : base(testOutputHelper, scopeProvider, typeof(T).FullName)
+    : base(testOutputHelper, scopeProvider, typeof(T).FullName ?? throw new ArgumentNullException("T type name"))
     {
     }
 }
@@ -59,12 +59,12 @@ internal class XUnitLogger : ILogger
         return logLevel != LogLevel.None;
     }
 
-    public IDisposable BeginScope<TState>(TState state)
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
         return _scopeProvider.Push(state);
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception, string> formatter)
     {
         try
         {

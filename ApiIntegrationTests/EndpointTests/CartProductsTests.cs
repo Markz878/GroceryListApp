@@ -53,7 +53,7 @@ public sealed class CartProductsTests : BaseTest
     }
 
     [Fact]
-    public async Task DeleteCartProduct_Success_ReturnsNoContent()
+    public async Task DeleteCartProducts_Success_ReturnsNoContent()
     {
         await SaveCartProducts(1);
         HttpResponseMessage response = await _client.DeleteAsync("api/cartproducts");
@@ -62,6 +62,42 @@ public sealed class CartProductsTests : BaseTest
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
         List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
         Assert.Empty(products);
+    }
+
+    [Fact]
+    public async Task DeleteCartProduct_Success_ReturnsNoContent()
+    {
+        List<CartProductDbModel> savedProducts = await SaveCartProducts(3);
+        HttpResponseMessage response = await _client.DeleteAsync($"api/cartproducts/{savedProducts[1].Id}");
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        Assert.Equal(2, products.Count);
+    }
+
+    [Fact]
+    public async Task DeleteCartProduct_InvalidGuid_ReturnsNotFound()
+    {
+        await SaveCartProducts(3);
+        HttpResponseMessage response = await _client.DeleteAsync($"api/cartproducts/{Guid.NewGuid()}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        Assert.Equal(3, products.Count);
+    }
+
+    [Fact]
+    public async Task DeleteCartProduct_NotUsersProduct_ReturnsNotFound()
+    {
+        List<CartProductDbModel> savedProducts = await SaveCartProducts(3, true);
+        HttpResponseMessage response = await _client.DeleteAsync($"api/cartproducts/{savedProducts[1].Id}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        using IServiceScope scope = _factory.Services.CreateScope();
+        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        Assert.Equal(3, products.Count);
     }
 
     [Fact]

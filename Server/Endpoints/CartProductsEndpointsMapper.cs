@@ -13,6 +13,7 @@ public static class CartProductsEndpointsMapper
             .WithSummary("Add a cart product")
             .WithDescription("Add a cart product to your cart.");
         group.MapDelete("", DeleteAllProducts);
+        group.MapDelete("/{id:guid}", DeleteProduct);
         group.MapPut("", UpdateProduct);
     }
 
@@ -32,6 +33,18 @@ public static class CartProductsEndpointsMapper
     {
         await cartProductsRepository.ClearProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.NoContent();
+    }
+
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(Guid id, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    {
+        Exception? ex = await cartProductsRepository.DeleteProduct(id, user.GetUserId().GetValueOrDefault());
+        return ex switch
+        {
+            NotFoundException => TypedResults.NotFound(),
+            ForbiddenException => TypedResults.Forbid(),
+            null => TypedResults.NoContent(),
+            _ => throw new UnreachableException()
+        };
     }
 
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
