@@ -10,22 +10,22 @@ namespace E2ETests.TestScenarios;
 [Collection(nameof(WebApplicationFactoryCollection))]
 public sealed class ServerStorageCartTests : IAsyncLifetime
 {
-    private readonly WebApplicationFactoryFixture fixture;
+    private readonly WebApplicationFactoryFixture server;
     private readonly FakeAuthInfo fakeAuth = new("Test User", "test_user@email.com", Guid.NewGuid());
+    private IBrowserContext browserContext = default!;
+    private IPage page = default!;
 
     public ServerStorageCartTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
-        fixture = server;
-        ArgumentNullException.ThrowIfNull(fixture.BrowserInstance);
+        this.server = server;
+        ArgumentNullException.ThrowIfNull(this.server.BrowserInstance);
     }
 
     [Fact]
     public async Task AddValidProductToCart()
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         string productName = "Maito";
         int productAmount = 2;
         double productPrice = 2.9;
@@ -37,8 +37,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("", 2, 2.9);
         await page.WaitForSelectorAsync("text='Name' must not be empty.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
@@ -47,8 +45,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", -2, 2.9);
         await page.WaitForSelectorAsync("text='Amount' must be greater than or equal to '0'.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -57,8 +53,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart("Maito", 2, -2.9);
         await page.WaitForSelectorAsync("text='Unit Price' must be greater than or equal to '0'.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
@@ -72,8 +66,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [InlineData(5, 0, 4)]
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
@@ -91,8 +83,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddValidProducts_CheckAllCollected_CartSummmaryShowsAllCollected()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
@@ -109,8 +99,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddValidProducts_ClickClearCart_CartShouldBeEmpty()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
@@ -125,8 +113,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     [Fact]
     public async Task AddProduct_EditProperties_ShouldChangeValues()
     {
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
         await page.FillAsync("#edit-item-amount-input-0", "2");
@@ -140,8 +126,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     public async Task AddProducts_ClickProductDeleteButton_ShouldRemoveItem()
     {
         int productCount = 3;
-        await using IBrowserContext BrowserContext = await fixture.GetNewBrowserContext(fakeAuth);
-        IPage page = await BrowserContext.GotoPage(fixture.BaseUrl, true);
         for (int i = 0; i < productCount; i++)
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
@@ -153,13 +137,16 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        using IServiceScope scope = fixture.Services.CreateScope();
+        using IServiceScope scope = server.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
         await db.Database.EnsureCreatedAsync();
+        browserContext = await server.GetNewBrowserContext(fakeAuth);
+        page= await browserContext.GotoPage(server.BaseUrl, true);
     }
     public async Task DisposeAsync()
     {
-        using IServiceScope scope = fixture.Services.CreateScope();
+        await browserContext.DisposeAsync();
+        using IServiceScope scope = server.Services.CreateScope();
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
         await db.Database.EnsureDeletedAsync();
     }

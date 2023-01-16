@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.DataAccess;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -58,8 +57,8 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false,
-            SlowMo = 1000,
+            Headless = true,
+            SlowMo = 100,
         });
     }
 
