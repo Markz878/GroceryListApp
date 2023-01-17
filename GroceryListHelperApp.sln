@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Shared", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.UnitTests", "UnitTests\GroceryListHelper.UnitTests.csproj", "{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.IntegrationTests", "IntegrationTests\GroceryListHelper.IntegrationTests.csproj", "{76BE5548-8050-4F83-865F-030A3783FE6F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2ETests", "E2ETests\E2ETests.csproj", "{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDbInitializer", "CosmosDbInitializer\CosmosDbInitializer.csproj", "{20FF3FFC-8D9C-4A25-B77D-67F9515261DC}"
@@ -55,10 +53,6 @@ Global
 		{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31A094E3-A15D-4A1D-BCB5-EB07D9DB1C4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{76BE5548-8050-4F83-865F-030A3783FE6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76BE5548-8050-4F83-865F-030A3783FE6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76BE5548-8050-4F83-865F-030A3783FE6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76BE5548-8050-4F83-865F-030A3783FE6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
