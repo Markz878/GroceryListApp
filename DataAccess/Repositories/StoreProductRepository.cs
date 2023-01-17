@@ -34,24 +34,6 @@ public sealed class StoreProductRepository : IStoreProductRepository
         return db.SaveChangesAsync();
     }
 
-    public async Task<Exception?> DeleteItem(Guid productId, Guid userId)
-    {
-        StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
-        if (product is null)
-        {
-            return NotFoundException.ForType<StoreProductDbModel>();
-        }
-
-        if (product.UserId != userId)
-        {
-            return ForbiddenException.Instance;
-        }
-
-        db.StoreProducts.Remove(product);
-        await db.SaveChangesAsync();
-        return null;
-    }
-
     public async Task<Exception?> UpdatePrice(Guid productId, Guid userId, double price)
     {
         StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
