@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.Shared.Models.Authentication;
+﻿namespace GroceryListHelper.Client.HelperMethods;
 
 public sealed class EmailModel
 {

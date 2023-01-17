@@ -14,13 +14,19 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<Guid> GetHostIdFromHostEmail(string hostEmail)
     {
-        Guid hostId = await db.UserCartGroups.AsNoTracking().Where(u => u.HostEmail.Equals(hostEmail)).Select(x => x.HostId).FirstOrDefaultAsync();
+        Guid hostId = await db.UserCartGroups
+            .Where(u => u.HostEmail.Equals(hostEmail))
+            .Select(x => x.HostId)
+            .FirstOrDefaultAsync();
         return hostId;
     }
 
     public async Task<List<string>> GetCartHostAllowedEmails(Guid hostId)
     {
-        List<string> result = await db.UserCartGroups.AsNoTracking().Where(x => x.HostId == hostId).Select(x => x.JoinerEmail).ToListAsync();
+        List<string> result = await db.UserCartGroups
+            .Where(x => x.HostId == hostId)
+            .Select(x => x.JoinerEmail)
+            .ToListAsync();
         return result;
     }
 
@@ -40,13 +46,18 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<Guid> GetUsersCartHostId(string email)
     {
-        Guid hostId = await db.UserCartGroups.AsNoTracking().Where(x => x.JoinerEmail == email).Select(x => x.HostId).FirstOrDefaultAsync();
+        Guid hostId = await db.UserCartGroups
+            .Where(x => x.JoinerEmail == email)
+            .Select(x => x.HostId)
+            .FirstOrDefaultAsync();
         return hostId;
     }
 
     public async Task RemoveCartGroup(Guid hostId)
     {
-        List<UserCartGroupDbModel> groups = await db.UserCartGroups.Where(x => x.HostId == hostId).ToListAsync();
+        List<UserCartGroupDbModel> groups = await db.UserCartGroups
+            .Where(x => x.HostId == hostId)
+            .ToListAsync();
         db.UserCartGroups.RemoveRange(groups);
         await db.SaveChangesAsync();
     }

@@ -23,7 +23,7 @@ internal class XUnitLoggingProvider : ILoggerProvider
 internal class XUnitLogger<T> : XUnitLogger, ILogger<T>
 {
     public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-    : base(testOutputHelper, scopeProvider, typeof(T).FullName)
+    : base(testOutputHelper, scopeProvider, typeof(T).FullName ?? throw new ArgumentException("ILogger generic type T name is null"))
     {
     }
 }
@@ -56,12 +56,12 @@ internal class XUnitLogger : ILogger
         return logLevel != LogLevel.None;
     }
 
-    public IDisposable BeginScope<TState>(TState state)
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
         return _scopeProvider.Push(state);
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         try
         {
