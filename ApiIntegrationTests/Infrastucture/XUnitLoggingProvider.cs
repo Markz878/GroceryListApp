@@ -1,4 +1,4 @@
-﻿namespace ApiIntegrationTests;
+﻿namespace ApiIntegrationTests.Infrastucture;
 
 internal class XUnitLoggingProvider : ILoggerProvider
 {

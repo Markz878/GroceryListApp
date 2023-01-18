@@ -1,4 +1,6 @@
-﻿namespace ApiIntegrationTests.EndpointTests;
+﻿using ApiIntegrationTests.Infrastucture;
+
+namespace ApiIntegrationTests.EndpointTests;
 
 public sealed class CartProductsTests : BaseTest
 {

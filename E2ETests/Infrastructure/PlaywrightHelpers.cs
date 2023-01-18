@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 using System.Globalization;
 
 namespace E2ETests.Infrastructure;

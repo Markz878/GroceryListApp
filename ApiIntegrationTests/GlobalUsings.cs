@@ -1,3 +1,4 @@
+global using ApiIntegrationTests.Infrastucture;
 global using GroceryListHelper.DataAccess;
 global using GroceryListHelper.DataAccess.Models;
 global using GroceryListHelper.Shared.Models.CartProduct;

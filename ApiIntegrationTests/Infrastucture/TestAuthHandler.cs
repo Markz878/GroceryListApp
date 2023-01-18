@@ -1,4 +1,4 @@
-﻿namespace ApiIntegrationTests;
+﻿namespace ApiIntegrationTests.Infrastucture;
 
 public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {

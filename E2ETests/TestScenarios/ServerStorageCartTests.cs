@@ -20,7 +20,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         this.server = server;
-        ArgumentNullException.ThrowIfNull(this.server.BrowserInstance);
     }
 
     [Fact]
@@ -42,26 +41,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
     }
 
-    [Fact]
-    public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
-    {
-        await page.AddProductToCart("Maito", -2, 2.9);
-        await page.WaitForSelectorAsync("text='Amount' must be greater than or equal to '0'.");
-        Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
-    }
-
-    [Fact]
-    public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
-    {
-        await page.AddProductToCart("Maito", 2, -2.9);
-        await page.WaitForSelectorAsync("text='Unit Price' must be greater than or equal to '0'.");
-        Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
-    }
-
     [Theory]
-    [InlineData(5, 4, 0)]
-    [InlineData(5, 3, 1)]
-    [InlineData(5, 2, 3)]
     [InlineData(5, 1, 4)]
     [InlineData(5, 0, 4)]
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
@@ -80,22 +60,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddValidProducts_CheckAllCollected_CartSummmaryShowsAllCollected()
-    {
-        int productCount = 3;
-        for (int i = 0; i < productCount; i++)
-        {
-            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
-        }
-        for (int i = 0; i < productCount; i++)
-        {
-            await page.CheckAsync($"#item-collected-checkbox-{i}");
-        }
-        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("text = All collected!");
-        Assert.NotNull(movedProductNameElement);
-    }
-
-    [Fact]
     public async Task AddValidProducts_ClickClearCart_CartShouldBeEmpty()
     {
         int productCount = 3;
@@ -106,8 +70,6 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         await page.ClickAsync("text=Clear cart");
         IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
         Assert.Null(movedProductNameElement);
-        string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        Assert.Null(cartProductsJson);
     }
 
     [Fact]

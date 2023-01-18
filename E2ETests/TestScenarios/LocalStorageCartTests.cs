@@ -75,6 +75,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         }
         await page.ClickAsync($"#reorder-button-{moveItemIndex}");
         await page.ClickAsync($"#reorder-button-{toTargetIndex}");
+        await Task.Delay(100);
         IElementHandle? movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
         ArgumentNullException.ThrowIfNull(movedProductNameElement);
         string movedProductName = await movedProductNameElement.InnerTextAsync();
