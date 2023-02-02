@@ -71,6 +71,23 @@ public sealed class SharedCartTests : IAsyncLifetime
         Assert.Equal("3.1", priceText);
     }
 
+    [Fact]
+    public async Task LeaveCartHostedByOther()
+    {
+        await page2.ClickAsync("#exit-cart-btn");
+        await Task.Delay(500);
+        IElementHandle? messageElement = await page1.QuerySelectorAsync($"p:has-text('{fakeAuth2.Email} has left the group.')");
+        Assert.NotNull(messageElement);
+    }
+
+    [Fact]
+    public async Task LeaveCartSelfHosted()
+    {
+        await page1.ClickAsync("#exit-share-cart-btn");
+        await Task.Delay(500);
+        IElementHandle? messageElement = await page2.QuerySelectorAsync($"h4:has-text('Cart session ended by host {fakeAuth1.Email}.')");
+        Assert.NotNull(messageElement);
+    }
 
     public async Task InitializeAsync()
     {

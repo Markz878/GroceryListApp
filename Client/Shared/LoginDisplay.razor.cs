@@ -22,6 +22,13 @@ public partial class LoginDisplay : IDisposable
         return Task.CompletedTask;
     }
 
+    private string GetUserName()
+    {
+        string name = loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "name")?.Value
+                    ?? loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "preferred_username")?.Value
+                    ?? "Shopper";
+        return name;
+    }
     public void Dispose()
     {
         stateSubscription.Dispose();
