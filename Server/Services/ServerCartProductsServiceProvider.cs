@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using System.ComponentModel;
 
 namespace GroceryListHelper.Server.Services;
 
@@ -35,6 +36,11 @@ public sealed class ServerCartProductsServiceProvider : ICartProductsService
     }
 
     public Task<Guid> SaveCartProduct(CartProduct product)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SortCartProducts(ListSortDirection sortDirection)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.Services;
+﻿using System.ComponentModel;
+
+namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsSignalRService : ICartProductsService
 {
@@ -30,6 +32,11 @@ public sealed class CartProductsSignalRService : ICartProductsService
         return string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage)
             ? Guid.Parse(response.SuccessMessage)
             : throw new Exception(response.ErrorMessage);
+    }
+
+    public Task SortCartProducts(ListSortDirection sortDirection)
+    {
+        throw new NotImplementedException();
     }
 
     public Task UpdateCartProduct(CartProductUIModel product)

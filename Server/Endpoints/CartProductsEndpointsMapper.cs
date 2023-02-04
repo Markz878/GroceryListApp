@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.ComponentModel;
 
 namespace GroceryListHelper.Server.Endpoints;
 
@@ -15,6 +16,7 @@ public static class CartProductsEndpointsMapper
         group.MapDelete("", DeleteAllProducts);
         group.MapDelete("/{id:guid}", DeleteProduct);
         group.MapPut("", UpdateProduct);
+        group.MapPatch("/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
 
     public static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
@@ -57,5 +59,11 @@ public static class CartProductsEndpointsMapper
             null => TypedResults.NoContent(),
             _ => throw new UnreachableException()
         };
+    }
+
+    public static async Task<NoContent> SortCartProducts(ListSortDirection sortDirection, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    {
+        await cartProductsRepository.SortUserProducts(user.GetUserId().GetValueOrDefault(), sortDirection);
+        return TypedResults.NoContent();
     }
 }

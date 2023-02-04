@@ -1,12 +1,16 @@
-﻿namespace GroceryListHelper.Client.Services;
+﻿using System.ComponentModel;
+
+namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsLocalService : ICartProductsService
 {
+    private readonly IndexViewModel viewModel;
     private readonly ILocalStorageService localStorage;
     private const string cartProductsKey = "cartProducts";
 
-    public CartProductsLocalService(ILocalStorageService localStorage)
+    public CartProductsLocalService(IndexViewModel viewModel, ILocalStorageService localStorage)
     {
+        this.viewModel = viewModel;
         this.localStorage = localStorage;
     }
 
@@ -17,28 +21,13 @@ public sealed class CartProductsLocalService : ICartProductsService
 
     public async Task<Guid> SaveCartProduct(CartProduct product)
     {
-        List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
-        CartProductUIModel newProduct = new()
-        {
-            Amount = product.Amount,
-            Name = product.Name,
-            Order = product.Order,
-            UnitPrice = product.UnitPrice
-        };
-        products.Add(newProduct);
-        await localStorage.SetItemAsync(cartProductsKey, products);
-        return newProduct.Id;
+        await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
+        return viewModel.CartProducts.Last().Id;
     }
 
     public async Task DeleteCartProduct(Guid id)
     {
-        List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-        CartProductUIModel? product = products.Find(x => x.Id == id);
-        if (product is not null)
-        {
-            products.Remove(product);
-            await localStorage.SetItemAsync(cartProductsKey, products);
-        }
+        await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
     }
 
     public async Task DeleteAllCartProducts()
@@ -48,16 +37,11 @@ public sealed class CartProductsLocalService : ICartProductsService
 
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
-        List<CartProductUIModel> products = await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
-        CartProductUIModel? product = products.Find(x => x.Id == cartProduct.Id);
-        if (product is not null)
-        {
-            product.Name = cartProduct.Name;
-            product.Amount = cartProduct.Amount;
-            product.UnitPrice = cartProduct.UnitPrice;
-            product.IsCollected = cartProduct.IsCollected;
-            product.Order = cartProduct.Order;
-            await localStorage.SetItemAsync(cartProductsKey, products);
-        }
+        await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
+    }
+
+    public async Task SortCartProducts(ListSortDirection sortDirection)
+    {
+        await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
     }
 }

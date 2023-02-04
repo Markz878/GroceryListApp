@@ -3,6 +3,7 @@ using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.CartProduct;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -67,5 +68,28 @@ public sealed class CartProductRepository : ICartProductRepository
         updatedProduct.Adapt(product);
         await db.SaveChangesAsync();
         return null;
+    }
+
+    public async Task SortUserProducts(Guid userId, ListSortDirection sortDirection)
+    {
+        List<CartProductDbModel> products = await db.CartProducts.Where(x => x.UserId == userId).ToListAsync();
+        int order = 1000;
+        if (sortDirection == ListSortDirection.Ascending)
+        {
+            foreach (CartProductDbModel? item in products.OrderBy(x => x.Name))
+            {
+                item.Order = order;
+                order += 1000;
+            }
+        }
+        else
+        {
+            foreach (CartProductDbModel? item in products.OrderByDescending(x => x.Name))
+            {
+                item.Order = order;
+                order += 1000;
+            }
+        }
+        await db.SaveChangesAsync();
     }
 }

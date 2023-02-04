@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Shared.Models.CartProduct;
+using System.ComponentModel;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -25,4 +26,5 @@ public interface ICartProductRepository
     /// Update a user's product info.
     /// </summary>
     Task<Exception?> UpdateProduct(Guid userId, CartProductCollectable updatedProduct);
+    Task SortUserProducts(Guid userId, ListSortDirection sortDirection);
 }

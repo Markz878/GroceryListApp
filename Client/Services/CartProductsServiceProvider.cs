@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.Services;
+﻿using System.ComponentModel;
+
+namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsServiceProvider : ICartProductsService
 {
@@ -49,6 +51,12 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         await actingCartService.UpdateCartProduct(cartProduct);
     }
 
+    public async Task SortCartProducts(ListSortDirection sortDirection)
+    {
+        actingCartService = await SelectProvider();
+        await actingCartService.SortCartProducts(sortDirection);
+    }
+
     private async ValueTask<ICartProductsService> SelectProvider()
     {
         bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
@@ -65,7 +73,7 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         }
         else if (actingCartService is not CartProductsLocalService)
         {
-            actingCartService = new CartProductsLocalService(localStorage);
+            actingCartService = new CartProductsLocalService(viewModel, localStorage);
         }
         ArgumentNullException.ThrowIfNull(actingCartService);
         return actingCartService;

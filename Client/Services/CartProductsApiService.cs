@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.Services;
+﻿using System.ComponentModel;
+
+namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsApiService : ICartProductsService
 {
@@ -41,5 +43,10 @@ public sealed class CartProductsApiService : ICartProductsService
     public async Task UpdateCartProduct(CartProductUIModel cartProduct)
     {
         await client.PutAsJsonAsync(uri, cartProduct);
+    }
+
+    public async Task SortCartProducts(ListSortDirection sortDirection)
+    {
+        await client.PatchAsync(uri + "/sort/" + (int)sortDirection, null);
     }
 }

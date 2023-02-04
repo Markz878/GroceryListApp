@@ -1,4 +1,7 @@
-﻿namespace GroceryListHelper.Client.Components;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+
+namespace GroceryListHelper.Client.Components;
 
 public abstract class CartComponentBase : BasePage<IndexViewModel>
 {
@@ -9,12 +12,12 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
     private PersistingComponentStateSubscription stateSubscription;
 
     protected CartProduct newProduct = new();
-    protected CartProductUIModel? checkedItem;
     protected CartProductUIModel? editingItem;
     protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
     protected ElementReference AddProductButton;
     protected bool isBusy;
+    protected SortState sortState;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,6 +66,39 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
         ApplicationState?.PersistAsJson(nameof(ViewModel.CartProducts), ViewModel.CartProducts);
         ApplicationState?.PersistAsJson(nameof(ViewModel.StoreProducts), ViewModel.StoreProducts);
         return Task.CompletedTask;
+    }
+
+    protected async Task SortItems()
+    {
+        if (ViewModel.IsPolling)
+        {
+            return;
+        }
+        sortState = sortState switch
+        {
+            SortState.None => SortState.Ascending,
+            SortState.Ascending => SortState.Descending,
+            SortState.Descending => SortState.Ascending,
+            _ => throw new UnreachableException()
+        };
+        int order = 1000;
+        if (sortState == SortState.Ascending)
+        {
+            foreach (CartProductUIModel? item in ViewModel.CartProducts.OrderBy(x => x.Name))
+            {
+                item.Order = order;
+                order += 1000;
+            }
+        }
+        else if (sortState == SortState.Descending)
+        {
+            foreach (CartProductUIModel? item in ViewModel.CartProducts.OrderByDescending(x => x.Name))
+            {
+                item.Order = order;
+                order += 1000;
+            }
+        }
+        await CartProductsService.SortCartProducts(sortState == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
     }
 
     private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
@@ -122,10 +158,6 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
 
     public string GetRowClass(CartProductUIModel cartProduct)
     {
-        if (cartProduct == checkedItem)
-        {
-            return "animate-background";
-        }
         if (cartProduct.IsCollected)
         {
             return "checked-item";
@@ -135,13 +167,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
 
     public async Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)
     {
-        if ((bool)e.Value! && ViewModel.ShowOnlyUncollected)
-        {
-            checkedItem = product;
-            await Task.Delay(900);
-        }
         product.IsCollected = (bool)e.Value!;
-        checkedItem = null;
         ViewModel.OnPropertyChanged();
         await CartProductsService.UpdateCartProduct(product);
     }
@@ -235,6 +261,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
         {
             if (cartProduct != movingItem)
             {
+                sortState = SortState.None;
                 movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
                 try
                 {
