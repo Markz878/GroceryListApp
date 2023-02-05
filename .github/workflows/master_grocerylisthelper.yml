@@ -36,7 +36,7 @@ jobs:
       - name: Start Cosmos Db emulator
         run: |
           ipaddr="`ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}' | head -n 1`"
-          docker run --publish 8081:8081 --publish 10250-10255:10250-10255 --memory 3g --cpus=2.0 --name=test-linux-emulator --env AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10 --env AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true --env AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=$ipaddr mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+          docker run -d --publish 8081:8081 --publish 10250-10255:10250-10255 --memory 3g --cpus=2.0 --name=test-linux-emulator --env AZURE_COSMOS_EMULATOR_PARTITION_COUNT=4 --env AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=$ipaddr mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
 
       - name: Run Tests
         run: dotnet test Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"
