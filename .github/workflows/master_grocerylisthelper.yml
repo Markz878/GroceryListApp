@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-env:
-  AZURE_WEBAPP_PACKAGE_PATH: 'publish' # Set this to the path to your web app project, defaults to the repository root:
 
 jobs:
   remove-old-artifacts:
@@ -20,7 +18,9 @@ jobs:
   publish:
     needs: remove-old-artifacts
     runs-on: windows-latest
-
+    env:
+      AZURE_WEBAPP_PACKAGE_PATH: 'publish'
+      AddLogging: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
