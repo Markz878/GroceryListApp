@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Azure.Identity;
 
 namespace GroceryListHelper.DataAccess.HelperMethods;
 
@@ -10,7 +9,6 @@ public static class ServiceExtensions
 {
     public static void AddDataAccessServices(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
-
         services.AddDbContext<GroceryStoreDbContext>(options =>
         {
             if (isDevelopment)
@@ -22,7 +20,7 @@ public static class ServiceExtensions
             }
             else
             {
-                options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), new ManagedIdentityCredential(), "GroceryListDb");
+                options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb");
             }
         });
         services.AddScoped<ICartProductRepository, CartProductRepository>();
