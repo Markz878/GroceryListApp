@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Repositories;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,18 @@ public static class ServiceExtensions
         {
             if (isDevelopment)
             {
-                options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb");
+                options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb", x =>
+                {
+                    x.HttpClientFactory(() =>
+                    {
+                        HttpMessageHandler httpMessageHandler = new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+                        return new HttpClient(httpMessageHandler);
+                    });
+                    x.ConnectionMode(ConnectionMode.Gateway);
+                });
                 options.EnableDetailedErrors();
                 options.EnableSensitiveDataLogging(true);
             }

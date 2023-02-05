@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Exclude>
+            [*]GroceryListHelper.Server.Filters.AntiForgeryTokenFilter,
+            [*]GroceryListHelper.Server.Installers.*,
+            [*]GroceryListHelper.Server.Services.Server*,
+            [*]GroceryListHelper.Server.Pages.*
+          </Exclude> <!-- [Assembly-Filter]Type-Filter -->
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

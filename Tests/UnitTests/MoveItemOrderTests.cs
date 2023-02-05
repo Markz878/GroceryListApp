@@ -1,7 +1,7 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
 using Xunit;
 
-namespace GroceryListHelper.UnitTests.UnitTests;
+namespace GroceryListHelper.Tests.UnitTests;
 
 public sealed class MoveItemOrderTests
 {

@@ -1,6 +1,7 @@
 ﻿using GroceryListHelper.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,21 +25,23 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {
         hostBuilder.UseUrls(BaseUrl);
-
-        hostBuilder.ConfigureAppConfiguration(config =>
-        {
-            config.AddInMemoryCollection(new Dictionary<string, string?>()
-            {
-                { "Logging:LogLevel:Microsoft.EntityFrameworkCore", "Warning" }
-            });
-        });
-
         hostBuilder.ConfigureServices((ctx, services) =>
         {
             services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
             services.AddDbContext<GroceryStoreDbContext>(options =>
             {
-                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("Cosmos connection string"), "E2ETestDb");
+                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "E2ETestDb", x =>
+                {
+                    x.HttpClientFactory(() =>
+                    {
+                        HttpMessageHandler httpMessageHandler = new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+                        return new HttpClient(httpMessageHandler);
+                    });
+                    x.ConnectionMode(ConnectionMode.Gateway);
+                });
             });
         });
     }

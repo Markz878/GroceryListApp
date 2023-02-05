@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Xunit;
 
-namespace GroceryListHelper.UnitTests.Client;
+namespace GroceryListHelper.Tests.Client;
 
 public class ClientAuthenticationStateProviderTests
 {

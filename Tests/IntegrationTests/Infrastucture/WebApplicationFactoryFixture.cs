@@ -1,9 +1,9 @@
 ﻿using Microsoft.Azure.Cosmos;
 using System.Configuration;
 
-namespace ApiIntegrationTests.Infrastucture;
+namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
-public sealed class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
+public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>, IAsyncLifetime
 {
     public required ITestOutputHelper TestOutputHelper { get; set; }
 
