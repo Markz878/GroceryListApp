@@ -15,7 +15,7 @@ public sealed class StoreProductsAPIService : IStoreProductsService
         return await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task<string> SaveStoreProduct(StoreProductModel product)
+    public async Task<string> SaveStoreProduct(StoreProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         if (response.IsSuccessStatusCode)

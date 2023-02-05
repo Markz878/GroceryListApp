@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.Shared.Models.CartProduct;
+﻿namespace GroceryListHelper.Shared.Models.CartProducts;
 
 public record CartProductUIModel : CartProductCollectable
 {

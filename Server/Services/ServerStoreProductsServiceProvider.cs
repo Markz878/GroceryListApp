@@ -28,7 +28,7 @@ public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
         return storeProducts.Select(x => x.Adapt<StoreProductUIModel>()).ToList();
     }
 
-    public Task<string> SaveStoreProduct(StoreProductModel product)
+    public Task<string> SaveStoreProduct(StoreProduct product)
     {
         throw new NotImplementedException();
     }

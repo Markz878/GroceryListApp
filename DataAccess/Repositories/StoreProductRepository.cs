@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
 using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Models.StoreProduct;
+using GroceryListHelper.Shared.Models.StoreProducts;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +20,7 @@ public sealed class StoreProductRepository : IStoreProductRepository
         return db.StoreProducts.Where(x => x.UserId == userId).Select(x => x.Adapt<StoreProductServerModel>()).ToListAsync();
     }
 
-    public async Task<Guid> AddProduct(StoreProductModel product, Guid userId)
+    public async Task<Guid> AddProduct(StoreProduct product, Guid userId)
     {
         StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, UserId = userId };
         db.StoreProducts.Add(storeProduct);

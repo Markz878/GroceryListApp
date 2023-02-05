@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Http.Metadata;
+using System.Reflection;
 
 namespace GroceryListHelper.Server.Filters;
 
@@ -6,37 +7,47 @@ public static class ValidatorFactory
 {
     public static RouteGroupBuilder AddFluentValidation(this RouteGroupBuilder builder)
     {
-        return builder.AddEndpointFilterFactory(ValidationFilter);
+        return builder.WithParameterValidation();
     }
 
-    private static EndpointFilterDelegate ValidationFilter(EndpointFilterFactoryContext handlerContext, EndpointFilterDelegate next)
+    private static TBuilder WithParameterValidation<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
     {
-        ParameterInfo[] parameters = handlerContext.MethodInfo.GetParameters();
-        for (int i = 0; i < parameters.Length; i++)
+        builder.Add(eb =>
         {
-            Type validatorType = typeof(IValidator<>).MakeGenericType(parameters[i].ParameterType);
-            IValidator? validator = handlerContext.ApplicationServices.GetService(validatorType) as IValidator;
-            if (validator is not null)
+            MethodInfo? methodInfo = eb.Metadata.OfType<MethodInfo>().FirstOrDefault();
+            ArgumentNullException.ThrowIfNull(methodInfo);
+            ParameterInfo[] parameters = methodInfo.GetParameters();
+            for (int i = 0; i < parameters.Length; i++)
             {
-                ValidationDescriptor validationDescriptor = new(i, parameters[i].ParameterType, validator);
-                return invocationContext =>
+                Type validatorType = typeof(IValidator<>).MakeGenericType(parameters[i].ParameterType);
+                IValidator? validator = eb.ApplicationServices.GetService(validatorType) as IValidator;
+                if (validator is not null)
                 {
-                    object? argument = invocationContext.Arguments[validationDescriptor.ArgumentIndex];
-                    if (argument is not null)
+                    eb.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), 400, new[] { "application/problem+json" }));
+                    eb.FilterFactories.Add((_, next) =>
                     {
-                        ValidationResult validationResult = validationDescriptor.Validator.Validate(new ValidationContext<object>(argument));
-                        if (!validationResult.IsValid)
+                        ValidationDescriptor validationDescriptor = new(i, parameters[i].ParameterType, validator);
+                        return invocationContext =>
                         {
-                            return ValueTask.FromResult<object?>(Results.ValidationProblem(validationResult.ToDictionary()));
-                        }
-                    }
-                    return next(invocationContext);
-                };
+                            object? argument = invocationContext.Arguments[validationDescriptor.ArgumentIndex];
+                            if (argument is not null)
+                            {
+                                ValidationResult validationResult = validationDescriptor.Validator.Validate(new ValidationContext<object>(argument));
+                                if (!validationResult.IsValid)
+                                {
+                                    return ValueTask.FromResult<object?>(TypedResults.ValidationProblem(validationResult.ToDictionary()));
+                                }
+                            }
+                            return next(invocationContext);
+                        };
+                    });
+                    return;
+                }
             }
-        }
-        return invocationContext => next(invocationContext);
+        });
+        return builder;
     }
-
-    private record ValidationDescriptor(int ArgumentIndex, Type ArgumentType, IValidator Validator);
+    private sealed record ProducesResponseTypeMetadata(Type Type, int StatusCode, IEnumerable<string> ContentTypes) : IProducesResponseTypeMetadata;
+    private sealed record ValidationDescriptor(int ArgumentIndex, Type ArgumentType, IValidator Validator);
 }
 

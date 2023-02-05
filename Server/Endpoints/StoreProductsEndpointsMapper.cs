@@ -20,7 +20,7 @@ public static class StoreProductsEndpointsMapper
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Created<Guid>> AddProduct(StoreProductModel product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Created<Guid>> AddProduct(StoreProduct product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         Guid id = await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
         return TypedResults.Created($"api/storeProducts", id);

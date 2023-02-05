@@ -1,5 +1,5 @@
 using E2ETests.Infrastructure;
-using GroceryListHelper.Shared.Models.CartProduct;
+using GroceryListHelper.Shared.Models.CartProducts;
 using Microsoft.Playwright;
 using System.Text.Json;
 using Xunit;
@@ -49,7 +49,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await page.AddProductToCart("Maito", -2, 2.9);
-        await page.WaitForSelectorAsync("text='Amount' must be greater than or equal to '0'.");
+        await page.WaitForSelectorAsync("text='Amount' must be between 0 and 10000.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
     }
 
@@ -57,7 +57,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await page.AddProductToCart("Maito", 2, -2.9);
-        await page.WaitForSelectorAsync("text='Unit Price' must be greater than or equal to '0'.");
+        await page.WaitForSelectorAsync("text='Unit Price' must be between 0 and 10000.");
         Assert.Null(await page.QuerySelectorAsync("td:has-text(\"Maito\")"));
     }
 

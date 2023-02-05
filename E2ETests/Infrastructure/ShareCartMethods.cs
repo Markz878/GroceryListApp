@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 
-namespace E2ETests;
+namespace E2ETests.Infrastructure;
 
 internal static class ShareCartMethods
 {

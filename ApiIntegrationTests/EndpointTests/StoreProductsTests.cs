@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.StoreProduct;
+﻿using GroceryListHelper.Shared.Models.StoreProducts;
 
 namespace ApiIntegrationTests.EndpointTests;
 
@@ -23,7 +23,7 @@ public sealed class StoreProductsTests : BaseTest
     [Fact]
     public async Task AddStoreProduct_Success_ReturnsCreated()
     {
-        StoreProductModel storeProduct = new()
+        StoreProduct storeProduct = new()
         {
             Name = "Product" + Random.Shared.Next(0, 10000),
             UnitPrice = Random.Shared.NextDouble() * 10
@@ -37,7 +37,7 @@ public sealed class StoreProductsTests : BaseTest
     [Fact]
     public async Task AddStoreProduct_InvalidProduct_ReturnsBadRequest()
     {
-        StoreProductModel storeProduct = new()
+        StoreProduct storeProduct = new()
         {
             Name = new string('x', 31),
             UnitPrice = -Random.Shared.NextDouble() * 10

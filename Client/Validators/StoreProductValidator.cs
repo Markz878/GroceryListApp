@@ -1,17 +1,16 @@
 ﻿namespace GroceryListHelper.Client.Validators;
 
-public sealed class StoreProductValidator : AbstractValidator<StoreProductModel>
+public sealed class StoreProductClientValidator : StoreProductValidator
 {
-    private readonly IEnumerable<StoreProductModel> productList;
+    private readonly IEnumerable<StoreProduct> productList;
 
-    public StoreProductValidator(IEnumerable<StoreProductModel> productList)
+    public StoreProductClientValidator(IEnumerable<StoreProduct> productList)
     {
         this.productList = productList;
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(30).Must(BeUnique).WithMessage("Product name must be unique");
-        RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Name).Must(BeUnique).WithMessage("Product name must be unique");
     }
 
-    private bool BeUnique(StoreProductModel product, string name)
+    private bool BeUnique(StoreProduct product, string name)
     {
         return productList.All(x => x.Equals(product) || !x.Name.Equals(name));
     }

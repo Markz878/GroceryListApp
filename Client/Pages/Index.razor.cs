@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Client.Pages;
+﻿using GroceryListHelper.Shared.Models.HelperModels;
+
+namespace GroceryListHelper.Client.Pages;
 
 public abstract class IndexBase : BasePage<IndexViewModel>, IAsyncDisposable
 {

@@ -103,7 +103,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
         await db.Database.EnsureCreatedAsync();
         browserContext = await server.GetNewBrowserContext(fakeAuth);
-        page= await browserContext.GotoPage(server.BaseUrl, true);
+        page = await browserContext.GotoPage(server.BaseUrl, true);
     }
     public async Task DisposeAsync()
     {

@@ -14,13 +14,13 @@ public static class ServiceExtensions
             if (isDevelopment)
             {
                 options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb");
-                options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
                 options.EnableDetailedErrors();
                 options.EnableSensitiveDataLogging(true);
             }
             else
             {
                 options.UseCosmos(configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "GroceryListDb");
+                options.EnableThreadSafetyChecks(false);
             }
         });
         services.AddScoped<ICartProductRepository, CartProductRepository>();

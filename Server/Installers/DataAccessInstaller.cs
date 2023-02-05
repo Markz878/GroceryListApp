@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Client.ViewModels;
+using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Server.Installers;
 

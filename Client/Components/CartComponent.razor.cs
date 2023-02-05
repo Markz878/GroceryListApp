@@ -130,7 +130,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
 
     public async Task SaveCartProduct(CartProduct product)
     {
-        CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
+        CartProductClientValidator cartProductValidator = new(ViewModel.CartProducts);
         ValidationResult validationResult = cartProductValidator.Validate(product);
         if (!validationResult.IsValid)
         {
@@ -172,7 +172,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
         await CartProductsService.UpdateCartProduct(product);
     }
 
-    public async Task SaveStoreProduct(StoreProductModel storeProduct)
+    public async Task SaveStoreProduct(StoreProduct storeProduct)
     {
         StoreProductUIModel? product = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == storeProduct.Name);
         if (product != null)
@@ -189,7 +189,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
         }
         else
         {
-            StoreProductValidator storeProductValidator = new(ViewModel.StoreProducts);
+            StoreProductClientValidator storeProductValidator = new(ViewModel.StoreProducts);
             ValidationResult validationResult = storeProductValidator.Validate(storeProduct);
             if (!validationResult.IsValid)
             {
@@ -220,7 +220,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
 
     public async Task UpdateCartProduct(CartProductUIModel product)
     {
-        CartProductValidator cartProductValidator = new(ViewModel.CartProducts);
+        CartProductClientValidator cartProductValidator = new(ViewModel.CartProducts);
         ModalViewModel.Message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
         if (string.IsNullOrEmpty(ModalViewModel.Message))
         {

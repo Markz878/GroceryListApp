@@ -1,15 +1,13 @@
 ﻿namespace GroceryListHelper.Client.Validators;
 
-public sealed class CartProductValidator : AbstractValidator<CartProduct>
+public sealed class CartProductClientValidator : CartProductValidator
 {
     private readonly IEnumerable<CartProductUIModel> productList;
 
-    public CartProductValidator(IEnumerable<CartProductUIModel> productList)
+    public CartProductClientValidator(IEnumerable<CartProductUIModel> productList)
     {
         this.productList = productList;
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(30).Must(BeUnique).WithMessage("Product name must be unique");
-        RuleFor(x => x.Amount).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.UnitPrice).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Name).Must(BeUnique).WithMessage("Product name must be unique");
     }
 
     private bool BeUnique(CartProduct product, string name)

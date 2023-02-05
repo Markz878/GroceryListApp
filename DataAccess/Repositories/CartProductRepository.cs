@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
 using GroceryListHelper.DataAccess.Models;
-using GroceryListHelper.Shared.Models.CartProduct;
+using GroceryListHelper.Shared.Models.CartProducts;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;

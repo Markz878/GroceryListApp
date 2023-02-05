@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.StoreProduct;
+﻿using GroceryListHelper.Shared.Models.StoreProducts;
 
 namespace GroceryListHelper.DataAccess.Models;
 

@@ -8,14 +8,23 @@ public static class CartProductsEndpointsMapper
 {
     public static void AddCartProductEndpoints(this RouteGroupBuilder builder)
     {
-        RouteGroupBuilder group = builder.MapGroup("cartproducts").RequireAuthorization().WithTags("Cart Products");
-        group.MapGet("", GetAll).WithName("Get cart products");
+        RouteGroupBuilder group = builder.MapGroup("cartproducts")
+            .RequireAuthorization()
+            .WithTags("Cart Products");
+
+        group.MapGet("", GetAll)
+            .WithName("Get cart products");
+
         group.MapPost("", AddProduct)
             .WithSummary("Add a cart product")
             .WithDescription("Add a cart product to your cart.");
+
         group.MapDelete("", DeleteAllProducts);
+
         group.MapDelete("/{id:guid}", DeleteProduct);
+
         group.MapPut("", UpdateProduct);
+
         group.MapPatch("/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
 

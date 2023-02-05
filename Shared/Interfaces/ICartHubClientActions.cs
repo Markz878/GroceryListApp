@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.Shared.Models.BaseModels;
-using GroceryListHelper.Shared.Models.CartProduct;
+using GroceryListHelper.Shared.Models.CartProducts;
 
 namespace GroceryListHelper.Shared.Interfaces;
 

@@ -27,7 +27,7 @@ public sealed class StoreProductsServiceProvider : IStoreProductsService
         return await actingStoreService.GetStoreProducts();
     }
 
-    public async Task<string> SaveStoreProduct(StoreProductModel product)
+    public async Task<string> SaveStoreProduct(StoreProduct product)
     {
         actingStoreService = await SelectProvider();
         return await actingStoreService.SaveStoreProduct(product);
