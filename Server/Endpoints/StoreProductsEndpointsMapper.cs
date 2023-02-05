@@ -14,9 +14,9 @@ public static class StoreProductsEndpointsMapper
         group.MapPut("", UpdateProduct);
     }
 
-    public static async Task<Ok<List<StoreProductServerModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Ok<List<StoreProductUIModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        List<StoreProductServerModel> results = await storeProductsRepository.GetStoreProductsForUser(user.GetUserId().GetValueOrDefault());
+        List<StoreProductUIModel> results = await storeProductsRepository.GetStoreProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
@@ -32,7 +32,7 @@ public static class StoreProductsEndpointsMapper
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProductServerModel updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProductUIModel updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
         Exception? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Id, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
         return ex switch

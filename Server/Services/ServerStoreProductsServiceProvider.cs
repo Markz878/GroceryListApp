@@ -24,11 +24,11 @@ public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
         {
             return new List<StoreProductUIModel>();
         }
-        List<StoreProductServerModel> storeProducts = await storeProductRepository.GetStoreProductsForUser(userName.Value);
+        List<StoreProductUIModel> storeProducts = await storeProductRepository.GetStoreProductsForUser(userName.Value);
         return storeProducts.Select(x => x.Adapt<StoreProductUIModel>()).ToList();
     }
 
-    public Task<string> SaveStoreProduct(StoreProduct product)
+    public Task<Guid> SaveStoreProduct(StoreProduct product)
     {
         throw new NotImplementedException();
     }

@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.DataAccess.Models;
 
-public record StoreProductDbModel : StoreProductServerModel
+public record StoreProductDbModel : StoreProductUIModel
 {
     public Guid UserId { get; set; }
 }

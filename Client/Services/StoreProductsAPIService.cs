@@ -15,13 +15,13 @@ public sealed class StoreProductsAPIService : IStoreProductsService
         return await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task<string> SaveStoreProduct(StoreProduct product)
+    public async Task<Guid> SaveStoreProduct(StoreProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         if (response.IsSuccessStatusCode)
         {
             string id = await response.Content.ReadAsStringAsync();
-            return id;
+            return Guid.Parse(id.Trim('"'));
         }
         throw new Exception("Could not save store product.");
     }

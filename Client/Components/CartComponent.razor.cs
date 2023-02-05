@@ -197,7 +197,7 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
             }
             try
             {
-                string id = await StoreProductsService.SaveStoreProduct(storeProduct);
+                Guid id = await StoreProductsService.SaveStoreProduct(storeProduct);
                 product = new()
                 {
                     Id = id,
@@ -229,6 +229,13 @@ public abstract class CartComponentBase : BasePage<IndexViewModel>
             try
             {
                 await CartProductsService.UpdateCartProduct(product);
+                List<StoreProductUIModel> storeProducts = await StoreProductsService.GetStoreProducts();
+                StoreProductUIModel? storeProduct = storeProducts.FirstOrDefault(x => x.Name == product.Name);
+                if (storeProduct is not null && storeProduct.UnitPrice != product.UnitPrice)
+                {
+                    storeProduct.UnitPrice = product.UnitPrice;
+                    await StoreProductsService.UpdateStoreProduct(storeProduct);
+                }
             }
             catch (Exception ex)
             {

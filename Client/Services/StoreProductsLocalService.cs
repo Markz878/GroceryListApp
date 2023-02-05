@@ -15,7 +15,7 @@ public sealed class StoreProductsLocalService : IStoreProductsService
         return await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
     }
 
-    public async Task<string> SaveStoreProduct(StoreProduct product)
+    public async Task<Guid> SaveStoreProduct(StoreProduct product)
     {
         List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
         StoreProductUIModel newProduct = new()

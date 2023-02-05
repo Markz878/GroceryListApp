@@ -15,9 +15,9 @@ public sealed class StoreProductRepository : IStoreProductRepository
         this.db = db;
     }
 
-    public Task<List<StoreProductServerModel>> GetStoreProductsForUser(Guid userId)
+    public Task<List<StoreProductUIModel>> GetStoreProductsForUser(Guid userId)
     {
-        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => x.Adapt<StoreProductServerModel>()).ToListAsync();
+        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => x.Adapt<StoreProductUIModel>()).ToListAsync();
     }
 
     public async Task<Guid> AddProduct(StoreProduct product, Guid userId)

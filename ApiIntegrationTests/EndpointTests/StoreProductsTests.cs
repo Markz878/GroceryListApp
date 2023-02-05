@@ -14,7 +14,7 @@ public sealed class StoreProductsTests : BaseTest
         List<StoreProductDbModel> insertedProducts = await SaveStoreProducts(1);
         HttpResponseMessage response = await _client.GetAsync("api/storeproducts");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        List<StoreProductServerModel>? products = await response.Content.ReadFromJsonAsync<List<StoreProductServerModel>>(_jsonOptions);
+        List<StoreProductUIModel>? products = await response.Content.ReadFromJsonAsync<List<StoreProductUIModel>>(_jsonOptions);
         Assert.NotNull(products);
         Assert.Equal(insertedProducts[0].Name, products[0].Name);
         Assert.Equal(insertedProducts[0].UnitPrice, products[0].UnitPrice);
@@ -64,7 +64,7 @@ public sealed class StoreProductsTests : BaseTest
     public async Task UpdateStoreProduct_Success_ReturnsOk()
     {
         List<StoreProductDbModel> insertedProducts = await SaveStoreProducts(1);
-        StoreProductServerModel storeProduct = new()
+        StoreProductUIModel storeProduct = new()
         {
             Id = insertedProducts[0].Id,
             Name = insertedProducts[0].Name,
@@ -84,7 +84,7 @@ public sealed class StoreProductsTests : BaseTest
     public async Task UpdateStoreProduct_InvalidProduct_ReturnsBadRequest()
     {
         List<StoreProductDbModel> insertedProducts = await SaveStoreProducts(1);
-        StoreProductServerModel storeProduct = new()
+        StoreProductUIModel storeProduct = new()
         {
             Id = insertedProducts[0].Id,
             Name = new string('x', 31),
@@ -98,7 +98,7 @@ public sealed class StoreProductsTests : BaseTest
     public async Task UpdateStoreProduct_InvalidProductId_ReturnsNotFound()
     {
         List<StoreProductDbModel> insertedProducts = await SaveStoreProducts(1);
-        StoreProductServerModel storeProduct = new()
+        StoreProductUIModel storeProduct = new()
         {
             Id = Guid.NewGuid(),
             Name = insertedProducts[0].Name + 'A',
