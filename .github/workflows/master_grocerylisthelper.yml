@@ -17,7 +17,7 @@ jobs:
 
   publish:
     needs: remove-old-artifacts
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       AZURE_WEBAPP_PACKAGE_PATH: 'publish'
       AddLogging: false
@@ -34,12 +34,7 @@ jobs:
         run: dotnet build Server --configuration Release
 
       - name: Start Cosmos Db emulator
-        run: |
-          ipaddr="`ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}' | head -n 1`"
-          docker run -d --publish 8081:8081 --publish 10250-10255:10250-10255 --memory 3g --cpus=2.0 --name=test-linux-emulator --env AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10 --env AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true --env AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=$ipaddr --interactive -t mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
-          date +%s
-          sleep 60
-          date +%s
+        uses: southpolesteve/cosmos-emulator-github-action@v1
 
       - name: Run Tests
         run: dotnet test Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"
