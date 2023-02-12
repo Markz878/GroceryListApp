@@ -9,7 +9,6 @@ public sealed class SwaggerInstaller : IInstaller
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
-            c.ParameterFilter<FluentValidationParameterFilter>();
             c.RequestBodyFilter<FluentValidationSwaggerFilter>();
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "GroceryListHelper", Version = "v1" });
         });
