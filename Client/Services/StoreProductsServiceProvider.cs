@@ -15,28 +15,28 @@ public sealed class StoreProductsServiceProvider : IStoreProductsService
         this.authenticationStateProvider = authenticationStateProvider;
     }
 
-    public async Task<bool> ClearStoreProducts()
+    public async Task ClearStoreProducts()
     {
         actingStoreService = await SelectProvider();
-        return await actingStoreService.ClearStoreProducts();
+        await actingStoreService.ClearStoreProducts();
     }
 
-    public async Task<List<StoreProductUIModel>> GetStoreProducts()
+    public async Task<List<StoreProduct>> GetStoreProducts()
     {
         actingStoreService = await SelectProvider();
         return await actingStoreService.GetStoreProducts();
     }
 
-    public async Task<Guid> SaveStoreProduct(StoreProduct product)
+    public async Task SaveStoreProduct(StoreProduct product)
     {
         actingStoreService = await SelectProvider();
-        return await actingStoreService.SaveStoreProduct(product);
+        await actingStoreService.SaveStoreProduct(product);
     }
 
-    public async Task<bool> UpdateStoreProduct(StoreProductUIModel product)
+    public async Task UpdateStoreProduct(StoreProduct product)
     {
         actingStoreService = await SelectProvider();
-        return await actingStoreService.UpdateStoreProduct(product);
+        await actingStoreService.UpdateStoreProduct(product);
     }
 
     private async ValueTask<IStoreProductsService> SelectProvider()

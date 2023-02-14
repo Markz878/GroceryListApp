@@ -21,7 +21,7 @@ public static class CartProductsEndpointsMapper
 
         group.MapDelete("", DeleteAllProducts);
 
-        group.MapDelete("/{id:guid}", DeleteProduct);
+        group.MapDelete("/{productName}", DeleteProduct);
 
         group.MapPut("", UpdateProduct);
 
@@ -30,25 +30,25 @@ public static class CartProductsEndpointsMapper
 
     public static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        List<CartProductCollectable> results = await cartProductsRepository.GetCartProductsForUser(user.GetUserId().GetValueOrDefault());
+        List<CartProductCollectable> results = await cartProductsRepository.GetCartProducts(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Created<Guid>> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Created> AddProduct(CartProduct product, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        Guid id = await cartProductsRepository.AddCartProduct(product, user.GetUserId().GetValueOrDefault());
-        return TypedResults.Created($"api/cartproducts", id);
+        await cartProductsRepository.AddCartProduct(product, user.GetUserId().GetValueOrDefault());
+        return TypedResults.Created($"api/cartproducts");
     }
 
     public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        await cartProductsRepository.ClearProductsForUser(user.GetUserId().GetValueOrDefault());
+        await cartProductsRepository.ClearCartProducts(user.GetUserId().GetValueOrDefault());
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(Guid id, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(string productName, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        Exception? ex = await cartProductsRepository.DeleteProduct(id, user.GetUserId().GetValueOrDefault());
+        Exception? ex = await cartProductsRepository.DeleteProduct(productName, user.GetUserId().GetValueOrDefault());
         return ex switch
         {
             NotFoundException => TypedResults.NotFound(),

@@ -30,19 +30,19 @@
             <td><input id="newproduct-price-input" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Product unit price input" @bind="newProduct.UnitPrice" @onfocusout="async () => await AddProductButton.FocusAsync()" /></td>
             <td></td>
         </tr>
-        @if (isBusy)
+@*        @if (isBusy)
         {
             <tr>
                 <td colspan="8"><LoadingComponent Message="Loading your cart items..." IsLarge=false/></td>
             </tr>
         }
         else
-        {
+        {*@
             @foreach (var (item, index) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((x, i) => (x, i)))
             {
                 @if (item != editingItem)
                 {
-                    <tr class="@GetRowClass(item)" @key=item.Id>
+                    <tr class="@GetRowClass(item)" @key=item.Name>
                         <td><button id="reorder-button-@index" class="btn btn-primary sort-button @(item==movingItem ? "moving-button" : "")" title="Move" aria-label="Move" @onclick="()=>Move(item)"><i class="fas fa-sort"></i></button></td>
                         <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item)) /></td>
                         <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
@@ -55,7 +55,7 @@
                 }
                 else
                 {
-                    <tr class="@GetRowClass(item)" @key=item.Id>
+                    <tr class="@GetRowClass(item)" @key=item.Name>
                         <td></td>
                         <td></td>
                         <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
@@ -66,7 +66,7 @@
                     </tr>
                 }
             }
-        }
+        @*}*@
 
     </tbody>
 </table>

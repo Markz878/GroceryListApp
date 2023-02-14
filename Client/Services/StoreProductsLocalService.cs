@@ -10,55 +10,37 @@ public sealed class StoreProductsLocalService : IStoreProductsService
         this.localStorage = localStorage;
     }
 
-    public async Task<List<StoreProductUIModel>> GetStoreProducts()
+    public async Task<List<StoreProduct>> GetStoreProducts()
     {
-        return await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
+        return await localStorage.GetItemAsync<List<StoreProduct>>(storeProductsKey) ?? new List<StoreProduct>();
     }
 
-    public async Task<Guid> SaveStoreProduct(StoreProduct product)
+    public async Task SaveStoreProduct(StoreProduct product)
     {
-        List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey) ?? new List<StoreProductUIModel>();
-        StoreProductUIModel newProduct = new()
+        List<StoreProduct> products = await localStorage.GetItemAsync<List<StoreProduct>>(storeProductsKey) ?? new List<StoreProduct>();
+        StoreProduct newProduct = new()
         {
             Name = product.Name,
             UnitPrice = product.UnitPrice
         };
         products.Add(newProduct);
         await localStorage.SetItemAsync(storeProductsKey, products);
-        return newProduct.Id;
     }
 
-    public async Task<bool> ClearStoreProducts()
+    public async Task ClearStoreProducts()
     {
-        try
-        {
-            await localStorage.RemoveItemAsync(storeProductsKey);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        await localStorage.RemoveItemAsync(storeProductsKey);
     }
 
-    public async Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct)
+    public async Task UpdateStoreProduct(StoreProduct storeProduct)
     {
-        try
+        List<StoreProduct> products = await localStorage.GetItemAsync<List<StoreProduct>>(storeProductsKey);
+        StoreProduct? product = products.Find(x => x.Name == storeProduct.Name);
+        if (product != null)
         {
-            List<StoreProductUIModel> products = await localStorage.GetItemAsync<List<StoreProductUIModel>>(storeProductsKey);
-            StoreProductUIModel? product = products.Find(x => x.Id == storeProduct.Id);
-            if (product != null)
-            {
-                product.UnitPrice = storeProduct.UnitPrice;
-                product.Name = storeProduct.Name;
-                await localStorage.SetItemAsync(storeProductsKey, products);
-                return true;
-            }
-            return false;
-        }
-        catch
-        {
-            return false;
+            product.UnitPrice = storeProduct.UnitPrice;
+            product.Name = storeProduct.Name;
+            await localStorage.SetItemAsync(storeProductsKey, products);
         }
     }
 }

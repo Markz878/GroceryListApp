@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using RichardSzalay.MockHttp;
-using System.Net;
-using System.Net.Http.Json;
-using Xunit;
 
 namespace GroceryListHelper.Tests.Client;
 

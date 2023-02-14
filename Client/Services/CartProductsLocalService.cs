@@ -4,11 +4,11 @@ namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsLocalService : ICartProductsService
 {
-    private readonly IndexViewModel viewModel;
+    private readonly MainViewModel viewModel;
     private readonly ILocalStorageService localStorage;
     private const string cartProductsKey = "cartProducts";
 
-    public CartProductsLocalService(IndexViewModel viewModel, ILocalStorageService localStorage)
+    public CartProductsLocalService(MainViewModel viewModel, ILocalStorageService localStorage)
     {
         this.viewModel = viewModel;
         this.localStorage = localStorage;
@@ -19,13 +19,12 @@ public sealed class CartProductsLocalService : ICartProductsService
         return await localStorage.GetItemAsync<List<CartProductUIModel>>(cartProductsKey) ?? new List<CartProductUIModel>();
     }
 
-    public async Task<Guid> SaveCartProduct(CartProduct product)
+    public async Task SaveCartProduct(CartProduct product)
     {
         await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
-        return viewModel.CartProducts.Last().Id;
     }
 
-    public async Task DeleteCartProduct(Guid id)
+    public async Task DeleteCartProduct(string name)
     {
         await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
     }
@@ -35,7 +34,7 @@ public sealed class CartProductsLocalService : ICartProductsService
         await localStorage.RemoveItemAsync(cartProductsKey);
     }
 
-    public async Task UpdateCartProduct(CartProductUIModel cartProduct)
+    public async Task UpdateCartProduct(CartProductCollectable cartProduct)
     {
         await localStorage.SetItemAsync(cartProductsKey, viewModel.CartProducts);
     }

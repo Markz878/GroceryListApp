@@ -1,6 +1,6 @@
 namespace GroceryListHelper.Client.Components;
 
-public abstract class CartSummaryRowComponentBase : BasePage<IndexViewModel>
+public abstract class CartSummaryRowComponentBase : BasePage<MainViewModel>
 {
     [Inject] public ICartProductsService CartProductsService { get; set; } = default!;
     [Inject] public IStoreProductsService StoreProductsService { get; set; } = default!;

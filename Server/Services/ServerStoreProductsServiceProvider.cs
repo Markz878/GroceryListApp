@@ -1,6 +1,4 @@
-﻿using Mapster;
-
-namespace GroceryListHelper.Server.Services;
+﻿namespace GroceryListHelper.Server.Services;
 
 public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
 {
@@ -12,28 +10,28 @@ public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
         this.httpContextAccessor = httpContextAccessor;
         this.storeProductRepository = storeProductRepository;
     }
-    public Task<bool> ClearStoreProducts()
+    public Task ClearStoreProducts()
     {
         throw new NotImplementedException();
     }
 
-    public async Task<List<StoreProductUIModel>> GetStoreProducts()
+    public async Task<List<StoreProduct>> GetStoreProducts()
     {
         Guid? userName = httpContextAccessor.HttpContext?.User.GetUserId();
         if (userName == null)
         {
-            return new List<StoreProductUIModel>();
+            return new List<StoreProduct>();
         }
-        List<StoreProductUIModel> storeProducts = await storeProductRepository.GetStoreProductsForUser(userName.Value);
-        return storeProducts.Select(x => x.Adapt<StoreProductUIModel>()).ToList();
+        List<StoreProduct> storeProducts = await storeProductRepository.GetStoreProductsForUser(userName.Value);
+        return storeProducts;
     }
 
-    public Task<Guid> SaveStoreProduct(StoreProduct product)
+    public Task SaveStoreProduct(StoreProduct product)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct)
+    public Task UpdateStoreProduct(StoreProduct storeProduct)
     {
         throw new NotImplementedException();
     }

@@ -11,18 +11,16 @@ global using GroceryListHelper.Server.Services;
 global using GroceryListHelper.Shared.Interfaces;
 global using GroceryListHelper.Shared.Models.Authentication;
 global using GroceryListHelper.Shared.Models.BaseModels;
+global using GroceryListHelper.Shared.Models.CartGroups;
 global using GroceryListHelper.Shared.Models.CartProducts;
 global using GroceryListHelper.Shared.Models.StoreProducts;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.ResponseCompression;
-global using Microsoft.Azure.Cosmos;
-global using Microsoft.Extensions.Diagnostics.HealthChecks;
 global using Microsoft.Extensions.Primitives;
 global using Microsoft.Identity.Web.UI;
 global using Microsoft.OpenApi.Models;
-global using System.Collections.Concurrent;
 global using System.Diagnostics;
 global using System.Security.Claims;
 
@@ -62,6 +60,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMiddleware<FakeAuthenticationMiddleware>();
 }
+app.Services.InitDatabase();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
@@ -73,7 +72,7 @@ app.MapAPIEndpoints();
 //});
 app.MapHub<CartHub>("/carthub");
 app.MapFallbackToPage("/_Host");
-app.MapHealthChecks("/health");
+//app.MapHealthChecks("/health");
 app.Run();
 
 namespace GroceryListHelper.Server

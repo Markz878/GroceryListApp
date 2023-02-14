@@ -7,4 +7,10 @@ public static class AuthenticationHelpers
         string? stringId = user.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
         return stringId == null ? null : Guid.Parse(stringId.Trim('"'));
     }
+
+    public static string? GetUserEmail(this ClaimsPrincipal user)
+    {
+        string? email = user.FindFirstValue("preferred_username");
+        return email;
+    }
 }

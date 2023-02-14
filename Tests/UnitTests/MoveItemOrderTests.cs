@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
-using Xunit;
 
 namespace GroceryListHelper.Tests.UnitTests;
 

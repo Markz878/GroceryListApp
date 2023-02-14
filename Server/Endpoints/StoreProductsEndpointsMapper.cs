@@ -14,16 +14,16 @@ public static class StoreProductsEndpointsMapper
         group.MapPut("", UpdateProduct);
     }
 
-    public static async Task<Ok<List<StoreProductUIModel>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Ok<List<StoreProduct>>> GetAll(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        List<StoreProductUIModel> results = await storeProductsRepository.GetStoreProductsForUser(user.GetUserId().GetValueOrDefault());
+        List<StoreProduct> results = await storeProductsRepository.GetStoreProductsForUser(user.GetUserId().GetValueOrDefault());
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Created<Guid>> AddProduct(StoreProduct product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Created> AddProduct(StoreProduct product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        Guid id = await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
-        return TypedResults.Created($"api/storeProducts", id);
+        await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
+        return TypedResults.Created($"api/storeProducts");
     }
 
     public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
@@ -32,13 +32,12 @@ public static class StoreProductsEndpointsMapper
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProductUIModel updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProduct updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        Exception? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Id, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
+        Exception? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Name, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
         return ex switch
         {
             NotFoundException => TypedResults.NotFound(),
-            ForbiddenException => TypedResults.Forbid(),
             null => TypedResults.NoContent(),
             _ => throw new UnreachableException()
         };

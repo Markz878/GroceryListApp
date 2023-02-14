@@ -5,10 +5,9 @@ namespace GroceryListHelper.Shared.Interfaces;
 
 public interface ICartHubClientActions
 {
-    Task<HubResponse> CreateGroup(List<string> allowedUserEmails);
-    Task<HubResponse> JoinGroup(string hostEmail);
-    Task<HubResponse> LeaveGroup();
+    Task<HubResponse> JoinGroup(Guid groupId);
+    Task<HubResponse> LeaveGroup(Guid groupId);
     Task<HubResponse> CartItemAdded(CartProduct product);
     Task<HubResponse> CartItemModified(CartProductCollectable product);
-    Task<HubResponse> CartItemDeleted(Guid id);
+    Task<HubResponse> CartItemDeleted(string name);
 }

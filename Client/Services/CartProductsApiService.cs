@@ -17,21 +17,15 @@ public sealed class CartProductsApiService : ICartProductsService
         return await client.GetFromJsonAsync<List<CartProductUIModel>>(uri) ?? new List<CartProductUIModel>();
     }
 
-    public async Task<Guid> SaveCartProduct(CartProduct product)
+    public async Task SaveCartProduct(CartProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
-        if (response.IsSuccessStatusCode)
-        {
-            string textId = await response.Content.ReadAsStringAsync();
-            Guid id = Guid.Parse(textId.Trim('"'));
-            return id;
-        }
-        throw new Exception("Could not insert product.");
+        response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteCartProduct(Guid id)
+    public async Task DeleteCartProduct(string productName)
     {
-        HttpResponseMessage response = await client.DeleteAsync(uri + $"/{id}");
+        HttpResponseMessage response = await client.DeleteAsync(uri + $"/{productName}");
         response.EnsureSuccessStatusCode();
     }
 
@@ -40,7 +34,7 @@ public sealed class CartProductsApiService : ICartProductsService
         await client.DeleteAsync(uri);
     }
 
-    public async Task UpdateCartProduct(CartProductUIModel cartProduct)
+    public async Task UpdateCartProduct(CartProductCollectable cartProduct)
     {
         await client.PutAsJsonAsync(uri, cartProduct);
     }

@@ -1,21 +1,5 @@
 ﻿@page "/"
-@inherits IndexBase
-<PageTitle>Grocery List Helper v1.3</PageTitle>
 
 <CartComponent />
 
 <CartSummaryRowComponent />
-
-@if (userInfo?.IsAuthenticated == true)
-{
-    <ChooseCartShareOptionComponent />
-    @if (ViewModel.ShareMode == ShareModeType.Self)
-    {
-        <ShareSelfCartComponent />
-    }
-    else
-    {
-        <JoinCartComponent />
-    }
-    <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
-}

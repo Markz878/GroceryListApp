@@ -1,5 +1,4 @@
 ﻿using E2ETests.Infrastructure;
-using GroceryListHelper.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Xunit;
@@ -92,8 +91,8 @@ public sealed class SharedCartTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         using IServiceScope scope = server.Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        await db.Database.EnsureCreatedAsync();
+        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        //await db.Database.EnsureCreatedAsync();
         browserContext1 = await server.GetNewBrowserContext(fakeAuth1);
         page1 = await browserContext1.GotoPage(server.BaseUrl, true);
         browserContext2 = await server.GetNewBrowserContext(fakeAuth2);
@@ -104,8 +103,8 @@ public sealed class SharedCartTests : IAsyncLifetime
     {
         await browserContext1.DisposeAsync();
         await browserContext2.DisposeAsync();
-        using IServiceScope scope = server.Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        await db.Database.EnsureDeletedAsync();
+        //using IServiceScope scope = server.Services.CreateScope();
+        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        //await db.Database.EnsureDeletedAsync();
     }
 }

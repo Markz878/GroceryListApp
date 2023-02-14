@@ -21,12 +21,11 @@ public abstract class BaseTest : IDisposable
     {
         return new CartProductDbModel()
         {
-            Id = Guid.NewGuid(),
             Amount = Random.Shared.NextDouble() * 10,
             Name = "Product" + Random.Shared.Next(0, 10000),
             Order = order,
             UnitPrice = Random.Shared.NextDouble() * 10,
-            UserId = randomUser ? Guid.NewGuid() : TestAuthHandler.UserId
+            OwnerId = randomUser ? Guid.NewGuid() : TestAuthHandler.UserId
         };
     }
 
@@ -34,10 +33,9 @@ public abstract class BaseTest : IDisposable
     {
         return new StoreProductDbModel()
         {
-            Id = Guid.NewGuid(),
             Name = "Product" + Random.Shared.Next(0, 10000),
             UnitPrice = Random.Shared.NextDouble() * 10,
-            UserId = TestAuthHandler.UserId,
+            OwnerId = TestAuthHandler.UserId,
         };
     }
 
@@ -49,9 +47,9 @@ public abstract class BaseTest : IDisposable
             result.Add(GetRandomDbCartProduct(i * 1000, randomUser));
         }
         using IServiceScope scope = _factory.Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        db.CartProducts.AddRange(result);
-        await db.SaveChangesAsync();
+        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        //db.CartProducts.AddRange(result);
+        //await db.SaveChangesAsync();
         return result;
     }
 
@@ -63,19 +61,19 @@ public abstract class BaseTest : IDisposable
             result.Add(GetRandomDbStoreProduct());
         }
         using IServiceScope scope = _factory.Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        db.StoreProducts.AddRange(result);
-        await db.SaveChangesAsync();
+        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        //db.StoreProducts.AddRange(result);
+        //await db.SaveChangesAsync();
         return result;
     }
 
     public void Dispose()
     {
         using IServiceScope scope = _factory.Services.CreateScope();
-        GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        db.CartProducts.RemoveRange(db.CartProducts);
-        db.StoreProducts.RemoveRange(db.StoreProducts);
-        db.SaveChanges();
+        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
+        //db.CartProducts.RemoveRange(db.CartProducts);
+        //db.StoreProducts.RemoveRange(db.StoreProducts);
+        //db.SaveChanges();
         GC.SuppressFinalize(this);
     }
 }

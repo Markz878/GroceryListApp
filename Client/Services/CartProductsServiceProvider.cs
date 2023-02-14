@@ -7,11 +7,11 @@ public sealed class CartProductsServiceProvider : ICartProductsService
     private readonly IHttpClientFactory httpClientFactory;
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
-    private readonly IndexViewModel viewModel;
+    private readonly MainViewModel viewModel;
     private readonly ICartHubClient cartHubClient;
     private ICartProductsService? actingCartService;
 
-    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, IndexViewModel viewModel, ICartHubClient cartHubClient)
+    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, MainViewModel viewModel, ICartHubClient cartHubClient)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;
@@ -26,10 +26,10 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         await actingCartService.DeleteAllCartProducts();
     }
 
-    public async Task DeleteCartProduct(Guid id)
+    public async Task DeleteCartProduct(string name)
     {
         actingCartService = await SelectProvider();
-        await actingCartService.DeleteCartProduct(id);
+        await actingCartService.DeleteCartProduct(name);
     }
 
     public async Task<List<CartProductUIModel>> GetCartProducts()
@@ -38,14 +38,13 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         return await actingCartService.GetCartProducts();
     }
 
-    public async Task<Guid> SaveCartProduct(CartProduct product)
+    public async Task SaveCartProduct(CartProduct product)
     {
         actingCartService = await SelectProvider();
-        Guid id = await actingCartService.SaveCartProduct(product);
-        return id;
+        await actingCartService.SaveCartProduct(product);
     }
 
-    public async Task UpdateCartProduct(CartProductUIModel cartProduct)
+    public async Task UpdateCartProduct(CartProductCollectable cartProduct)
     {
         actingCartService = await SelectProvider();
         await actingCartService.UpdateCartProduct(cartProduct);

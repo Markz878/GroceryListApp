@@ -50,8 +50,9 @@ builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
 builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
+builder.Services.AddScoped<ICartGroupsService, CartGroupsService>();
 
-builder.Services.AddScoped<IndexViewModel>();
+builder.Services.AddScoped<MainViewModel>();
 builder.Services.AddScoped<ModalViewModel>();
 
 await builder.Build().RunAsync();

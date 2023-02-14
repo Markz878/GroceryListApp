@@ -2,17 +2,12 @@
 
 public sealed class ServerCartHubClient : ICartHubClient
 {
-    public void BuildCartHubConnection()
-    {
-        throw new NotImplementedException();
-    }
-
     public Task<HubResponse> CartItemAdded(CartProduct product)
     {
         throw new NotImplementedException();
     }
 
-    public Task<HubResponse> CartItemDeleted(Guid id)
+    public Task<HubResponse> CartItemDeleted(string name)
     {
         throw new NotImplementedException();
     }
@@ -22,22 +17,7 @@ public sealed class ServerCartHubClient : ICartHubClient
         throw new NotImplementedException();
     }
 
-    public Task<HubResponse> CreateGroup(List<string> allowedUserEmails)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-
-    public ValueTask DisposeAsync()
-    {
-        return ValueTask.CompletedTask;
-    }
-
-    public Task<HubResponse> JoinGroup(string cartHostEmail)
+    public Task<HubResponse> JoinGroup(Guid groupId)
     {
         throw new NotImplementedException();
     }
@@ -53,6 +33,16 @@ public sealed class ServerCartHubClient : ICartHubClient
     }
 
     public ValueTask Stop()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    public Task<HubResponse> LeaveGroup(Guid groupId)
     {
         throw new NotImplementedException();
     }

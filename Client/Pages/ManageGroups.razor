@@ -1,0 +1,53 @@
+﻿@page "/managegroups"
+
+@inherits ManageGroupsBase
+
+<div class="container">
+    @if (isCreatingNewGroup)
+    {
+        <fieldset id="add-group-form">
+            <legend>Create cart group</legend>
+            <input id="create-group-name" @bind="createCartGroupRequest.Name" placeholder="Group name" />
+            <p>@string.Join(", ", createCartGroupRequest.OtherUsers)</p>
+            <input id="add-user-to-group" @bind="newMemberEmail.Email" placeholder="New member email" />
+            <button class="btn-success add-btn" @onclick="AddMember">+</button>
+            <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
+        </fieldset>
+    }
+    else
+    {
+        <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
+    }
+    @if (cartGroups.Count == 0)
+    {
+        <p>You have no groups yet.</p>
+    }
+    else
+    {
+        @foreach (CartGroup group in cartGroups)
+        {
+            @if (isEditingGroup != group)
+            {
+                <fieldset>
+                    <h4 @onclick="() => SelectCart(group.Id)">@group.Name</h4>
+                    <button class="edit-group-btn btn-success" @onclick="() => EditGroup(group)">
+                        <i class="fa fa-edit" aria-hidden="true" />
+                    </button>
+                    <button class="leave-group-btn btn-danger" @onclick="() => LeaveGroup(group.Id)">&times;</button>
+                    <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
+                </fieldset>
+            }
+            else
+            {
+                <fieldset>
+                    <input id="edit-group-name-input" @bind="group.Name" />
+                    <button class="edit-group-btn btn-success" @onclick="() => SubmitEditGroup(group)">
+                        <i class="fa fa-check" aria-hidden="true" />
+                    </button>
+                    <button class="leave-group-btn btn-danger" @onclick="() => StopEditGroup()">&times;</button>
+                    <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
+                </fieldset>
+            }
+        }
+    }
+</div>

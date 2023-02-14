@@ -16,9 +16,9 @@ public sealed class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public Task DeleteCartProduct(Guid id)
+    public Task DeleteCartProduct(string name)
     {
-        return cartHubClient.CartItemDeleted(id);
+        return cartHubClient.CartItemDeleted(name);
     }
 
     public Task<List<CartProductUIModel>> GetCartProducts()
@@ -26,12 +26,9 @@ public sealed class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public async Task<Guid> SaveCartProduct(CartProduct product)
+    public async Task SaveCartProduct(CartProduct product)
     {
-        HubResponse response = await cartHubClient.CartItemAdded(product);
-        return string.IsNullOrEmpty(response.ErrorMessage) && !string.IsNullOrEmpty(response.SuccessMessage)
-            ? Guid.Parse(response.SuccessMessage)
-            : throw new Exception(response.ErrorMessage);
+        await cartHubClient.CartItemAdded(product);
     }
 
     public Task SortCartProducts(ListSortDirection sortDirection)
@@ -39,7 +36,7 @@ public sealed class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public Task UpdateCartProduct(CartProductUIModel product)
+    public Task UpdateCartProduct(CartProductCollectable product)
     {
         return cartHubClient.CartItemModified(product);
     }

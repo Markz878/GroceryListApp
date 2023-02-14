@@ -1,54 +1,60 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using Azure;
+using Azure.Data.Tables;
+using GroceryListHelper.DataAccess.Exceptions;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.StoreProducts;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
 public sealed class StoreProductRepository : IStoreProductRepository
 {
-    private readonly GroceryStoreDbContext db;
+    private readonly TableClient db;
 
-    public StoreProductRepository(GroceryStoreDbContext db)
+    public StoreProductRepository(TableServiceClient db)
     {
-        this.db = db;
+        this.db = db.GetTableClient(StoreProductDbModel.GetTableName());
+
     }
 
-    public Task<List<StoreProductUIModel>> GetStoreProductsForUser(Guid userId)
+    public async Task<List<StoreProduct>> GetStoreProductsForUser(Guid userId)
     {
-        return db.StoreProducts.Where(x => x.UserId == userId).Select(x => x.Adapt<StoreProductUIModel>()).ToListAsync();
-    }
-
-    public async Task<Guid> AddProduct(StoreProduct product, Guid userId)
-    {
-        StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, UserId = userId };
-        db.StoreProducts.Add(storeProduct);
-        await db.SaveChangesAsync();
-        return storeProduct.Id;
-    }
-
-    public Task DeleteAll(Guid userId)
-    {
-        db.StoreProducts.RemoveRange(db.StoreProducts.Where(x => x.UserId == userId));
-        return db.SaveChangesAsync();
-    }
-
-    public async Task<Exception?> UpdatePrice(Guid productId, Guid userId, double price)
-    {
-        StoreProductDbModel? product = await db.StoreProducts.FindAsync(productId, userId);
-        if (product is null)
+        AsyncPageable<StoreProductDbModel> cartProductPages = db.QueryAsync<StoreProductDbModel>(x => x.PartitionKey == userId.ToString());
+        List<StoreProduct> result = new();
+        string? token = null;
+        await foreach (Page<StoreProductDbModel> cartProductPage in cartProductPages.AsPages())
         {
-            return NotFoundException.ForType<StoreProductDbModel>();
+            token = cartProductPage.ContinuationToken;
+            result.AddRange(cartProductPage.Values.Select(x => new StoreProduct()
+            {
+                Name = x.Name,
+                UnitPrice = x.UnitPrice
+            }));
         }
+        return result;
+    }
 
-        if (product.UserId != userId)
+    public async Task AddProduct(StoreProduct product, Guid userId)
+    {
+        StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, OwnerId = userId };
+        await db.AddEntityAsync(storeProduct);
+    }
+
+    public async Task DeleteAll(Guid userId)
+    {
+        AsyncPageable<StoreProductDbModel> pages = db.QueryAsync<StoreProductDbModel>(x => x.PartitionKey == userId.ToString());
+        string? token = null;
+        List<StoreProductDbModel> products = new();
+        await foreach (Page<StoreProductDbModel> page in pages.AsPages(token))
         {
-            return ForbiddenException.Instance;
+            token = page.ContinuationToken;
+            products.AddRange(page.Values);
         }
+        Response<IReadOnlyList<Response>> response = await db.SubmitTransactionAsync(products.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
+    }
 
-        product.UnitPrice = price;
-        await db.SaveChangesAsync();
-        return null;
+    public async Task<Exception?> UpdatePrice(string productName, Guid userId, double price)
+    {
+        Response response = await db.UpdateEntityAsync(new StoreProductDbModel() { Name = productName, OwnerId = userId, UnitPrice = price }, ETag.All);
+        return response.Status is 404 ? NotFoundException.ForType<StoreProductDbModel>() : null;
     }
 }

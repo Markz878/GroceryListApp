@@ -1,11 +1,5 @@
-﻿using GroceryListHelper.DataAccess;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Azure.Cosmos;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
 using System.Net;
@@ -27,22 +21,22 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
         hostBuilder.UseUrls(BaseUrl);
         hostBuilder.ConfigureServices((ctx, services) =>
         {
-            services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
-            services.AddDbContext<GroceryStoreDbContext>(options =>
-            {
-                options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "E2ETestDb", x =>
-                {
-                    x.HttpClientFactory(() =>
-                    {
-                        HttpMessageHandler httpMessageHandler = new HttpClientHandler()
-                        {
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                        };
-                        return new HttpClient(httpMessageHandler);
-                    });
-                    x.ConnectionMode(ConnectionMode.Gateway);
-                });
-            });
+            //services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
+            //services.AddDbContext<GroceryStoreDbContext>(options =>
+            //{
+            //    options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "E2ETestDb", x =>
+            //    {
+            //        x.HttpClientFactory(() =>
+            //        {
+            //            HttpMessageHandler httpMessageHandler = new HttpClientHandler()
+            //            {
+            //                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            //            };
+            //            return new HttpClient(httpMessageHandler);
+            //        });
+            //        x.ConnectionMode(ConnectionMode.Gateway);
+            //    });
+            //});
         });
     }
 

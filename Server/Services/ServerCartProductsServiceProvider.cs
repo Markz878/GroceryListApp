@@ -1,5 +1,4 @@
-﻿using Mapster;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace GroceryListHelper.Server.Services;
 
@@ -19,7 +18,7 @@ public sealed class ServerCartProductsServiceProvider : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public Task DeleteCartProduct(Guid id)
+    public Task DeleteCartProduct(string name)
     {
         throw new NotImplementedException();
     }
@@ -31,11 +30,18 @@ public sealed class ServerCartProductsServiceProvider : ICartProductsService
         {
             return new List<CartProductUIModel>();
         }
-        List<CartProductCollectable> cartProducts = await cartProductsRepository.GetCartProductsForUser(userName.Value);
-        return cartProducts.Select(x => x.Adapt<CartProductUIModel>()).ToList();
+        List<CartProductCollectable> cartProducts = await cartProductsRepository.GetCartProducts(userName.Value);
+        return cartProducts.Select(x => new CartProductUIModel()
+        {
+            Amount = x.Amount,
+            IsCollected = x.IsCollected,
+            Name = x.Name,
+            Order = x.Order,
+            UnitPrice = x.UnitPrice
+        }).ToList();
     }
 
-    public Task<Guid> SaveCartProduct(CartProduct product)
+    public Task SaveCartProduct(CartProduct product)
     {
         throw new NotImplementedException();
     }
@@ -45,7 +51,7 @@ public sealed class ServerCartProductsServiceProvider : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public Task UpdateCartProduct(CartProductUIModel cartProduct)
+    public Task UpdateCartProduct(CartProductCollectable cartProduct)
     {
         throw new NotImplementedException();
     }

@@ -10,31 +10,26 @@ public sealed class StoreProductsAPIService : IStoreProductsService
         client = clientFactory.CreateClient("ProtectedClient");
     }
 
-    public async Task<List<StoreProductUIModel>> GetStoreProducts()
+    public async Task<List<StoreProduct>> GetStoreProducts()
     {
-        return await client.GetFromJsonAsync<List<StoreProductUIModel>>(uri) ?? new List<StoreProductUIModel>();
+        return await client.GetFromJsonAsync<List<StoreProduct>>(uri) ?? new List<StoreProduct>();
     }
 
-    public async Task<Guid> SaveStoreProduct(StoreProduct product)
+    public async Task SaveStoreProduct(StoreProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
-        if (response.IsSuccessStatusCode)
-        {
-            string id = await response.Content.ReadAsStringAsync();
-            return Guid.Parse(id.Trim('"'));
-        }
-        throw new Exception("Could not save store product.");
+        response.EnsureSuccessStatusCode();
     }
 
-    public async Task<bool> ClearStoreProducts()
+    public async Task ClearStoreProducts()
     {
         HttpResponseMessage response = await client.DeleteAsync(uri);
-        return response.IsSuccessStatusCode;
+        response.EnsureSuccessStatusCode();
     }
 
-    public async Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct)
+    public async Task UpdateStoreProduct(StoreProduct storeProduct)
     {
         HttpResponseMessage response = await client.PutAsJsonAsync(uri, storeProduct);
-        return response.IsSuccessStatusCode;
+        response.EnsureSuccessStatusCode();
     }
 }

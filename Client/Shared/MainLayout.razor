@@ -1,19 +1,45 @@
 ﻿@inherits LayoutComponentBase
 
-<div id="main">
-    <div id="top-row">
+<main id="main">
+    <nav id="top-row">
         <div id="top-row-content">
             <div id="logo">
-                <a href="/"><img id="logo-img" width="48" src="/cart128.png" alt="Logo"/></a>
+                <a href="/"><img id="logo-img" width="48" src="/cart128.png" alt="Logo" /></a>
                 <h3 id="logo-header">Grocery List Helper</h3>
             </div>
-            <LoginDisplay />
+            @if (loggedInUserInfo?.IsAuthenticated == true)
+            {
+                @if (Navigation.Uri.Contains("group"))
+                {
+                    <button class="btn btn-success" @onclick="NavigateToIndex">My Cart</button>
+                }
+                else
+                {
+                    <button class="btn btn-success" @onclick="NavigateToGroups">Cart Groups</button>
+                }
+                <div class="profile-menu-container">
+                    <button id="profile-btn" class="profile-btn" @onclick="ToggleUserMenuOpen">@GetUserInitials(loggedInUserInfo)</button>
+                    @if (userMenuOpen)
+                    {
+                        <div class="profile-menu">
+                            <form class="signout-form" method="post" action="api/Account/Logout">
+                                <AntiForgeryTokenInput />
+                                <button id="signout-btn" class="profile-menu-btn" type="submit">Sign out</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <a id="login-link" class="nav-link" href="api/Account/Login">Log in</a>
+            }
         </div>
-    </div>
+    </nav>
 
     <div id="content">
         @Body
     </div>
-</div>
+</main>
 
 <Modal />

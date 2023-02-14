@@ -6,75 +6,62 @@ namespace GroceryListHelper.Server.Hubs;
 public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
 {
     private readonly ICartProductRepository db;
-    private readonly IUserRepository userRepository;
+    private readonly ICartGroupRepository userRepository;
     private readonly ILogger<CartHub> logger;
 
-    public CartHub(ICartProductRepository db, IUserRepository userRepository, ILogger<CartHub> logger)
+    public CartHub(ICartProductRepository db, ICartGroupRepository userRepository, ILogger<CartHub> logger)
     {
         this.db = db;
         this.userRepository = userRepository;
         this.logger = logger;
     }
 
-    public async Task<HubResponse> CreateGroup(List<string> allowedUserEmails)
+    public async Task<HubResponse> JoinGroup(Guid groupId)
     {
-        if (allowedUserEmails.Count == 0)
+        CartGroup? group = await userRepository.GetCartGroup(groupId, GetUserEmail());
+        if (group is not null)
         {
-            return new HubResponse() { ErrorMessage = "There are no allowed users for your cart" };
-        }
-        Guid hostId = GetUserId();
-        string hostEmail = GetUserEmail();
-        string otherUsers = string.Join(", ", allowedUserEmails);
-        await Groups.AddToGroupAsync(Context.ConnectionId, hostId.ToString());
-        allowedUserEmails.Add(hostEmail);
-        await userRepository.CreateGroupAllowedEmails(hostId, hostEmail, allowedUserEmails);
-        return new HubResponse() { SuccessMessage = $"You are sharing your cart to {otherUsers}." };
-    }
-
-    public async Task<HubResponse> JoinGroup(string hostEmail)
-    {
-        Guid hostId = await userRepository.GetHostIdFromHostEmail(hostEmail);
-        if (hostId == Guid.Empty)
-        {
-            return new HubResponse() { ErrorMessage = "No user with that email." };
-        }
-        List<string> emails = await userRepository.GetCartHostAllowedEmails(hostId);
-        if (emails.Any())
-        {
-            if (emails.Contains(GetUserEmail()))
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, hostId.ToString());
-                await Clients.Caller.ReceiveCart(await db.GetCartProductsForUser(hostId));
-            }
-            else
-            {
-                return new HubResponse() { ErrorMessage = "You are not allowed to join this cart." };
-            }
-            await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail()} has joined {hostEmail}'s cart.");
-            return new HubResponse() { SuccessMessage = $"You have joined {hostEmail}'s cart" };
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
+            await userRepository.UserJoinedSharing(GetUserId(), groupId);
+            await Clients.Caller.ReceiveCart(await db.GetCartProducts(groupId));
+            await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has joined group cart.");
+            return new HubResponse() { SuccessMessage = $"You have joined '{group.Name}' cart" };
         }
         else
         {
-            return new HubResponse() { ErrorMessage = "There is no cart hosted by that user." };
+            return new HubResponse() { ErrorMessage = "There is no cart with that id." };
         }
+    }
+
+
+    public async Task<HubResponse> LeaveGroup(Guid groupId)
+    {
+        CartGroup? group = await userRepository.GetCartGroup(groupId, GetUserEmail());
+        if (group is not null)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
+            await userRepository.UserLeftSharing(GetUserId(), groupId);
+            await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has left sharing.");
+            return new HubResponse() { SuccessMessage = $"You left '{group.Name}' cart sharing." };
+        }
+        return new HubResponse() { SuccessMessage = $"No active cart group with the given id." };
     }
 
     public async Task<HubResponse> CartItemAdded(CartProduct product)
     {
         try
         {
-            Guid hostId = await GetHostId();
-            Guid id = await db.AddCartProduct(product, hostId);
+            Guid groupId = await GetGroupId(GetUserId());
+            await db.AddCartProduct(product, groupId);
             CartProductCollectable cartProduct = new()
             {
-                Id = id,
                 Amount = product.Amount,
                 Name = product.Name,
                 Order = product.Order,
                 UnitPrice = product.UnitPrice
             };
-            await Clients.OthersInGroup(hostId.ToString()).ItemAdded(cartProduct);
-            return new HubResponse() { SuccessMessage = id.ToString() };
+            await Clients.OthersInGroup(groupId.ToString()).ItemAdded(cartProduct);
+            return new HubResponse() { SuccessMessage = "Saved" };
         }
         catch (Exception ex)
         {
@@ -86,54 +73,31 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
     {
         try
         {
-            Guid hostId = await GetHostId();
-            await db.UpdateProduct(hostId, product);
-            await Clients.OthersInGroup(hostId.ToString()).ItemModified(product);
+            Guid groupId = await GetGroupId(GetUserId());
+            await db.UpdateProduct(groupId, product);
+            await Clients.OthersInGroup(groupId.ToString()).ItemModified(product);
             return new HubResponse() { SuccessMessage = "Updated product in group's cart." };
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating item in cart hub with id {id}, host id {hostId} and user email {userId}", product.Id, await GetHostId(), GetUserEmail());
+            logger.LogError(ex, "Error updating item in cart hub with name {name}, host id {hostId} and user email {userId}", product.Name, GetGroupId(GetUserId()), GetUserEmail());
             return new HubResponse() { ErrorMessage = ex.Message };
         }
     }
 
-    public async Task<HubResponse> CartItemDeleted(Guid id)
+    public async Task<HubResponse> CartItemDeleted(string name)
     {
         try
         {
-            Guid hostId = await GetHostId();
-            await db.DeleteProduct(id, hostId);
-            await Clients.OthersInGroup(hostId.ToString()).ItemDeleted(id);
+            Guid groupId = await GetGroupId(GetUserId());
+            await db.DeleteProduct(name, groupId);
+            await Clients.OthersInGroup(groupId.ToString()).ItemDeleted(name);
             return new HubResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting item from cart hub with id {id}, host id {hostId} and user email {userId}", id, await GetHostId(), GetUserEmail());
+            logger.LogError(ex, "Error deleting item from cart hub with name {name}, host id {hostId} and user email {userId}", name, GetGroupId(GetUserId()), GetUserEmail());
             return new HubResponse() { ErrorMessage = ex.Message };
-        }
-    }
-
-    public async Task<HubResponse> LeaveGroup()
-    {
-        Guid hostId = await GetHostId();
-        if (hostId != Guid.Empty)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, hostId.ToString());
-            if (hostId == GetUserId())
-            {
-                await Clients.OthersInGroup(hostId.ToString()).LeaveCart(GetUserEmail());
-                await userRepository.RemoveCartGroup(hostId);
-            }
-            else
-            {
-                await Clients.OthersInGroup(hostId.ToString()).GetMessage($"{GetUserEmail()} has left the group.");
-            }
-            return new HubResponse() { SuccessMessage = "You have left the group." };
-        }
-        else
-        {
-            return new HubResponse() { ErrorMessage = "You are not part of any shopping cart." };
         }
     }
 
@@ -151,10 +115,11 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
         return email;
     }
 
-    private async Task<Guid> GetHostId()
+    private async Task<Guid> GetGroupId(Guid userId)
     {
-        string email = GetUserEmail();
-        Guid hostId = await userRepository.GetUsersCartHostId(email);
-        return hostId;
+        Guid? groupId = await userRepository.GetUserCurrentShareGroup(userId);
+        ArgumentNullException.ThrowIfNull(groupId);
+        return groupId.GetValueOrDefault();
     }
+
 }

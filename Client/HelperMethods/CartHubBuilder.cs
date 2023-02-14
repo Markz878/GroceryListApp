@@ -3,12 +3,12 @@
 public sealed partial class CartHubClient : ICartHubClient
 {
     private readonly NavigationManager navigation;
-    private readonly IndexViewModel indexViewModel;
+    private readonly MainViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
     private readonly ILogger<CartHubClient> logger;
     private readonly HubConnection hub;
 
-    public CartHubClient(NavigationManager navigation, IndexViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubClient> logger)
+    public CartHubClient(NavigationManager navigation, MainViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubClient> logger)
     {
         this.navigation = navigation;
         this.indexViewModel = indexViewModel;
@@ -37,29 +37,20 @@ public sealed partial class CartHubClient : ICartHubClient
             indexViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in cartProducts)
             {
-                indexViewModel.CartProducts.Add(new CartProductUIModel() { Id = item.Id, Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice, Order = item.Order });
+                indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = item.Amount, IsCollected = item.IsCollected, Name = item.Name, UnitPrice = item.UnitPrice, Order = item.Order });
             }
-        });
-
-        hub.On<string>(nameof(ICartHubNotifications.LeaveCart), async (hostEmail) =>
-        {
-            modalViewModel.Message = $"Cart session ended by host {hostEmail}.";
-            await hub.StopAsync();
-            indexViewModel.IsPolling = false;
-            await Task.Delay(2000);
-            navigation.NavigateTo("/", true);
         });
 
         hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
         {
-            LogItemAdded(p.Id, p.Name);
-            indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, Id = p.Id, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice, Order = p.Order });
+            LogItemAdded(p.Name);
+            indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice, Order = p.Order });
         });
 
         hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
-            LogItemModified(cartProduct.Id, cartProduct.Name);
-            CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Id.Equals(cartProduct.Id));
+            LogItemModified(cartProduct.Name);
+            CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Name == cartProduct.Name);
             product.Amount = cartProduct.Amount;
             product.UnitPrice = cartProduct.UnitPrice;
             product.Order = cartProduct.Order;
@@ -68,10 +59,10 @@ public sealed partial class CartHubClient : ICartHubClient
             indexViewModel.OnPropertyChanged();
         });
 
-        hub.On<Guid>(nameof(ICartHubNotifications.ItemDeleted), (id) =>
+        hub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (name) =>
         {
-            LogItemDeleted(id);
-            indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Id == id));
+            LogItemDeleted(name);
+            indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Name == name));
         });
         return hub;
     }
@@ -110,19 +101,15 @@ public sealed partial class CartHubClient : ICartHubClient
         }
     }
 
-    public Task<HubResponse> JoinGroup(string cartHostEmail)
+    public Task<HubResponse> JoinGroup(Guid groupId)
     {
-        return hub.InvokeAsync<HubResponse>(nameof(JoinGroup), cartHostEmail);
+        return hub.InvokeAsync<HubResponse>(nameof(JoinGroup), groupId);
     }
 
-    public Task<HubResponse> CreateGroup(List<string> allowedUserEmails)
-    {
-        return hub.InvokeAsync<HubResponse>(nameof(CreateGroup), allowedUserEmails);
-    }
 
-    public Task<HubResponse> LeaveGroup()
+    public Task<HubResponse> LeaveGroup(Guid groupId)
     {
-        return hub.InvokeAsync<HubResponse>(nameof(LeaveGroup));
+        return hub.InvokeAsync<HubResponse>(nameof(LeaveGroup), groupId);
     }
 
     public Task<HubResponse> CartItemAdded(CartProduct product)
@@ -135,9 +122,9 @@ public sealed partial class CartHubClient : ICartHubClient
         return hub.InvokeAsync<HubResponse>(nameof(CartItemModified), product);
     }
 
-    public Task<HubResponse> CartItemDeleted(Guid id)
+    public Task<HubResponse> CartItemDeleted(string name)
     {
-        return hub.InvokeAsync<HubResponse>(nameof(CartItemDeleted), id);
+        return hub.InvokeAsync<HubResponse>(nameof(CartItemDeleted), name);
     }
 
     public ValueTask DisposeAsync()
@@ -154,12 +141,13 @@ public sealed partial class CartHubClient : ICartHubClient
     [LoggerMessage(1, LogLevel.Information, "Received cart from server, items count is {cartProductsCount}.")]
     partial void LogReceiveCart(int cartProductsCount);
 
-    [LoggerMessage(2, LogLevel.Information, "Received new item with id {id} and name {name}.")]
-    partial void LogItemAdded(Guid id, string name);
+    [LoggerMessage(2, LogLevel.Information, "Received new item with name {name}.")]
+    partial void LogItemAdded(string name);
 
-    [LoggerMessage(3, LogLevel.Information, "Item with id {id} and name {name} was modified.")]
-    partial void LogItemModified(Guid id, string name);
+    [LoggerMessage(3, LogLevel.Information, "Item with name {name} was modified.")]
+    partial void LogItemModified(string name);
 
-    [LoggerMessage(4, LogLevel.Information, "Item with id {id} was deleted.")]
-    partial void LogItemDeleted(Guid id);
+    [LoggerMessage(4, LogLevel.Information, "Item with name {name} was deleted.")]
+    partial void LogItemDeleted(string name);
+
 }

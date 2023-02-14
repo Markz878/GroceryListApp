@@ -1,0 +1,98 @@
+﻿.container {
+    padding: 1rem;
+}
+
+fieldset {
+    margin-top: 1rem;
+    border: 2px solid lightgray;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+legend {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.create-btn {
+    display: block;
+    margin-top: 1rem;
+}
+
+
+.add-btn {
+    height: 1.3rem;
+    width: 1.3rem;
+    display: inline-block;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    font-weight: bold;
+    padding-left: 0.33rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+    .add-btn:disabled {
+        color: var(--disabled-btn-color);
+        transition: none;
+    }
+
+h4 {
+    margin-top: 0;
+    display: inline;
+    cursor: pointer;
+}
+
+.edit-group-btn {
+    height: 1.5rem;
+    width: 1.5rem;
+    margin-left: 0.2rem;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    font-weight: bold;
+    padding-left: 0.33rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+    .edit-group-btn:disabled {
+        color: var(--disabled-btn-color);
+        transition: none;
+    }
+
+.leave-group-btn {
+    height: 1.5rem;
+    width: 1.5rem;
+    margin-left: 0.2rem;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding-left: 0.33rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+    .leave-group-btn:disabled {
+        color: var(--disabled-btn-color);
+        transition: none;
+    }
+
+#edit-group-name-input {
+    font-size: 1rem;
+}
+
+.group-members {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}

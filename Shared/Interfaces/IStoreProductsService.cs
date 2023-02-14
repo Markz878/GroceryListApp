@@ -4,8 +4,8 @@ namespace GroceryListHelper.Shared.Interfaces;
 
 public interface IStoreProductsService
 {
-    Task<bool> ClearStoreProducts();
-    Task<List<StoreProductUIModel>> GetStoreProducts();
-    Task<Guid> SaveStoreProduct(StoreProduct product);
-    Task<bool> UpdateStoreProduct(StoreProductUIModel storeProduct);
+    Task ClearStoreProducts();
+    Task<List<StoreProduct>> GetStoreProducts();
+    Task SaveStoreProduct(StoreProduct product);
+    Task UpdateStoreProduct(StoreProduct storeProduct);
 }

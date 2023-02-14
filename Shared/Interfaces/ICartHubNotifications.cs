@@ -5,9 +5,8 @@ namespace GroceryListHelper.Shared.Interfaces;
 public interface ICartHubNotifications
 {
     Task ReceiveCart(List<CartProductCollectable> cartProducts);
-    Task LeaveCart(string hostEmail);
     Task ItemAdded(CartProductCollectable cartProduct);
     Task ItemModified(CartProductCollectable cartProduct);
-    Task ItemDeleted(Guid id);
+    Task ItemDeleted(string name);
     Task GetMessage(string message);
 }
