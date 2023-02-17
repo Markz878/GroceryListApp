@@ -54,7 +54,14 @@ public sealed class StoreProductRepository : IStoreProductRepository
 
     public async Task<Exception?> UpdatePrice(string productName, Guid userId, double price)
     {
-        Response response = await db.UpdateEntityAsync(new StoreProductDbModel() { Name = productName, OwnerId = userId, UnitPrice = price }, ETag.All);
-        return response.Status is 404 ? NotFoundException.ForType<StoreProductDbModel>() : null;
+        try
+        {
+            Response response = await db.UpdateEntityAsync(new StoreProductDbModel() { Name = productName, OwnerId = userId, UnitPrice = price }, ETag.All);
+            return null;
+        }
+        catch (RequestFailedException ex) when (ex.Status is 404)
+        {
+            return NotFoundException.ForType<StoreProductDbModel>();
+        }
     }
 }

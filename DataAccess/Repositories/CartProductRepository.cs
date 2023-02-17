@@ -78,8 +78,15 @@ public sealed class CartProductRepository : ICartProductRepository
             OwnerId = ownerId,
             UnitPrice = updatedProduct.UnitPrice
         };
-        Response response = await db.UpdateEntityAsync(dbProduct, ETag.All, TableUpdateMode.Merge);
-        return response.Status == 404 ? NotFoundException.ForType<CartProduct>() : null;
+        try
+        {
+            Response response = await db.UpdateEntityAsync(dbProduct, ETag.All, TableUpdateMode.Merge);
+            return null;
+        }
+        catch (RequestFailedException ex) when (ex.Status is 404)
+        {
+            return NotFoundException.ForType<CartProduct>();
+        }
     }
 
     public async Task SortUserProducts(Guid ownerId, ListSortDirection sortDirection)

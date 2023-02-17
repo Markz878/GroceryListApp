@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
+﻿using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
@@ -11,7 +12,7 @@ public sealed class CartProductsTests : BaseTest
     [Fact]
     public async Task GetCartProducts()
     {
-        List<CartProductDbModel> insertedProducts = await SaveCartProducts(1);
+        List<CartProduct> insertedProducts = await SaveCartProducts(1);
         HttpResponseMessage response = await _client.GetAsync("api/cartproducts");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         List<CartProductCollectable>? products = await response.Content.ReadFromJsonAsync<List<CartProductCollectable>>(_jsonOptions);
@@ -34,8 +35,6 @@ public sealed class CartProductsTests : BaseTest
         };
         HttpResponseMessage response = await _client.PostAsJsonAsync("api/cartproducts", cartProduct);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        string id = await response.Content.ReadAsStringAsync();
-        Assert.True(Guid.TryParse(id.Trim('"'), out _));
     }
 
     [Fact]
@@ -62,19 +61,19 @@ public sealed class CartProductsTests : BaseTest
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        //List<CartProduct> products = await db.CartProducts.ToListAsync();
         //Assert.Empty(products);
     }
 
     [Fact]
     public async Task DeleteCartProduct_Success_ReturnsNoContent()
     {
-        List<CartProductDbModel> savedProducts = await SaveCartProducts(3);
+        List<CartProduct> savedProducts = await SaveCartProducts(3);
         HttpResponseMessage response = await _client.DeleteAsync($"api/cartproducts/{savedProducts[1].Name}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        //List<CartProduct> products = await db.CartProducts.ToListAsync();
         //Assert.Equal(2, products.Count);
     }
 
@@ -86,39 +85,39 @@ public sealed class CartProductsTests : BaseTest
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        //List<CartProduct> products = await db.CartProducts.ToListAsync();
         //Assert.Equal(3, products.Count);
     }
 
     [Fact]
     public async Task DeleteCartProduct_NotUsersProduct_ReturnsNotFound()
     {
-        List<CartProductDbModel> savedProducts = await SaveCartProducts(3, true);
+        List<CartProduct> savedProducts = await SaveCartProducts(3, true);
         HttpResponseMessage response = await _client.DeleteAsync($"api/cartproducts/{savedProducts[1].Name}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //List<CartProductDbModel> products = await db.CartProducts.ToListAsync();
+        //List<CartProduct> products = await db.CartProducts.ToListAsync();
         //Assert.Equal(3, products.Count);
     }
 
     [Fact]
     public async Task UpdateCartProduct_Success_ReturnsOk()
     {
-        List<CartProductDbModel> insertedProducts = await SaveCartProducts(1);
+        List<CartProduct> insertedProducts = await SaveCartProducts(1);
         CartProductCollectable cartProduct = new()
         {
             Amount = insertedProducts[0].Amount + 1,
-            Name = insertedProducts[0].Name + 'A',
+            Name = insertedProducts[0].Name,
             Order = insertedProducts[0].Order + 1000,
             UnitPrice = insertedProducts[0].UnitPrice + 1,
-            IsCollected = !insertedProducts[0].IsCollected
+            IsCollected = true
         };
         HttpResponseMessage response = await _client.PutAsJsonAsync("api/cartproducts", cartProduct);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
         //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //CartProductDbModel product = await db.CartProducts.FirstAsync(x => x.Id == insertedProducts[0].Id);
+        //CartProduct product = await db.CartProducts.FirstAsync(x => x.Id == insertedProducts[0].Id);
         //Assert.Equal(cartProduct.Id, product.Id);
         //Assert.Equal(cartProduct.Amount, product.Amount);
         //Assert.Equal(cartProduct.Name, product.Name);
@@ -130,14 +129,14 @@ public sealed class CartProductsTests : BaseTest
     [Fact]
     public async Task UpdateCartProduct_InvalidProduct_ReturnsBadRequest()
     {
-        List<CartProductDbModel> insertedProducts = await SaveCartProducts(1);
+        await SaveCartProducts(1);
         CartProductCollectable cartProduct = new()
         {
             Amount = -Random.Shared.NextDouble() * 10,
             Name = new string('x', 31),
             Order = 1500,
             UnitPrice = -Random.Shared.NextDouble() * 10,
-            IsCollected = !insertedProducts[0].IsCollected
+            IsCollected = true
         };
         HttpResponseMessage response = await _client.PutAsJsonAsync("api/cartproducts", cartProduct);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -146,19 +145,20 @@ public sealed class CartProductsTests : BaseTest
     [Fact]
     public async Task UpdateCartProduct_InvalidProductId_ReturnsNotFound()
     {
-        List<CartProductDbModel> insertedProducts = await SaveCartProducts(1);
+        List<CartProduct> insertedProducts = await SaveCartProducts(1);
         CartProductCollectable cartProduct = new()
         {
             Amount = insertedProducts[0].Amount + 1,
             Name = insertedProducts[0].Name + 'A',
             Order = insertedProducts[0].Order + 1000,
             UnitPrice = insertedProducts[0].UnitPrice + 1,
-            IsCollected = !insertedProducts[0].IsCollected
+            IsCollected = true
         };
         HttpResponseMessage response = await _client.PutAsJsonAsync("api/cartproducts", cartProduct);
+        var x = await response.Content.ReadAsStringAsync();
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         using IServiceScope scope = _factory.Services.CreateScope();
-        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //CartProductDbModel product = await db.CartProducts.FirstAsync(x => x.Id == insertedProducts[0].Id);
+        ICartProductRepository db = scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
+        List<CartProductCollectable> products = await db.GetCartProducts(TestAuthHandler.UserId);
     }
 }
