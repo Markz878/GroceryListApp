@@ -5,7 +5,10 @@
         <tr>
             <th>Reorder</th>
             <th>Collected</th>
-            <th class="product-col" @onclick="SortItems">Product @if(sortState != SortState.None) {<img class="sort-icon" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg")/>}</th>
+            <th class="product-col" @onclick="SortItems">Product @if (sortState != SortState.None)
+                {
+                    <img class="sort-icon" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg") />
+                }</th>
             <th class="number-col">Amount</th>
             <th class="number-col">Price</th>
             <th>Total</th>
@@ -16,7 +19,7 @@
     <tbody>
         <tr>
             <td></td>
-            <td><button id="add-cartproduct-button" type="submit" class="btn btn-success" @onclick="AddNewProduct" @ref="AddProductButton" aria-label="Add product">Add</button></td>
+            <td><button id="add-cartproduct-button" type="submit" class="btn btn-success" @onclick="AddNewProduct" aria-label="Add product">Add</button></td>
             <td>
                 <input id="newproduct-name-input" type="text" list="products" class="form-control" aria-label="Product name input" autocomplete="off" @bind="newProduct.Name" @onfocusout="GetItemPrice" @ref="NewProductNameBox" />
                 <datalist id="products">
@@ -27,46 +30,38 @@
                 </datalist>
             </td>
             <td><input id="newproduct-amount-input" type="number" step="1" min="1" class="form-control text-center" aria-label="Product amount input" @bind="newProduct.Amount" /></td>
-            <td><input id="newproduct-price-input" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Product unit price input" @bind="newProduct.UnitPrice" @onfocusout="async () => await AddProductButton.FocusAsync()" /></td>
+            <td><input id="newproduct-price-input" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Product unit price input" @bind="newProduct.UnitPrice" /></td>
             <td></td>
         </tr>
-@*        @if (isBusy)
+
+        @foreach (var (item, index) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((x, i) => (x, i)))
         {
-            <tr>
-                <td colspan="8"><LoadingComponent Message="Loading your cart items..." IsLarge=false/></td>
-            </tr>
-        }
-        else
-        {*@
-            @foreach (var (item, index) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((x, i) => (x, i)))
+            @if (item != editingItem)
             {
-                @if (item != editingItem)
-                {
-                    <tr class="@GetRowClass(item)" @key=item.Name>
-                        <td><button id="reorder-button-@index" class="btn btn-primary sort-button @(item==movingItem ? "moving-button" : "")" title="Move" aria-label="Move" @onclick="()=>Move(item)"><i class="fas fa-sort"></i></button></td>
-                        <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item)) /></td>
-                        <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
-                        <td id="item-amount-@index" aria-label="Amount">@item.Amount</td>
-                        <td id="item-unitprice-@index" aria-label="Unit price">@item.UnitPrice</td>
-                        <td id="item-totalprice-@index" aria-label="Total price">@item.Total.ToString("N2")</td>
-                        <td><button id="edit-product-button-@index" class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product" disabled=@item.IsCollected><i class="fas fa-edit"></i></button></td>
-                        <td><button id="delete-product-button-@index" class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product" disabled=@item.IsCollected>X</button></td>
-                    </tr>
-                }
-                else
-                {
-                    <tr class="@GetRowClass(item)" @key=item.Name>
-                        <td></td>
-                        <td></td>
-                        <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
-                        <td><input id="edit-item-amount-input-@index" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Amount" @bind="item.Amount" /></td>
-                        <td><input id="edit-item-unitprice-input-@index" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Unit price" @bind="item.UnitPrice" /></td>
-                        <td id="item-totalprice-@index">@item.Total.ToString("N2")</td>
-                        <td colspan="2"><button id="update-product-button-@index" class="btn btn-success" @onclick=@(()=>UpdateCartProduct(item)) aria-label="Submit change" disabled=@item.IsCollected>Submit</button></td>
-                    </tr>
-                }
+                <tr class="@GetRowClass(item)" @key=item.Name>
+                    <td><button id="reorder-button-@index" class="btn btn-primary sort-button @(item==movingItem ? "moving-button" : "")" title="Move" aria-label="Move" @onclick="()=>Move(item)"><i class="fas fa-sort"></i></button></td>
+                    <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item)) /></td>
+                    <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
+                    <td id="item-amount-@index" aria-label="Amount">@item.Amount</td>
+                    <td id="item-unitprice-@index" aria-label="Unit price">@item.UnitPrice</td>
+                    <td id="item-totalprice-@index" aria-label="Total price">@item.Total.ToString("N2")</td>
+                    <td><button id="edit-product-button-@index" class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product" disabled=@item.IsCollected><i class="fas fa-edit"></i></button></td>
+                    <td><button id="delete-product-button-@index" class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product" disabled=@item.IsCollected>X</button></td>
+                </tr>
             }
-        @*}*@
+            else
+            {
+                <tr class="@GetRowClass(item)" @key=item.Name>
+                    <td></td>
+                    <td></td>
+                    <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
+                    <td><input id="edit-item-amount-input-@index" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Amount" @bind="item.Amount" /></td>
+                    <td><input id="edit-item-unitprice-input-@index" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Unit price" @bind="item.UnitPrice" /></td>
+                    <td id="item-totalprice-@index">@item.Total.ToString("N2")</td>
+                    <td colspan="2"><button id="update-product-button-@index" class="btn btn-success" @onclick=@(()=>UpdateCartProduct(item)) aria-label="Submit change" disabled=@item.IsCollected>Submit</button></td>
+                </tr>
+            }
+        }
 
     </tbody>
 </table>

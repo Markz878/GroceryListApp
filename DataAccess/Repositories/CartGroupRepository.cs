@@ -19,7 +19,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
     public async Task<List<CartGroup>> GetCartGroupsForUser(string userEmail)
     {
         List<CartGroup> result = new();
-        List<CartUserGroupDbModel> cartUserGroups = await db.GetTableEntitiesByPrimaryKey<CartUserGroupDbModel>(CartUserGroupDbModel.GetTableName(), select: new[] { "GroupId" });
+        List<CartUserGroupDbModel> cartUserGroups = await db.GetTableEntitiesByPrimaryKey<CartUserGroupDbModel>(userEmail, select: new[] { "GroupId" });
         foreach (CartUserGroupDbModel? cartUserGroup in cartUserGroups.DistinctBy(x=>x.GroupId))
         {
             List<CartGroupUserDbModel> cartGroupUsers = await db.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(cartUserGroup.GroupId.ToString());
@@ -34,56 +34,6 @@ public sealed class CartGroupRepository : ICartGroupRepository
             }
         }
         return result;
-        //TableClient cartGroupUserClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        //AsyncPageable<CartUserGroupDbModel> cartUserGroupPages = cartUserGroupClient.QueryAsync<CartUserGroupDbModel>(x => x.PartitionKey == userEmail, 20, new[] { "GroupId" });
-        //List<CartGroup> result = new();
-        //string? token = null;
-        //await foreach (Page<CartUserGroupDbModel> cartUserGroupPage in cartUserGroupPages.AsPages(token, 20))
-        //{
-        //    token = cartUserGroupPage.ContinuationToken;
-        //    IReadOnlyList<CartUserGroupDbModel> cartUserGroups = cartUserGroupPage.Values;
-        //    foreach (CartUserGroupDbModel cartUserGroup in cartUserGroups)
-        //    {
-        //        AsyncPageable<CartGroupUserDbModel> cartGroupUserPage = cartGroupUserClient.QueryAsync<CartGroupUserDbModel>(x => x.PartitionKey == cartUserGroup.GroupId.ToString(), 20);
-        //        CartGroup? group = null;
-        //        await foreach (CartGroupUserDbModel cartGroupUser in cartGroupUserPage)
-        //        {
-        //            group ??= new() { Id = cartGroupUser.GroupId, Name = cartGroupUser.Name };
-        //            group.OtherUsers.Add(cartGroupUser.MemberEmail);
-        //        }
-        //        if (group is not null)
-        //        {
-        //            group.OtherUsers.Remove(userEmail);
-        //            result.Add(group);
-        //        }
-        //    }
-        //}
-        //return result;
-        //CosmosClient cosmosClient = db.Database.GetCosmosClient();
-        //Database database = cosmosClient.GetDatabase("GroceryListDb");
-        //Container userCartGroupsContainer = database.GetContainer("CartGroups");
-        //QueryDefinition query = new QueryDefinition("SELECT * FROM CartGroups WHERE ARRAY_CONTAINS(CartGroups.Users, @userEmail)")
-        //    .WithParameter("@userEmail", userEmail);
-        //List<CartUserGroupDbModel> results = new();
-        //using (FeedIterator<CartUserGroupDbModel> resultSetIterator = userCartGroupsContainer.GetItemQueryIterator<CartUserGroupDbModel>(
-        //    query,
-        //    requestOptions: new QueryRequestOptions()
-        //    {
-        //        MaxItemCount = 20,
-        //        EnableScanInQuery = true
-        //    }))
-        //{
-        //    while (resultSetIterator.HasMoreResults)
-        //    {
-        //        FeedResponse<CartUserGroupDbModel> response = await resultSetIterator.ReadNextAsync();
-        //        results.AddRange(response);
-        //        if (response.Diagnostics != null)
-        //        {
-        //            Console.WriteLine($"\nQueryWithSqlParameters Diagnostics: {response.Diagnostics}");
-        //        }
-        //    }
-        //}
-        //return results.Select(x => new CartGroup() { Id = x.GroupId, Name = x.Name, OtherUsers = x.Users.Where(x => x != userEmail).ToHashSet() }).ToList();
     }
 
     public async Task<CartGroup?> GetCartGroup(Guid groupId, string userEmail)
@@ -143,27 +93,30 @@ public sealed class CartGroupRepository : ICartGroupRepository
         List<CartGroupUserDbModel> cartGroupUsers = await DeleteCartGroupUsers(groupId);
         await DeleteCartUserGroups(cartGroupUsers);
         await DeleteCartGroupProducts(groupId);
-    }
 
-    private async Task DeleteCartGroupProducts(Guid groupId)
-    {
-        TableClient cartProductsTableClient = db.GetTableClient(CartProductDbModel.GetTableName());
-        List<CartProductDbModel> cartProducts = await cartProductsTableClient.GetTableEntitiesByPrimaryKey<CartProductDbModel>(groupId.ToString());
-        Response<IReadOnlyList<Response>> response3 = await cartProductsTableClient.SubmitTransactionAsync(cartProducts.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
-    }
+        async Task<List<CartGroupUserDbModel>> DeleteCartGroupUsers(Guid groupId)
+        {
+            TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
+            List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
+            await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
+            return cartGroupUsers;
+        }
 
-    private async Task DeleteCartUserGroups(List<CartGroupUserDbModel> cartGroupUsers)
-    {
-        TableClient cartUserGroupTableClient = db.GetTableClient(CartUserGroupDbModel.GetTableName());
-        Response<IReadOnlyList<Response>> response2 = await cartUserGroupTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, new CartUserGroupDbModel() { MemberEmail = x.MemberEmail, GroupId = x.GroupId })));
-    }
+        async Task DeleteCartUserGroups(List<CartGroupUserDbModel> cartGroupUsers)
+        {
+            TableClient cartUserGroupTableClient = db.GetTableClient(CartUserGroupDbModel.GetTableName());
+            await cartUserGroupTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, new CartUserGroupDbModel() { MemberEmail = x.MemberEmail, GroupId = x.GroupId })));
+        }
 
-    private async Task<List<CartGroupUserDbModel>> DeleteCartGroupUsers(Guid groupId)
-    {
-        TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
-        Response<IReadOnlyList<Response>> response1 = await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
-        return cartGroupUsers;
+        async Task DeleteCartGroupProducts(Guid groupId)
+        {
+            TableClient cartProductsTableClient = db.GetTableClient(CartProductDbModel.GetTableName());
+            List<CartProductDbModel> cartProducts = await cartProductsTableClient.GetTableEntitiesByPrimaryKey<CartProductDbModel>(groupId.ToString());
+            if (cartProducts.Count > 0)
+            {
+                await cartProductsTableClient.SubmitTransactionAsync(cartProducts.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
+            }
+        }
     }
 
     public async Task UserJoinedSharing(Guid userId, Guid groupId)
@@ -208,7 +161,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         {
             cartGroupUser.Name = newName;
         }
-        Response<IReadOnlyList<Response>> response = await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.UpdateMerge, x)));
+        await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.UpdateMerge, x)));
         return null;
     }
 

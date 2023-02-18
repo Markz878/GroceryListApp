@@ -2,7 +2,7 @@
 
 public abstract class BaseViewModel : IDisposable
 {
-    public event Action? StateChanged;
+    public Func<Task>? StateChanged;
 
     public BaseViewModel()
     {

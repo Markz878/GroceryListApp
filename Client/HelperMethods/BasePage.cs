@@ -9,9 +9,10 @@ public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseVie
         ViewModel.StateChanged += PropertyChanged;
     }
 
-    private void PropertyChanged()
+    private Task PropertyChanged()
     {
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
     public virtual void Dispose()

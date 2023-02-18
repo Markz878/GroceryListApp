@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.StoreProducts;
 
@@ -13,24 +14,12 @@ public sealed class StoreProductRepository : IStoreProductRepository
     public StoreProductRepository(TableServiceClient db)
     {
         this.db = db.GetTableClient(StoreProductDbModel.GetTableName());
-
     }
 
     public async Task<List<StoreProduct>> GetStoreProductsForUser(Guid userId)
     {
-        AsyncPageable<StoreProductDbModel> cartProductPages = db.QueryAsync<StoreProductDbModel>(x => x.PartitionKey == userId.ToString());
-        List<StoreProduct> result = new();
-        string? token = null;
-        await foreach (Page<StoreProductDbModel> cartProductPage in cartProductPages.AsPages())
-        {
-            token = cartProductPage.ContinuationToken;
-            result.AddRange(cartProductPage.Values.Select(x => new StoreProduct()
-            {
-                Name = x.Name,
-                UnitPrice = x.UnitPrice
-            }));
-        }
-        return result;
+        List<StoreProductDbModel> result = await db.GetTableEntitiesByPrimaryKey<StoreProductDbModel>(userId.ToString());
+        return result.Select(x => new StoreProduct() { Name = x.Name, UnitPrice = x.UnitPrice }).ToList();
     }
 
     public async Task AddProduct(StoreProduct product, Guid userId)
@@ -41,22 +30,18 @@ public sealed class StoreProductRepository : IStoreProductRepository
 
     public async Task DeleteAll(Guid userId)
     {
-        AsyncPageable<StoreProductDbModel> pages = db.QueryAsync<StoreProductDbModel>(x => x.PartitionKey == userId.ToString());
-        string? token = null;
-        List<StoreProductDbModel> products = new();
-        await foreach (Page<StoreProductDbModel> page in pages.AsPages(token))
+        List<StoreProductDbModel> products = await db.GetTableEntitiesByPrimaryKey<StoreProductDbModel>(userId.ToString());
+        if (products.Count > 0)
         {
-            token = page.ContinuationToken;
-            products.AddRange(page.Values);
+            await db.SubmitTransactionAsync(products.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
         }
-        Response<IReadOnlyList<Response>> response = await db.SubmitTransactionAsync(products.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
     }
 
     public async Task<Exception?> UpdatePrice(string productName, Guid userId, double price)
     {
         try
         {
-            Response response = await db.UpdateEntityAsync(new StoreProductDbModel() { Name = productName, OwnerId = userId, UnitPrice = price }, ETag.All);
+            await db.UpdateEntityAsync(new StoreProductDbModel() { Name = productName, OwnerId = userId, UnitPrice = price }, ETag.All);
             return null;
         }
         catch (RequestFailedException ex) when (ex.Status is 404)

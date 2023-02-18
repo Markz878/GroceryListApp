@@ -1,16 +1,15 @@
 ﻿@inherits ModalBase
 
-@if (!string.IsNullOrWhiteSpace(ViewModel.Message))
-{
-    <div class="modal" @onmousedown="CloseModal">
-        <div class="modal-content" @onmousedown:stopPropagation="true">
-            <div class="modal-header">
-                <span class="close" @onmousedown="CloseModal">&times;</span>
-                <h2 class="header-text">@ViewModel.Header</h2>
-            </div>
-            <div class="modal-body">
-                <h4 class="body-text">@ViewModel.Message</h4>
-            </div>
+<dialog id="modal" class="modal" @ref=modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="header-text">@ViewModel.Header</h3>
+            <form method="dialog">
+                <button class="close" autofocus @onclick=CloseModal>&times;</button>
+            </form>
+        </div>
+        <div class="modal-body">
+            <h4 class="body-text">@ViewModel.Message</h4>
         </div>
     </div>
-}
+</dialog>

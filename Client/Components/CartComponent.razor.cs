@@ -16,8 +16,6 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
     protected CartProductUIModel? editingItem;
     protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
-    protected ElementReference AddProductButton;
-    //protected bool isBusy;
     protected SortState sortState;
     protected bool isAuthenticated;
 
@@ -258,24 +256,25 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         {
             movingItem = cartProduct;
         }
+        else if (cartProduct == movingItem)
+        {
+            movingItem = null;
+        }
         else
         {
-            if (cartProduct != movingItem)
+            sortState = SortState.None;
+            movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
+            try
             {
-                sortState = SortState.None;
-                movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
-                try
-                {
-                    await CartProductsService.UpdateCartProduct(movingItem);
-                }
-                catch (Exception ex)
-                {
-                    ModalViewModel.Message = ex.Message;
-                }
-                finally
-                {
-                    movingItem = null;
-                }
+                await CartProductsService.UpdateCartProduct(movingItem);
+            }
+            catch (Exception ex)
+            {
+                ModalViewModel.Message = ex.Message;
+            }
+            finally
+            {
+                movingItem = null;
             }
         }
     }
