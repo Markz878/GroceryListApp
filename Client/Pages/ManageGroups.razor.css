@@ -67,7 +67,7 @@ h4 {
         transition: none;
     }
 
-.leave-group-btn {
+.delete-group-btn {
     height: 1.5rem;
     width: 1.5rem;
     margin-left: 0.2rem;
@@ -83,7 +83,7 @@ h4 {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-    .leave-group-btn:disabled {
+    .delete-group-btn:disabled {
         color: var(--disabled-btn-color);
         transition: none;
     }

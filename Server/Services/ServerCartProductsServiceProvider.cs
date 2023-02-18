@@ -25,12 +25,29 @@ public sealed class ServerCartProductsServiceProvider : ICartProductsService
 
     public async Task<List<CartProductUIModel>> GetCartProducts()
     {
-        Guid? userName = httpContextAccessor.HttpContext?.User.GetUserId();
-        if (userName == null)
+        List<CartProductCollectable>? cartProducts = null;
+        if (httpContextAccessor.HttpContext!.Request.Path.Value!.Contains("groupcart"))
         {
-            return new List<CartProductUIModel>();
+            string groupId = httpContextAccessor.HttpContext.Request.Path.Value![(httpContextAccessor.HttpContext.Request.Path.Value!.LastIndexOf('/') + 1)..];
+            if (Guid.TryParse(groupId, out Guid groupGuid))
+            {
+                cartProducts = await cartProductsRepository.GetCartProducts(groupGuid);
+            }
+            else
+            {
+                return new List<CartProductUIModel>();
+            }
         }
-        List<CartProductCollectable> cartProducts = await cartProductsRepository.GetCartProducts(userName.Value);
+        else
+        {
+            Guid? userName = httpContextAccessor.HttpContext?.User.GetUserId();
+            if (userName == null)
+            {
+                return new List<CartProductUIModel>();
+            }
+            cartProducts = await cartProductsRepository.GetCartProducts(userName.Value);
+        }
+
         return cartProducts.Select(x => new CartProductUIModel()
         {
             Amount = x.Amount,

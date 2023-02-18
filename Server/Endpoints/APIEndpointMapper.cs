@@ -14,6 +14,7 @@ public static class APIEndpointMapper
         }
         apiGroup.AddAccountEndpoints();
         apiGroup.AddCartProductEndpoints();
+        apiGroup.AddCartGroupProductEndpoints();
         apiGroup.AddStoreProductEndpoints();
         apiGroup.AddCartGroupEndpoints();
     }

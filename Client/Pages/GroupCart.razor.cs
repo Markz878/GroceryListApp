@@ -1,3 +1,4 @@
+using GroceryListHelper.Shared.Models.CartGroups;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GroceryListHelper.Client.Pages;
@@ -7,6 +8,26 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
 {
     [Parameter] public Guid GroupId { get; set; }
     [Inject] public required ICartHubClient CartHubClient { get; set; }
+    [Inject] public required ICartGroupsService CartGroupsService { get; set; }
+    [Inject] public required PersistentComponentState ApplicationState { get; set; }
+
+    protected CartGroup? group;
+    private PersistingComponentStateSubscription stateSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!ApplicationState.TryTakeFromJson(nameof(group), out group))
+        {
+            group = await CartGroupsService.GetCartGroupInfo(GroupId);
+        }
+        stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState?.PersistAsJson(nameof(group), group);
+        return Task.CompletedTask;
+    }
 
     public async Task JoinCart()
     {
@@ -41,5 +62,11 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
             await CartHubClient.Stop();
             ViewModel.IsPolling = false;
         }
+    }
+
+    public override void Dispose()
+    {
+        stateSubscription.Dispose();
+        base.Dispose();
     }
 }

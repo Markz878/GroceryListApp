@@ -87,19 +87,25 @@
 .profile-menu {
     position: absolute;
     border: 1px solid white;
+    border-radius: 0.5rem;
     right: 0;
+    background: var(--color-darker-gray);
+    color: var(--color-light);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
-.signout-form {
-}
 
 .profile-menu-btn {
-    background: rgb(210, 200, 200);
-    color: rgb(0 123 255);
-    padding: 0.5rem;
+    padding-bottom: 1rem;
+    font-weight: 500;
+    background: transparent;
+    border: 0;
+    color: white;
 }
     .profile-menu-btn:is(:hover, :active, :focus) {
-        background: rgb(200, 192, 192);
+        color: #ccc;
+        text-decoration: underline;
     }
 
 .cart-group-btn {

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Server.Filters;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.RegularExpressions;
 
 namespace GroceryListHelper.Server.Endpoints;
 
@@ -11,7 +14,10 @@ public static class CartGroupsEndpointsMapper
             .WithTags("Cart Groups");
 
         group.MapGet("", GetGroupsForUser)
-            .WithName("Get cart groups");
+            .WithName("Get cart groups for user");
+
+        group.MapGet("/{groupId:guid}", GetGroup)
+            .WithName("Get cart group info");
 
         group.MapPost("", AddGroup)
             .WithSummary("Add a cart product")
@@ -19,13 +25,19 @@ public static class CartGroupsEndpointsMapper
 
         group.MapDelete("/{groupId:guid}", RemoveUserFromGroup);
 
-        //group.MapPut("", UpdateGroup);
+        group.MapPut("", UpdateGroup);
     }
 
     public static async Task<Ok<List<CartGroup>>> GetGroupsForUser(ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        List<CartGroup> results = await cartGroupRepository.GetCartGroupsForUser(user.GetUserEmail() ?? throw new ArgumentNullException("User email"));
+        List<CartGroup> results = await cartGroupRepository.GetCartGroupsForUser(user.GetUserEmail());
         return TypedResults.Ok(results);
+    }
+
+    public static async Task<Results<Ok<CartGroup>, NotFound>> GetGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    {
+        CartGroup? result = await cartGroupRepository.GetCartGroup(groupId, user.GetUserEmail());
+        return result is null ? TypedResults.NotFound() : TypedResults.Ok(result);
     }
 
     public static async Task<Created<Guid>> AddGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
@@ -39,19 +51,23 @@ public static class CartGroupsEndpointsMapper
 
     public static async Task<NoContent> RemoveUserFromGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        await cartGroupRepository.RemoveUserFromCartGroup(groupId, user.GetUserEmail() ?? throw new ArgumentNullException("user email"));
+        await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
         return TypedResults.NoContent();
     }
 
-    //public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(CartGroup updatedProduct, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
-    //{
-    //    Exception? ex = await cartGroupRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
-    //    return ex switch
-    //    {
-    //        NotFoundException => TypedResults.NotFound(),
-    //        ForbiddenException => TypedResults.Forbid(),
-    //        null => TypedResults.NoContent(),
-    //        _ => throw new UnreachableException()
-    //    };
-    //}
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(CartGroup updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    {
+        bool hasAccess = await cartGroupRepository.CheckGroupAccess(updatedGroup.Id, user.GetUserEmail());
+        if (hasAccess is false)
+        {
+            return TypedResults.Forbid();
+        }
+        Exception? ex = await cartGroupRepository.UpdateGroupName(updatedGroup.Id, updatedGroup.Name);
+        return ex switch
+        {
+            NotFoundException => TypedResults.NotFound(),
+            null => TypedResults.NoContent(),
+            _ => throw new UnreachableException()
+        };
+    }
 }

@@ -19,6 +19,14 @@ public class CartGroupsService : ICartGroupsService
         return cartGroups;
     }
 
+
+    public async Task<CartGroup> GetCartGroupInfo(Guid groupId)
+    {
+        CartGroup? cartGroup = await client.GetFromJsonAsync<CartGroup>($"{uri}/{groupId}");
+        ArgumentNullException.ThrowIfNull(cartGroup);
+        return cartGroup;
+    }
+
     public async Task<CartGroup?> CreateCartGroup(CreateCartGroupRequest cartGroup)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, cartGroup);
@@ -37,7 +45,7 @@ public class CartGroupsService : ICartGroupsService
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task LeaveCartGroup(Guid groupId)
+    public async Task DeleteCartGroup(Guid groupId)
     {
         HttpResponseMessage response = await client.DeleteAsync($"{uri}/{groupId}");
         response.EnsureSuccessStatusCode();
@@ -52,4 +60,5 @@ public class CartGroupsService : ICartGroupsService
     {
         throw new NotImplementedException();
     }
+
 }

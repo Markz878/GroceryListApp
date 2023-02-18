@@ -3,7 +3,7 @@ using GroceryListHelper.DataAccess.HelperMethods;
 
 namespace GroceryListHelper.DataAccess.Models;
 
-public record ActiveCartGroupDbModel : ITable
+internal record ActiveCartGroupDbModel : ITable
 {
     public Guid UserId { get; set; }
     public Guid GroupId { get; set; }

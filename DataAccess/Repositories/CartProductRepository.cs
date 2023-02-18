@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.CartProducts;
 using System.ComponentModel;
@@ -30,34 +31,37 @@ public sealed class CartProductRepository : ICartProductRepository
 
     public async Task<List<CartProductCollectable>> GetCartProducts(Guid ownerId)
     {
-        AsyncPageable<CartProductDbModel> cartProductPages = db.QueryAsync<CartProductDbModel>(x => x.PartitionKey == ownerId.ToString());
-        List<CartProductCollectable> result = new();
-        string? token = null;
-        await foreach (Page<CartProductDbModel> cartProductPage in cartProductPages.AsPages())
-        {
-            token = cartProductPage.ContinuationToken;
-            result.AddRange(cartProductPage.Values.Select(x => new CartProductCollectable()
-            {
-                Amount = x.Amount,
-                IsCollected = x.IsCollected,
-                Name = x.Name,
-                Order = x.Order,
-                UnitPrice = x.UnitPrice
-            }));
-        }
-        return result;
+        List<CartProductDbModel> products = await db.GetTableEntitiesByPrimaryKey<CartProductDbModel>(ownerId.ToString());
+
+        //AsyncPageable<CartProductDbModel> cartProductPages = db.QueryAsync<CartProductDbModel>(x => x.PartitionKey == ownerId.ToString());
+        //List<CartProductCollectable> result = new();
+        //string? token = null;
+        //await foreach (Page<CartProductDbModel> cartProductPage in cartProductPages.AsPages())
+        //{
+        //    token = cartProductPage.ContinuationToken;
+        //    result.AddRange(cartProductPage.Values.Select(x => new CartProductCollectable()
+        //    {
+        //        Amount = x.Amount,
+        //        IsCollected = x.IsCollected,
+        //        Name = x.Name,
+        //        Order = x.Order,
+        //        UnitPrice = x.UnitPrice
+        //    }));
+        //}
+        return products.Select(x => new CartProductCollectable() { Amount = x.Amount, IsCollected = x.IsCollected, Name = x.Name, Order = x.Order, UnitPrice = x.UnitPrice }).ToList();
     }
 
     public async Task ClearCartProducts(Guid ownerId)
     {
-        AsyncPageable<CartProductDbModel> cartProductPages = db.QueryAsync<CartProductDbModel>(x => x.PartitionKey == ownerId.ToString());
-        string? token = null;
-        List<CartProductDbModel> products = new();
-        await foreach (Page<CartProductDbModel> cartProductPage in cartProductPages.AsPages(token))
-        {
-            token = cartProductPage.ContinuationToken;
-            products.AddRange(cartProductPage.Values);
-        }
+        //AsyncPageable<CartProductDbModel> cartProductPages = db.QueryAsync<CartProductDbModel>(x => x.PartitionKey == ownerId.ToString());
+        //string? token = null;
+        //List<CartProductDbModel> products = new();
+        //await foreach (Page<CartProductDbModel> cartProductPage in cartProductPages.AsPages(token))
+        //{
+        //    token = cartProductPage.ContinuationToken;
+        //    products.AddRange(cartProductPage.Values);
+        //}
+        List<CartProductDbModel> products = await db.GetTableEntitiesByPrimaryKey<CartProductDbModel>(ownerId.ToString());
         Response<IReadOnlyList<Response>> response = await db.SubmitTransactionAsync(products.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
     }
 
@@ -91,14 +95,7 @@ public sealed class CartProductRepository : ICartProductRepository
 
     public async Task SortUserProducts(Guid ownerId, ListSortDirection sortDirection)
     {
-        AsyncPageable<CartProductDbModel> cartProductPages = db.QueryAsync<CartProductDbModel>(x => x.PartitionKey == ownerId.ToString());
-        List<CartProductDbModel> products = new();
-        string? token = null;
-        await foreach (Page<CartProductDbModel> cartProductPage in cartProductPages.AsPages())
-        {
-            token = cartProductPage.ContinuationToken;
-            products.AddRange(cartProductPage.Values);
-        }
+        List<CartProductDbModel> products = await db.GetTableEntitiesByPrimaryKey<CartProductDbModel>(ownerId.ToString());
         int order = 1000;
         if (sortDirection == ListSortDirection.Ascending)
         {

@@ -5,28 +5,40 @@ using Microsoft.AspNetCore.Authorization;
 namespace GroceryListHelper.Client.Pages;
 
 [Authorize]
-public abstract class ManageGroupsBase : BasePage<MainViewModel>, IAsyncDisposable
+public abstract class ManageGroupsBase : BasePage<MainViewModel>
 {
     [Inject] public required ICartGroupsService GroupsService { get; set; }
     [Inject] public required NavigationManager Navigation { get; set; }
     [Inject] public required ModalViewModel Modal { get; set; }
+    [Inject] public required PersistentComponentState ApplicationState { get; set; }
 
-    protected List<CartGroup> cartGroups = new();
+    protected List<CartGroup>? cartGroups = new();
     protected bool isCreatingNewGroup;
     protected EmailModel newMemberEmail = new();
     protected CreateCartGroupRequest createCartGroupRequest = new();
     protected CartGroup? isEditingGroup;
     private readonly EmailModelValidator emailValidator = new();
     private readonly CreateCartGroupRequestValidator cartGroupValidator = new();
+    private PersistingComponentStateSubscription stateSubscription;
 
     protected override async Task OnInitializedAsync()
     {
-        cartGroups = await GroupsService.GetCartGroups();
+        if (!ApplicationState.TryTakeFromJson(nameof(cartGroups), out cartGroups))
+        {
+            cartGroups = await GroupsService.GetCartGroups();
+        }
+        stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState?.PersistAsJson(nameof(cartGroups), cartGroups);
+        return Task.CompletedTask;
     }
 
     protected async Task CreateGroup()
     {
-        if (isCreatingNewGroup)
+        if (isCreatingNewGroup && cartGroups is not null)
         {
             ValidationResult validationResult = cartGroupValidator.Validate(createCartGroupRequest);
             if (validationResult.IsValid is false)
@@ -83,6 +95,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>, IAsyncDisposab
     protected async void SubmitEditGroup(CartGroup group)
     {
         await GroupsService.UpdateCartGroup(new CartGroup() { Id = group.Id, Name = group.Name, OtherUsers = group.OtherUsers });
+        isEditingGroup = null;
     }
 
     protected void StopEditGroup()
@@ -90,13 +103,15 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>, IAsyncDisposab
         isEditingGroup = null;
     }
 
-    protected async Task LeaveGroup(Guid groupId)
+    protected async Task DeleteGroup(CartGroup group)
     {
-        await GroupsService.LeaveCartGroup(groupId);
+        await GroupsService.DeleteCartGroup(group.Id);
+        cartGroups?.Remove(group);
     }
 
-    public ValueTask DisposeAsync()
+    public override void Dispose()
     {
-        return ValueTask.CompletedTask;
+        stateSubscription.Dispose();
+        base.Dispose();
     }
 }

@@ -22,9 +22,20 @@
                     @if (userMenuOpen)
                     {
                         <div class="profile-menu">
-                            <form class="signout-form" method="post" action="api/Account/Logout">
+                            @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "name")?.Value is not null)
+                            {
+                                <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "name")!.Value</p>
+                            }
+                            @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "preferred_username")?.Value is not null)
+                            {
+                                <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "preferred_username")!.Value</p>
+                            }
+                            <form id="signout-form" method="post" action="api/Account/Logout">
                                 <AntiForgeryTokenInput />
-                                <button id="signout-btn" class="profile-menu-btn" type="submit">Sign out</button>
+                                <button id="signout-btn" class="profile-menu-btn" type="submit">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    Sign out
+                                </button>
                             </form>
                         </div>
                     }

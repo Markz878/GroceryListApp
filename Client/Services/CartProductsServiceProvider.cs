@@ -9,15 +9,17 @@ public sealed class CartProductsServiceProvider : ICartProductsService
     private readonly AuthenticationStateProvider authenticationStateProvider;
     private readonly MainViewModel viewModel;
     private readonly ICartHubClient cartHubClient;
+    private readonly NavigationManager navigation;
     private ICartProductsService? actingCartService;
 
-    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, MainViewModel viewModel, ICartHubClient cartHubClient)
+    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, MainViewModel viewModel, ICartHubClient cartHubClient, NavigationManager navigation)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;
         this.authenticationStateProvider = authenticationStateProvider;
         this.viewModel = viewModel;
         this.cartHubClient = cartHubClient;
+        this.navigation = navigation;
     }
 
     public async Task DeleteAllCartProducts()
@@ -61,7 +63,11 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
         if (isAuthenticated)
         {
-            if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
+            if (navigation.Uri.Contains("group") && actingCartService is not CartProductsGroupService)
+            {
+                actingCartService = new CartProductsGroupService(httpClientFactory, navigation);
+            }
+            else if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
             {
                 actingCartService = new CartProductsSignalRService(cartHubClient);
             }

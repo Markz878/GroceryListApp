@@ -18,7 +18,7 @@
     {
         <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
     }
-    @if (cartGroups.Count == 0)
+    @if (cartGroups is null || cartGroups.Count == 0)
     {
         <p>You have no groups yet.</p>
     }
@@ -33,7 +33,7 @@
                     <button class="edit-group-btn btn-success" @onclick="() => EditGroup(group)">
                         <i class="fa fa-edit" aria-hidden="true" />
                     </button>
-                    <button class="leave-group-btn btn-danger" @onclick="() => LeaveGroup(group.Id)">&times;</button>
+                    <button class="delete-group-btn btn-danger" @onclick="() => DeleteGroup(group)">&times;</button>
                     <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
                 </fieldset>
             }

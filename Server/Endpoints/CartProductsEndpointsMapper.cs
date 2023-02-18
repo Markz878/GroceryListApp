@@ -13,7 +13,7 @@ public static class CartProductsEndpointsMapper
             .WithTags("Cart Products");
 
         group.MapGet("", GetAll)
-            .WithName("Get cart products");
+            .WithName("Get cart products for a user");
 
         group.MapPost("", AddProduct)
             .WithSummary("Add a cart product")

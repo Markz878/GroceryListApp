@@ -4,7 +4,7 @@ using GroceryListHelper.Shared.Models.CartProducts;
 
 namespace GroceryListHelper.DataAccess.Models;
 
-public sealed record CartProductDbModel : CartProductCollectable, ITable
+internal sealed record CartProductDbModel : CartProductCollectable, ITable
 {
     public Guid OwnerId { get; set; }
     public string PartitionKey { get => OwnerId.ToString(); set => OwnerId = Guid.Parse(value); }
