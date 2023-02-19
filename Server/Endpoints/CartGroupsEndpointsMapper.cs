@@ -1,7 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
-using GroceryListHelper.Server.Filters;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Text.RegularExpressions;
 
 namespace GroceryListHelper.Server.Endpoints;
 
@@ -19,11 +17,11 @@ public static class CartGroupsEndpointsMapper
         group.MapGet("/{groupId:guid}", GetGroup)
             .WithName("Get cart group info");
 
-        group.MapPost("", AddGroup)
+        group.MapPost("", CreateGroup)
             .WithSummary("Add a cart product")
             .WithDescription("Add a cart product to your cart.");
 
-        group.MapDelete("/{groupId:guid}", RemoveUserFromGroup);
+        group.MapDelete("/{groupId:guid}", DeleteCartGroup);
 
         group.MapPut("", UpdateGroup);
     }
@@ -40,7 +38,7 @@ public static class CartGroupsEndpointsMapper
         return result is null ? TypedResults.NotFound() : TypedResults.Ok(result);
     }
 
-    public static async Task<Created<Guid>> AddGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Created<Guid>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
         string? userEmail = user.GetUserEmail();
         ArgumentNullException.ThrowIfNull(userEmail);
@@ -49,10 +47,17 @@ public static class CartGroupsEndpointsMapper
         return TypedResults.Created($"api/cartgroups", id);
     }
 
-    public static async Task<NoContent> RemoveUserFromGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<NoContent, ForbidHttpResult>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
-        return TypedResults.NoContent();
+        try
+        {
+            await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
+            return TypedResults.NoContent();
+        }
+        catch (ForbiddenException)
+        {
+            return TypedResults.Forbid();
+        }
     }
 
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(CartGroup updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)

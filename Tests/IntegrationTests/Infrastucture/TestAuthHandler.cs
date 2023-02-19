@@ -3,7 +3,7 @@
 public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public static Guid UserId { get; } = Guid.NewGuid();
-
+    public const string UserEmail = "test_user@email.com";
     public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
         : base(options, logger, encoder, clock)
@@ -15,7 +15,7 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
         Claim[] claims = new[]
         {
             new Claim("name", "Test user"),
-            new Claim("preferred_username", "test_user@email.com"),
+            new Claim("preferred_username", UserEmail),
             new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", UserId.ToString())
         };
         ClaimsIdentity identity = new(claims, "FakeAuth", "preferred_username", "role");

@@ -98,6 +98,10 @@ public sealed class CartGroupRepository : ICartGroupRepository
         {
             TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
             List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
+            if (!cartGroupUsers.Any(x=>x.MemberEmail == userEmail))
+            {
+                throw new ForbiddenException("User is not part of the group");
+            }
             await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
             return cartGroupUsers;
         }

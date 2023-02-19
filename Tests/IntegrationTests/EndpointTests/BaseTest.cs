@@ -21,15 +21,16 @@ public abstract class BaseTest : IDisposable
         _scope = _factory.Services.CreateScope();
     }
 
-    public async Task<List<CartProduct>> SaveCartProducts(int n, bool randomUser = false)
+    public async Task<List<CartProduct>> SaveCartProducts(int n, Guid? ownerId = null)
     {
         ICartProductRepository db = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
+        await db.ClearCartProducts(ownerId.GetValueOrDefault(TestAuthHandler.UserId));
         List<CartProduct> result = new(n);
         for (int i = 0; i < n; i++)
         {
             CartProduct product = GetRandomCartProduct(i * 1000);
             result.Add(product);
-            await db.AddCartProduct(product, randomUser ? Guid.NewGuid() : TestAuthHandler.UserId);
+            await db.AddCartProduct(product, ownerId.GetValueOrDefault(TestAuthHandler.UserId));
         }
         return result;
 

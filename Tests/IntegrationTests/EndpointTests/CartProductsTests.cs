@@ -100,11 +100,12 @@ public sealed class CartProductsTests : BaseTest
     [Fact]
     public async Task DeleteCartProduct_NotUsersProduct_ReturnsNotFound()
     {
-        List<CartProduct> savedProducts = await SaveCartProducts(3, true);
+        Guid fakeUserId = Guid.NewGuid();
+        List<CartProduct> savedProducts = await SaveCartProducts(3, fakeUserId);
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{savedProducts[1].Name}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         ICartProductRepository repository = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
-        List<CartProductCollectable> products = await repository.GetCartProducts(TestAuthHandler.UserId);
+        List<CartProductCollectable> products = await repository.GetCartProducts(fakeUserId);
         Assert.Equal(3, products.Count);
     }
 
