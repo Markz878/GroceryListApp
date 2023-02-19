@@ -30,7 +30,7 @@ internal static class PlaywrightHelpers
         await page.GotoAsync(url);
         if (checkIfAuthenticated)
         {
-            await page.Locator("#signout-btn").WaitForAsync();
+            await page.Locator("#profile-btn").WaitForAsync();
         }
         await Task.Delay(1000);
         return page;

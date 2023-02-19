@@ -39,7 +39,7 @@ public static class CartGroupProductsEndpointsMapper
     public static async Task<Created> AddProductToGroup(Guid groupId, CartProduct product, ICartProductRepository cartProductsRepository)
     {
         await cartProductsRepository.AddCartProduct(product, groupId);
-        return TypedResults.Created($"api/cartproducts/{groupId}");
+        return TypedResults.Created($"api/cartgroupproducts/{groupId}");
     }
 
     public static async Task<NoContent> DeleteAllProducts(Guid groupId, ICartProductRepository cartProductsRepository)

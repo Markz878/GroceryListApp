@@ -33,7 +33,7 @@
                     <button class="edit-group-btn btn-success" @onclick="() => EditGroup(group)">
                         <i class="fa fa-edit" aria-hidden="true" />
                     </button>
-                    <button class="delete-group-btn btn-danger" @onclick="() => DeleteGroup(group)">&times;</button>
+                    <button class="delete-group-btn btn-danger" @onclick="() => ShowDeleteConfirm(group)">&times;</button>
                     <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
                 </fieldset>
             }
@@ -51,3 +51,4 @@
         }
     }
 </div>
+<Confirm Header="Confirm delete" Message="This will delete the group and its products for all group members, are you sure?" OkCallback="DeleteGroup" CancelCallback="CancelGroupDelete" @ref=confirm />

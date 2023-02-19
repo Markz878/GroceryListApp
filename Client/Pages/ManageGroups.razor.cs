@@ -1,3 +1,4 @@
+using GroceryListHelper.Client.Components;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Shared.Models.CartGroups;
 using Microsoft.AspNetCore.Authorization;
@@ -11,12 +12,15 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     [Inject] public required NavigationManager Navigation { get; set; }
     [Inject] public required ModalViewModel Modal { get; set; }
     [Inject] public required PersistentComponentState ApplicationState { get; set; }
+    [Inject] public required IJSRuntime JS { get; set; }
 
     protected List<CartGroup>? cartGroups = new();
     protected bool isCreatingNewGroup;
     protected EmailModel newMemberEmail = new();
     protected CreateCartGroupRequest createCartGroupRequest = new();
     protected CartGroup? isEditingGroup;
+    protected CartGroup? isDeletingGroup;
+    protected Confirm? confirm;
     private readonly EmailModelValidator emailValidator = new();
     private readonly CreateCartGroupRequestValidator cartGroupValidator = new();
     private PersistingComponentStateSubscription stateSubscription;
@@ -103,10 +107,25 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
         isEditingGroup = null;
     }
 
-    protected async Task DeleteGroup(CartGroup group)
+    protected async Task ShowDeleteConfirm(CartGroup group)
     {
-        await GroupsService.DeleteCartGroup(group.Id);
-        cartGroups?.Remove(group);
+        isDeletingGroup = group;
+        if (confirm is not null)
+        {
+            await confirm.ShowConfirm();
+        }
+    }
+
+    protected void CancelGroupDelete()
+    {
+        isDeletingGroup = null;
+    }
+
+    protected async Task DeleteGroup()
+    {
+        ArgumentNullException.ThrowIfNull(isDeletingGroup);
+        await GroupsService.DeleteCartGroup(isDeletingGroup.Id);
+        cartGroups?.Remove(isDeletingGroup);
     }
 
     public override void Dispose()

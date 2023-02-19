@@ -6,25 +6,24 @@ using System.Text.Json;
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public abstract class BaseTest
+public abstract class BaseTest : IDisposable
 {
     protected readonly WebApplicationFactoryFixture _factory;
     protected readonly HttpClient _client;
     protected static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+    protected readonly IServiceScope _scope;
 
     public BaseTest(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper)
     {
         _factory = factory;
         factory.TestOutputHelper = testOutputHelper;
         _client = factory.CreateClient();
+        _scope = _factory.Services.CreateScope();
     }
-
-
 
     public async Task<List<CartProduct>> SaveCartProducts(int n, bool randomUser = false)
     {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        ICartProductRepository db = scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
+        ICartProductRepository db = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
         List<CartProduct> result = new(n);
         for (int i = 0; i < n; i++)
         {
@@ -48,8 +47,7 @@ public abstract class BaseTest
 
     public async Task<List<StoreProduct>> SaveStoreProducts(int n)
     {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        IStoreProductRepository db = scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
+        IStoreProductRepository db = _scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
         List<StoreProduct> result = new(n);
         for (int i = 0; i < n; i++)
         {
@@ -71,8 +69,12 @@ public abstract class BaseTest
 
     public async Task ClearStoreProducts()
     {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        IStoreProductRepository db = scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
+        IStoreProductRepository db = _scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
         await db.DeleteAll(TestAuthHandler.UserId);
+    }
+
+    public void Dispose()
+    {
+        _scope.Dispose();
     }
 }
