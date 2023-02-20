@@ -1,11 +1,9 @@
 using GroceryListHelper.Client.Components;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Shared.Models.CartGroups;
-using Microsoft.AspNetCore.Authorization;
 
 namespace GroceryListHelper.Client.Pages;
 
-[Authorize]
 public abstract class ManageGroupsBase : BasePage<MainViewModel>
 {
     [Inject] public required ICartGroupsService GroupsService { get; set; }

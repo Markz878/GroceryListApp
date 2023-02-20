@@ -32,17 +32,7 @@ public class ServerCartGroupsService : ICartGroupsService
         return groups;
     }
 
-    public Task JoinGroup(Guid groupId)
-    {
-        throw new NotImplementedException();
-    }
-
     public Task DeleteCartGroup(Guid groupId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task LeaveGroup(Guid groupId)
     {
         throw new NotImplementedException();
     }

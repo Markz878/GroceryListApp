@@ -49,15 +49,4 @@ public class CartGroupsService : ICartGroupsService
         HttpResponseMessage response = await client.DeleteAsync($"{uri}/{groupId}");
         response.EnsureSuccessStatusCode();
     }
-
-    public Task JoinGroup(Guid groupId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task LeaveGroup(Guid groupId)
-    {
-        throw new NotImplementedException();
-    }
-
 }

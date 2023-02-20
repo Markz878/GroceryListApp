@@ -25,7 +25,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
             await userRepository.UserJoinedSharing(GetUserId(), groupId);
             await Clients.Caller.ReceiveCart(await db.GetCartProducts(groupId));
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has joined group cart.");
-            return new HubResponse() { SuccessMessage = $"You have joined '{group.Name}' cart" };
+            return new HubResponse() { SuccessMessage = $"You have joined cart '{group.Name}'" };
         }
         else
         {

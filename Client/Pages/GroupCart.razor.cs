@@ -1,9 +1,7 @@
 using GroceryListHelper.Shared.Models.CartGroups;
-using Microsoft.AspNetCore.Authorization;
 
 namespace GroceryListHelper.Client.Pages;
 
-[Authorize]
 public abstract class GroupCartBase : BasePage<MainViewModel>
 {
     [Parameter] public Guid GroupId { get; set; }
@@ -27,6 +25,12 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
     {
         ApplicationState?.PersistAsJson(nameof(group), group);
         return Task.CompletedTask;
+    }
+
+    protected async Task<bool> CheckAccess()
+    {
+        CartGroup? x = await CartGroupsService.GetCartGroup(GroupId);
+        return x != null;
     }
 
     public async Task JoinCart()

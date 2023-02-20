@@ -150,10 +150,9 @@ public sealed class CartGroupRepository : ICartGroupRepository
                 UserId = userId
             });
         }
-        catch (RequestFailedException ex)
+        catch (RequestFailedException ex) when (ex.Message.Contains("409"))
         {
         }
-
     }
 
     public async Task UserLeftSharing(Guid userId, Guid groupId)
