@@ -1,4 +1,3 @@
-global using GroceryListHelper.DataAccess.Models;
 global using GroceryListHelper.Shared.Models.CartProducts;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Hosting;

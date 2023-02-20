@@ -8,9 +8,10 @@ public static class AuthenticationHelpers
         return stringId == null ? null : Guid.Parse(stringId.Trim('"'));
     }
 
-    public static string? GetUserEmail(this ClaimsPrincipal user)
+    public static string GetUserEmail(this ClaimsPrincipal user)
     {
         string? email = user.FindFirstValue("preferred_username");
+        ArgumentNullException.ThrowIfNull(email);
         return email;
     }
 }

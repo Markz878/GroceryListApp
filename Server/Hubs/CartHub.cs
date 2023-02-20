@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace GroceryListHelper.Server.Hubs;
 
@@ -9,42 +10,39 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
     private readonly ICartGroupRepository userRepository;
     private readonly ILogger<CartHub> logger;
 
-    public CartHub(ICartProductRepository db, ICartGroupRepository userRepository, ILogger<CartHub> logger)
+    public CartHub(ICartProductRepository productRepository, ICartGroupRepository userRepository, ILogger<CartHub> logger)
     {
-        this.db = db;
+        this.db = productRepository;
         this.userRepository = userRepository;
         this.logger = logger;
     }
 
     public async Task<HubResponse> JoinGroup(Guid groupId)
     {
-        CartGroup? group = await userRepository.GetCartGroup(groupId, GetUserEmail());
-        if (group is not null)
+        Response<string, NotFoundException> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
+        return await getGroupResponse.MatchAsync(async x =>
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
             await userRepository.UserJoinedSharing(GetUserId(), groupId);
             await Clients.Caller.ReceiveCart(await db.GetCartProducts(groupId));
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has joined group cart.");
-            return new HubResponse() { SuccessMessage = $"You have joined cart '{group.Name}'" };
-        }
-        else
-        {
-            return new HubResponse() { ErrorMessage = "There is no cart with that id." };
-        }
+            return new HubResponse() { SuccessMessage = $"You have joined cart '{x}'" };
+        },
+        e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a group with given the id." }));
     }
 
 
     public async Task<HubResponse> LeaveGroup(Guid groupId)
     {
-        CartGroup? group = await userRepository.GetCartGroup(groupId, GetUserEmail());
-        if (group is not null)
+        Response<string, NotFoundException> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
+        return await getGroupResponse.MatchAsync(async x =>
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
             await userRepository.UserLeftSharing(GetUserId(), groupId);
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has left sharing.");
-            return new HubResponse() { SuccessMessage = $"You left '{group.Name}' cart sharing." };
-        }
-        return new HubResponse() { SuccessMessage = $"No active cart group with the given id." };
+            return new HubResponse() { SuccessMessage = $"You left '{x}' cart sharing." };
+        },
+e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a group with given the id." }));
     }
 
     public async Task<HubResponse> CartItemAdded(CartProduct product)
@@ -121,5 +119,4 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
         ArgumentNullException.ThrowIfNull(groupId);
         return groupId.GetValueOrDefault();
     }
-
 }

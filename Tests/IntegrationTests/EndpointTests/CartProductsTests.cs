@@ -164,4 +164,37 @@ public sealed class CartProductsTests : BaseTest
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+
+    [Fact]
+    public async Task SortCartProducts_OrderAscending()
+    {
+        List<CartProduct> insertedProducts = await SaveCartProducts(5);
+        HttpResponseMessage response = await _client.PatchAsync($"{_uri}/sort/0", null);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        ICartProductRepository repository = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
+        List<CartProductCollectable> sortedProducts = await repository.GetCartProducts(TestAuthHandler.UserId);
+        double order = double.MinValue;
+        foreach (CartProductCollectable product in sortedProducts.OrderBy(x => x.Name))
+        {
+            Assert.True(product.Order > order);
+            order = product.Order;
+        }
+    }
+
+    [Fact]
+    public async Task SortCartProducts_OrderDescending()
+    {
+        List<CartProduct> insertedProducts = await SaveCartProducts(5);
+        HttpResponseMessage response = await _client.PatchAsync($"{_uri}/sort/1", null);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        ICartProductRepository repository = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
+        List<CartProductCollectable> sortedProducts = await repository.GetCartProducts(TestAuthHandler.UserId);
+        double order = double.MinValue;
+        foreach (CartProductCollectable product in sortedProducts.OrderByDescending(x => x.Name))
+        {
+            Assert.True(product.Order > order);
+            order = product.Order;
+        }
+    }
 }

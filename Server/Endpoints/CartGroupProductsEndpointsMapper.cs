@@ -50,31 +50,19 @@ public static class CartGroupProductsEndpointsMapper
 
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(Guid groupId, string productName, ICartProductRepository cartProductsRepository)
     {
-        Exception? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
-        return ex switch
-        {
-            NotFoundException => TypedResults.NotFound(),
-            ForbiddenException => TypedResults.Forbid(),
-            null => TypedResults.NoContent(),
-            _ => throw new UnreachableException()
-        };
+        NotFoundException? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, ICartProductRepository cartProductsRepository)
     {
-        Exception? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
-        return ex switch
-        {
-            NotFoundException => TypedResults.NotFound(),
-            ForbiddenException => TypedResults.Forbid(),
-            null => TypedResults.NoContent(),
-            _ => throw new UnreachableException()
-        };
+        NotFoundException? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<NoContent> SortCartProducts(Guid groupId, ListSortDirection sortDirection, ICartProductRepository cartProductsRepository)
     {
-        await cartProductsRepository.SortUserProducts(groupId, sortDirection);
+        await cartProductsRepository.SortCartProducts(groupId, sortDirection);
         return TypedResults.NoContent();
     }
 }

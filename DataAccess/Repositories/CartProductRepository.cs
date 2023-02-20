@@ -44,13 +44,13 @@ public sealed class CartProductRepository : ICartProductRepository
         }
     }
 
-    public async Task<Exception?> DeleteProduct(string productName, Guid ownerId)
+    public async Task<NotFoundException?> DeleteProduct(string productName, Guid ownerId)
     {
         Response response = await db.DeleteEntityAsync(ownerId.ToString(), productName);
         return response.Status == 404 ? NotFoundException.ForType<CartProduct>() : null;
     }
 
-    public async Task<Exception?> UpdateProduct(Guid ownerId, CartProductCollectable updatedProduct)
+    public async Task<NotFoundException?> UpdateProduct(Guid ownerId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel dbProduct = new()
         {
@@ -72,7 +72,7 @@ public sealed class CartProductRepository : ICartProductRepository
         }
     }
 
-    public async Task SortUserProducts(Guid ownerId, ListSortDirection sortDirection)
+    public async Task SortCartProducts(Guid ownerId, ListSortDirection sortDirection)
     {
         List<CartProductDbModel> products = await db.GetTableEntitiesByPrimaryKey<CartProductDbModel>(ownerId.ToString());
         if (products.Count > 1)

@@ -1,4 +1,6 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.HelperMethods;
+using GroceryListHelper.DataAccess.Repositories;
 using GroceryListHelper.Shared.Models.CartGroups;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
@@ -14,7 +16,7 @@ public class CartGroupTests : BaseTest
     }
 
     [Fact]
-    public async Task GetGroupsForUserTest()
+    public async Task GetGroupsForUser()
     {
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
         List<CartGroup>? cartGroups = await _client.GetFromJsonAsync<List<CartGroup>>(_uri, _jsonOptions);
@@ -40,6 +42,16 @@ public class CartGroupTests : BaseTest
     }
 
     [Fact]
+    public async Task GetCartGroupName()
+    {
+        Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
+        List<CartGroup>? cartGroups = await _client.GetFromJsonAsync<List<CartGroup>>(_uri, _jsonOptions);
+        Assert.NotNull(cartGroups);
+        Assert.True(cartGroups.Count > 0);
+        await groupRepository.DeleteCartGroup(groupId, TestAuthHandler.UserEmail);
+    }
+
+    [Fact]
     public async Task CreateGroup()
     {
         CreateCartGroupRequest request = new() { Name = "Test", OtherUsers = new HashSet<string>() { "testi@user.com" } };
@@ -57,8 +69,8 @@ public class CartGroupTests : BaseTest
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{groupId}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        CartGroup? group = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
-        Assert.Null(group);
+        Response<CartGroup, ForbiddenException, NotFoundException> groupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
+        Assert.False(groupResponse.IsSuccess);
     }
 
     [Fact]
@@ -78,7 +90,8 @@ public class CartGroupTests : BaseTest
         UpdateCartGroupNameRequest group = new() { GroupId = groupId, Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, group);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        CartGroup? updatedGroup = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
+        Response<CartGroup, ForbiddenException, NotFoundException> updatedGroupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
+        CartGroup? updatedGroup = updatedGroupResponse.Match<CartGroup?>(x => x, e => null, e => null);
         Assert.NotNull(updatedGroup);
         Assert.Equal(group.Name, updatedGroup.Name);
         await groupRepository.DeleteCartGroup(groupId, TestAuthHandler.UserEmail);

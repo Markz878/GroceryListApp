@@ -26,44 +26,36 @@ public static class CartGroupsEndpointsMapper
         group.MapPut("", UpdateGroup);
     }
 
-    public static async Task<Ok<List<CartGroup>>> GetGroupsForUser(ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<Ok<List<CartGroup>>, ForbidHttpResult>> GetGroupsForUser(ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
         List<CartGroup> results = await cartGroupRepository.GetCartGroupsForUser(user.GetUserEmail());
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Results<Ok<CartGroup>, NotFound>> GetGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<Ok<CartGroup>, ForbidHttpResult, NotFound<string>>> GetGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        CartGroup? result = await cartGroupRepository.GetCartGroup(groupId, user.GetUserEmail());
-        return result is null ? TypedResults.NotFound() : TypedResults.Ok(result);
+        Response<CartGroup, ForbiddenException, NotFoundException> cartGroupResponse = await cartGroupRepository.GetCartGroup(groupId, user.GetUserEmail());
+        return cartGroupResponse.Match<Results<Ok<CartGroup>, ForbidHttpResult, NotFound<string>>>(
+            x => TypedResults.Ok(x), 
+            e => TypedResults.Forbid(), 
+            e => TypedResults.NotFound(e.Message));
     }
-
-    public static async Task<Created<Guid>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<Created<Guid>, ForbidHttpResult>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        string? userEmail = user.GetUserEmail();
-        ArgumentNullException.ThrowIfNull(userEmail);
-        request.OtherUsers.Add(userEmail);
+        request.OtherUsers.Add(user.GetUserEmail());
         Guid id = await cartGroupRepository.CreateGroup(request.Name, request.OtherUsers);
         return TypedResults.Created($"api/cartgroups", id);
     }
 
-    public static async Task<Results<NoContent, NotFound>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<NoContent, ForbidHttpResult, NotFound<string>>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        Exception? ex = await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
-        return ex switch
-        {
-            NotFoundException => TypedResults.NotFound(),
-            _ => TypedResults.NoContent()
-        };
+        NotFoundException? ex = await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Message);
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(UpdateCartGroupNameRequest updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<NoContent, ForbidHttpResult, NotFound<string>>> UpdateGroup(UpdateCartGroupNameRequest updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        Exception? ex = await cartGroupRepository.UpdateGroupName(updatedGroup.GroupId, updatedGroup.Name, user.GetUserEmail());
-        return ex switch
-        {
-            NotFoundException => TypedResults.NotFound(),
-            _ => TypedResults.NoContent(),
-        };
+        NotFoundException? ex = await cartGroupRepository.UpdateGroupName(updatedGroup.GroupId, updatedGroup.Name, user.GetUserEmail());
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Message);
     }
 }

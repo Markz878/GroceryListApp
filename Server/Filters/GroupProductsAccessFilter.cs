@@ -11,7 +11,11 @@ public class GroupProductsAccessFilter : IEndpointFilter
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         Guid groupId = context.GetArgument<Guid>(0);
-        string email = context.HttpContext.User.GetUserEmail();
+        string? email = context.HttpContext.User.GetUserEmail();
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return TypedResults.Unauthorized();
+        }
         bool hasAccess = await cartGroupRepository.CheckGroupAccess(groupId, email);
         if (hasAccess)
         {
@@ -19,7 +23,7 @@ public class GroupProductsAccessFilter : IEndpointFilter
         }
         else
         {
-            return TypedResults.Forbid();
+            return TypedResults.Unauthorized();
         }
     }
 }

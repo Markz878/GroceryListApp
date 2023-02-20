@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Services;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+
+namespace GroceryListHelper.Server.Services;
 
 public class ServerCartGroupsService : ICartGroupsService
 {
@@ -18,12 +20,12 @@ public class ServerCartGroupsService : ICartGroupsService
     public async Task<CartGroup?> GetCartGroup(Guid groupId)
     {
         string? userEmail = httpContextAccessor.HttpContext?.User.GetUserEmail();
-        if(string.IsNullOrWhiteSpace(userEmail))
+        if (string.IsNullOrWhiteSpace(userEmail))
         {
             return null;
         }
-        CartGroup? group = await cartGroupRepository.GetCartGroup(groupId, userEmail);
-        return group;
+        Response<CartGroup, ForbiddenException, NotFoundException> groupResponse = await cartGroupRepository.GetCartGroup(groupId, userEmail);
+        return groupResponse.Match<CartGroup?>(x => x, e => null, e => null);
     }
 
     public async Task<List<CartGroup>> GetCartGroups()

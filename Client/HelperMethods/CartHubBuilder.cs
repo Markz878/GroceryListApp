@@ -149,5 +149,4 @@ public sealed partial class CartHubClient : ICartHubClient
 
     [LoggerMessage(4, LogLevel.Information, "Item with name {name} was deleted.")]
     partial void LogItemDeleted(string name);
-
 }

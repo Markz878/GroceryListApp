@@ -26,5 +26,4 @@ public partial class Confirm
             await module.InvokeVoidAsync("showModal", modal);
         }
     }
-
 }

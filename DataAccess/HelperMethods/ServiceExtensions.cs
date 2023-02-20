@@ -24,4 +24,17 @@ public static class ServiceExtensions
         tableService.CreateTableIfNotExists(CartUserGroupDbModel.GetTableName());
         tableService.CreateTableIfNotExists(ActiveCartGroupDbModel.GetTableName());
     }
+
+    public static void DeleteDatabase(this IServiceProvider services)
+    {
+        TableServiceClient tableService = services.GetRequiredService<TableServiceClient>();
+        if (tableService.AccountName == "devstoreaccount1")
+        {
+            tableService.DeleteTable(CartProductDbModel.GetTableName());
+            tableService.DeleteTable(StoreProductDbModel.GetTableName());
+            tableService.DeleteTable(CartGroupUserDbModel.GetTableName());
+            tableService.DeleteTable(CartUserGroupDbModel.GetTableName());
+            tableService.DeleteTable(ActiveCartGroupDbModel.GetTableName());
+        }
+    }
 }

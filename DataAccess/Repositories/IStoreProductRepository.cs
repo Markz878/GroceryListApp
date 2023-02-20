@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.Shared.Models.StoreProducts;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Shared.Models.StoreProducts;
 
 namespace GroceryListHelper.DataAccess.Repositories;
 
@@ -7,5 +8,5 @@ public interface IStoreProductRepository
     Task<List<StoreProduct>> GetStoreProductsForUser(Guid userId);
     Task AddProduct(StoreProduct product, Guid userId);
     Task DeleteAll(Guid userId);
-    Task<Exception?> UpdatePrice(string productName, Guid userId, double price);
+    Task<NotFoundException?> UpdatePrice(string productName, Guid userId, double price);
 }
