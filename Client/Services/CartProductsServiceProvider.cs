@@ -63,20 +63,20 @@ public sealed class CartProductsServiceProvider : ICartProductsService
         bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
         if (isAuthenticated)
         {
-            if (navigation.Uri.Contains("group") && actingCartService is not CartProductsGroupService)
-            {
-                actingCartService = new CartProductsGroupService(httpClientFactory, navigation);
-            }
-            else if (viewModel.IsPolling && actingCartService is not CartProductsSignalRService)
+            if (viewModel.IsPolling)
             {
                 actingCartService = new CartProductsSignalRService(cartHubClient);
             }
-            else if (!viewModel.IsPolling && actingCartService is not CartProductsApiService)
+            else if (navigation.Uri.Contains("group"))
+            {
+                actingCartService = new CartProductsGroupService(httpClientFactory, navigation);
+            }
+            else if (!viewModel.IsPolling)
             {
                 actingCartService = new CartProductsApiService(httpClientFactory);
             }
         }
-        else if (actingCartService is not CartProductsLocalService)
+        else
         {
             actingCartService = new CartProductsLocalService(viewModel, localStorage);
         }

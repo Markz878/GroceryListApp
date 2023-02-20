@@ -15,10 +15,14 @@ public class ServerCartGroupsService : ICartGroupsService
         throw new NotImplementedException();
     }
 
-    public async Task<CartGroup> GetCartGroupInfo(Guid groupId)
+    public async Task<CartGroup?> GetCartGroup(Guid groupId)
     {
-        CartGroup? group = await cartGroupRepository.GetCartGroup(groupId, httpContextAccessor.HttpContext?.User.GetUserEmail()!);
-        ArgumentNullException.ThrowIfNull(group);
+        string? userEmail = httpContextAccessor.HttpContext?.User.GetUserEmail();
+        if(string.IsNullOrWhiteSpace(userEmail))
+        {
+            return null;
+        }
+        CartGroup? group = await cartGroupRepository.GetCartGroup(groupId, userEmail);
         return group;
     }
 
@@ -43,7 +47,7 @@ public class ServerCartGroupsService : ICartGroupsService
         throw new NotImplementedException();
     }
 
-    public Task UpdateCartGroup(CartGroup cartGroup)
+    public Task UpdateCartGroup(UpdateCartGroupNameRequest cartGroup)
     {
         throw new NotImplementedException();
     }

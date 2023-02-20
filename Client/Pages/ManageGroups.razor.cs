@@ -98,7 +98,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
 
     protected async void SubmitEditGroup(CartGroup group)
     {
-        await GroupsService.UpdateCartGroup(new CartGroup() { Id = group.Id, Name = group.Name, OtherUsers = group.OtherUsers });
+        await GroupsService.UpdateCartGroup(new UpdateCartGroupNameRequest() { GroupId = group.Id, Name = group.Name });
         isEditingGroup = null;
     }
 

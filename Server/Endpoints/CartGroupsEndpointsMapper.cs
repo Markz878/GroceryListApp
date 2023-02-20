@@ -47,32 +47,23 @@ public static class CartGroupsEndpointsMapper
         return TypedResults.Created($"api/cartgroups", id);
     }
 
-    public static async Task<Results<NoContent, ForbidHttpResult>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<NoContent, NotFound>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        try
-        {
-            await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
-            return TypedResults.NoContent();
-        }
-        catch (ForbiddenException)
-        {
-            return TypedResults.Forbid();
-        }
-    }
-
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(CartGroup updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
-    {
-        bool hasAccess = await cartGroupRepository.CheckGroupAccess(updatedGroup.Id, user.GetUserEmail());
-        if (hasAccess is false)
-        {
-            return TypedResults.Forbid();
-        }
-        Exception? ex = await cartGroupRepository.UpdateGroupName(updatedGroup.Id, updatedGroup.Name);
+        Exception? ex = await cartGroupRepository.DeleteCartGroup(groupId, user.GetUserEmail());
         return ex switch
         {
             NotFoundException => TypedResults.NotFound(),
-            null => TypedResults.NoContent(),
-            _ => throw new UnreachableException()
+            _ => TypedResults.NoContent()
+        };
+    }
+
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateGroup(UpdateCartGroupNameRequest updatedGroup, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    {
+        Exception? ex = await cartGroupRepository.UpdateGroupName(updatedGroup.GroupId, updatedGroup.Name, user.GetUserEmail());
+        return ex switch
+        {
+            NotFoundException => TypedResults.NotFound(),
+            _ => TypedResults.NoContent(),
         };
     }
 }

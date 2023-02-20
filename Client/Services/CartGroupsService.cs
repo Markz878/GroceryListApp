@@ -20,10 +20,9 @@ public class CartGroupsService : ICartGroupsService
     }
 
 
-    public async Task<CartGroup> GetCartGroupInfo(Guid groupId)
+    public async Task<CartGroup?> GetCartGroup(Guid groupId)
     {
         CartGroup? cartGroup = await client.GetFromJsonAsync<CartGroup>($"{uri}/{groupId}");
-        ArgumentNullException.ThrowIfNull(cartGroup);
         return cartGroup;
     }
 
@@ -39,7 +38,7 @@ public class CartGroupsService : ICartGroupsService
         return new CartGroup() { Id = Guid.Parse(id), Name = cartGroup.Name, OtherUsers = cartGroup.OtherUsers.ToHashSet() };
     }
 
-    public async Task UpdateCartGroup(CartGroup cartGroup)
+    public async Task UpdateCartGroup(UpdateCartGroupNameRequest cartGroup)
     {
         HttpResponseMessage response = await client.PutAsJsonAsync(uri, cartGroup);
         response.EnsureSuccessStatusCode();

@@ -18,7 +18,7 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
     {
         if (!ApplicationState.TryTakeFromJson(nameof(group), out group))
         {
-            group = await CartGroupsService.GetCartGroupInfo(GroupId);
+            group = await CartGroupsService.GetCartGroup(GroupId);
         }
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
     }

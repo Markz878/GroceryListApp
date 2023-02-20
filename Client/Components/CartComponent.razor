@@ -5,7 +5,7 @@
         <tr>
             <th>Reorder</th>
             <th>Collected</th>
-            <th class="product-col" @onclick="SortItems">Product @if (sortState != SortState.None)
+            <th class="product-col" @onclick="SortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")">Product @if (sortState != SortState.None)
                 {
                     <img class="sort-icon" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg") />
                 }</th>

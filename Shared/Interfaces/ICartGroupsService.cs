@@ -6,9 +6,9 @@ public interface ICartGroupsService
 {
     Task<CartGroup?> CreateCartGroup(CreateCartGroupRequest cartGroup);
     Task<List<CartGroup>> GetCartGroups();
+    Task<CartGroup?> GetCartGroup(Guid groupId);
     Task DeleteCartGroup(Guid groupId);
-    Task UpdateCartGroup(CartGroup cartGroup);
+    Task UpdateCartGroup(UpdateCartGroupNameRequest cartGroup);
     Task JoinGroup(Guid groupId);
     Task LeaveGroup(Guid groupId);
-    Task<CartGroup> GetCartGroupInfo(Guid groupId);
 }

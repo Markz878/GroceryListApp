@@ -24,12 +24,19 @@ public class CartGroupTests : BaseTest
     }
 
     [Fact]
-    public async Task GetGroupsById()
+    public async Task GetGroupById()
     {
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
         CartGroup? cartGroup = await _client.GetFromJsonAsync<CartGroup>($"{_uri}/{groupId}", _jsonOptions);
         Assert.NotNull(cartGroup);
         await groupRepository.DeleteCartGroup(groupId, TestAuthHandler.UserEmail);
+    }
+
+    [Fact]
+    public async Task GetGroupById_NotFound()
+    {
+        HttpResponseMessage response = await _client.GetAsync($"{_uri}/{Guid.NewGuid()}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
@@ -59,7 +66,7 @@ public class CartGroupTests : BaseTest
     {
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { "test1@email.com", "test2@email.com" });
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{groupId}");
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await groupRepository.DeleteCartGroup(groupId, "test1@email.com");
     }
 
@@ -68,7 +75,7 @@ public class CartGroupTests : BaseTest
     public async Task UpdateGroup()
     {
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
-        CartGroup group = new() { Id = groupId, Name = "Updated" };
+        UpdateCartGroupNameRequest group = new() { GroupId = groupId, Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, group);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         CartGroup? updatedGroup = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
@@ -78,12 +85,20 @@ public class CartGroupTests : BaseTest
     }
 
     [Fact]
-    public async Task UpdateGroup_Forbidden()
+    public async Task UpdateGroup_WheUserNotPartOfGroup_ReturnNotFound()
     {
         Guid groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { "test1@email.com", "test2@email.com" });
-        CartGroup group = new() { Id = groupId, Name = "Updated" };
+        UpdateCartGroupNameRequest group = new() { GroupId = groupId, Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, group);
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await groupRepository.DeleteCartGroup(groupId, "test1@email.com");
+    }
+
+    [Fact]
+    public async Task UpdateGroup_WhenGroupIdInvalid_ReturnNotFound()
+    {
+        UpdateCartGroupNameRequest group = new() { GroupId = Guid.NewGuid(), Name = "Updated" };
+        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, group);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

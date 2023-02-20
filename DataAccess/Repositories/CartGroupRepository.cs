@@ -44,10 +44,10 @@ public sealed class CartGroupRepository : ICartGroupRepository
         {
             return null;
         }
-        CartGroup? group = new() { Id = groupId, Name = cartGroupUsers[0].Name };
-        foreach (var member in cartGroupUsers.Where(x => x.Name != userEmail))
+        CartGroup group = new() { Id = groupId, Name = cartGroupUsers[0].Name };
+        foreach (var member in cartGroupUsers.Where(x => x.MemberEmail != userEmail))
         {
-            group.OtherUsers.Add(member.Name);
+            group.OtherUsers.Add(member.MemberEmail);
         }
         return group;
     }
@@ -57,7 +57,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
         try
         {
-            CartGroupUserDbModel group = await cartGroupUserTableClient.GetEntityAsync<CartGroupUserDbModel>(groupId.ToString(), userEmail);
+            CartGroupUserDbModel group = await cartGroupUserTableClient.GetEntityAsync<CartGroupUserDbModel>(groupId.ToString(), userEmail, Array.Empty<string>());
             return true;
         }
         catch (RequestFailedException)
@@ -70,7 +70,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
     {
         TableClient cartUserGroupTableClient = db.GetTableClient(CartUserGroupDbModel.GetTableName());
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        Guid groupId = Guid.NewGuid();
+        Guid groupId = await GetNewGroupId(cartGroupUserTableClient);
         foreach (string item in userEmails)
         {
             await cartUserGroupTableClient.AddEntityAsync(new CartUserGroupDbModel()
@@ -86,22 +86,38 @@ public sealed class CartGroupRepository : ICartGroupRepository
             });
         }
         return groupId;
+
+        static async Task<Guid> GetNewGroupId(TableClient cartGroupUserTableClient)
+        {
+            Guid groupId;
+            List<CartGroupUserDbModel> entities;
+            do
+            {
+                groupId = Guid.NewGuid();
+                entities = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
+            } while (entities.Count > 0);
+            return groupId;
+        }
     }
 
-    public async Task DeleteCartGroup(Guid groupId, string userEmail)
+
+
+    public async Task<Exception?> DeleteCartGroup(Guid groupId, string userEmail)
     {
+        bool hasAccess = await CheckGroupAccess(groupId, userEmail);
+        if (hasAccess is false)
+        {
+            return new NotFoundException("Cart group user");
+        }
         List<CartGroupUserDbModel> cartGroupUsers = await DeleteCartGroupUsers(groupId);
         await DeleteCartUserGroups(cartGroupUsers);
         await DeleteCartGroupProducts(groupId);
+        return null;
 
         async Task<List<CartGroupUserDbModel>> DeleteCartGroupUsers(Guid groupId)
         {
             TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
             List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
-            if (!cartGroupUsers.Any(x=>x.MemberEmail == userEmail))
-            {
-                throw new ForbiddenException("User is not part of the group");
-            }
             await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
             return cartGroupUsers;
         }
@@ -126,11 +142,18 @@ public sealed class CartGroupRepository : ICartGroupRepository
     public async Task UserJoinedSharing(Guid userId, Guid groupId)
     {
         TableClient activeCartGroupTableClient = db.GetTableClient(ActiveCartGroupDbModel.GetTableName());
-        await activeCartGroupTableClient.AddEntityAsync(new ActiveCartGroupDbModel()
+        try
         {
-            GroupId = groupId,
-            UserId = userId
-        });
+            await activeCartGroupTableClient.AddEntityAsync(new ActiveCartGroupDbModel()
+            {
+                GroupId = groupId,
+                UserId = userId
+            });
+        }
+        catch (RequestFailedException ex)
+        {
+        }
+
     }
 
     public async Task UserLeftSharing(Guid userId, Guid groupId)
@@ -153,14 +176,15 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return null;
     }
 
-    public async Task<Exception?> UpdateGroupName(Guid groupId, string newName)
+    public async Task<Exception?> UpdateGroupName(Guid groupId, string newName, string userEmail)
     {
+        bool hasAccess = await CheckGroupAccess(groupId, userEmail);
+        if (hasAccess is false)
+        {
+            return new NotFoundException("Cart group user");
+        }
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
         List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
-        if (cartGroupUsers.Count == 0)
-        {
-            return NotFoundException.ForType<CartGroupUserDbModel>();
-        }
         foreach (var cartGroupUser in cartGroupUsers)
         {
             cartGroupUser.Name = newName;
