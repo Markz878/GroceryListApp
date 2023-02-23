@@ -21,25 +21,14 @@ legend {
 
 
 .add-btn {
-    height: 1.5rem;
-    width: 1.5rem;
-    display: inline-block;
-    color: #fff;
-    white-space: nowrap;
     text-align: center;
     vertical-align: middle;
     border: 1px solid transparent;
-    font-size: 1rem;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.5rem;
     font-weight: bold;
-    padding-left: 0.33rem;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-
-    .add-btn:disabled {
-        color: var(--disabled-btn-color);
-        transition: none;
-    }
 
 h4 {
     margin-top: 0;
@@ -47,46 +36,20 @@ h4 {
     cursor: pointer;
 }
 
-.edit-btn {
+.edit-group-btn {
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: small;
+    margin-left: 0.2rem;
+    padding: 0;
+}
+
+.delete-group-btn {
     height: 1.5rem;
     width: 1.5rem;
     margin-left: 0.2rem;
-    color: #fff;
-    white-space: nowrap;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid transparent;
-    font-weight: bold;
-    padding-left: 0.33rem;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    padding: 0;
 }
-
-    .edit-btn:disabled {
-        color: var(--disabled-btn-color);
-        transition: none;
-    }
-
-.delete-btn {
-    height: 1.5rem;
-    width: 1.5rem;
-    margin-left: 0.2rem;
-    color: #fff;
-    white-space: nowrap;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid transparent;
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding-left: 0.33rem;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
-
-    .delete-btn:disabled {
-        color: var(--disabled-btn-color);
-        transition: none;
-    }
 
 #edit-group-name-input {
     font-size: 1rem;
@@ -143,7 +106,7 @@ h4 {
         animation: gradient 3s linear infinite;
     }*/
 
-input {
+/*input {
     background: rgba(57, 63, 84, 0.8);
     padding: 5px;
     border-radius: 5px;
@@ -166,4 +129,4 @@ input {
     input:-webkit-autofill:active {
         -webkit-transition-delay: 9999s;
         transition-delay: 9999s;
-    }
+    }*/

@@ -102,6 +102,7 @@
     background: transparent;
     border: 0;
     color: white;
+    cursor: pointer;
 }
     .profile-menu-btn:is(:hover, :active, :focus) {
         color: #ccc;

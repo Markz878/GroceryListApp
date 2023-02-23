@@ -20,6 +20,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     protected CartGroup? isEditingGroup;
     protected CartGroup? isDeletingGroup;
     protected Confirm? confirm;
+    private string oldName = "";
     private readonly EmailModelValidator emailValidator = new();
     private readonly CreateCartGroupRequestValidator cartGroupValidator = new();
     private PersistingComponentStateSubscription stateSubscription;
@@ -94,18 +95,24 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
 
     protected void EditGroup(CartGroup group)
     {
+        oldName = group.Name;
         isEditingGroup = group;
     }
 
     protected async void SubmitEditGroup(CartGroup group)
     {
-        await GroupsService.UpdateCartGroup(new UpdateCartGroupNameRequest() { GroupId = group.Id, Name = group.Name });
         isEditingGroup = null;
+        if (group.Name != oldName)
+        {
+            await GroupsService.UpdateCartGroup(new UpdateCartGroupNameRequest() { GroupId = group.Id, Name = group.Name });
+        }
+        oldName = "";
     }
 
     protected void StopEditGroup()
     {
         isEditingGroup = null;
+        oldName = "";
     }
 
     protected async Task ShowDeleteConfirm(CartGroup group)

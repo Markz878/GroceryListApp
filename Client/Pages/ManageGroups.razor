@@ -7,18 +7,22 @@
         {
             <fieldset id="add-group-form">
                 <legend>Create cart group</legend>
-                <input id="create-group-name" @bind="createCartGroupRequest.Name" maxlength="30" size="30" placeholder="Group name" />
+                <input id="create-group-name" class="form-control" @bind="createCartGroupRequest.Name" maxlength="30" size="30" placeholder="Group name" />
                 <div class="new-group-members-container">
+                    <span>Members: </span>
                     @foreach (string email in createCartGroupRequest.OtherUsers)
                     {
+
                         <div class="new-group-member-container">
                             <span>@email</span>
-                            <button class="delete-btn btn-danger" @onclick="() => RemoveNewMember(email)">&times;</button>
+                            <button class="delete-group-btn btn btn-danger" @onclick="() => RemoveNewMember(email)">&times;</button>
                         </div>
                     }
                 </div>
-                <input id="add-user-to-group" @bind="newMemberEmail.Email" size="30" placeholder="New member email" />
-                <button class="btn-success add-btn" @onclick="AddMember">+</button>
+                <div class="flex">
+                    <button class="btn-success btn add-btn" @onclick="AddMember">+</button>
+                    <input id="add-user-to-group" class="form-control" @bind="newMemberEmail.Email" size="30" placeholder="New member email" />
+                </div>
                 <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
             </fieldset>
         }
@@ -34,28 +38,25 @@
         {
             @foreach (CartGroup group in cartGroups)
             {
-                @if (isEditingGroup != group)
-                {
-                    <fieldset>
+                <fieldset>
+                    @if (isEditingGroup != group)
+                    {
                         <h4 @onclick="() => SelectCart(group.Id)">@group.Name</h4>
-                        <button class="edit-group-btn btn-success" @onclick="() => EditGroup(group)">
+                        <button class="edit-group-btn btn btn-success" @onclick="() => EditGroup(group)" disabled="@(isEditingGroup != null)">
                             <i class="fa fa-edit" aria-hidden="true" />
                         </button>
-                        <button class="delete-group-btn btn-danger" @onclick="() => ShowDeleteConfirm(group)">&times;</button>
-                        <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
-                    </fieldset>
-                }
-                else
-                {
-                    <fieldset>
-                        <input id="edit-group-name-input" @bind="group.Name" />
-                        <button class="edit-group-btn btn-success" @onclick="() => SubmitEditGroup(group)">
+                        <button class="delete-group-btn btn btn-danger" @onclick="() => ShowDeleteConfirm(group)">&times;</button>
+                    }
+                    else
+                    {
+                        <input id="edit-group-name-input" class="form-control-small" @bind="group.Name" />
+                        <button class="edit-group-btn btn btn-success" @onclick="() => SubmitEditGroup(group)">
                             <i class="fa fa-check" aria-hidden="true" />
                         </button>
-                        <button class="leave-group-btn btn-danger" @onclick="() => StopEditGroup()">&times;</button>
-                        <p class="group-members">@string.Join(", ", group.OtherUsers)</p>
-                    </fieldset>
-                }
+                        <button class="delete-group-btn btn btn-danger" @onclick="() => StopEditGroup()">&times;</button>
+                    }
+                    <p class="group-members">You, @string.Join(", ", group.OtherUsers)</p>
+                </fieldset>
             }
         }
     </div>

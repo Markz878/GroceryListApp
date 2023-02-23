@@ -10,6 +10,8 @@
     animation-name: animatetop;
     animation-duration: 0.4s;
     padding: 0;
+    max-width: 600px;
+    overflow-wrap: break-word;
 }
 
 @-webkit-keyframes animatetop {

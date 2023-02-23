@@ -33,12 +33,9 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             {
                 ViewModel.StoreProducts.Add(item);
             }
-            //isBusy = false;
         }
         else
         {
-            //isBusy = true;
-            //AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             ViewModel.CartProducts.Clear();
             foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
             {
@@ -52,15 +49,6 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
     }
-
-    //protected override void OnAfterRender(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        isBusy = false;
-    //        StateHasChanged();
-    //    }
-    //}
 
     private Task PersistData()
     {

@@ -106,6 +106,12 @@ html, body {
         margin: 0.75rem;
     }
 
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .form-control {
     display: block;
     width: 100%;
@@ -129,8 +135,26 @@ html, body {
         border: 1px solid #8B8D8F;
     }
 
+.form-control-small {
+    display: inline-block;
+    padding: .25rem .5rem;
+    line-height: 1.2;
+    color: #495057;
+    box-sizing: border-box;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+    .form-control-small:focus {
+        box-shadow: 0 0 10px 3px rgba(71, 133, 183, 0.30);
+        border: 1px solid #8B8D8F;
+    }
+
 @media (prefers-color-scheme: dark) {
-    .form-control {
+    .form-control .form-control-small {
         color: #fff;
         background-color: #222;
     }
