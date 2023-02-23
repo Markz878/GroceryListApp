@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.HelperMethods;
+using GroceryListHelper.DataAccess.Repositories;
 
 namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
@@ -6,12 +7,15 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
 {
     public required ITestOutputHelper TestOutputHelper { get; set; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         using IServiceScope scope = Server.Services.CreateScope();
         scope.ServiceProvider.DeleteDatabase();
         scope.ServiceProvider.InitDatabase();
-        return Task.CompletedTask;
+        IUserRepository userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        await userRepository.AddUser(TestAuthHandler.UserEmail, Guid.NewGuid(), null);
+        await userRepository.AddUser(TestAuthHandler.RandomEmail1, Guid.NewGuid(), null);
+        await userRepository.AddUser(TestAuthHandler.RandomEmail2, Guid.NewGuid(), null);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)

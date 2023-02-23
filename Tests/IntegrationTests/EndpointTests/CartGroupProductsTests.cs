@@ -1,4 +1,6 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Shared.Models.HelperModels;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
@@ -202,7 +204,8 @@ public class CartGroupProductsTests : BaseTest, IAsyncLifetime
     public async Task InitializeAsync()
     {
         ICartGroupRepository groupRepository = _scope.ServiceProvider.GetRequiredService<ICartGroupRepository>();
-        groupId = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, "test@email.com" });
+        Response<Guid, NotFoundException> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
+        groupId = response.Match(x => x, e => throw new InvalidOperationException("No user in database"));
         _uri += groupId;
     }
 

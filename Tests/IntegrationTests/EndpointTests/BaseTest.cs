@@ -1,4 +1,6 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Shared.Models.HelperModels;
 using GroceryListHelper.Shared.Models.StoreProducts;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 using System.Text.Json;
@@ -13,7 +15,7 @@ public abstract class BaseTest : IDisposable
     protected static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
     protected readonly IServiceScope _scope;
 
-    public BaseTest(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper)
+    protected BaseTest(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper)
     {
         _factory = factory;
         factory.TestOutputHelper = testOutputHelper;
@@ -21,7 +23,7 @@ public abstract class BaseTest : IDisposable
         _scope = _factory.Services.CreateScope();
     }
 
-    public async Task<List<CartProduct>> SaveCartProducts(int n, Guid? ownerId = null)
+    protected async Task<List<CartProduct>> SaveCartProducts(int n, Guid? ownerId = null)
     {
         ICartProductRepository db = _scope.ServiceProvider.GetRequiredService<ICartProductRepository>();
         await db.ClearCartProducts(ownerId.GetValueOrDefault(TestAuthHandler.UserId));
@@ -46,7 +48,7 @@ public abstract class BaseTest : IDisposable
         }
     }
 
-    public async Task<List<StoreProduct>> SaveStoreProducts(int n)
+    protected async Task<List<StoreProduct>> SaveStoreProducts(int n)
     {
         IStoreProductRepository db = _scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
         List<StoreProduct> result = new(n);
@@ -68,10 +70,18 @@ public abstract class BaseTest : IDisposable
         }
     }
 
-    public async Task ClearStoreProducts()
+    protected async Task ClearStoreProducts()
     {
         IStoreProductRepository db = _scope.ServiceProvider.GetRequiredService<IStoreProductRepository>();
         await db.DeleteAll(TestAuthHandler.UserId);
+    }
+
+
+    protected async Task<Guid> CreateNewGroup(bool randomUser = false)
+    {
+        ICartGroupRepository groupRepository = _scope.ServiceProvider.GetRequiredService<ICartGroupRepository>();
+        Response<Guid, NotFoundException> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { randomUser ? TestAuthHandler.RandomEmail2 : TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
+        return response.Match(x => x, e => throw e);
     }
 
     public void Dispose()

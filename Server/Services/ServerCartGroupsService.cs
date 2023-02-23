@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Server.Services;
 
@@ -12,14 +13,10 @@ public class ServerCartGroupsService : ICartGroupsService
         this.httpContextAccessor = httpContextAccessor;
         this.cartGroupRepository = cartGroupRepository;
     }
-    public Task<CartGroup?> CreateCartGroup(CreateCartGroupRequest cartGroup)
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<CartGroup?> GetCartGroup(Guid groupId)
     {
-        string? userEmail = httpContextAccessor.HttpContext?.User.GetUserEmail();
+        string? userEmail = httpContextAccessor.HttpContext?.User.GetDisplayName();
         if (string.IsNullOrWhiteSpace(userEmail))
         {
             return null;
@@ -30,7 +27,7 @@ public class ServerCartGroupsService : ICartGroupsService
 
     public async Task<List<CartGroup>> GetCartGroups()
     {
-        List<CartGroup> groups = await cartGroupRepository.GetCartGroupsForUser(httpContextAccessor.HttpContext?.User.GetUserEmail()!);
+        List<CartGroup> groups = await cartGroupRepository.GetCartGroupsForUser(httpContextAccessor.HttpContext!.User.GetUserEmail());
         return groups;
     }
 
@@ -40,6 +37,11 @@ public class ServerCartGroupsService : ICartGroupsService
     }
 
     public Task UpdateCartGroup(UpdateCartGroupNameRequest cartGroup)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Response<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
     {
         throw new NotImplementedException();
     }

@@ -1,5 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
-using GroceryListHelper.DataAccess.HelperMethods;
+using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Tests.UnitTests;
 public class ResponseModelTests

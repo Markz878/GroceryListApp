@@ -49,9 +49,13 @@ public partial class MainLayout : IDisposable
         string? name = userAuthInfo.Claims?.FirstOrDefault(x => x.Type == "name")?.Value;
         if (string.IsNullOrWhiteSpace(name))
         {
-            return null;
+            name = userAuthInfo.Claims?.FirstOrDefault(x => x.Type == "preferred_username")?.Value;
+            if (name is null)
+            {
+                return null;
+            }
         }
-        string[] names = name.Split(" ");
+        string[] names = name.ToUpper().Split(" ");
         return new string(names.Select(x => x[0]).ToArray());
     }
 

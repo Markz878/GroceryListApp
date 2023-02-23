@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Shared.Models.HelperModels;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GroceryListHelper.Server.Endpoints;
@@ -40,11 +41,13 @@ public static class CartGroupsEndpointsMapper
             e => TypedResults.Forbid(), 
             e => TypedResults.NotFound(e.Message));
     }
-    public static async Task<Results<Created<Guid>, ForbidHttpResult>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
+    public static async Task<Results<Created<Guid>, NotFound<string>>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
         request.OtherUsers.Add(user.GetUserEmail());
-        Guid id = await cartGroupRepository.CreateGroup(request.Name, request.OtherUsers);
-        return TypedResults.Created($"api/cartgroups", id);
+        Response<Guid, NotFoundException> createGroupResponse = await cartGroupRepository.CreateGroup(request.Name, request.OtherUsers);
+        return createGroupResponse.Match<Results<Created<Guid>, NotFound<string>>>(
+            x=> TypedResults.Created($"api/cartgroups", x), 
+            e=> TypedResults.NotFound(e.Message));
     }
 
     public static async Task<Results<NoContent, ForbidHttpResult, NotFound<string>>> DeleteCartGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)

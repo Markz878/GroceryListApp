@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Shared.Models.CartGroups;
+using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Client.Services;
 
@@ -26,16 +27,16 @@ public class CartGroupsService : ICartGroupsService
         return cartGroup;
     }
 
-    public async Task<CartGroup?> CreateCartGroup(CreateCartGroupRequest cartGroup)
+    public async Task<Response<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, cartGroup);
-        if (response.IsSuccessStatusCode is false)
+        string body = await response.Content.ReadAsStringAsync();
+        body = body.Trim('"');
+        if (response.StatusCode is HttpStatusCode.NotFound)
         {
-            return null;
+            return new Response<CartGroup, UserNotFoundException>(new UserNotFoundException(body[..body.IndexOf(" ")]));
         }
-        string id = await response.Content.ReadAsStringAsync();
-        id = id.Trim('"');
-        return new CartGroup() { Id = Guid.Parse(id), Name = cartGroup.Name, OtherUsers = cartGroup.OtherUsers.ToHashSet() };
+        return new CartGroup() { Id = Guid.Parse(body), Name = cartGroup.Name, OtherUsers = cartGroup.OtherUsers.ToHashSet() };
     }
 
     public async Task UpdateCartGroup(UpdateCartGroupNameRequest cartGroup)

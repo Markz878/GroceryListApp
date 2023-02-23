@@ -12,7 +12,7 @@ public static class ServiceExtensions
         services.AddScoped<ICartProductRepository, CartProductRepository>();
         services.AddScoped<IStoreProductRepository, StoreProductRepository>();
         services.AddScoped<ICartGroupRepository, CartGroupRepository>();
-
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 
     public static void InitDatabase(this IServiceProvider services)
@@ -23,6 +23,7 @@ public static class ServiceExtensions
         tableService.CreateTableIfNotExists(CartGroupUserDbModel.GetTableName());
         tableService.CreateTableIfNotExists(CartUserGroupDbModel.GetTableName());
         tableService.CreateTableIfNotExists(ActiveCartGroupDbModel.GetTableName());
+        tableService.CreateTableIfNotExists(UserDbModel.GetTableName());
     }
 
     public static void DeleteDatabase(this IServiceProvider services)
@@ -35,6 +36,7 @@ public static class ServiceExtensions
             tableService.DeleteTable(CartGroupUserDbModel.GetTableName());
             tableService.DeleteTable(CartUserGroupDbModel.GetTableName());
             tableService.DeleteTable(ActiveCartGroupDbModel.GetTableName());
+            tableService.DeleteTable(UserDbModel.GetTableName());
         }
     }
 }

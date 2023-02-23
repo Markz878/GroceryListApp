@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Shared.Models.HelperModels;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GroceryListHelper.Server.Hubs;
@@ -31,13 +32,12 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
         e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a group with given the id." }));
     }
 
-
     public async Task<HubResponse> LeaveGroup(Guid groupId)
     {
         Response<string, NotFoundException> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
         return await getGroupResponse.MatchAsync(async x =>
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());
             await userRepository.UserLeftSharing(GetUserId(), groupId);
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has left sharing.");
             return new HubResponse() { SuccessMessage = $"You left '{x}' cart sharing." };

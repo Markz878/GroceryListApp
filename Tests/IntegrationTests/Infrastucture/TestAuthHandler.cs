@@ -4,6 +4,8 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
 {
     public static Guid UserId { get; } = Guid.NewGuid();
     public const string UserEmail = "test_user@email.com";
+    public const string RandomEmail1 = "test1@email.com";
+    public const string RandomEmail2 = "test2@email.com";
     public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
         : base(options, logger, encoder, clock)

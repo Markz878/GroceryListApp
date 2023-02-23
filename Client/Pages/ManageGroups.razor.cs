@@ -1,6 +1,7 @@
 using GroceryListHelper.Client.Components;
 using GroceryListHelper.Client.Models;
 using GroceryListHelper.Shared.Models.CartGroups;
+using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Client.Pages;
 
@@ -49,16 +50,18 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
                 Modal.Message = validationResult.Errors.First().ErrorMessage;
                 return;
             }
-            CartGroup? group = await GroupsService.CreateCartGroup(createCartGroupRequest);
-            if (group is null)
+            Response<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
+            response.Match(x =>
+            {
+                cartGroups.Add(x);
+                isCreatingNewGroup = false;
+                createCartGroupRequest = new();
+            },
+            e =>
             {
                 Modal.Header = "Error";
-                Modal.Message = "Group contained an invalid email, check them again.";
-                return;
-            }
-            cartGroups.Add(group);
-            isCreatingNewGroup = false;
-            createCartGroupRequest = new();
+                Modal.Message = e.Message;
+            });
         }
         else
         {

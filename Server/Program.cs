@@ -19,6 +19,7 @@ global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.ResponseCompression;
 global using Microsoft.Extensions.Primitives;
+global using Microsoft.Identity.Web;
 global using Microsoft.Identity.Web.UI;
 global using Microsoft.OpenApi.Models;
 global using System.Diagnostics;

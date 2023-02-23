@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace GroceryListHelper.DataAccess.HelperMethods;
+namespace GroceryListHelper.Shared.Models.HelperModels;
 
 public readonly struct Response<T, E> where E : Exception
 {
@@ -32,6 +32,20 @@ public readonly struct Response<T, E> where E : Exception
         {
             ArgumentNullException.ThrowIfNull(_error);
             return handleError.Invoke(_error);
+        }
+    }
+
+    public void Match(Action<T> handleValue, Action<E> handleError)
+    {
+        if (IsSuccess)
+        {
+            ArgumentNullException.ThrowIfNull(_value);
+            handleValue.Invoke(_value);
+        }
+        else
+        {
+            ArgumentNullException.ThrowIfNull(_error);
+            handleError.Invoke(_error);
         }
     }
 

@@ -7,9 +7,17 @@
         {
             <fieldset id="add-group-form">
                 <legend>Create cart group</legend>
-                <input id="create-group-name" @bind="createCartGroupRequest.Name" placeholder="Group name" />
-                <p>@string.Join(", ", createCartGroupRequest.OtherUsers)</p>
-                <input id="add-user-to-group" @bind="newMemberEmail.Email" placeholder="New member email" />
+                <input id="create-group-name" @bind="createCartGroupRequest.Name" maxlength="30" size="30" placeholder="Group name" />
+                <div class="new-group-members-container">
+                    @foreach (string email in createCartGroupRequest.OtherUsers)
+                    {
+                        <div class="new-group-member-container">
+                            <span>@email</span>
+                            <button class="delete-btn btn-danger" @onclick="() => RemoveNewMember(email)">&times;</button>
+                        </div>
+                    }
+                </div>
+                <input id="add-user-to-group" @bind="newMemberEmail.Email" size="30" placeholder="New member email" />
                 <button class="btn-success add-btn" @onclick="AddMember">+</button>
                 <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
             </fieldset>

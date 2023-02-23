@@ -121,6 +121,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             await SaveCartProduct(product);
             await SaveStoreProduct(product);
             await NewProductNameBox.FocusAsync();
+            await SortItems();
         }
         catch (Exception ex)
         {

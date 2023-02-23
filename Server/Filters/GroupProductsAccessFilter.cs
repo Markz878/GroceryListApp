@@ -11,7 +11,7 @@ public class GroupProductsAccessFilter : IEndpointFilter
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         Guid groupId = context.GetArgument<Guid>(0);
-        string? email = context.HttpContext.User.GetUserEmail();
+        string? email = context.HttpContext.User.GetDisplayName();
         if (string.IsNullOrWhiteSpace(email))
         {
             return TypedResults.Unauthorized();
