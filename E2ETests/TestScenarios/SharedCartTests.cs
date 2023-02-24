@@ -1,4 +1,5 @@
 ﻿using E2ETests.Infrastructure;
+using GroceryListHelper.DataAccess.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Xunit;
@@ -22,6 +23,25 @@ public sealed class SharedCartTests : IAsyncLifetime
         server.CreateDefaultClient();
         server.TestOutputHelper = testOutputHelper;
         this.server = server;
+    }
+
+
+    public async Task InitializeAsync()
+    {
+        using IServiceScope scope = server.Services.CreateScope();
+        IUserRepository db = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        await db.AddUser(fakeAuth1.Email, fakeAuth1.Guid, fakeAuth1.UserName);
+        await db.AddUser(fakeAuth2.Email, fakeAuth2.Guid, fakeAuth2.UserName);
+        browserContext1 = await server.GetNewBrowserContext(fakeAuth1);
+        page1 = await browserContext1.GotoPage(server.BaseUrl, true);
+        browserContext2 = await server.GetNewBrowserContext(fakeAuth2);
+        page2 = await browserContext2.GotoPage(server.BaseUrl, true);
+        await ShareCartMethods.StartShare(page1, page2, fakeAuth1.Email, fakeAuth2.Email);
+    }
+    public async Task DisposeAsync()
+    {
+        await browserContext1.DisposeAsync();
+        await browserContext2.DisposeAsync();
     }
 
     [Fact]
@@ -71,40 +91,11 @@ public sealed class SharedCartTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task LeaveCartHostedByOther()
+    public async Task StopSharing()
     {
-        await page2.ClickAsync("#exit-cart-btn");
+        await page2.GetByRole(AriaRole.Button, new() { Name = "Stop sharing" }).ClickAsync();
         await Task.Delay(500);
-        IElementHandle? messageElement = await page1.QuerySelectorAsync($"p:has-text('{fakeAuth2.Email} has left the group.')");
+        IElementHandle? messageElement = await page1.GetByText($"{fakeAuth2.Email} has left sharing.").ElementHandleAsync();
         Assert.NotNull(messageElement);
-    }
-
-    [Fact]
-    public async Task LeaveCartSelfHosted()
-    {
-        await page1.ClickAsync("#exit-share-cart-btn");
-        await Task.Delay(500);
-        IElementHandle? messageElement = await page2.QuerySelectorAsync($"h4:has-text('Cart session ended by host {fakeAuth1.Email}.')");
-        Assert.NotNull(messageElement);
-    }
-
-    public async Task InitializeAsync()
-    {
-        using IServiceScope scope = server.Services.CreateScope();
-        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //await db.Database.EnsureCreatedAsync();
-        browserContext1 = await server.GetNewBrowserContext(fakeAuth1);
-        page1 = await browserContext1.GotoPage(server.BaseUrl, true);
-        browserContext2 = await server.GetNewBrowserContext(fakeAuth2);
-        page2 = await browserContext2.GotoPage(server.BaseUrl, true);
-        await ShareCartMethods.StartShare(page1, page2, fakeAuth1.Email, fakeAuth2.Email);
-    }
-    public async Task DisposeAsync()
-    {
-        await browserContext1.DisposeAsync();
-        await browserContext2.DisposeAsync();
-        //using IServiceScope scope = server.Services.CreateScope();
-        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //await db.Database.EnsureDeletedAsync();
     }
 }

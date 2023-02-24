@@ -19,25 +19,6 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {
         hostBuilder.UseUrls(BaseUrl);
-        hostBuilder.ConfigureServices((ctx, services) =>
-        {
-            //services.RemoveAll<DbContextOptions<GroceryStoreDbContext>>();
-            //services.AddDbContext<GroceryStoreDbContext>(options =>
-            //{
-            //    options.UseCosmos(ctx.Configuration.GetConnectionString("Cosmos") ?? throw new ArgumentNullException("CosmosDb connection string"), "E2ETestDb", x =>
-            //    {
-            //        x.HttpClientFactory(() =>
-            //        {
-            //            HttpMessageHandler httpMessageHandler = new HttpClientHandler()
-            //            {
-            //                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            //            };
-            //            return new HttpClient(httpMessageHandler);
-            //        });
-            //        x.ConnectionMode(ConnectionMode.Gateway);
-            //    });
-            //});
-        });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

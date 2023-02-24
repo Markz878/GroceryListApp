@@ -16,7 +16,7 @@
         @if (ViewModel.IsPolling)
         {
             <button class="btn btn-danger" @onclick="ExitCart">Stop sharing</button>
-            <p style="margin-left: 1rem;">@ViewModel.ShareCartInfo</p>
+            <p id="share-cart-info">@ViewModel.ShareCartInfo</p>
         }
         else
         {

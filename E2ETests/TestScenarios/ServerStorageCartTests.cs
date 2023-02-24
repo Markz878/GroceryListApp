@@ -1,5 +1,4 @@
 ﻿using E2ETests.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Xunit;
 using Xunit.Abstractions;
@@ -98,17 +97,11 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        using IServiceScope scope = server.Services.CreateScope();
-        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //await db.Database.EnsureCreatedAsync();
         browserContext = await server.GetNewBrowserContext(fakeAuth);
         page = await browserContext.GotoPage(server.BaseUrl, true);
     }
     public async Task DisposeAsync()
     {
         await browserContext.DisposeAsync();
-        //using IServiceScope scope = server.Services.CreateScope();
-        //GroceryStoreDbContext db = scope.ServiceProvider.GetRequiredService<GroceryStoreDbContext>();
-        //await db.Database.EnsureDeletedAsync();
     }
 }
