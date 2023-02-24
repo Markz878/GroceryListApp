@@ -17,7 +17,7 @@ jobs:
 
   publish:
     needs: remove-old-artifacts
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       AZURE_WEBAPP_PACKAGE_PATH: 'publish'
       AddLogging: false
@@ -33,8 +33,8 @@ jobs:
       - name: Build
         run: dotnet build Server --configuration Release
 
-      - name: Start Cosmos Db emulator
-        uses: southpolesteve/cosmos-emulator-github-action@v1
+      - name: Run Azurite in Docker
+        run: docker run -p 10002:10002 -d mcr.microsoft.com/azure-storage/azurite:3.20.1
 
       - name: Run Tests
         run: dotnet test Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"

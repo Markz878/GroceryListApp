@@ -7,7 +7,7 @@ public class HealthTests : BaseTest
     {
     }
 
-    [Fact(Skip = "CI pipeline can't perform health check")]
+    [Fact]
     public async Task PingHealth_Success()
     {
         HttpResponseMessage result = await _client.GetAsync("/health");
