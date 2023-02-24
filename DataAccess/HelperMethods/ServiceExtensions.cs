@@ -39,4 +39,17 @@ public static class ServiceExtensions
             tableService.DeleteTable(UserDbModel.GetTableName());
         }
     }
+
+    public static string[] GetTables()
+    {
+        return new[]
+        {
+            CartProductDbModel.GetTableName(),
+            StoreProductDbModel.GetTableName(),
+            CartGroupUserDbModel.GetTableName(),
+            CartUserGroupDbModel.GetTableName(),
+            ActiveCartGroupDbModel.GetTableName(),
+            UserDbModel.GetTableName()
+        };
+    }
 }

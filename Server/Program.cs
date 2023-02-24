@@ -73,7 +73,7 @@ app.MapAPIEndpoints();
 //});
 app.MapHub<CartHub>("/carthub");
 app.MapFallbackToPage("/_Host");
-//app.MapHealthChecks("/health");
+app.MapHealthChecks("/health");
 app.Run();
 
 namespace GroceryListHelper.Server

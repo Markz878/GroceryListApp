@@ -37,7 +37,7 @@ public sealed class StoreProductRepository : IStoreProductRepository
         }
     }
 
-    public async Task<NotFoundException?> UpdatePrice(string productName, Guid userId, double price)
+    public async Task<NotFound?> UpdatePrice(string productName, Guid userId, double price)
     {
         try
         {
@@ -46,7 +46,7 @@ public sealed class StoreProductRepository : IStoreProductRepository
         }
         catch (RequestFailedException ex) when (ex.Status is 404)
         {
-            return new NotFoundException("Store product");
+            return new NotFound("Store product");
         }
     }
 }

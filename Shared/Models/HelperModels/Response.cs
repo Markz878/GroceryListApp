@@ -2,7 +2,7 @@
 
 namespace GroceryListHelper.Shared.Models.HelperModels;
 
-public readonly struct Response<T, E> where E : Exception
+public readonly struct Response<T, E>
 {
     public bool IsSuccess { get; }
     private readonly T? _value;
@@ -12,14 +12,12 @@ public readonly struct Response<T, E> where E : Exception
         _value = value;
         IsSuccess = true;
     }
-    public Response(E error)
-    {
-        _error = error;
-    }
-    public static implicit operator Response<T, E>(T value)
-    {
-        return new(value);
-    }
+
+    public Response(E error) => _error = error;
+
+    public static implicit operator Response<T, E>(T value) => new(value);
+
+    public static implicit operator Response<T, E>(E value) => new(value);
 
     public U Match<U>(Func<T, U> handleValue, Func<E, U> handleError)
     {
@@ -64,30 +62,35 @@ public readonly struct Response<T, E> where E : Exception
     }
 }
 
-public readonly struct Response<T, E1, E2> where E1 : Exception where E2 : Exception
+public readonly struct Response<T, E1, E2>
 {
     public bool IsSuccess { get; }
     private readonly T? _value;
     private readonly E1? _error1;
     private readonly E2? _error2;
+    private readonly bool isError1;
+    private readonly bool isError2;
+
     public Response(T value)
     {
         _value = value;
         IsSuccess = true;
     }
-    public Response(E1 error)
-    {
-        _error1 = error;
+    public Response(E1 error) 
+    { 
+        _error1 = error; 
+        isError1 = true; 
     }
     public Response(E2 error)
     {
         _error2 = error;
+        isError2 = true;
     }
+    public static implicit operator Response<T, E1, E2>(T value) => new(value);
 
-    public static implicit operator Response<T, E1, E2>(T value)
-    {
-        return new(value);
-    }
+    public static implicit operator Response<T, E1, E2>(E1 value) => new(value);
+
+    public static implicit operator Response<T, E1, E2>(E2 value) => new(value);
 
     public U Match<U>(Func<T, U> handleValue, Func<E1, U> handleError1, Func<E2, U> handleError2)
     {
@@ -95,11 +98,11 @@ public readonly struct Response<T, E1, E2> where E1 : Exception where E2 : Excep
         {
             return handleValue.Invoke(_value);
         }
-        else if (_error1 is not null)
+        else if (isError1 && _error1 is not null)
         {
             return handleError1.Invoke(_error1);
         }
-        else if (_error2 is not null)
+        else if (isError2 && _error2 is not null)
         {
             return handleError2.Invoke(_error2);
         }
@@ -108,16 +111,15 @@ public readonly struct Response<T, E1, E2> where E1 : Exception where E2 : Excep
 
     public Task<U> MatchAsync<U>(Func<T, Task<U>> handleValue, Func<E1, Task<U>> handleError1, Func<E2, Task<U>> handleError2)
     {
-        if (IsSuccess)
+        if (IsSuccess && _value is not null)
         {
-            ArgumentNullException.ThrowIfNull(_value);
             return handleValue.Invoke(_value);
         }
-        else if (_error1 is not null)
+        else if (isError1 && _error1 is not null)
         {
             return handleError1.Invoke(_error1);
         }
-        else if (_error2 is not null)
+        else if (isError2 && _error2 is not null)
         {
             return handleError2.Invoke(_error2);
         }

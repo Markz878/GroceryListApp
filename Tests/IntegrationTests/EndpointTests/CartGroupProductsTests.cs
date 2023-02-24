@@ -204,7 +204,7 @@ public class CartGroupProductsTests : BaseTest, IAsyncLifetime
     public async Task InitializeAsync()
     {
         ICartGroupRepository groupRepository = _scope.ServiceProvider.GetRequiredService<ICartGroupRepository>();
-        Response<Guid, NotFoundException> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
+        Response<Guid, NotFound> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
         groupId = response.Match(x => x, e => throw new InvalidOperationException("No user in database"));
         _uri += groupId;
     }

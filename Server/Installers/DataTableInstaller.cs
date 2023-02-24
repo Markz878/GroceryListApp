@@ -9,7 +9,7 @@ public class DataTableInstaller : IInstaller
         if (!builder.Environment.IsDevelopment())
         {
             ManagedIdentityCredential credential = new();
-            builder.Services.AddSingleton(new TableServiceClient(new Uri($"{builder.Configuration["ImageStorageSettings:ImageStorageUri"] ?? throw new ArgumentNullException("ImageStorageUri configuration value")}"), credential));
+            builder.Services.AddSingleton(new TableServiceClient(new Uri($"{builder.Configuration["TableStorageUri"] ?? throw new ArgumentNullException("TableStorageUri configuration value")}"), credential));
         }
         else
         {

@@ -34,7 +34,7 @@ public class CartGroupsService : ICartGroupsService
         body = body.Trim('"');
         if (response.StatusCode is HttpStatusCode.NotFound)
         {
-            return new Response<CartGroup, UserNotFoundException>(new UserNotFoundException(body[..body.IndexOf(" ")]));
+            return new UserNotFoundException(body[..body.IndexOf(" ")]);
         }
         return new CartGroup() { Id = Guid.Parse(body), Name = cartGroup.Name, OtherUsers = cartGroup.OtherUsers.ToHashSet() };
     }

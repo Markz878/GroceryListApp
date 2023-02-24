@@ -55,7 +55,7 @@ public partial class MainLayout : IDisposable
                 return null;
             }
         }
-        string[] names = name.ToUpper().Split(" ");
+        string[] names = name.ToUpper().Split(" ", 2, StringSplitOptions.TrimEntries);
         return new string(names.Select(x => x[0]).ToArray());
     }
 

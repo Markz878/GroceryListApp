@@ -44,13 +44,13 @@ public sealed class CartProductRepository : ICartProductRepository
         }
     }
 
-    public async Task<NotFoundException?> DeleteProduct(string productName, Guid ownerId)
+    public async Task<NotFound?> DeleteProduct(string productName, Guid ownerId)
     {
         Response response = await db.DeleteEntityAsync(ownerId.ToString(), productName);
-        return response.Status == 404 ? NotFoundException.ForType<CartProduct>() : null;
+        return response.Status == 404 ? new NotFound("Cart product") : null;
     }
 
-    public async Task<NotFoundException?> UpdateProduct(Guid ownerId, CartProductCollectable updatedProduct)
+    public async Task<NotFound?> UpdateProduct(Guid ownerId, CartProductCollectable updatedProduct)
     {
         CartProductDbModel dbProduct = new()
         {
@@ -68,7 +68,7 @@ public sealed class CartProductRepository : ICartProductRepository
         }
         catch (RequestFailedException ex) when (ex.Status is 404)
         {
-            return NotFoundException.ForType<CartProduct>();
+            return new NotFound("Cart product");
         }
     }
 

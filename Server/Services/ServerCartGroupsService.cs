@@ -21,7 +21,7 @@ public class ServerCartGroupsService : ICartGroupsService
         {
             return null;
         }
-        Response<CartGroup, ForbiddenException, NotFoundException> groupResponse = await cartGroupRepository.GetCartGroup(groupId, userEmail);
+        Response<CartGroup, Forbidden, NotFound> groupResponse = await cartGroupRepository.GetCartGroup(groupId, userEmail);
         return groupResponse.Match<CartGroup?>(x => x, e => null, e => null);
     }
 

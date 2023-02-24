@@ -34,7 +34,7 @@ public static class StoreProductsEndpointsMapper
 
     public static async Task<Results<NoContent, NotFound<string>, ForbidHttpResult>> UpdateProduct(StoreProduct updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        NotFoundException? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Name, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Message);
+        DataAccess.Exceptions.NotFound? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Name, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Value.Message);
     }
 }
