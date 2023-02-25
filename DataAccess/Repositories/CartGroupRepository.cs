@@ -39,16 +39,16 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return result;
     }
 
-    public async Task<Response<CartGroup, Forbidden, NotFound>> GetCartGroup(Guid groupId, string userEmail)
+    public async Task<Response<CartGroup, ForbiddenError, NotFoundError>> GetCartGroup(Guid groupId, string userEmail)
     {
         List<CartGroupUserDbModel> cartGroupUsers = await db.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
         if (cartGroupUsers.Count == 0)
         {
-            return new NotFound("Cart group");
+            return new NotFoundError();
         }
         if (!cartGroupUsers.Any(x => x.MemberEmail == userEmail))
         {
-            return new Forbidden();
+            return new ForbiddenError();
         }
         CartGroup group = new() { Id = groupId, Name = cartGroupUsers[0].Name };
         foreach (CartGroupUserDbModel? member in cartGroupUsers.Where(x => x.MemberEmail != userEmail))
@@ -58,7 +58,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return group;
     }
 
-    public async Task<Response<string, NotFound>> GetCartGroupName(Guid groupId, string userEmail)
+    public async Task<Response<string, NotFoundError>> GetCartGroupName(Guid groupId, string userEmail)
     {
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
         NullableResponse<CartGroupUserDbModel> groupName = await cartGroupUserTableClient.GetEntityIfExistsAsync<CartGroupUserDbModel>(groupId.ToString(), userEmail, new[] { "Name" });
@@ -68,7 +68,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         }
         else
         {
-            return new NotFound("Cart group");
+            return new NotFoundError();
         }
     }
 
@@ -79,13 +79,13 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return group.HasValue;
     }
 
-    public async Task<Response<Guid, NotFound>> CreateGroup(string name, HashSet<string> userEmails)
+    public async Task<Response<Guid, NotFoundError>> CreateGroup(string name, HashSet<string> userEmails)
     {
         foreach (string email in userEmails)
         {
             if (await userRepository.CheckIfUserExists(email) is false)
             {
-                return new NotFound(email);
+                return new NotFoundError(email);
             }
         }
 
@@ -123,12 +123,12 @@ public sealed class CartGroupRepository : ICartGroupRepository
 
 
 
-    public async Task<NotFound?> DeleteCartGroup(Guid groupId, string userEmail)
+    public async Task<NotFoundError?> DeleteCartGroup(Guid groupId, string userEmail)
     {
         bool hasAccess = await CheckGroupAccess(groupId, userEmail);
         if (hasAccess is false)
         {
-            return new NotFound("Cart group user");
+            return new NotFoundError();
         }
         List<CartGroupUserDbModel> cartGroupUsers = await DeleteCartGroupUsers(groupId);
         await DeleteCartUserGroups(cartGroupUsers);
@@ -191,12 +191,12 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return firstFound ? asyncEnumerator.Current.GroupId : null;
     }
 
-    public async Task<NotFound?> UpdateGroupName(Guid groupId, string newName, string userEmail)
+    public async Task<NotFoundError?> UpdateGroupName(Guid groupId, string newName, string userEmail)
     {
         bool hasAccess = await CheckGroupAccess(groupId, userEmail);
         if (hasAccess is false)
         {
-            return new NotFound("Cart group user");
+            return new NotFoundError();
         }
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
         List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());

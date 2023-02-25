@@ -21,13 +21,16 @@ legend {
 
 
 .add-btn {
+    height: 1.8rem;
+    width: 1.8rem;
     text-align: center;
     vertical-align: middle;
     border: 1px solid transparent;
-    margin-right: 1rem;
+    margin-right: 0.5rem;
     font-size: 1.5rem;
     line-height: 1.5rem;
     font-weight: bold;
+    padding: 0;
 }
 
 h4 {
@@ -83,50 +86,3 @@ h4 {
         background-position: 100% 0
     }
 }
-
-/*.input-container {
-    border-radius: 2px;
-    padding: 1.4rem 2rem 1.6rem;
-    background: rgba(57, 63, 84, 0.8);
-}
-
-    .input-container:after {
-        content: "";
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        z-index: 999;
-        height: 2px;
-        border-bottom-left-radius: 2px;
-        border-bottom-right-radius: 2px;
-        background-position: 0% 0%;
-        background: linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6);
-        background-size: 500% auto;
-        animation: gradient 3s linear infinite;
-    }*/
-
-/*input {
-    background: rgba(57, 63, 84, 0.8);
-    padding: 5px;
-    border-radius: 5px;
-    color: whitesmoke;
-    font-size: 1.1rem;
-    vertical-align: middle;
-    border: 2px solid;
-    border-image-slice: 1;
-    border-radius: 5px;
-    border-left: 0;
-    border-right: 0;
-    border-top: 0;
-    border-image-source: linear-gradient(to left, #00C853, #B2FF59);
-    animation: gradient 3s linear infinite;
-}
-
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:active {
-        -webkit-transition-delay: 9999s;
-        transition-delay: 9999s;
-    }*/

@@ -50,13 +50,13 @@ public static class CartGroupProductsEndpointsMapper
 
     public static async Task<Results<NoContent, Microsoft.AspNetCore.Http.HttpResults.NotFound, ForbidHttpResult>> DeleteProduct(Guid groupId, string productName, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFound? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
+        DataAccess.Exceptions.NotFoundError? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<Results<NoContent, Microsoft.AspNetCore.Http.HttpResults.NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFound? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
+        DataAccess.Exceptions.NotFoundError? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 

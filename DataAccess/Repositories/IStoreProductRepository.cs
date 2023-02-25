@@ -8,5 +8,5 @@ public interface IStoreProductRepository
     Task<List<StoreProduct>> GetStoreProductsForUser(Guid userId);
     Task AddProduct(StoreProduct product, Guid userId);
     Task DeleteAll(Guid userId);
-    Task<NotFound?> UpdatePrice(string productName, Guid userId, double price);
+    Task<NotFoundError?> UpdatePrice(string productName, Guid userId, double price);
 }

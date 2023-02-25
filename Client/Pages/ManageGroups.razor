@@ -12,7 +12,6 @@
                     <span>Members: </span>
                     @foreach (string email in createCartGroupRequest.OtherUsers)
                     {
-
                         <div class="new-group-member-container">
                             <span>@email</span>
                             <button class="delete-group-btn btn btn-danger" @onclick="() => RemoveNewMember(email)">&times;</button>

@@ -46,16 +46,16 @@ public static class CartProductsEndpointsMapper
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, NotFound<string>, ForbidHttpResult>> DeleteProduct(string productName, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(string productName, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFound? ex = await cartProductsRepository.DeleteProduct(productName, user.GetUserId().GetValueOrDefault());
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Value.Message);
+        NotFoundError? ex = await cartProductsRepository.DeleteProduct(productName, user.GetUserId().GetValueOrDefault());
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, NotFound<string>, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFound? ex = await cartProductsRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Value.Message);
+        NotFoundError? ex = await cartProductsRepository.UpdateProduct(user.GetUserId().GetValueOrDefault(), updatedProduct);
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<NoContent> SortCartProducts(ListSortDirection sortDirection, ClaimsPrincipal user, ICartProductRepository cartProductsRepository)

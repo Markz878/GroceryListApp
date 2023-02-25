@@ -32,9 +32,9 @@ public static class StoreProductsEndpointsMapper
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, NotFound<string>, ForbidHttpResult>> UpdateProduct(StoreProduct updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(StoreProduct updatedProduct, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        DataAccess.Exceptions.NotFound? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Name, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound(ex.Value.Message);
+        NotFoundError? ex = await storeProductsRepository.UpdatePrice(updatedProduct.Name, user.GetUserId().GetValueOrDefault(), updatedProduct.UnitPrice);
+        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }

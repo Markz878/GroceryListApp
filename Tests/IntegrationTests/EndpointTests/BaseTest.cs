@@ -80,7 +80,7 @@ public abstract class BaseTest : IDisposable
     protected async Task<Guid> CreateNewGroup(bool randomUser = false)
     {
         ICartGroupRepository groupRepository = _scope.ServiceProvider.GetRequiredService<ICartGroupRepository>();
-        Response<Guid, NotFound> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { randomUser ? TestAuthHandler.RandomEmail2 : TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
+        Response<Guid, NotFoundError> response = await groupRepository.CreateGroup(Guid.NewGuid().ToString().Replace("-", ""), new HashSet<string>() { randomUser ? TestAuthHandler.RandomEmail2 : TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1 });
         return response.Match(x => x, e => throw new Exception());
     }
 
