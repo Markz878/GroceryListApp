@@ -9,10 +9,9 @@ public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseVie
         ViewModel.StateChanged += PropertyChanged;
     }
 
-    private Task PropertyChanged()
+    private async Task PropertyChanged()
     {
-        StateHasChanged();
-        return Task.CompletedTask;
+        await InvokeAsync(StateHasChanged);
     }
 
     public virtual void Dispose()

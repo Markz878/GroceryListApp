@@ -2,9 +2,9 @@ namespace GroceryListHelper.Client.Components;
 
 public abstract class CartSummaryRowComponentBase : BasePage<MainViewModel>
 {
-    [Inject] public ICartProductsService CartProductsService { get; set; } = default!;
-    [Inject] public IStoreProductsService StoreProductsService { get; set; } = default!;
-    public bool AllCollected => ViewModel.CartProducts.All(x => x.IsCollected);
+    [Inject] public required ICartProductsService CartProductsService { get; set; }
+    [Inject] public required IStoreProductsService StoreProductsService { get; set; }
+    public bool AllCollected => ViewModel.CartProducts.Count > 0 && ViewModel.CartProducts.All(x => x.IsCollected);
     public double Total => ViewModel.CartProducts.Sum(x => x.Total);
 
     public Task ClearCartProducts()

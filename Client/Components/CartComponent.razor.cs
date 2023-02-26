@@ -57,12 +57,14 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         return Task.CompletedTask;
     }
 
-    protected async Task SortItems()
+    protected async Task ChangeSortDirectionAndSortItems()
     {
-        if (ViewModel.IsPolling)
-        {
-            return;
-        }
+        ChangeSortDirection();
+        await SortItems();
+    }
+
+    private void ChangeSortDirection()
+    {
         sortState = sortState switch
         {
             SortState.None => SortState.Ascending,
@@ -70,6 +72,14 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             SortState.Descending => SortState.Ascending,
             _ => throw new UnreachableException()
         };
+    }
+
+    protected async Task SortItems()
+    {
+        if (ViewModel.IsPolling)
+        {
+            return;
+        }
         int order = 1000;
         if (sortState == SortState.Ascending)
         {

@@ -5,10 +5,12 @@
         <tr>
             <th>Reorder</th>
             <th>Collected</th>
-            <th class="product-col" @onclick="SortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")">Product @if (sortState != SortState.None)
+            <th class="product-col" @onclick="ChangeSortDirectionAndSortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")">
+                Product @if (sortState != SortState.None)
                 {
                     <img class="sort-icon" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg") />
-                }</th>
+                }
+            </th>
             <th class="number-col">Amount</th>
             <th class="number-col">Price</th>
             <th>Total</th>
@@ -43,7 +45,7 @@
                     <td><input id="item-collected-checkbox-@index" type="checkbox" class="checkbox" checked="@item.IsCollected" @onchange=@((e)=>MarkItemCollected(e, item)) /></td>
                     <td id="item-name-@index" style="text-decoration: @(item.IsCollected ? "line-through" : "none")" aria-label="Product name">@item.Name</td>
                     <td id="item-amount-@index" aria-label="Amount">@item.Amount</td>
-                    <td id="item-unitprice-@index" aria-label="Unit price">@item.UnitPrice</td>
+                    <td id="item-unitprice-@index" aria-label="Unit price">@item.UnitPrice.ToString("N2")</td>
                     <td id="item-totalprice-@index" aria-label="Total price">@item.Total.ToString("N2")</td>
                     <td><button id="edit-product-button-@index" class="btn btn-success" @onclick="()=>StartEditItem(item)" aria-label="Edit product" disabled=@item.IsCollected><i class="fas fa-edit"></i></button></td>
                     <td><button id="delete-product-button-@index" class="btn btn-danger" @onclick="()=>RemoveProduct(item)" aria-label="Delete product" disabled=@item.IsCollected>X</button></td>
