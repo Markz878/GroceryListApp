@@ -5,14 +5,15 @@ public sealed class StoreProductsServiceProvider : IStoreProductsService
     private readonly IHttpClientFactory httpClientFactory;
     private readonly ILocalStorageService localStorage;
     private readonly AuthenticationStateProvider authenticationStateProvider;
-    private bool isAuthenticated;
+    private readonly MainViewModel mainViewModel;
     private IStoreProductsService? actingStoreService;
 
-    public StoreProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider)
+    public StoreProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, MainViewModel mainViewModel)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;
         this.authenticationStateProvider = authenticationStateProvider;
+        this.mainViewModel = mainViewModel;
     }
 
     public async Task ClearStoreProducts()
@@ -43,8 +44,8 @@ public sealed class StoreProductsServiceProvider : IStoreProductsService
     {
         if (actingStoreService is null)
         {
-            isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
-            actingStoreService = isAuthenticated ? new StoreProductsAPIService(httpClientFactory) : new StoreProductsLocalService(localStorage);
+            bool isAuthenticated = await authenticationStateProvider.IsUserAuthenticated();
+            actingStoreService = isAuthenticated ? new StoreProductsAPIService(httpClientFactory) : new StoreProductsLocalService(localStorage, mainViewModel);
         }
         return actingStoreService;
     }
