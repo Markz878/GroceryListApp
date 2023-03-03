@@ -39,7 +39,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return result;
     }
 
-    public async Task<Response<CartGroup, ForbiddenError, NotFoundError>> GetCartGroup(Guid groupId, string userEmail)
+    public async Task<Result<CartGroup, ForbiddenError, NotFoundError>> GetCartGroup(Guid groupId, string userEmail)
     {
         List<CartGroupUserDbModel> cartGroupUsers = await db.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
         if (cartGroupUsers.Count == 0)
@@ -58,7 +58,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return group;
     }
 
-    public async Task<Response<string, NotFoundError>> GetCartGroupName(Guid groupId, string userEmail)
+    public async Task<Result<string, NotFoundError>> GetCartGroupName(Guid groupId, string userEmail)
     {
         TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
         NullableResponse<CartGroupUserDbModel> groupName = await cartGroupUserTableClient.GetEntityIfExistsAsync<CartGroupUserDbModel>(groupId.ToString(), userEmail, new[] { "Name" });
@@ -79,7 +79,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         return group.HasValue;
     }
 
-    public async Task<Response<Guid, NotFoundError>> CreateGroup(string name, HashSet<string> userEmails)
+    public async Task<Result<Guid, NotFoundError>> CreateGroup(string name, HashSet<string> userEmails)
     {
         foreach (string email in userEmails)
         {

@@ -78,7 +78,7 @@ public class CartGroupTests : BaseTest
         Guid groupId = await CreateNewGroup();
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{groupId}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        Response<CartGroup, ForbiddenError, NotFoundError> groupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
+        Result<CartGroup, ForbiddenError, NotFoundError> groupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
         Assert.False(groupResponse.IsSuccess);
     }
 
@@ -99,7 +99,7 @@ public class CartGroupTests : BaseTest
         UpdateCartGroupNameRequest group = new() { GroupId = groupId, Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, group);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        Response<CartGroup, ForbiddenError, NotFoundError> updatedGroupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
+        Result<CartGroup, ForbiddenError, NotFoundError> updatedGroupResponse = await groupRepository.GetCartGroup(groupId, TestAuthHandler.UserEmail);
         CartGroup? updatedGroup = updatedGroupResponse.Match<CartGroup?>(x => x, e => null, e => null);
         Assert.NotNull(updatedGroup);
         Assert.Equal(group.Name, updatedGroup.Name);

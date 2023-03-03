@@ -35,7 +35,7 @@ public static class CartGroupsEndpointsMapper
 
     public static async Task<Results<Ok<CartGroup>, ForbidHttpResult, NotFound>> GetGroup(Guid groupId, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
-        Response<CartGroup, ForbiddenError, NotFoundError> cartGroupResponse = await cartGroupRepository.GetCartGroup(groupId, user.GetUserEmail());
+        Result<CartGroup, ForbiddenError, NotFoundError> cartGroupResponse = await cartGroupRepository.GetCartGroup(groupId, user.GetUserEmail());
         return cartGroupResponse.Match<Results<Ok<CartGroup>, ForbidHttpResult, NotFound>>(
             x => TypedResults.Ok(x), 
             e => TypedResults.Forbid(), 
@@ -44,7 +44,7 @@ public static class CartGroupsEndpointsMapper
     public static async Task<Results<Created<Guid>, NotFound<string>>> CreateGroup(CreateCartGroupRequest request, ClaimsPrincipal user, ICartGroupRepository cartGroupRepository)
     {
         request.OtherUsers.Add(user.GetUserEmail());
-        Response<Guid, NotFoundError> createGroupResponse = await cartGroupRepository.CreateGroup(request.Name, request.OtherUsers);
+        Result<Guid, NotFoundError> createGroupResponse = await cartGroupRepository.CreateGroup(request.Name, request.OtherUsers);
         return createGroupResponse.Match<Results<Created<Guid>, NotFound<string>>>(
             x=> TypedResults.Created($"api/cartgroups", x), 
             e=> TypedResults.NotFound(e.Message));

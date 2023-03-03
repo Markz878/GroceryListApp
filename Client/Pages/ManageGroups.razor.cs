@@ -51,7 +51,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
                 Modal.Message = validationResult.Errors.First().ErrorMessage;
                 return;
             }
-            Response<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
+            Result<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
             response.Match(x =>
             {
                 cartGroups.Add(x);

@@ -7,10 +7,10 @@ namespace GroceryListHelper.DataAccess.Repositories;
 public interface ICartGroupRepository
 {
     Task<List<CartGroup>> GetCartGroupsForUser(string userEmail);
-    Task<Response<CartGroup, ForbiddenError, NotFoundError>> GetCartGroup(Guid groupId, string userEmail);
+    Task<Result<CartGroup, ForbiddenError, NotFoundError>> GetCartGroup(Guid groupId, string userEmail);
     Task<bool> CheckGroupAccess(Guid groupId, string userEmail);
-    Task<Response<Guid, NotFoundError>> CreateGroup(string name, HashSet<string> userEmails);
-    Task<Response<string, NotFoundError>> GetCartGroupName(Guid groupId, string userEmail);
+    Task<Result<Guid, NotFoundError>> CreateGroup(string name, HashSet<string> userEmails);
+    Task<Result<string, NotFoundError>> GetCartGroupName(Guid groupId, string userEmail);
     Task<NotFoundError?> DeleteCartGroup(Guid groupId, string userEmail);
     Task UserJoinedSharing(Guid userId, Guid groupId);
     Task UserLeftSharing(Guid userId, Guid groupId);

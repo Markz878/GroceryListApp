@@ -21,7 +21,7 @@ public class ServerCartGroupsService : ICartGroupsService
         {
             return null;
         }
-        Response<CartGroup, ForbiddenError, NotFoundError> groupResponse = await cartGroupRepository.GetCartGroup(groupId, userEmail);
+        Result<CartGroup, ForbiddenError, NotFoundError> groupResponse = await cartGroupRepository.GetCartGroup(groupId, userEmail);
         return groupResponse.Match<CartGroup?>(x => x, e => null, e => null);
     }
 
@@ -41,7 +41,7 @@ public class ServerCartGroupsService : ICartGroupsService
         throw new NotImplementedException();
     }
 
-    public Task<Response<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
+    public Task<Result<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
     {
         throw new NotImplementedException();
     }

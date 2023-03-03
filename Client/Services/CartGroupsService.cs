@@ -27,7 +27,7 @@ public class CartGroupsService : ICartGroupsService
         return cartGroup;
     }
 
-    public async Task<Response<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
+    public async Task<Result<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, cartGroup);
         string body = await response.Content.ReadAsStringAsync();

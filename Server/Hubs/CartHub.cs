@@ -20,7 +20,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
 
     public async Task<HubResponse> JoinGroup(Guid groupId)
     {
-        Response<string, NotFoundError> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
+        Result<string, NotFoundError> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
         return await getGroupResponse.MatchAsync(async x =>
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
@@ -34,7 +34,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
 
     public async Task<HubResponse> LeaveGroup(Guid groupId)
     {
-        Response<string, NotFoundError> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
+        Result<string, NotFoundError> getGroupResponse = await userRepository.GetCartGroupName(groupId, GetUserEmail());
         return await getGroupResponse.MatchAsync(async x =>
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());

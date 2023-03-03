@@ -5,7 +5,7 @@ namespace GroceryListHelper.Shared.Interfaces;
 
 public interface ICartGroupsService
 {
-    Task<Response<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup);
+    Task<Result<CartGroup, UserNotFoundException>> CreateCartGroup(CreateCartGroupRequest cartGroup);
     Task<List<CartGroup>> GetCartGroups();
     Task<CartGroup?> GetCartGroup(Guid groupId);
     Task DeleteCartGroup(Guid groupId);

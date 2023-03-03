@@ -2,17 +2,19 @@
     min-width: 150px;
 }
 
-.sort-button {
-    padding: 0;
-    height: 2rem;
-    width: 2rem;
-}
-
 .sort-icon {
     position: absolute;
     height: 0.8rem;
     padding-top: 4px;
     margin-left: 1rem;
+}
+
+tr {
+    height: 3.5rem;
+}
+
+input {
+    margin: 0;
 }
 
 .number-col {

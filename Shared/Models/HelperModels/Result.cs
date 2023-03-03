@@ -2,22 +2,22 @@
 
 namespace GroceryListHelper.Shared.Models.HelperModels;
 
-public readonly struct Response<T, E>
+public readonly struct Result<T, E>
 {
     public bool IsSuccess { get; }
     private readonly T? _value;
     private readonly E? _error;
-    public Response(T value)
+    public Result(T value)
     {
         _value = value;
         IsSuccess = true;
     }
 
-    public Response(E error) => _error = error;
+    public Result(E error) => _error = error;
 
-    public static implicit operator Response<T, E>(T value) => new(value);
+    public static implicit operator Result<T, E>(T value) => new(value);
 
-    public static implicit operator Response<T, E>(E value) => new(value);
+    public static implicit operator Result<T, E>(E value) => new(value);
 
     public U Match<U>(Func<T, U> handleValue, Func<E, U> handleError)
     {
@@ -62,7 +62,7 @@ public readonly struct Response<T, E>
     }
 }
 
-public readonly struct Response<T, E1, E2>
+public readonly struct Result<T, E1, E2>
 {
     public bool IsSuccess { get; }
     private readonly T? _value;
@@ -71,26 +71,26 @@ public readonly struct Response<T, E1, E2>
     private readonly bool isError1;
     private readonly bool isError2;
 
-    public Response(T value)
+    public Result(T value)
     {
         _value = value;
         IsSuccess = true;
     }
-    public Response(E1 error) 
+    public Result(E1 error) 
     { 
         _error1 = error; 
         isError1 = true; 
     }
-    public Response(E2 error)
+    public Result(E2 error)
     {
         _error2 = error;
         isError2 = true;
     }
-    public static implicit operator Response<T, E1, E2>(T value) => new(value);
+    public static implicit operator Result<T, E1, E2>(T value) => new(value);
 
-    public static implicit operator Response<T, E1, E2>(E1 value) => new(value);
+    public static implicit operator Result<T, E1, E2>(E1 value) => new(value);
 
-    public static implicit operator Response<T, E1, E2>(E2 value) => new(value);
+    public static implicit operator Result<T, E1, E2>(E2 value) => new(value);
 
     public U Match<U>(Func<T, U> handleValue, Func<E1, U> handleError1, Func<E2, U> handleError2)
     {

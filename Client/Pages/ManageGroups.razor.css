@@ -72,9 +72,13 @@ h4 {
     display: inline-block;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
-    padding: 5px 4px 8px 4px;
+    padding: 5px 4px 5px 4px;
     border: 1px solid white;
     border-radius: 5px;
+}
+
+.new-member-email {
+    vertical-align: middle;
 }
 
 @keyframes gradient {

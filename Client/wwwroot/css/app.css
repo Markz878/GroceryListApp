@@ -67,6 +67,12 @@ html, body {
         transition: none;
     }
 
+.btn-medium {
+    padding: 0;
+    height: 2rem;
+    width: 2rem;
+}
+
 .btn-primary {
     background-color: #007bff;
 }
