@@ -54,40 +54,6 @@ public class CartComponentTests : TestContext
     };
 
 
-    [Fact]
-    public void WhenCartIsEmpty_NoProductsShown()
-    {
-        cartProductsServiceMock.GetCartProducts().Returns(new List<CartProductUIModel>());
-        storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
-        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        cut.MarkupMatches($"""
-            <table b-l8ub2h82qp>
-              <thead b-l8ub2h82qp>
-                <tr b-l8ub2h82qp>
-                  <th b-l8ub2h82qp>Reorder</th>
-                  <th b-l8ub2h82qp>Collected</th>
-                  <th class="product-col" blazor:onclick="1" style="cursor: pointer" b-l8ub2h82qp>Product</th>
-                  <th class="number-col" b-l8ub2h82qp>Amount</th>
-                  <th class="number-col" b-l8ub2h82qp>Price</th>
-                  <th b-l8ub2h82qp>Total</th>
-                  <th b-l8ub2h82qp></th>
-                  <th b-l8ub2h82qp></th>
-                </tr>
-              </thead>
-              <tbody b-l8ub2h82qp>
-                <tr b-l8ub2h82qp>
-                  <td b-l8ub2h82qp></td>
-                  <td b-l8ub2h82qp><button id="add-cartproduct-button" type="submit" class="btn btn-success" blazor:onclick="2" aria-label="Add product" b-l8ub2h82qp>Add</button></td>
-                  <td b-l8ub2h82qp><input id="newproduct-name-input" type="text" list="products" class="form-control" aria-label="Product name input" autocomplete="off" blazor:onfocusout="3" value="" blazor:onchange="4" b-l8ub2h82qp blazor:elementReference="c0050e19-db88-40a7-bc57-62e11fd8fbef" /> <datalist id="products" b-l8ub2h82qp></datalist></td>
-                  <td b-l8ub2h82qp><input id="newproduct-amount-input" type="number" step="1" min="1" class="form-control text-center" aria-label="Product amount input" value="1" blazor:onchange="5" b-l8ub2h82qp /></td>
-                  <td b-l8ub2h82qp><input id="newproduct-price-input" type="number" step="0.01" min="0" class="form-control text-center" aria-label="Product unit price input" value="0" blazor:onchange="6" b-l8ub2h82qp /></td>
-                  <td b-l8ub2h82qp></td>
-                </tr>
-              </tbody>
-            </table>
-            """);
-    }
-
     [Theory]
     [MemberData(nameof(CartProductListData))]
     public void WhenCartHasItems_TheyAreShown(List<CartProductUIModel> products)

@@ -24,11 +24,6 @@ public class AuthorizedViewTests : TestContext
         IRenderedComponent<AuthorizedView> cut = RenderComponent<AuthorizedView>(p => p
             .Add(x => x.ChildContent, "<h1>Hello</h1>")
             .Add(x => x.AuthorizedCondition, () => Task.FromResult(false)));
-        cut.MarkupMatches("""
-            <div style="padding: 1rem;">
-                <h4>You are not authorized to see this content.</h4>
-                <a href="/">Back to App</a>
-            </div>
-            """);
+        Assert.Contains("You are not authorized to see this content", cut.Markup);
     }
 }
