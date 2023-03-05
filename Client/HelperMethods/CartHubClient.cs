@@ -1,39 +1,36 @@
-﻿namespace GroceryListHelper.Client.HelperMethods;
+﻿using Microsoft.AspNetCore.Http.Connections.Client;
 
-public sealed partial class CartHubClient : ICartHubClient
+namespace GroceryListHelper.Client.HelperMethods;
+
+public sealed class CartHubClient : ICartHubClient
 {
-    private readonly NavigationManager navigation;
     private readonly MainViewModel indexViewModel;
     private readonly ModalViewModel modalViewModel;
-    private readonly ILogger<CartHubClient> logger;
     private readonly HubConnection hub;
 
-    public CartHubClient(NavigationManager navigation, MainViewModel indexViewModel, ModalViewModel modalViewModel, ILogger<CartHubClient> logger)
+    public CartHubClient(Uri hubUri, MainViewModel indexViewModel, ModalViewModel modalViewModel, Action<HttpConnectionOptions>? configureHttpConnection = null)
     {
-        this.navigation = navigation;
         this.indexViewModel = indexViewModel;
         this.modalViewModel = modalViewModel;
-        this.logger = logger;
-        hub = BuildCartHubConnection();
+        hub = BuildCartHubConnection(hubUri, configureHttpConnection);
     }
 
-    private HubConnection BuildCartHubConnection()
+    private HubConnection BuildCartHubConnection(Uri hubUri, Action<HttpConnectionOptions>? configureHttpConnection = null)
     {
-        HubConnection hub = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/carthub")).WithAutomaticReconnect().Build();
+        HubConnection hub = configureHttpConnection is null ?
+            new HubConnectionBuilder().WithUrl(hubUri).WithAutomaticReconnect().Build() :
+            new HubConnectionBuilder().WithUrl(hubUri, configureHttpConnection).WithAutomaticReconnect().Build();
 
         hub.Closed += CartHub_Closed!;
         hub.Reconnected += CartHub_Reconnected!;
         hub.Reconnecting += CartHub_Reconnecting!;
-
         hub.On<string>(nameof(ICartHubNotifications.GetMessage), (message) =>
         {
-            LogGetMessage(message);
             indexViewModel.ShareCartInfo = message;
         });
 
         hub.On<List<CartProductCollectable>>(nameof(ICartHubNotifications.ReceiveCart), (cartProducts) =>
         {
-            LogReceiveCart(cartProducts.Count);
             indexViewModel.CartProducts.Clear();
             foreach (CartProductCollectable item in cartProducts)
             {
@@ -43,13 +40,11 @@ public sealed partial class CartHubClient : ICartHubClient
 
         hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemAdded), (p) =>
         {
-            LogItemAdded(p.Name);
             indexViewModel.CartProducts.Add(new CartProductUIModel() { Amount = p.Amount, IsCollected = p.IsCollected, Name = p.Name, UnitPrice = p.UnitPrice, Order = p.Order });
         });
 
         hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
-            LogItemModified(cartProduct.Name);
             CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Name == cartProduct.Name);
             product.Amount = cartProduct.Amount;
             product.UnitPrice = cartProduct.UnitPrice;
@@ -61,7 +56,6 @@ public sealed partial class CartHubClient : ICartHubClient
 
         hub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (name) =>
         {
-            LogItemDeleted(name);
             indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Name == name));
         });
         return hub;
@@ -69,19 +63,19 @@ public sealed partial class CartHubClient : ICartHubClient
 
     private Task CartHub_Reconnecting(Exception arg)
     {
-        modalViewModel.Message = $"Cart sharing reconnecting, reason: {arg.Message}";
+        modalViewModel.ShowInfo($"Cart sharing reconnecting, reason: {arg.Message}");
         return Task.CompletedTask;
     }
 
     private Task CartHub_Reconnected(string arg)
     {
-        modalViewModel.Message = $"Cart sharing reconnected, reason: {arg}";
+        modalViewModel.ShowInfo($"Cart sharing reconnected, reason: {arg}");
         return Task.CompletedTask;
     }
 
     private Task CartHub_Closed(Exception arg)
     {
-        modalViewModel.Message = $"Cart sharing connection closed unexpectedly, reason: {arg.Message}";
+        modalViewModel.ShowInfo($"Cart sharing connection closed unexpectedly, reason: {arg.Message}");
         return Task.CompletedTask;
     }
 
@@ -105,7 +99,6 @@ public sealed partial class CartHubClient : ICartHubClient
     {
         return hub.InvokeAsync<HubResponse>(nameof(JoinGroup), groupId);
     }
-
 
     public Task<HubResponse> LeaveGroup(Guid groupId)
     {
@@ -134,19 +127,4 @@ public sealed partial class CartHubClient : ICartHubClient
         hub.Reconnecting -= CartHub_Reconnecting!;
         return hub.DisposeAsync();
     }
-
-    [LoggerMessage(0, LogLevel.Information, "Received message '{message}'")]
-    partial void LogGetMessage(string message);
-
-    [LoggerMessage(1, LogLevel.Information, "Received cart from server, items count is {cartProductsCount}.")]
-    partial void LogReceiveCart(int cartProductsCount);
-
-    [LoggerMessage(2, LogLevel.Information, "Received new item with name {name}.")]
-    partial void LogItemAdded(string name);
-
-    [LoggerMessage(3, LogLevel.Information, "Item with name {name} was modified.")]
-    partial void LogItemModified(string name);
-
-    [LoggerMessage(4, LogLevel.Information, "Item with name {name} was deleted.")]
-    partial void LogItemDeleted(string name);
 }

@@ -27,9 +27,9 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
             await userRepository.UserJoinedSharing(GetUserId(), groupId);
             await Clients.Caller.ReceiveCart(await db.GetCartProducts(groupId));
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has joined group cart.");
-            return new HubResponse() { SuccessMessage = $"You have joined cart '{x}'" };
+            return new HubResponse();
         },
-        e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a group with given the id." }));
+        e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of the group with given the id." }));
     }
 
     public async Task<HubResponse> LeaveGroup(Guid groupId)
@@ -40,9 +40,9 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());
             await userRepository.UserLeftSharing(GetUserId(), groupId);
             await Clients.OthersInGroup(groupId.ToString()).GetMessage($"{GetUserEmail()} has left sharing.");
-            return new HubResponse() { SuccessMessage = $"You left '{x}' cart sharing." };
+            return new HubResponse();
         },
-e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a group with given the id." }));
+e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of the group with given the id." }));
     }
 
     public async Task<HubResponse> CartItemAdded(CartProduct product)
@@ -50,16 +50,23 @@ e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a g
         try
         {
             Guid groupId = await GetGroupId(GetUserId());
-            await db.AddCartProduct(product, groupId);
-            CartProductCollectable cartProduct = new()
+            ConflictError? itemExistsError = await db.AddCartProduct(product, groupId);
+            if (itemExistsError is null)
             {
-                Amount = product.Amount,
-                Name = product.Name,
-                Order = product.Order,
-                UnitPrice = product.UnitPrice
-            };
-            await Clients.OthersInGroup(groupId.ToString()).ItemAdded(cartProduct);
-            return new HubResponse() { SuccessMessage = "Saved" };
+                CartProductCollectable cartProduct = new()
+                {
+                    Amount = product.Amount,
+                    Name = product.Name,
+                    Order = product.Order,
+                    UnitPrice = product.UnitPrice
+                };
+                await Clients.OthersInGroup(groupId.ToString()).ItemAdded(cartProduct);
+                return new HubResponse();
+            }
+            else
+            {
+                return new HubResponse() { ErrorMessage = "Product already exists." };
+            }
         }
         catch (Exception ex)
         {
@@ -72,9 +79,12 @@ e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a g
         try
         {
             Guid groupId = await GetGroupId(GetUserId());
-            await db.UpdateProduct(groupId, product);
-            await Clients.OthersInGroup(groupId.ToString()).ItemModified(product);
-            return new HubResponse() { SuccessMessage = "Updated product in group's cart." };
+            NotFoundError? notFoundError = await db.UpdateProduct(groupId, product);
+            if (notFoundError is null)
+            {
+                await Clients.OthersInGroup(groupId.ToString()).ItemModified(product);
+            }
+            return new HubResponse();
         }
         catch (Exception ex)
         {
@@ -88,8 +98,11 @@ e => Task.FromResult(new HubResponse() { ErrorMessage = "User is not part of a g
         try
         {
             Guid groupId = await GetGroupId(GetUserId());
-            await db.DeleteProduct(name, groupId);
-            await Clients.OthersInGroup(groupId.ToString()).ItemDeleted(name);
+            NotFoundError? notFoundError = await db.DeleteProduct(name, groupId);
+            if (notFoundError is null)
+            {
+                await Clients.OthersInGroup(groupId.ToString()).ItemDeleted(name);
+            }
             return new HubResponse();
         }
         catch (Exception ex)

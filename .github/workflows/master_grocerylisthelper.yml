@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to Azure Web App GroceryListHelper
+﻿name: Build and deploy ASP.Net Core app to Azure Web App GroceryListHelper
 
 on:
   push:
@@ -18,6 +18,10 @@ jobs:
   publish:
     needs: remove-old-artifacts
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     env:
       AZURE_WEBAPP_PACKAGE_PATH: 'publish'
       AddLogging: false
@@ -32,6 +36,17 @@ jobs:
 
       - name: Build
         run: dotnet build Server --configuration Release
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
       - name: Run Azurite in Docker
         run: docker run -p 10002:10002 -d mcr.microsoft.com/azure-storage/azurite
@@ -49,7 +64,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: console
-          thresholds: '50 85'
+          thresholds: '55 85'
 
       - name: Install Playwright
         run: |

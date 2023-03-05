@@ -41,11 +41,17 @@ AsyncCircuitBreakerPolicy<HttpResponseMessage> ciruitBreakerPolicy = HttpPolicyE
 AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, t => TimeSpan.FromSeconds(2 * t + 2));
 AsyncPolicyWrap<HttpResponseMessage> pollyPolicy = HttpPolicyExtensions.HandleTransientHttpError().FallbackAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("Sorry, we are experiencing issues now, come back later.") }).WrapAsync(retryPolicy).WrapAsync(ciruitBreakerPolicy);
 
-builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy); ;
+builder.Services.AddHttpClient("AnonymousClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddPolicyHandler(pollyPolicy);
 builder.Services.AddHttpClient("ProtectedClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<AuthorizedHandler>().AddPolicyHandler(pollyPolicy);
 
-builder.Services.AddScoped<ICartHubClient, CartHubClient>();
+builder.Services.AddScoped<ICartHubClient>(x =>
+{
+    NavigationManager nav = x.GetRequiredService<NavigationManager>();
+    MainViewModel mainVM = x.GetRequiredService<MainViewModel>();
+    ModalViewModel modalVM = x.GetRequiredService<ModalViewModel>();
+    return new CartHubClient(nav.ToAbsoluteUri("carthub"), mainVM, modalVM);
+});
 builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
 builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
 builder.Services.AddBlazoredLocalStorage();

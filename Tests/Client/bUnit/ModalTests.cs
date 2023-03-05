@@ -12,8 +12,7 @@ public class ModalTests : TestContext
         module.SetupVoid("showModal", _ => true).SetVoidResult();
         Services.AddSingleton(new ModalViewModel());
         IRenderedComponent<Modal> cut = RenderComponent<Modal>();
-        cut.Instance.ViewModel.Header = "Error";
-        cut.Instance.ViewModel.Message = "This is an error message";
+        cut.Instance.ViewModel.ShowError("This is an error message");
         Assert.Single(module.Invocations);
         Assert.Contains("<dialog id=\"modal\" class=\"modal\"", cut.Markup);
     }

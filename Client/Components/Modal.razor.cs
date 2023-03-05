@@ -29,8 +29,12 @@ public abstract class ModalBase : BasePage<ModalViewModel>
 
     public void CloseModal()
     {
-        ViewModel.Header = "";
-        ViewModel.Message = "";
+        ViewModel.Clear();
+    }
+
+    protected string GetHeaderBackgroundClass()
+    {
+        return ViewModel.Header == "Error" ? "header-error" : "header-info";
     }
 
     public override void Dispose()

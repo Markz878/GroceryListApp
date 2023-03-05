@@ -160,7 +160,7 @@ public sealed class CartGroupRepository : ICartGroupRepository
         }
     }
 
-    public async Task UserJoinedSharing(Guid userId, Guid groupId)
+    public async Task<ConflictError?> UserJoinedSharing(Guid userId, Guid groupId)
     {
         TableClient activeCartGroupTableClient = db.GetTableClient(ActiveCartGroupDbModel.GetTableName());
         try
@@ -170,16 +170,19 @@ public sealed class CartGroupRepository : ICartGroupRepository
                 GroupId = groupId,
                 UserId = userId
             });
+            return null;
         }
         catch (RequestFailedException ex) when (ex.Message.Contains("409"))
         {
+            return new ConflictError();
         }
     }
 
-    public async Task UserLeftSharing(Guid userId, Guid groupId)
+    public async Task<NotFoundError?> UserLeftSharing(Guid userId, Guid groupId)
     {
         TableClient activeCartGroupTableClient = db.GetTableClient(ActiveCartGroupDbModel.GetTableName());
-        await activeCartGroupTableClient.DeleteEntityAsync(userId.ToString(), groupId.ToString());
+        Response response = await activeCartGroupTableClient.DeleteEntityAsync(userId.ToString(), groupId.ToString());
+        return response.Status == 204 ? null : new NotFoundError();
     }
 
     public async Task<Guid?> GetUserCurrentShareGroup(Guid userId)

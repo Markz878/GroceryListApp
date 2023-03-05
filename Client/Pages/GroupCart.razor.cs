@@ -44,9 +44,9 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
             await CartHubClient.Stop();
             ViewModel.ShareCartInfo = response.ErrorMessage;
         }
-        else if (!string.IsNullOrEmpty(response.SuccessMessage))
+        else if (group is not null)
         {
-            ViewModel.ShareCartInfo = response.SuccessMessage;
+            ViewModel.ShareCartInfo = $"You have joined cart {group.Name}.";
         }
     }
 

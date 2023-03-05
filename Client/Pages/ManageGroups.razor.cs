@@ -47,8 +47,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
             ValidationResult validationResult = cartGroupValidator.Validate(createCartGroupRequest);
             if (validationResult.IsValid is false)
             {
-                Modal.Header = "Error";
-                Modal.Message = validationResult.Errors.First().ErrorMessage;
+                Modal.ShowError(validationResult.Errors.First().ErrorMessage);
                 return;
             }
             Result<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
@@ -60,8 +59,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
             },
             e =>
             {
-                Modal.Header = "Error";
-                Modal.Message = e.Message;
+                Modal.ShowError(e.Message);
             });
         }
         else
@@ -80,8 +78,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
         ValidationResult validationResult = emailValidator.Validate(newMemberEmail);
         if (validationResult.IsValid is false)
         {
-            Modal.Header = "Error";
-            Modal.Message = validationResult.Errors.First().ErrorMessage;
+            Modal.ShowError(validationResult.Errors.First().ErrorMessage);
             return;
         }
         createCartGroupRequest.OtherUsers.Add(newMemberEmail.Email);

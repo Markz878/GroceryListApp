@@ -61,7 +61,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMiddleware<FakeAuthenticationMiddleware>();
 }
-app.Services.InitDatabase();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
@@ -74,6 +73,7 @@ app.MapAPIEndpoints();
 app.MapHub<CartHub>("/carthub");
 app.MapFallbackToPage("/_Host");
 app.MapHealthChecks("/health");
+app.Services.InitDatabase();
 app.Run();
 
 namespace GroceryListHelper.Server

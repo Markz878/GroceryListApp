@@ -2,7 +2,7 @@
 
 <dialog id="modal" class="modal" @ref=modal>
     <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header @GetHeaderBackgroundClass()">
             <h3 class="header-text">@ViewModel.Header</h3>
             <form method="dialog">
                 <button class="close" autofocus @onclick=CloseModal>&times;</button>

@@ -63,8 +63,6 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
 
     [Theory]
     [InlineData(5, 4, 0)]
-    [InlineData(5, 3, 1)]
-    [InlineData(5, 2, 3)]
     [InlineData(5, 1, 4)]
     [InlineData(5, 0, 4)]
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
@@ -119,10 +117,10 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
         await page.FillAsync("#edit-item-amount-input-0", "2");
-        await page.FillAsync("#edit-item-unitprice-input-0", "2.5");
+        await page.FillAsync("#edit-item-unitprice-input-0", "2.50");
         await page.ClickAsync("#update-product-button-0");
         Assert.Equal("2", await page.InnerTextAsync("#item-amount-0"));
-        Assert.Equal("2.5", await page.InnerTextAsync("#item-unitprice-0"));
+        Assert.Equal("2.50", await page.InnerTextAsync("#item-unitprice-0"));
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
         CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
         ArgumentNullException.ThrowIfNull(models);

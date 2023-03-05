@@ -76,10 +76,10 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         await page.AddProductToCart($"Product", 1, 1.5);
         await page.ClickAsync("#edit-product-button-0");
         await page.FillAsync("#edit-item-amount-input-0", "2");
-        await page.FillAsync("#edit-item-unitprice-input-0", "2.5");
+        await page.FillAsync("#edit-item-unitprice-input-0", "2.50");
         await page.ClickAsync("#update-product-button-0");
         Assert.Equal("2", await page.InnerTextAsync("#item-amount-0"));
-        Assert.Equal("2.5", await page.InnerTextAsync("#item-unitprice-0"));
+        Assert.Equal("2.50", await page.InnerTextAsync("#item-unitprice-0"));
     }
 
     [Fact]

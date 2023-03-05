@@ -16,17 +16,26 @@ public sealed class CartProductRepository : ICartProductRepository
         this.db = db.GetTableClient(CartProductDbModel.GetTableName());
     }
 
-    public async Task AddCartProduct(CartProduct cartProduct, Guid userId)
+    public async Task<ConflictError?> AddCartProduct(CartProduct cartProduct, Guid userId)
     {
-        CartProductDbModel cartDbProduct = new()
+        try
         {
-            Name = cartProduct.Name,
-            Order = cartProduct.Order,
-            OwnerId = userId,
-            Amount = cartProduct.Amount,
-            UnitPrice = cartProduct.UnitPrice
-        };
-        await db.AddEntityAsync(cartDbProduct);
+            CartProductDbModel cartDbProduct = new()
+            {
+                Name = cartProduct.Name,
+                Order = cartProduct.Order,
+                OwnerId = userId,
+                Amount = cartProduct.Amount,
+                UnitPrice = cartProduct.UnitPrice
+            };
+            await db.AddEntityAsync(cartDbProduct);
+            return null;
+        }
+        catch (RequestFailedException ex) when (ex.Status is 409)
+        {
+            return new ConflictError();
+        }
+
     }
 
     public async Task<List<CartProductCollectable>> GetCartProducts(Guid ownerId)

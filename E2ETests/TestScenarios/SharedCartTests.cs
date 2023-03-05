@@ -45,7 +45,7 @@ public sealed class SharedCartTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddValidProductToCart()
+    public async Task CartSharing_Success()
     {
         string productName = "Maito";
         int productAmount = 2;
@@ -55,26 +55,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         ArgumentNullException.ThrowIfNull(element);
         string elementText = await element.InnerTextAsync();
         Assert.Equal(productName, elementText);
-    }
 
-    [Fact]
-    public async Task DeleteProductFromCart()
-    {
-        string productName = "Maito";
-        int productAmount = 2;
-        double productPrice = 2.9;
-        await page1.AddProductToCart(productName, productAmount, productPrice);
-        await page2.ClickAsync("#delete-product-button-0");
-        IElementHandle? element = await page1.QuerySelectorAsync("#item-name-0");
-        Assert.Null(element);
-    }
-
-    [Fact]
-    public async Task UpdateProductFromCart()
-    {
-        string productName = "Maito";
-        int productAmount = 2;
-        double productPrice = 2.9;
         await page1.AddProductToCart(productName, productAmount, productPrice);
         await page2.ClickAsync("#edit-product-button-0");
         await page2.FillAsync("#edit-item-amount-input-0", (productAmount + 1).ToString());
@@ -87,12 +68,12 @@ public sealed class SharedCartTests : IAsyncLifetime
         IElementHandle? priceElement = await page1.QuerySelectorAsync("#item-unitprice-0");
         ArgumentNullException.ThrowIfNull(priceElement);
         string priceText = await priceElement.InnerTextAsync();
-        Assert.Equal("3.1", priceText);
-    }
+        Assert.Equal("3.10", priceText);
 
-    [Fact]
-    public async Task StopSharing()
-    {
+        await page2.ClickAsync("#delete-product-button-0");
+        IElementHandle? deletedElement = await page1.QuerySelectorAsync("#item-name-0");
+        Assert.Null(deletedElement);
+
         await page2.GetByRole(AriaRole.Button, new() { Name = "Stop sharing" }).ClickAsync();
         await Task.Delay(500);
         IElementHandle? messageElement = await page1.GetByText($"{fakeAuth2.Email} has left sharing.").ElementHandleAsync();

@@ -54,12 +54,19 @@
 
 .modal-header {
     padding: 4px 16px;
-    background-color: #28a745;
     color: white;
     height: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.header-info {
+    background-color: #28a745;
+}
+
+.header-error {
+    background-color: #dc3545;
 }
 
 .modal-body {

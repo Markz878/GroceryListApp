@@ -127,8 +127,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         catch (Exception ex)
         {
-            ModalViewModel.Header = "Error";
-            ModalViewModel.Message = ex.Message;
+            ModalViewModel.ShowError(ex.Message);
         }
     }
 
@@ -209,8 +208,8 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
     protected async Task UpdateCartProduct(CartProductUIModel product)
     {
         CartProductClientValidator cartProductValidator = new(ViewModel.CartProducts);
-        ModalViewModel.Message = string.Join(" ", cartProductValidator.Validate(product).Errors.Select(x => x.ErrorMessage));
-        if (string.IsNullOrEmpty(ModalViewModel.Message))
+        ValidationResult validationResult = cartProductValidator.Validate(product);
+        if (validationResult.IsValid)
         {
             editingItem = null;
             ViewModel.OnPropertyChanged();
@@ -226,8 +225,12 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             }
             catch (Exception ex)
             {
-                ModalViewModel.Message = ex.Message;
+                ModalViewModel.ShowError(ex.Message);
             }
+        }
+        else
+        {
+            ModalViewModel.ShowError(string.Join(" ", validationResult.Errors.Select(x => x.ErrorMessage)));
         }
     }
 
@@ -260,7 +263,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             }
             catch (Exception ex)
             {
-                ModalViewModel.Message = ex.Message;
+                ModalViewModel.ShowError(ex.Message);
             }
             finally
             {

@@ -12,7 +12,7 @@ public sealed class CartProductsServiceProvider : ICartProductsService
     private readonly NavigationManager navigation;
     private ICartProductsService? actingCartService;
 
-    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, MainViewModel viewModel, ICartHubClient cartHubClient, NavigationManager navigation)
+    public CartProductsServiceProvider(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider, ICartHubClient cartHubClient, MainViewModel viewModel, NavigationManager navigation)
     {
         this.httpClientFactory = httpClientFactory;
         this.localStorage = localStorage;

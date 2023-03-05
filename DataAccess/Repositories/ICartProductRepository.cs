@@ -6,7 +6,7 @@ namespace GroceryListHelper.DataAccess.Repositories;
 
 public interface ICartProductRepository
 {
-    Task AddCartProduct(CartProduct cartProduct, Guid ownerId);
+    Task<ConflictError?> AddCartProduct(CartProduct cartProduct, Guid ownerId);
     Task<NotFoundError?> DeleteProduct(string productName, Guid ownerId);
     Task<List<CartProductCollectable>> GetCartProducts(Guid ownerId);
     Task ClearCartProducts(Guid ownerId);
