@@ -17,11 +17,7 @@ public abstract class ModalBase : BasePage<ModalViewModel>
 
     private async Task PropertyChanged()
     {
-        if (string.IsNullOrWhiteSpace(ViewModel.Header) || string.IsNullOrWhiteSpace(ViewModel.Message))
-        {
-            return;
-        }
-        if (module is not null)
+        if (!string.IsNullOrWhiteSpace(ViewModel.Header) && !string.IsNullOrWhiteSpace(ViewModel.Message) && module is not null)
         {
             await module.InvokeVoidAsync("showModal", modal);
         }

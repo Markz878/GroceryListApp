@@ -48,15 +48,15 @@ public static class CartGroupProductsEndpointsMapper
         return TypedResults.NoContent();
     }
 
-    public static async Task<Results<NoContent, Microsoft.AspNetCore.Http.HttpResults.NotFound, ForbidHttpResult>> DeleteProduct(Guid groupId, string productName, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteProduct(Guid groupId, string productName, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFoundError? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
+        NotFoundError? ex = await cartProductsRepository.DeleteProduct(productName, groupId);
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, Microsoft.AspNetCore.Http.HttpResults.NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, ICartProductRepository cartProductsRepository)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, ICartProductRepository cartProductsRepository)
     {
-        DataAccess.Exceptions.NotFoundError? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
+        NotFoundError? ex = await cartProductsRepository.UpdateProduct(groupId, updatedProduct);
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
