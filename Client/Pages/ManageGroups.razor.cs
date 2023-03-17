@@ -24,6 +24,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     private readonly EmailModelValidator emailValidator = new();
     private readonly CreateCartGroupRequestValidator cartGroupValidator = new();
     private PersistingComponentStateSubscription stateSubscription;
+    protected bool isBusy;
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,17 +51,29 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
                 Modal.ShowError(validationResult.Errors.First().ErrorMessage);
                 return;
             }
-            Result<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
-            response.Match(x =>
+            try
             {
-                cartGroups.Add(x);
-                isCreatingNewGroup = false;
-                createCartGroupRequest = new();
-            },
-            e =>
+                isBusy = true;
+                Result<CartGroup, UserNotFoundException> response = await GroupsService.CreateCartGroup(createCartGroupRequest);
+                response.Match(x =>
+                {
+                    cartGroups.Add(x);
+                    isCreatingNewGroup = false;
+                    createCartGroupRequest = new();
+                },
+                e =>
+                {
+                    Modal.ShowError(e.Message);
+                });
+            }
+            catch (Exception ex)
             {
-                Modal.ShowError(e.Message);
-            });
+                Modal.ShowError(ex.Message);
+            }
+            finally
+            {
+                isBusy = false;
+            }
         }
         else
         {
@@ -137,5 +150,6 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     {
         stateSubscription.Dispose();
         base.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

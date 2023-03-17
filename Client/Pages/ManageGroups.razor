@@ -22,7 +22,19 @@
                     <button class="btn-success btn add-btn" @onclick="AddMember">+</button>
                     <input id="add-user-to-group" class="form-control" @bind="newMemberEmail.Email" size="30" placeholder="New member email" />
                 </div>
-                <button class="btn btn-success create-btn" @onclick=CreateGroup>Create group</button>
+                <button class="btn btn-success create-btn" @onclick=CreateGroup>
+                    @if (isBusy is false)
+                    {
+                        <span>Create Group</span>
+                    }
+                    else
+                    {
+                        <div class="loading-btn-content">
+                            <span class="spinner"></span>
+                            <span>Creating...</span>
+                        </div>
+                    }
+                </button>
             </fieldset>
         }
         else
