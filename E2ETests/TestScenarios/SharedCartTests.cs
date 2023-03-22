@@ -36,7 +36,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         page1 = await browserContext1.GotoPage(server.BaseUrl, true);
         browserContext2 = await server.GetNewBrowserContext(fakeAuth2);
         page2 = await browserContext2.GotoPage(server.BaseUrl, true);
-        await ShareCartMethods.StartShare(page1, page2, fakeAuth1.Email, fakeAuth2.Email);
+        await ShareCartMethods.StartShare(page1, page2, fakeAuth2.Email);
     }
     public async Task DisposeAsync()
     {
