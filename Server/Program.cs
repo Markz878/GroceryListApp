@@ -48,7 +48,7 @@ else
 }
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
-
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 if (app.Environment.IsDevelopment())
