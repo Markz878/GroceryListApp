@@ -27,12 +27,11 @@ internal static class PlaywrightHelpers
     internal static async Task<IPage> GotoPage(this IBrowserContext browserContext, string url, bool checkIfAuthenticated = false)
     {
         IPage page = await browserContext.NewPageAsync();
-        await page.GotoAsync(url);
+        await page.GotoAsync(url, new PageGotoOptions() { WaitUntil = WaitUntilState.NetworkIdle });
         if (checkIfAuthenticated)
         {
             await page.Locator("#profile-btn").WaitForAsync();
         }
-        await Task.Delay(1000);
         return page;
     }
 
