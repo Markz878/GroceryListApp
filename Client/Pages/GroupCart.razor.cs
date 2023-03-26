@@ -29,8 +29,8 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
 
     protected async Task<bool> CheckAccess()
     {
-        CartGroup? x = await CartGroupsService.GetCartGroup(GroupId);
-        return x != null;
+        CartGroup? cartGroup = await CartGroupsService.GetCartGroup(GroupId);
+        return cartGroup != null;
     }
 
     public async Task JoinCart()

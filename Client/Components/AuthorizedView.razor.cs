@@ -7,7 +7,7 @@ public partial class AuthorizedView : IDisposable
     [Parameter][EditorRequired] public required RenderFragment ChildContent { get; set; }
     [Parameter] public Func<Task<bool>>? AuthorizedCondition { get; set; }
 
-    protected UserInfo? userInfo;
+    private UserInfo? userInfo;
     private PersistingComponentStateSubscription stateSubscription;
 
     protected override async Task OnInitializedAsync()
