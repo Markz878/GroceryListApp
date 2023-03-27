@@ -285,10 +285,10 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
         stateSubscription.Dispose();
-        base.Dispose();
+        return base.DisposeAsync();
     }
 
     //private CartProductUIModel dragTarget;

@@ -146,10 +146,9 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
         cartGroups?.Remove(isDeletingGroup);
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
         stateSubscription.Dispose();
-        base.Dispose();
-        GC.SuppressFinalize(this);
+        return base.DisposeAsync();
     }
 }

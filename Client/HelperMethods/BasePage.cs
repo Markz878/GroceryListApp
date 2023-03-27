@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Client.HelperMethods;
 
-public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseViewModel
+public abstract class BasePage<T> : ComponentBase, IAsyncDisposable where T : BaseViewModel
 {
     [Inject] public T ViewModel { get; set; } = default!;
 
@@ -14,9 +14,10 @@ public abstract class BasePage<T> : ComponentBase, IDisposable where T : BaseVie
         await InvokeAsync(StateHasChanged);
     }
 
-    public virtual void Dispose()
+    public virtual ValueTask DisposeAsync()
     {
         ViewModel.StateChanged -= PropertyChanged;
         GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
     }
 }

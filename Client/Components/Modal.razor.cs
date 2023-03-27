@@ -33,9 +33,9 @@ public abstract class ModalBase : BasePage<ModalViewModel>
         return ViewModel.Header == "Error" ? "header-error" : "header-info";
     }
 
-    public override void Dispose()
+    public override ValueTask DisposeAsync()
     {
         ViewModel.StateChanged -= PropertyChanged;
-        base.Dispose();
+        return base.DisposeAsync();
     }
 }

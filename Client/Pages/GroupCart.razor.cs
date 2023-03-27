@@ -68,9 +68,14 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
         }
     }
 
-    public override void Dispose()
+    public override async ValueTask DisposeAsync()
     {
+        if (ViewModel.IsPolling)
+        {
+            ViewModel.IsPolling = false; // This needs to be set before any async calls
+            await ExitCart();
+        }
         stateSubscription.Dispose();
-        base.Dispose();
+        await base.DisposeAsync();
     }
 }
