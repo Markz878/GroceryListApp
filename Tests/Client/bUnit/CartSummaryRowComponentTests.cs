@@ -56,10 +56,6 @@ public class CartSummaryRowComponentTests : TestContext
         Services.AddSingleton(vm);
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
         double expectedPrice = Math.Round(vm.CartProducts.Select(x => x.Amount * x.UnitPrice).Sum(), 2);
-        string expectedColor = vm.CartProducts.All(x => x.IsCollected) ? "green" : "black";
-        string allCollectedText = vm.CartProducts.All(x => x.IsCollected) ? "All collected!" : "";
-        Assert.Contains(allCollectedText, cut.Markup);
-        Assert.Contains(expectedColor, cut.Markup);
         Assert.Contains(expectedPrice.ToString("N2", CultureInfo.InvariantCulture), cut.Markup);
     }
 

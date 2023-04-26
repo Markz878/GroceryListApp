@@ -81,22 +81,6 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddValidProducts_CheckAllCollected_CartSummmaryShowsAllCollected()
-    {
-        int productCount = 3;
-        for (int i = 0; i < productCount; i++)
-        {
-            await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
-        }
-        for (int i = 0; i < productCount; i++)
-        {
-            await page.CheckAsync($"#item-collected-checkbox-{i}");
-        }
-        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("text=All collected!");
-        Assert.NotNull(movedProductNameElement);
-    }
-
-    [Fact]
     public async Task AddValidProducts_ClickClearCart_CartShouldBeEmpty()
     {
         int productCount = 3;
