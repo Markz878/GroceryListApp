@@ -7,7 +7,7 @@ public static class StoreProductsEndpointsMapper
 {
     public static void AddStoreProductEndpoints(this RouteGroupBuilder builder)
     {
-        RouteGroupBuilder group = builder.MapGroup("storeproducts").RequireAuthorization().WithTags("Store Products");
+        RouteGroupBuilder group = builder.MapGroup("storeproducts").WithTags("Store Products");
         group.MapGet("", GetAll);
         group.MapPost("", AddProduct);
         group.MapDelete("", DeleteAllProducts);

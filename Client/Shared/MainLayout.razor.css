@@ -1,7 +1,8 @@
 ﻿#main {
-    min-height: 100vh;
-    min-width: 840px;
+    min-height: 100%;
     background-image: url("../store-transparent.webp");
+    background-size: cover;
+    min-width: 820px;
 }
 
 

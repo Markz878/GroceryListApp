@@ -9,7 +9,6 @@ public static class CartGroupsEndpointsMapper
     public static void AddCartGroupEndpoints(this RouteGroupBuilder builder)
     {
         RouteGroupBuilder group = builder.MapGroup("cartgroups")
-            .RequireAuthorization()
             .WithTags("Cart Groups");
 
         group.MapGet("", GetGroupsForUser)

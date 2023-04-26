@@ -10,9 +10,10 @@ public static class AccountEndpointsMapper
     public static void AddAccountEndpoints(this RouteGroupBuilder builder)
     {
         RouteGroupBuilder accountGroup = builder.MapGroup("account").WithTags("Account");
-        accountGroup.MapGet("login", Login);
-        accountGroup.MapPost("logout", Logout).RequireAuthorization();
-        accountGroup.MapGet("user", GetUserInfo);
+        accountGroup.MapGet("login", Login).AllowAnonymous();
+        accountGroup.MapPost("logout", Logout);
+        accountGroup.MapGet("user", GetUserInfo).AllowAnonymous();
+        accountGroup.MapGet("signout", PostLogoutRedirect).AllowAnonymous().ExcludeFromDescription();
     }
 
     public static ChallengeHttpResult Login(string? returnUrl)
@@ -28,9 +29,15 @@ public static class AccountEndpointsMapper
         CookieAuthenticationDefaults.AuthenticationScheme,
         OpenIdConnectDefaults.AuthenticationScheme
     };
+
     public static SignOutHttpResult Logout()
     {
-        return TypedResults.SignOut(new AuthenticationProperties { RedirectUri = "/" }, authSchemes);
+        return TypedResults.SignOut(authenticationSchemes: authSchemes);
+    }
+
+    public static RedirectHttpResult PostLogoutRedirect()
+    {
+        return TypedResults.Redirect("/");
     }
 
     private static readonly string[] returnClaimTypes = new[] { "name", "preferred_username", "http://schemas.microsoft.com/identity/claims/objectidentifier" };

@@ -10,7 +10,6 @@ public static class CartGroupProductsEndpointsMapper
     public static void AddCartGroupProductEndpoints(this RouteGroupBuilder builder)
     {
         RouteGroupBuilder group = builder.MapGroup("cartgroupproducts")
-            .RequireAuthorization()
             .AddEndpointFilter<GroupProductsAccessFilter>()
             .WithTags("Cart Group Products");
 
