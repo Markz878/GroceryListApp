@@ -1,10 +1,8 @@
 ﻿using AngleSharp.Dom;
 using Bunit;
-using Bunit.TestDoubles;
 using GroceryListHelper.Client.Components;
 using GroceryListHelper.Client.ViewModels;
 using GroceryListHelper.Shared.Interfaces;
-using Microsoft.AspNetCore.Components.Web;
 using NSubstitute;
 using System.Globalization;
 

@@ -1,9 +1,19 @@
-﻿using Microsoft.Playwright;
+﻿using GroceryListHelper.DataAccess.Repositories;
+using Microsoft.Playwright;
 
 namespace E2ETests.Infrastructure;
 
 internal static class ShareCartMethods
 {
+    public static FakeAuthInfo FakeAuth1 { get; } = new("Test User 1", "test_user1@email.com", Guid.NewGuid());
+    public static FakeAuthInfo FakeAuth2 { get; } = new("Test User 2", "test_user2@email.com", Guid.NewGuid());
+
+    internal static async Task AddFakeUsers(IUserRepository db)
+    {
+        await db.AddUser(FakeAuth1.Email, FakeAuth1.Guid, FakeAuth1.UserName);
+        await db.AddUser(FakeAuth2.Email, FakeAuth2.Guid, FakeAuth2.UserName);
+    }
+
     internal static async Task StartShare(IPage page1, IPage page2, string user2Email)
     {
         await page1.GetByRole(AriaRole.Button, new() { Name = "Cart Groups" }).ClickAsync();

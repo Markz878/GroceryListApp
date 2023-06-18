@@ -9,7 +9,9 @@
             [*]GroceryListHelper.Server.Installers.*,
             [*]GroceryListHelper.Server.Services.Server*,
             [*]GroceryListHelper.Server.Pages.*
-          </Exclude> <!-- [Assembly-Filter]Type-Filter -->
+            [GroceryListHelper.Client]Program.cs
+          </Exclude>  <!-- [Assembly-Filter]Type-Filter -->
+          <ExcludeByFile>**/*/Program.cs</ExcludeByFile> <!-- Globbing filter -->
         </Configuration>
       </DataCollector>
     </DataCollectors>

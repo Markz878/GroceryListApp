@@ -87,5 +87,6 @@ public abstract class BaseTest : IDisposable
     public void Dispose()
     {
         _scope.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

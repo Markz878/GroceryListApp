@@ -11,8 +11,6 @@ namespace E2ETests.TestScenarios;
 public sealed class SharedCartTests : IAsyncLifetime
 {
     private readonly WebApplicationFactoryFixture server;
-    private readonly FakeAuthInfo fakeAuth1 = new("Test User 1", "test_user1@email.com", Guid.NewGuid());
-    private readonly FakeAuthInfo fakeAuth2 = new("Test User 2", "test_user2@email.com", Guid.NewGuid());
     private IBrowserContext browserContext1 = default!;
     private IPage page1 = default!;
     private IBrowserContext browserContext2 = default!;
@@ -30,13 +28,12 @@ public sealed class SharedCartTests : IAsyncLifetime
     {
         using IServiceScope scope = server.Services.CreateScope();
         IUserRepository db = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-        await db.AddUser(fakeAuth1.Email, fakeAuth1.Guid, fakeAuth1.UserName);
-        await db.AddUser(fakeAuth2.Email, fakeAuth2.Guid, fakeAuth2.UserName);
-        browserContext1 = await server.GetNewBrowserContext(fakeAuth1);
+        await ShareCartMethods.AddFakeUsers(db);
+        browserContext1 = await server.GetNewBrowserContext(ShareCartMethods.FakeAuth1);
         page1 = await browserContext1.GotoPage(server.BaseUrl, true);
-        browserContext2 = await server.GetNewBrowserContext(fakeAuth2);
+        browserContext2 = await server.GetNewBrowserContext(ShareCartMethods.FakeAuth2);
         page2 = await browserContext2.GotoPage(server.BaseUrl, true);
-        await ShareCartMethods.StartShare(page1, page2, fakeAuth2.Email);
+        await ShareCartMethods.StartShare(page1, page2, ShareCartMethods.FakeAuth2.Email);
     }
     public async Task DisposeAsync()
     {
@@ -76,7 +73,7 @@ public sealed class SharedCartTests : IAsyncLifetime
 
         await page2.GetByRole(AriaRole.Button, new() { Name = "Stop sharing" }).ClickAsync();
         await Task.Delay(500);
-        IElementHandle? messageElement = await page1.GetByText($"{fakeAuth2.Email} has left sharing.").ElementHandleAsync();
+        IElementHandle? messageElement = await page1.GetByText($"{ShareCartMethods.FakeAuth2.Email} has left sharing.").ElementHandleAsync();
         Assert.NotNull(messageElement);
     }
 }
