@@ -48,7 +48,13 @@ else
 }
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={60 * 60 * 24 * 7}");
+    }
+});
 app.UseRouting();
 app.UseAuthentication();
 if (app.Environment.IsDevelopment())
