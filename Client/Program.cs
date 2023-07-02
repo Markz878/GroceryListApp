@@ -54,8 +54,15 @@ builder.Services.AddScoped<ICartHubClient>(x =>
     ModalViewModel modalVM = x.GetRequiredService<ModalViewModel>();
     return new CartHubClient(nav.ToAbsoluteUri("carthub"), mainVM, modalVM);
 });
-builder.Services.AddScoped<ICartProductsService, CartProductsServiceProvider>();
-builder.Services.AddScoped<IStoreProductsService, StoreProductsServiceProvider>();
+builder.Services.AddScoped<ICartProductsServiceFactory, CartProductServiceFactory>();
+builder.Services.AddScoped<ICartProductsService, CartProductsApiService>();
+builder.Services.AddScoped<ICartProductsService, CartProductsLocalService>();
+builder.Services.AddScoped<ICartProductsService, CartProductsSignalRService>();
+builder.Services.AddScoped<ICartProductsService, CartProductsGroupService>();
+builder.Services.AddScoped<IStoreProductsServiceFactory, StoreProductsServiceFactory>();
+builder.Services.AddScoped<IStoreProductsService, StoreProductsLocalService>();
+builder.Services.AddScoped<IStoreProductsService, StoreProductsAPIService>();
+
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
 builder.Services.AddScoped<ICartGroupsService, CartGroupsService>();

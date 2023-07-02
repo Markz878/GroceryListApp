@@ -33,7 +33,7 @@ internal class DbHealthCheck : IHealthCheck
             AsyncPageable<TableItem> tablePages = tableServiceClient.QueryAsync(cancellationToken: cancellationToken);
             await foreach (Page<TableItem> tablePage in tablePages.AsPages())
             {
-                IEnumerable<string> existingTableNames = tablePage.Values.Select(x=>x.Name);
+                IEnumerable<string> existingTableNames = tablePage.Values.Select(x => x.Name);
                 foreach (string tableName in tableNames)
                 {
                     if (!existingTableNames.Contains(tableName))

@@ -1,7 +1,5 @@
 ﻿using Bunit;
 using GroceryListHelper.Client.Components;
-using GroceryListHelper.Client.ViewModels;
-using Microsoft.AspNetCore.Components;
 
 namespace GroceryListHelper.Tests.Client.bUnit;
 public class ConfirmTests : TestContext

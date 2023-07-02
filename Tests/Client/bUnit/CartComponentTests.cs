@@ -14,14 +14,18 @@ public class CartComponentTests : TestContext
 {
     private readonly MainViewModel mainVM = new();
     private readonly ModalViewModel modalVm = new();
+    private readonly ICartProductsServiceFactory cartProductsServiceFactoryMock = Substitute.For<ICartProductsServiceFactory>();
+    private readonly IStoreProductsServiceFactory storeProductsServiceFactoryMock = Substitute.For<IStoreProductsServiceFactory>();
     private readonly ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
     private readonly IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
     private readonly FakePersistentComponentState persist;
     public CartComponentTests()
     {
         persist = this.AddFakePersistentComponentState();
-        Services.AddSingleton(cartProductsServiceMock);
-        Services.AddSingleton(storeProductsServiceMock);
+        Services.AddSingleton(cartProductsServiceFactoryMock);
+        Services.AddSingleton(storeProductsServiceFactoryMock);
+        cartProductsServiceFactoryMock.GetCartProductsService().Returns(cartProductsServiceMock);
+        storeProductsServiceFactoryMock.GetStoreProductsService().Returns(storeProductsServiceMock);
         Services.AddSingleton(mainVM);
         Services.AddSingleton(modalVm);
     }
@@ -61,7 +65,7 @@ public class CartComponentTests : TestContext
         cartProductsServiceMock.GetCartProducts().Returns(products);
         storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        foreach (var p in products)
+        foreach (CartProductUIModel p in products)
         {
             Assert.NotNull(cut.Find($"td:contains(\"{p.Name}\")"));
             Assert.NotNull(cut.Find($"td:contains(\"{p.Amount}\")"));
@@ -85,15 +89,15 @@ public class CartComponentTests : TestContext
         Assert.True(persisted);
         Assert.NotNull(persistedProducts);
         Assert.Equal(products.Count, persistedProducts.Count);
-        foreach (var p in products)
+        foreach (CartProductUIModel p in products)
         {
             Assert.NotNull(cut.Find($"td:contains(\"{p.Name}\")"));
             Assert.NotNull(cut.Find($"td:contains(\"{p.Amount}\")"));
             Assert.NotNull(cut.Find($"td:contains(\"{p.UnitPrice:N2}\")"));
             Assert.NotNull(cut.Find($"td:contains(\"{p.Total:N2}\")"));
         }
-        Assert.Equal(products.Count(x=>x.IsCollected), cut.FindAll("input[checked]").Count);
-        Assert.Equal(products.Count(x=>x.IsCollected), cut.FindAll("tr.checked-item").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("input[checked]").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.checked-item").Count);
     }
 
     [Fact]

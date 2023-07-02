@@ -18,7 +18,7 @@ public class CartProductsServiceProviderTests
     private readonly MainViewModel mainViewModel = new();
     private readonly ICartHubClient cartHubClient = Substitute.For<ICartHubClient>();
     private readonly NavigationManager navigation = new FakeNavigationManager("localhost:5001", "localhost:5001");
-    private readonly CartProductsServiceProvider cartProductsService;
+    private readonly ICartProductsServiceFactory cartProductsServiceFactory;
     private readonly MockHttpMessageHandler _handlerMock = new();
     private const string cartProductsKey = "cartProducts";
     private const string baseUri = "https://localhost:5001";
@@ -26,8 +26,13 @@ public class CartProductsServiceProviderTests
 
     public CartProductsServiceProviderTests()
     {
-        cartProductsService = new(httpFactory, localStorage, authProvider, cartHubClient, mainViewModel, navigation);
         httpFactory.CreateClient("ProtectedClient").Returns(new HttpClient(_handlerMock) { BaseAddress = new Uri(baseUri) });
+        ICartProductsService[] cartProductsServices = new ICartProductsService[]
+        {
+            new CartProductsLocalService(mainViewModel, localStorage),
+            new CartProductsApiService(httpFactory),
+        };
+        cartProductsServiceFactory = new CartProductServiceFactory(cartProductsServices, authProvider, mainViewModel, navigation);
     }
 
     private void AuthProviderSetAnonymous()
@@ -44,6 +49,7 @@ public class CartProductsServiceProviderTests
     public async Task GetCartProducts_WhenAnonymous_CallsLocalStorageGetItem()
     {
         AuthProviderSetAnonymous();
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.GetCartProducts();
         await localStorage.Received(1).GetItemAsync<List<CartProductUIModel>>(cartProductsKey);
     }
@@ -55,6 +61,7 @@ public class CartProductsServiceProviderTests
         MockedRequest request = _handlerMock
             .When(HttpMethod.Get, fullUri)
             .Respond(HttpStatusCode.OK, JsonContent.Create(new List<CartProduct>()));
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.GetCartProducts();
         int matches = _handlerMock.GetMatchCount(request);
         Assert.Equal(1, matches);
@@ -64,6 +71,7 @@ public class CartProductsServiceProviderTests
     public async Task SaveCartProduct_WhenAnonymous_CallsLocalStorageSave()
     {
         AuthProviderSetAnonymous();
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.SaveCartProduct(new CartProduct());
         await localStorage.Received(1).SetItemAsync(cartProductsKey, Arg.Any<ObservableCollection<CartProductUIModel>>());
     }
@@ -75,6 +83,7 @@ public class CartProductsServiceProviderTests
         MockedRequest request = _handlerMock
             .When(HttpMethod.Post, fullUri)
             .Respond(HttpStatusCode.Created);
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.SaveCartProduct(new CartProduct());
         int matches = _handlerMock.GetMatchCount(request);
         Assert.Equal(1, matches);
@@ -84,6 +93,7 @@ public class CartProductsServiceProviderTests
     public async Task ClearCartProducts_WhenAnonymous_CallsLocalStorageClear()
     {
         AuthProviderSetAnonymous();
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.DeleteAllCartProducts();
         await localStorage.Received(1).RemoveItemAsync(cartProductsKey);
     }
@@ -95,6 +105,7 @@ public class CartProductsServiceProviderTests
         MockedRequest request = _handlerMock
             .When(HttpMethod.Delete, fullUri)
             .Respond(HttpStatusCode.NoContent);
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.DeleteAllCartProducts();
         int matches = _handlerMock.GetMatchCount(request);
         Assert.Equal(1, matches);
@@ -104,6 +115,7 @@ public class CartProductsServiceProviderTests
     public async Task DeleteCartProduct_WhenAnonymous_CallsLocalStorageClear()
     {
         AuthProviderSetAnonymous();
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.DeleteCartProduct("test");
         await localStorage.Received(1).SetItemAsync(cartProductsKey, Arg.Any<ObservableCollection<CartProductUIModel>>());
     }
@@ -115,6 +127,7 @@ public class CartProductsServiceProviderTests
         MockedRequest request = _handlerMock
             .When(HttpMethod.Delete, $"{fullUri}/test")
             .Respond(HttpStatusCode.NoContent);
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.DeleteCartProduct("test");
         int matches = _handlerMock.GetMatchCount(request);
         Assert.Equal(1, matches);
@@ -124,6 +137,7 @@ public class CartProductsServiceProviderTests
     public async Task UpdateCartProduct_WhenAnonymous_CallsLocalSetItems()
     {
         AuthProviderSetAnonymous();
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.UpdateCartProduct(new CartProductCollectable());
         await localStorage.Received(1).SetItemAsync(cartProductsKey, Arg.Any<ObservableCollection<CartProductUIModel>>());
     }
@@ -135,6 +149,7 @@ public class CartProductsServiceProviderTests
         MockedRequest request = _handlerMock
             .When(HttpMethod.Put, fullUri)
             .Respond(HttpStatusCode.NoContent);
+        ICartProductsService cartProductsService = await cartProductsServiceFactory.GetCartProductsService();
         await cartProductsService.UpdateCartProduct(new CartProductCollectable());
         int matches = _handlerMock.GetMatchCount(request);
         Assert.Equal(1, matches);

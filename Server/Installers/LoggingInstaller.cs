@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.AspNetCore.HttpLogging;
+using Serilog;
 
 namespace GroceryListHelper.Server.Installers;
 
@@ -16,6 +17,12 @@ public class LoggingInstaller : IInstaller
             builder.Host.UseSerilog((context, services, configuration) =>
             {
                 configuration.ReadFrom.Configuration(builder.Configuration);
+            });
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.RequestBody | HttpLoggingFields.ResponseBody;
+                logging.RequestBodyLogLimit = 4096;
+                logging.ResponseBodyLogLimit = 4096;
             });
         }
     }

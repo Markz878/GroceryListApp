@@ -9,9 +9,9 @@ public sealed class CartProductsSignalRService : ICartProductsService
         this.cartHubClient = cartHubClient;
     }
 
-    public Task DeleteAllCartProducts()
+    public async Task SaveCartProduct(CartProduct product)
     {
-        throw new NotImplementedException();
+        await cartHubClient.CartItemAdded(product);
     }
 
     public Task DeleteCartProduct(string name)
@@ -24,11 +24,6 @@ public sealed class CartProductsSignalRService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public async Task SaveCartProduct(CartProduct product)
-    {
-        await cartHubClient.CartItemAdded(product);
-    }
-
     public Task SortCartProducts(ListSortDirection sortDirection)
     {
         throw new NotImplementedException();
@@ -37,5 +32,10 @@ public sealed class CartProductsSignalRService : ICartProductsService
     public Task UpdateCartProduct(CartProductCollectable product)
     {
         return cartHubClient.CartItemModified(product);
+    }
+
+    public Task DeleteAllCartProducts()
+    {
+        throw new NotImplementedException();
     }
 }

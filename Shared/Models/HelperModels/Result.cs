@@ -13,11 +13,20 @@ public readonly struct Result<T, E>
         IsSuccess = true;
     }
 
-    public Result(E error) => _error = error;
+    public Result(E error)
+    {
+        _error = error;
+    }
 
-    public static implicit operator Result<T, E>(T value) => new(value);
+    public static implicit operator Result<T, E>(T value)
+    {
+        return new(value);
+    }
 
-    public static implicit operator Result<T, E>(E value) => new(value);
+    public static implicit operator Result<T, E>(E value)
+    {
+        return new(value);
+    }
 
     public U Match<U>(Func<T, U> handleValue, Func<E, U> handleError)
     {
@@ -76,21 +85,30 @@ public readonly struct Result<T, E1, E2>
         _value = value;
         IsSuccess = true;
     }
-    public Result(E1 error) 
-    { 
-        _error1 = error; 
-        isError1 = true; 
+    public Result(E1 error)
+    {
+        _error1 = error;
+        isError1 = true;
     }
     public Result(E2 error)
     {
         _error2 = error;
         isError2 = true;
     }
-    public static implicit operator Result<T, E1, E2>(T value) => new(value);
+    public static implicit operator Result<T, E1, E2>(T value)
+    {
+        return new(value);
+    }
 
-    public static implicit operator Result<T, E1, E2>(E1 value) => new(value);
+    public static implicit operator Result<T, E1, E2>(E1 value)
+    {
+        return new(value);
+    }
 
-    public static implicit operator Result<T, E1, E2>(E2 value) => new(value);
+    public static implicit operator Result<T, E1, E2>(E2 value)
+    {
+        return new(value);
+    }
 
     public U Match<U>(Func<T, U> handleValue, Func<E1, U> handleError1, Func<E2, U> handleError2)
     {

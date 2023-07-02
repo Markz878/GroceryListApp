@@ -1,3 +1,5 @@
+using GroceryListHelper.Client.Components;
+
 namespace GroceryListHelper.Client.Pages;
 
 public abstract class GroupCartBase : BasePage<MainViewModel>
@@ -9,6 +11,7 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
 
     protected CartGroup? group;
     private PersistingComponentStateSubscription stateSubscription;
+    protected CartComponent? cartComponent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,8 +48,12 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
         else if (group is not null)
         {
             ViewModel.ShareCartInfo = $"You have joined cart {group.Name}.";
+            ArgumentNullException.ThrowIfNull(cartComponent);
+            await cartComponent.RefreshCartProductsService();
         }
     }
+
+
 
     public async Task ExitCart()
     {
@@ -54,6 +61,9 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
         {
             HubResponse response = await CartHubClient.LeaveGroup(GroupId);
             ViewModel.ShareCartInfo = response.ErrorMessage;
+            ViewModel.IsPolling = false;
+            ArgumentNullException.ThrowIfNull(cartComponent);
+            await cartComponent.RefreshCartProductsService();
         }
         catch (Exception ex)
         {
@@ -62,7 +72,6 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
         finally
         {
             await CartHubClient.Stop();
-            ViewModel.IsPolling = false;
         }
     }
 

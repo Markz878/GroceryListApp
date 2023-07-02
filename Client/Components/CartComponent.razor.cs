@@ -5,23 +5,26 @@ namespace GroceryListHelper.Client.Components;
 public abstract class CartComponentBase : BasePage<MainViewModel>
 {
     [Inject] public required ModalViewModel ModalViewModel { get; set; }
-    [Inject] public required ICartProductsService CartProductsService { get; set; }
-    [Inject] public required IStoreProductsService StoreProductsService { get; set; }
+    [Inject] public required ICartProductsServiceFactory CartProductServiceFactory { get; set; }
+    [Inject] public required IStoreProductsServiceFactory StoreProductsServiceFactory { get; set; }
     [Inject] public required PersistentComponentState ApplicationState { get; set; }
 
-    private PersistingComponentStateSubscription stateSubscription;
-
+    protected ICartProductsService cartProductsService = default!;
+    protected IStoreProductsService storeProductsService = default!;
     protected CartProduct newProduct = new();
     protected CartProductUIModel? editingItem;
     protected CartProductUIModel? movingItem;
     protected ElementReference NewProductNameBox;
     protected SortState sortState;
     protected bool isAuthenticated;
+    private PersistingComponentStateSubscription stateSubscription;
 
     protected override async Task OnInitializedAsync()
     {
         ViewModel.CartProducts.Clear();
         ViewModel.StoreProducts.Clear();
+        cartProductsService = await CartProductServiceFactory.GetCartProductsService();
+        storeProductsService = await StoreProductsServiceFactory.GetStoreProductsService();
         if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0)
         {
             foreach (CartProductUIModel item in cartProducts)
@@ -31,7 +34,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         else
         {
-            foreach (CartProductUIModel item in await CartProductsService.GetCartProducts())
+            foreach (CartProductUIModel item in await cartProductsService.GetCartProducts())
             {
                 ViewModel.CartProducts.Add(item);
             }
@@ -45,12 +48,17 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         else
         {
-            foreach (StoreProduct item in await StoreProductsService.GetStoreProducts())
+            foreach (StoreProduct item in await storeProductsService.GetStoreProducts())
             {
                 ViewModel.StoreProducts.Add(item);
             }
         }
         stateSubscription = ApplicationState.RegisterOnPersisting(PersistData);
+    }
+
+    public async Task RefreshCartProductsService()
+    {
+        cartProductsService = await CartProductServiceFactory.GetCartProductsService();
     }
 
     private Task PersistData()
@@ -83,6 +91,10 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         {
             return;
         }
+        if (sortState == SortState.None)
+        {
+            return;
+        }
         int order = 1000;
         if (sortState == SortState.Ascending)
         {
@@ -100,7 +112,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
                 order += 1000;
             }
         }
-        await CartProductsService.SortCartProducts(sortState == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
+        await cartProductsService.SortCartProducts(sortState == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
     }
 
     private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
@@ -149,7 +161,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         ViewModel.CartProducts.Add(newCartProductUIModel);
         try
         {
-            await CartProductsService.SaveCartProduct(product);
+            await cartProductsService.SaveCartProduct(product);
         }
         catch
         {
@@ -167,7 +179,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
     {
         product.IsCollected = (bool)e.Value!;
         ViewModel.OnPropertyChanged();
-        await CartProductsService.UpdateCartProduct(product);
+        await cartProductsService.UpdateCartProduct(product);
     }
 
     private async Task SaveStoreProduct(StoreProduct storeProduct)
@@ -187,14 +199,14 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
                 UnitPrice = storeProduct.UnitPrice
             };
             ViewModel.StoreProducts.Add(product);
-            await StoreProductsService.SaveStoreProduct(storeProduct);
+            await storeProductsService.SaveStoreProduct(storeProduct);
         }
         else
         {
             if (product.UnitPrice != storeProduct.UnitPrice)
             {
                 product.UnitPrice = storeProduct.UnitPrice;
-                await StoreProductsService.UpdateStoreProduct(product);
+                await storeProductsService.UpdateStoreProduct(product);
             }
         }
     }
@@ -214,12 +226,12 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             ViewModel.OnPropertyChanged();
             try
             {
-                await CartProductsService.UpdateCartProduct(product);
+                await cartProductsService.UpdateCartProduct(product);
                 StoreProduct? storeProduct = ViewModel.StoreProducts.FirstOrDefault(x => x.Name == product.Name);
                 if (storeProduct is not null && storeProduct.UnitPrice != product.UnitPrice)
                 {
                     storeProduct.UnitPrice = product.UnitPrice;
-                    await StoreProductsService.UpdateStoreProduct(storeProduct);
+                    await storeProductsService.UpdateStoreProduct(storeProduct);
                 }
             }
             catch (Exception ex)
@@ -258,7 +270,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
             try
             {
-                await CartProductsService.UpdateCartProduct(movingItem);
+                await cartProductsService.UpdateCartProduct(movingItem);
             }
             catch (Exception ex)
             {
@@ -276,7 +288,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         ViewModel.CartProducts.Remove(product);
         try
         {
-            await CartProductsService.DeleteCartProduct(product.Name);
+            await cartProductsService.DeleteCartProduct(product.Name);
         }
         catch (Exception ex)
         {

@@ -32,6 +32,7 @@ builder.InstallAssemblyServices();
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();
+app.UseHttpLogging();
 app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {

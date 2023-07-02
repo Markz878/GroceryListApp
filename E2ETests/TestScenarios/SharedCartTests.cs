@@ -44,18 +44,21 @@ public sealed class SharedCartTests : IAsyncLifetime
     [Fact]
     public async Task CartSharing_Success()
     {
-        string productName = "Maito";
-        int productAmount = 2;
-        double productPrice = 2.9;
-        await page1.AddProductToCart(productName, productAmount, productPrice);
+        string productName1 = "Maito";
+        string productName2 = "Leipä";
+        string productName3 = "Juusto";
+        int product1Amount = 2;
+        await page1.AddProductToCart(productName1, product1Amount, 2.9);
+        await page1.AddProductToCart(productName2, 2, 1.5);
+        await page1.AddProductToCart(productName3, 1, 4.5);
+
         IElementHandle? element = await page2.QuerySelectorAsync("#item-name-0");
         ArgumentNullException.ThrowIfNull(element);
         string elementText = await element.InnerTextAsync();
-        Assert.Equal(productName, elementText);
+        Assert.Equal(productName1, elementText);
 
-        await page1.AddProductToCart(productName, productAmount, productPrice);
         await page2.ClickAsync("#edit-product-button-0");
-        await page2.FillAsync("#edit-item-amount-input-0", (productAmount + 1).ToString());
+        await page2.FillAsync("#edit-item-amount-input-0", (product1Amount + 1).ToString());
         await page2.FillAsync("#edit-item-unitprice-input-0", "3.1");
         await page2.ClickAsync("#update-product-button-0");
         IElementHandle? amountElement = await page1.QuerySelectorAsync("#item-amount-0");
@@ -68,8 +71,10 @@ public sealed class SharedCartTests : IAsyncLifetime
         Assert.Equal("3.10", priceText);
 
         await page2.ClickAsync("#delete-product-button-0");
-        IElementHandle? deletedElement = await page1.QuerySelectorAsync("#item-name-0");
-        Assert.Null(deletedElement);
+        IElementHandle? currentTopItem = await page1.QuerySelectorAsync("#item-name-0");
+        ArgumentNullException.ThrowIfNull(currentTopItem);
+        string currentTopItemName = await currentTopItem.InnerTextAsync();
+        Assert.Equal(productName2, currentTopItemName);
 
         await page2.GetByRole(AriaRole.Button, new() { Name = "Stop sharing" }).ClickAsync();
         await Task.Delay(500);

@@ -9,7 +9,9 @@ public sealed class DataAccessInstaller : IInstaller
     {
         builder.Services.AddDataAccessServices();
         builder.Services.AddScoped<ICartHubClient, ServerCartHubClient>();
+        builder.Services.AddScoped<ICartProductsServiceFactory, ServerCartProductsServiceFactory>();
         builder.Services.AddScoped<ICartProductsService, ServerCartProductsServiceProvider>();
+        builder.Services.AddScoped<IStoreProductsServiceFactory, ServerStoreProductsServiceFactory>();
         builder.Services.AddScoped<IStoreProductsService, ServerStoreProductsServiceProvider>();
         builder.Services.AddScoped<ICartGroupsService, ServerCartGroupsService>();
         builder.Services.AddScoped<MainViewModel>();

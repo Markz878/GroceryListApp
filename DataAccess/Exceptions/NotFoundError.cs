@@ -6,7 +6,7 @@ public readonly struct NotFoundError
     public string? Message => valueNotFound is null ? null : $"{valueNotFound} was not found.";
     public NotFoundError()
     {
-        
+
     }
     public NotFoundError(string valueNotFound)
     {

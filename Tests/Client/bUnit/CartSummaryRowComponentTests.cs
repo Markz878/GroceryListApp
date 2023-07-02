@@ -10,6 +10,20 @@ namespace GroceryListHelper.Tests.Client.bUnit;
 
 public class CartSummaryRowComponentTests : TestContext
 {
+    private readonly MainViewModel vm = new();
+    private readonly ICartProductsServiceFactory cartProductsServiceFactoryMock = Substitute.For<ICartProductsServiceFactory>();
+    private readonly ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
+    private readonly IStoreProductsServiceFactory storeProductsServiceFactoryMock = Substitute.For<IStoreProductsServiceFactory>();
+    private readonly IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
+
+    public CartSummaryRowComponentTests()
+    {
+        cartProductsServiceFactoryMock.GetCartProductsService().Returns(cartProductsServiceMock);
+        storeProductsServiceFactoryMock.GetStoreProductsService().Returns(storeProductsServiceMock);
+        Services.AddSingleton(cartProductsServiceFactoryMock);
+        Services.AddSingleton(storeProductsServiceFactoryMock);
+        Services.AddSingleton(vm);
+    }
     public static TheoryData<List<CartProductUIModel>> CartProductListData => new()
     {
         {
@@ -42,16 +56,10 @@ public class CartSummaryRowComponentTests : TestContext
     [MemberData(nameof(CartProductListData))]
     public void WhenCartHasItems_ShowsCorrectTotal(List<CartProductUIModel> products)
     {
-        MainViewModel vm = new();
         foreach (CartProductUIModel p in products)
         {
             vm.CartProducts.Add(p);
         }
-        ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
-        IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
-        Services.AddSingleton(cartProductsServiceMock);
-        Services.AddSingleton(storeProductsServiceMock);
-        Services.AddSingleton(vm);
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
         double expectedPrice = Math.Round(vm.CartProducts.Select(x => x.Amount * x.UnitPrice).Sum(), 2);
         Assert.Contains(expectedPrice.ToString("N2", CultureInfo.InvariantCulture), cut.Markup);
@@ -61,16 +69,10 @@ public class CartSummaryRowComponentTests : TestContext
     [MemberData(nameof(CartProductListData))]
     public void WhenCartHasItems_AndClearCartProductsButtonIsPressed_CartIsCleared(List<CartProductUIModel> products)
     {
-        MainViewModel vm = new();
         foreach (CartProductUIModel p in products)
         {
             vm.CartProducts.Add(p);
         }
-        ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
-        IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
-        Services.AddSingleton(cartProductsServiceMock);
-        Services.AddSingleton(storeProductsServiceMock);
-        Services.AddSingleton(vm);
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
         IElement buttonElement = cut.Find("button[aria-label=\"Clear cart\"]");
         buttonElement.Click();
@@ -80,12 +82,6 @@ public class CartSummaryRowComponentTests : TestContext
     [Fact]
     public void WhenStoreProductHasItems_AndClearStoreProductsButtonIsPressed_StoreProductsIsCleared()
     {
-        MainViewModel vm = new();
-        Services.AddSingleton(vm);
-        ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
-        Services.AddSingleton(cartProductsServiceMock);
-        IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
-        Services.AddSingleton(storeProductsServiceMock);
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
         IElement buttonElement = cut.Find("button[aria-label=\"Clear store products\"]");
         buttonElement.Click();

@@ -13,7 +13,7 @@ public sealed class CartHub : Hub<ICartHubNotifications>, ICartHubClientActions
 
     public CartHub(ICartProductRepository productRepository, ICartGroupRepository userRepository, ILogger<CartHub> logger)
     {
-        this.db = productRepository;
+        db = productRepository;
         this.userRepository = userRepository;
         this.logger = logger;
     }
