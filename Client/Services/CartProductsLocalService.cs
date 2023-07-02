@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsLocalService : ICartProductsService
 {

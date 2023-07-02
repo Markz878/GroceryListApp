@@ -1,5 +1,3 @@
-using GroceryListHelper.Shared.Models.CartGroups;
-
 namespace GroceryListHelper.Client.Pages;
 
 public abstract class GroupCartBase : BasePage<MainViewModel>

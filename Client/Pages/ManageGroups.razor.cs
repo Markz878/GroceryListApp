@@ -1,7 +1,5 @@
 using GroceryListHelper.Client.Components;
 using GroceryListHelper.Client.Models;
-using GroceryListHelper.Shared.Models.CartGroups;
-using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Client.Pages;
 

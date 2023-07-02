@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.CartGroups;
-using GroceryListHelper.Shared.Models.HelperModels;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public class CartGroupsService : ICartGroupsService
 {

@@ -9,7 +9,9 @@ global using GroceryListHelper.Client.ViewModels;
 global using GroceryListHelper.Shared.Interfaces;
 global using GroceryListHelper.Shared.Models.Authentication;
 global using GroceryListHelper.Shared.Models.BaseModels;
+global using GroceryListHelper.Shared.Models.CartGroups;
 global using GroceryListHelper.Shared.Models.CartProducts;
+global using GroceryListHelper.Shared.Models.HelperModels;
 global using GroceryListHelper.Shared.Models.StoreProducts;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Authorization;
@@ -23,12 +25,12 @@ global using Polly.Retry;
 global using Polly.Wrap;
 global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
+global using System.ComponentModel;
 global using System.Net;
 global using System.Net.Http;
 global using System.Net.Http.Json;
 global using System.Reflection;
 global using System.Security.Claims;
-using GroceryListHelper.Shared.Models.HelperModels;
 
 WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
