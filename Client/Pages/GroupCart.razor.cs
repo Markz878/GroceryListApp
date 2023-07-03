@@ -53,8 +53,6 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
         }
     }
 
-
-
     public async Task ExitCart()
     {
         try

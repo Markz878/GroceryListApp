@@ -9,9 +9,8 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     [Inject] public required NavigationManager Navigation { get; set; }
     [Inject] public required ModalViewModel Modal { get; set; }
     [Inject] public required PersistentComponentState ApplicationState { get; set; }
-    [Inject] public required IJSRuntime JS { get; set; }
 
-    protected List<CartGroup>? cartGroups = new();
+    protected List<CartGroup> cartGroups = new();
     protected bool isCreatingNewGroup;
     protected EmailModel newMemberEmail = new();
     protected CreateCartGroupRequest createCartGroupRequest = new();
@@ -141,7 +140,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
     {
         ArgumentNullException.ThrowIfNull(isDeletingGroup);
         await GroupsService.DeleteCartGroup(isDeletingGroup.Id);
-        cartGroups?.Remove(isDeletingGroup);
+        cartGroups.Remove(isDeletingGroup);
     }
 
     public override ValueTask DisposeAsync()
