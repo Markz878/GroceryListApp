@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		coverage_command.bat = coverage_command.bat
 		Dockerfile = Dockerfile
+		Infrastructure\main.bicep = Infrastructure\main.bicep
 		.github\workflows\master_grocerylisthelper.yml = .github\workflows\master_grocerylisthelper.yml
 		README.md = README.md
 	EndProjectSection

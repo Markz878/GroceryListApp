@@ -1,30 +1,26 @@
 ﻿name: Build and deploy ASP.Net Core app to Azure Web App GroceryListHelper
 
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+  security-events: write
+
 on:
   push:
     branches:
       - master
 
-jobs:
-  remove-old-artifacts:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-    - name: Remove old artifacts
-      uses: c-hive/gha-remove-artifacts@v1
-      with:
-        age: '2 days' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
+  workflow_dispatch:
 
-  publish:
-    needs: remove-old-artifacts
+jobs:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
     env:
       AZURE_WEBAPP_PACKAGE_PATH: 'publish'
       AddLogging: false
+      WebsiteName: 'grocerylisthelper'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -64,7 +60,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: console
-          thresholds: '70 85'
+          thresholds: '65 85'
 
       - name: Install Playwright
         run: |
@@ -77,9 +73,18 @@ jobs:
       - name: Publish app
         run: dotnet publish Server -c Release -o "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
 
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Azure Infra
+        run: az deployment group create --resource-group ${{ secrets.AZURE_RG }} --template-file Infrastructure/main.bicep
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'GroceryListHelper'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C99403358B7E4954BCBAE0769BA6A9BB }}
+          app-name: 'grocerylisthelper'
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

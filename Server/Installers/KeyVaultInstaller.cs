@@ -6,7 +6,7 @@ public sealed class KeyVaultInstaller : IInstaller
     {
         if (builder.Environment.IsProduction())
         {
-            builder.Configuration.AddAzureKeyVault(new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"), new ManagedIdentityCredential());
+            builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["KeyVaultUri"] ?? throw new ArgumentException("Key vault Uri")), new ManagedIdentityCredential());
         }
     }
 }
