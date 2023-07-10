@@ -88,9 +88,9 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
       alwaysOn: true
       http20Enabled: true
       minTlsVersion: '1.2'
+      linuxFxVersion: 'DOTNET|7.0'
       webSocketsEnabled: true
       use32BitWorkerProcess: false
-      netFrameworkVersion: 'DOTNET|7.0'
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
