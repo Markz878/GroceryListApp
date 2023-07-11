@@ -3,7 +3,6 @@ param webSiteName string = 'grocerylisthelper'
 param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
-param keyVaultName string = 'kv-${webSiteName}'
 param storageName string = 'st${webSiteName}'
 param sku string = 'B1'
 
@@ -48,19 +47,6 @@ resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  name: keyVaultName
-  location: location
-  properties: {
-    tenantId: tenant().tenantId
-    enableRbacAuthorization: true
-    sku: {
-      name: 'standard'
-      family: 'A'
-    }
-  }
-}
-
 resource appservicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: planName
   location: location
@@ -97,26 +83,12 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
           value: appinsights.properties.ConnectionString
         }
         {
-          name: 'KeyVaultUri'
-          value: keyVault.properties.vaultUri
-        }
-        {
           name: 'TableStorageUri'
           value: storageaccount.properties.primaryEndpoints.table
         }
       ]
 
     }
-  }
-}
-
-resource app_keyvaultreader_roleassignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(resourceGroup().id, appService.id, keyvault_reader.id)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: keyvault_reader.id
-    principalId: appService.identity.principalId
-    principalType: 'ServicePrincipal'
   }
 }
 
@@ -133,11 +105,6 @@ resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@202
 resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: storageaccount
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
-}
-
-resource keyvault_reader 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: keyVault
-  name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
 
