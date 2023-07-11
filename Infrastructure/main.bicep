@@ -42,8 +42,7 @@ resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   properties: {
     allowSharedKeyAccess: false
     networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices'
+      defaultAction: 'Allow'
     }
     supportsHttpsTrafficOnly: true
   }
@@ -84,11 +83,12 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
   properties: {
     serverFarmId: appservicePlan.id
     httpsOnly: true
+    clientAffinityEnabled: false
     siteConfig: {
       alwaysOn: true
       http20Enabled: true
       minTlsVersion: '1.2'
-      linuxFxVersion: 'DOTNET|7.0'
+      linuxFxVersion: 'DOTNETCORE|7.0'
       webSocketsEnabled: true
       use32BitWorkerProcess: false
       appSettings: [
