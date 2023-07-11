@@ -23,17 +23,17 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
     {
         ViewModel.CartProducts.Clear();
         ViewModel.StoreProducts.Clear();
-        cartProductsService = await CartProductServiceFactory.GetCartProductsService();
-        storeProductsService = await StoreProductsServiceFactory.GetStoreProductsService();
         if (ApplicationState.TryTakeFromJson(nameof(ViewModel.CartProducts), out IList<CartProductUIModel>? cartProducts) && cartProducts is not null && cartProducts.Count > 0)
         {
             foreach (CartProductUIModel item in cartProducts)
             {
                 ViewModel.CartProducts.Add(item);
             }
+            cartProductsService = await CartProductServiceFactory.GetCartProductsService(); // Init here to prevent UI flash
         }
         else
         {
+            cartProductsService = await CartProductServiceFactory.GetCartProductsService();
             foreach (CartProductUIModel item in await cartProductsService.GetCartProducts())
             {
                 ViewModel.CartProducts.Add(item);
@@ -45,9 +45,11 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             {
                 ViewModel.StoreProducts.Add(item);
             }
+            storeProductsService = await StoreProductsServiceFactory.GetStoreProductsService();
         }
         else
         {
+            storeProductsService = await StoreProductsServiceFactory.GetStoreProductsService();
             foreach (StoreProduct item in await storeProductsService.GetStoreProducts())
             {
                 ViewModel.StoreProducts.Add(item);
