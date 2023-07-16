@@ -6,6 +6,7 @@ public sealed class AuthenticationInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
         builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
         builder.Services.Configure(CookieAuthenticationDefaults.AuthenticationScheme, (CookieAuthenticationOptions options) =>

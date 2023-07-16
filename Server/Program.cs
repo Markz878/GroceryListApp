@@ -32,7 +32,6 @@ builder.InstallAssemblyServices();
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 
 WebApplication app = builder.Build();
-app.UseHttpLogging();
 app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
@@ -40,7 +39,7 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryListHelper.Server v1"));
-    app.UseMiddleware<TimerMiddleware>();
+    app.UseMiddleware<FakeAuthenticationMiddleware>();
 }
 else
 {
@@ -58,19 +57,11 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.UseRouting();
 app.UseAuthentication();
-if (app.Environment.IsDevelopment())
-{
-    app.UseMiddleware<FakeAuthenticationMiddleware>();
-}
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.MapRazorPages();
 app.MapAPIEndpoints();
-//app.UseAzureSignalR(routes =>
-//{
-//    routes.MapHub<CartHub>("/carthub");
-//});
 app.MapHub<CartHub>("/carthub");
 app.MapFallbackToPage("/_Host");
 app.MapHealthChecks("/health");

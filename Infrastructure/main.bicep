@@ -21,7 +21,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource appinsights 'Microsoft.Insights/components@2020-02-02' = {
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   kind: 'web'
   location: location
@@ -31,7 +31,7 @@ resource appinsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageName
   location: location
   kind: 'StorageV2'
@@ -44,10 +44,13 @@ resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
       defaultAction: 'Allow'
     }
     supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: false
+    defaultToOAuthAuthentication: true
+    minimumTlsVersion: 'TLS1_2'
   }
 }
 
-resource appservicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: planName
   location: location
   kind: 'linux'
@@ -67,7 +70,7 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    serverFarmId: appservicePlan.id
+    serverFarmId: appServicePlan.id
     httpsOnly: true
     clientAffinityEnabled: false
     siteConfig: {
@@ -80,21 +83,20 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appinsights.properties.ConnectionString
+          value: appInsights.properties.ConnectionString
         }
         {
           name: 'TableStorageUri'
-          value: storageaccount.properties.primaryEndpoints.table
+          value: storageAccount.properties.primaryEndpoints.table
         }
       ]
-
     }
   }
 }
 
 resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(resourceGroup().id, appService.id, storage_table_contributor.id)
-  scope: storageaccount
+  scope: storageAccount
   properties: {
     roleDefinitionId: storage_table_contributor.id
     principalId: appService.identity.principalId
@@ -103,8 +105,6 @@ resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@202
 }
 
 resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: storageaccount
+  scope: storageAccount
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 }
-
-

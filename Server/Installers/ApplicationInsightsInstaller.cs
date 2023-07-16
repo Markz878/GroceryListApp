@@ -4,6 +4,9 @@ public sealed class ApplicationInsightsInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddApplicationInsightsTelemetry();
+        if (builder.Environment.IsProduction())
+        {
+            builder.Services.AddApplicationInsightsTelemetry();
+        }
     }
 }

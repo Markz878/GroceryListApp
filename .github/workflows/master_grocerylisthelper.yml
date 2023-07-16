@@ -31,16 +31,16 @@ jobs:
       - name: Build
         run: dotnet build Server --configuration Release
 
-      #- name: Initialize CodeQL
-      #  uses: github/codeql-action/init@v2
-      #  with:
-      #    languages: csharp
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
 
-      #- name: Autobuild
-      #  uses: github/codeql-action/autobuild@v2
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
 
-      #- name: Perform CodeQL Analysis
-      #  uses: github/codeql-action/analyze@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
       - name: Run Azurite in Docker
         run: docker run -p 10002:10002 -d mcr.microsoft.com/azure-storage/azurite
@@ -95,7 +95,10 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Azure Infra
-        run: az deployment group create --resource-group ${{ secrets.AZURE_RG }} --template-file Infrastructure/main.bicep --parameters webSiteName=${{ env.WebsiteName }}
+        run: >
+          az deployment group create --resource-group ${{ secrets.AZURE_RG }} 
+          --template-file Infrastructure/main.bicep 
+          --parameters webSiteName=${{ env.WebsiteName }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
