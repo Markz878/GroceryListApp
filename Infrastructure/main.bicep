@@ -46,6 +46,23 @@ resource vnet 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: 'default'
         properties: {
           addressPrefix: '10.0.0.0/24'
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.Storage'
+              locations: [
+                'northeurope'
+                'westeurope'
+              ]
+            }
+          ]
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverfarms'
+              }
+            }
+          ]
         }
       }
     ]
@@ -61,7 +78,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   properties: {
     allowSharedKeyAccess: false
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
     defaultToOAuthAuthentication: true
@@ -70,7 +87,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       bypass: 'None'
       virtualNetworkRules: [
         {
-          id: vnet.properties.subnets[0].id
+          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
           action: 'Allow'
         }
       ]
