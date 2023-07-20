@@ -1,5 +1,6 @@
 param location string = resourceGroup().location
 param webSiteName string = 'grocerylisthelper'
+param vnetName string = 'vnet-${webSiteName}'
 param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
@@ -31,6 +32,26 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+resource vnet 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+  name: vnetName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'default'
+        properties: {
+          addressPrefix: '10.0.0.0/24'
+        }
+      }
+    ]
+  }
+}
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageName
   location: location
@@ -40,13 +61,22 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   properties: {
     allowSharedKeyAccess: false
-    networkAcls: {
-      defaultAction: 'Allow'
-    }
+    publicNetworkAccess: 'Disabled'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
     defaultToOAuthAuthentication: true
     minimumTlsVersion: 'TLS1_2'
+    networkAcls: {
+      bypass: 'None'
+      virtualNetworkRules: [
+        {
+          id: vnet.properties.subnets[0].id
+          action: 'Allow'
+        }
+      ]
+      ipRules: []
+      defaultAction: 'Deny'
+    }
   }
 }
 
@@ -62,7 +92,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   }
 }
 
-resource appService 'Microsoft.Web/sites@2021-03-01' = {
+resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: webSiteName
   location: location
   kind: 'app'
@@ -73,6 +103,8 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     clientAffinityEnabled: false
+    vnetRouteAllEnabled: true
+    virtualNetworkSubnetId: vnet.properties.subnets[0].id
     siteConfig: {
       alwaysOn: true
       http20Enabled: true
@@ -80,6 +112,7 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
       linuxFxVersion: 'DOTNETCORE|7.0'
       webSocketsEnabled: true
       use32BitWorkerProcess: false
+      healthCheckPath: '/health'
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -91,6 +124,15 @@ resource appService 'Microsoft.Web/sites@2021-03-01' = {
         }
       ]
     }
+  }
+}
+
+resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2022-09-01' = {
+  parent: appService
+  name: guid(resourceGroup().id, appService.id, vnet.id)
+  properties: {
+    vnetResourceId: vnet.properties.subnets[0].id
+    isSwift: true
   }
 }
 
