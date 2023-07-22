@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using GroceryListHelper.Core.RepositoryContracts;
 
 namespace GroceryListHelper.Server.Services;
 

@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.DataAccess.Models;
 
 namespace GroceryListHelper.DataAccess.Repositories;

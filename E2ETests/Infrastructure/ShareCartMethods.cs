@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.Core.RepositoryContracts;
 using Microsoft.Playwright;
 
 namespace E2ETests.Infrastructure;

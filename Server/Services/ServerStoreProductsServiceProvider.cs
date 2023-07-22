@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Services;
+﻿using GroceryListHelper.Core.RepositoryContracts;
+
+namespace GroceryListHelper.Server.Services;
 
 public sealed class ServerStoreProductsServiceProvider : IStoreProductsService
 {

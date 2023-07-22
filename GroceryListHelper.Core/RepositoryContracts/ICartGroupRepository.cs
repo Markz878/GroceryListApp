@@ -1,8 +1,8 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using GroceryListHelper.Core.Exceptions;
 using GroceryListHelper.Shared.Models.CartGroups;
 using GroceryListHelper.Shared.Models.HelperModels;
 
-namespace GroceryListHelper.DataAccess.Repositories;
+namespace GroceryListHelper.Core.RepositoryContracts;
 
 public interface ICartGroupRepository
 {

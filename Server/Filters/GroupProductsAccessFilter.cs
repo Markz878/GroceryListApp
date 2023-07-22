@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Filters;
+﻿using GroceryListHelper.Core.RepositoryContracts;
+
+namespace GroceryListHelper.Server.Filters;
 
 public class GroupProductsAccessFilter : IEndpointFilter
 {

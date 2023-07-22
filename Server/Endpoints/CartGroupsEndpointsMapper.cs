@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using GroceryListHelper.Core.Exceptions;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.Shared.Models.HelperModels;
 using Microsoft.AspNetCore.Http.HttpResults;
 

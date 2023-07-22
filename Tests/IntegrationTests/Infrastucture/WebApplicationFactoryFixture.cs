@@ -1,5 +1,5 @@
-﻿using GroceryListHelper.DataAccess.HelperMethods;
-using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.Core.RepositoryContracts;
+using GroceryListHelper.DataAccess.HelperMethods;
 
 namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 

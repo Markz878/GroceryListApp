@@ -1,5 +1,5 @@
 ﻿using E2ETests.Infrastructure;
-using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Core.RepositoryContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Xunit;

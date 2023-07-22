@@ -47,6 +47,7 @@ public static class ValidatorFactory
         });
         return builder;
     }
+
     private sealed record ProducesResponseTypeMetadata(Type Type, int StatusCode, IEnumerable<string> ContentTypes) : IProducesResponseTypeMetadata;
     private sealed record ValidationDescriptor(int ArgumentIndex, Type ArgumentType, IValidator Validator);
 }

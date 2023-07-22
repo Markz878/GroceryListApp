@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.DataAccess.Repositories;
+﻿namespace GroceryListHelper.Core.RepositoryContracts;
 
 public interface IUserRepository
 {

@@ -1,6 +1,6 @@
 ﻿using GroceryListHelper.Client.HelperMethods;
 using GroceryListHelper.Client.ViewModels;
-using GroceryListHelper.DataAccess.Repositories;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.Shared.Models.BaseModels;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 

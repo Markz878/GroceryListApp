@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.Shared.Models.StoreProducts;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 

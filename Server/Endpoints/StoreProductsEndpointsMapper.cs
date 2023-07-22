@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using GroceryListHelper.Core.Exceptions;
+using GroceryListHelper.Core.RepositoryContracts;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GroceryListHelper.Server.Endpoints;
@@ -20,10 +21,10 @@ public static class StoreProductsEndpointsMapper
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Created> AddProduct(StoreProduct product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
+    public static async Task<Results<Created, Conflict<string>>> AddProduct(StoreProduct product, ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)
     {
-        await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
-        return TypedResults.Created($"api/storeProducts");
+        ConflictError? conflict = await storeProductsRepository.AddProduct(product, user.GetUserId().GetValueOrDefault());
+        return conflict is null ? TypedResults.Created($"api/storeProducts") : TypedResults.Conflict("Product already exists");
     }
 
     public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, IStoreProductRepository storeProductsRepository)

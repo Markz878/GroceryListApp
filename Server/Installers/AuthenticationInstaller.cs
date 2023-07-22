@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using GroceryListHelper.Core.RepositoryContracts;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace GroceryListHelper.Server.Installers;
 

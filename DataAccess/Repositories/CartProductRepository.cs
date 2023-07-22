@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Data.Tables;
-using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Core.Exceptions;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.Shared.Models.CartProducts;
@@ -35,7 +36,6 @@ public sealed class CartProductRepository : ICartProductRepository
         {
             return new ConflictError();
         }
-
     }
 
     public async Task<List<CartProductCollectable>> GetCartProducts(Guid ownerId)

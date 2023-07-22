@@ -1,8 +1,10 @@
 ﻿using Azure;
 using Azure.Data.Tables;
-using GroceryListHelper.DataAccess.Exceptions;
+using GroceryListHelper.Core.Exceptions;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.DataAccess.HelperMethods;
 using GroceryListHelper.DataAccess.Models;
+using GroceryListHelper.Shared.Models.CartProducts;
 using GroceryListHelper.Shared.Models.StoreProducts;
 
 namespace GroceryListHelper.DataAccess.Repositories;
@@ -22,10 +24,23 @@ public sealed class StoreProductRepository : IStoreProductRepository
         return result.Select(x => new StoreProduct() { Name = x.Name, UnitPrice = x.UnitPrice }).ToList();
     }
 
-    public async Task AddProduct(StoreProduct product, Guid userId)
+    public async Task<ConflictError?> AddProduct(StoreProduct product, Guid userId)
     {
-        StoreProductDbModel storeProduct = new() { Name = product.Name, UnitPrice = product.UnitPrice, OwnerId = userId };
-        await db.AddEntityAsync(storeProduct);
+        try
+        {
+            StoreProductDbModel storeProduct = new()
+            {
+                Name = product.Name,
+                UnitPrice = product.UnitPrice,
+                OwnerId = userId
+            };
+            await db.AddEntityAsync(storeProduct);
+            return null;
+        }
+        catch (RequestFailedException ex) when (ex.Status is 409)
+        {
+            return new ConflictError();
+        }
     }
 
     public async Task DeleteAll(Guid userId)

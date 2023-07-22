@@ -1,8 +1,8 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using GroceryListHelper.Core.Exceptions;
 using GroceryListHelper.Shared.Models.CartProducts;
 using System.ComponentModel;
 
-namespace GroceryListHelper.DataAccess.Repositories;
+namespace GroceryListHelper.Core.RepositoryContracts;
 
 public interface ICartProductRepository
 {

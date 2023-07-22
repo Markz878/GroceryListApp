@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
+﻿using GroceryListHelper.Core.Exceptions;
 using GroceryListHelper.Shared.Models.HelperModels;
 
 namespace GroceryListHelper.Tests.UnitTests;

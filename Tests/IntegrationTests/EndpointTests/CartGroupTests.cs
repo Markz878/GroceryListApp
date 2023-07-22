@@ -1,5 +1,5 @@
-﻿using GroceryListHelper.DataAccess.Exceptions;
-using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.Core.Exceptions;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.Shared.Models.CartGroups;
 using GroceryListHelper.Shared.Models.HelperModels;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;

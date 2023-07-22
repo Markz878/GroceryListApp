@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.DataAccess.Exceptions;
+﻿namespace GroceryListHelper.Core.Exceptions;
 
 public readonly struct NotFoundError
 {

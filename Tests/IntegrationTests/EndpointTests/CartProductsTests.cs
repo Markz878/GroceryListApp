@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.DataAccess.Repositories;
+﻿using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;

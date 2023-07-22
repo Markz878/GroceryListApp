@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using GroceryListHelper.Core.RepositoryContracts;
 using GroceryListHelper.DataAccess.Models;
 using GroceryListHelper.DataAccess.Repositories;
 using Microsoft.Extensions.DependencyInjection;
