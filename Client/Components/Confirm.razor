@@ -1,10 +1,10 @@
-﻿<dialog class="confirm" @ref=modal>
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="header-text">@Header</h3>
+﻿<dialog class="border-2 border-gray-500 rounded max-w-md animate-fade-in-down p-0" @ref=modal>
+    <div class="font-semibold">
+        <div class="bg-[#28a745] text-white p-2">
+            <h3 class="text-xl font-semibold">@Header</h3>
         </div>
-        <div class="modal-body">
-            <p class="body-text">@Message</p>
+        <div class="p-2">
+            <p class="pb-2">@Message</p>
             <form method="dialog">
                 <button class="btn btn-success" autofocus @onclick=OkCallback>Ok</button>
                 <button class="btn btn-danger" @onclick=CancelCallback>Cancel</button>

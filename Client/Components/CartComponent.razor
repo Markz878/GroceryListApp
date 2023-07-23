@@ -5,15 +5,15 @@
         <tr>
             <th>Reorder</th>
             <th>Collected</th>
-            <th class="product-col" @onclick="ChangeSortDirectionAndSortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")">
+            <th class="min-w-[150px]" @onclick="ChangeSortDirectionAndSortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")">
                 Product
                 @if (sortState != SortState.None)
                 {
                     <img class="sort-icon" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg") />
                 }
             </th>
-            <th class="number-col">Amount</th>
-            <th class="number-col">Price</th>
+            <th class="min-w-[100px]">Amount</th>
+            <th class="min-w-[100px]">Price</th>
             <th>Total</th>
             <th></th>
             <th></th>

@@ -5,7 +5,7 @@ public abstract class ModalBase : BasePage<ModalViewModel>
     [Inject] public required IJSRuntime JS { get; set; }
     protected ElementReference modal;
     private IJSObjectReference? module;
-
+    protected string? HeaderBackgroundClass { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -19,6 +19,7 @@ public abstract class ModalBase : BasePage<ModalViewModel>
     {
         if (!string.IsNullOrWhiteSpace(ViewModel.Header) && !string.IsNullOrWhiteSpace(ViewModel.Message) && module is not null)
         {
+            SetHeaderBackgroundClass();
             await module.InvokeVoidAsync("showModal", modal);
         }
     }
@@ -28,9 +29,9 @@ public abstract class ModalBase : BasePage<ModalViewModel>
         ViewModel.Clear();
     }
 
-    protected string GetHeaderBackgroundClass()
+    protected void SetHeaderBackgroundClass()
     {
-        return ViewModel.Header == "Error" ? "header-error" : "header-info";
+        HeaderBackgroundClass = ViewModel.Header == "Error" ? "bg-red-600" : "bg-green-600";
     }
 
     public override ValueTask DisposeAsync()

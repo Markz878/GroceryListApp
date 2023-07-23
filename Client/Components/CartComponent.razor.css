@@ -23,10 +23,6 @@ input {
     margin: 0;
 }
 
-.number-col {
-    min-width: 100px;
-}
-
 .checkbox {
     margin: auto;
     transform: scale(2,2);

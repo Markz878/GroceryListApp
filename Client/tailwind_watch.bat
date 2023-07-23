@@ -1,0 +1,1 @@
+tailwind -i Styles/input.css -o wwwroot/css/output.css --watch

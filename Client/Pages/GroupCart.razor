@@ -4,19 +4,19 @@
 <AuthorizedView AuthorizedCondition="CheckAccess">
     @if (group is not null)
     {
-        <div class="group-cart-info-container">
-            <h3>@group.Name</h3>
-            <p><b>Members: </b>@string.Join(", ", group.OtherUsers)</p>
+        <div class="pt-4 pl-4">
+            <h3 class="text-2xl">@group.Name</h3>
+            <p class="my-2"><b>Members: </b>@string.Join(", ", group.OtherUsers)</p>
         </div>
     }
     <CartComponent @ref=cartComponent />
     <CartSummaryRowComponent />
 
-    <div class="share-info-container">
+    <div class="p-4">
         @if (ViewModel.IsPolling)
         {
             <button class="btn btn-danger" @onclick="ExitCart">Stop sharing</button>
-            <p id="share-cart-info">@ViewModel.ShareCartInfo</p>
+            <span id="share-cart-info">@ViewModel.ShareCartInfo</span>
         }
         else
         {

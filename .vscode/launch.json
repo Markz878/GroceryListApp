@@ -1,0 +1,43 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "blazorwasm",
+            "name": "Launch and Debug Blazor WebAssembly Application",
+            "request": "launch"
+        },
+        {
+            "name": "Watch",
+            "type": "coreclr",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/Server",
+            "program": "dotnet",
+            "console": "integratedTerminal",
+            "args": [
+                "watch",
+                "--project",
+                ".",
+                "--verbose" // Let's us confirm browser connects with hot reload capabilities
+            ],
+            "preLaunchTask": "build" // Ensure we don't watch an unbuilt site
+        },
+        {
+            "name": "Attach",
+            "type": "blazorwasm",
+            "request": "attach",
+            "cwd": "${workspaceFolder}/Server",
+            "url": "https://localhost:5021",  // Tell launch where to find site
+            "browser": "chrome",
+            "timeout": 20000, // Allows time for the site to launch
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug with Hot Reload",
+            "configurations": [ "Watch", "Attach" ]
+        }
+    ]
+}

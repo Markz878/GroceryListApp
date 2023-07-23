@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Installers;
+﻿using Microsoft.AspNetCore.DataProtection;
+
+namespace GroceryListHelper.Server.Installers;
 
 public sealed class AntiForgeryTokenInstaller : IInstaller
 {
@@ -11,5 +13,6 @@ public sealed class AntiForgeryTokenInstaller : IInstaller
             options.Cookie.SameSite = SameSiteMode.Strict;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
+        //builder.Services.AddDataProtection(x=>x.ApplicationDiscriminator="Test").SetApplicationName("FAf").;
     }
 }

@@ -4,31 +4,10 @@
     </Found>
     <NotFound>
         <LayoutView Layout="@typeof(MainLayout)">
-            <div style="padding: 1rem;">
+            <div class="p-4">
                 <h4>Sorry, there's nothing at this address.</h4>
                 <a href="/">Back to App</a>
             </div>
         </LayoutView>
     </NotFound>
 </Router>
-@*<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    <p role="alert">You are not authorized to access this resource.</p>
-                </NotAuthorized>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-            <div style="padding: 1rem;">
-                <h4>Sorry, there's nothing at this address.</h4>
-                <a href="/">Back to App</a>
-            </div>
-            </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>*@

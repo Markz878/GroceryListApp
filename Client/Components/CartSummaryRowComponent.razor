@@ -1,10 +1,10 @@
 ﻿@using System.Globalization;
 @inherits CartSummaryRowComponentBase
 
-<div class="summary-row">
-    <div class="collected">
-        <input id="filter-collected-checkbox" type="checkbox" class="checkbox" @bind=@ViewModel.ShowOnlyUncollected/>
-        <label id="filter-collected-label" for="filter-collected-checkbox">Filter collected</label>
+<div class="grid grid-cols-4 items-center justify-items-center pb-4">
+    <div class="justify-self-start ml-8">
+        <input id="filter-collected-checkbox" type="checkbox" class="scale-150" @bind=@ViewModel.ShowOnlyUncollected/>
+        <label id="filter-collected-label" class="m-1 font-bold" for="filter-collected-checkbox">Filter collected</label>
     </div>
     <b id="cart-total">Total: @Total.ToString("N2", CultureInfo.InvariantCulture) €</b>
     <button class="btn btn-primary" disabled="@ViewModel.IsPolling" @onclick="ClearCartProducts" aria-label="Clear cart">Clear cart</button>

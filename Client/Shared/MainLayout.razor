@@ -1,56 +1,55 @@
 ﻿@inherits LayoutComponentBase
 
-<main id="main">
-    <nav id="top-row">
-        <div id="top-row-content">
-            <div id="logo">
-                <a href="/"><img id="logo-img" width="48" src="/cart128.png" alt="Logo" /></a>
-                <h3 id="logo-header">Grocery List Helper</h3>
-            </div>
-            @if (loggedInUserInfo?.IsAuthenticated == true)
-            {
-                @if (Navigation.Uri.Contains("group"))
-                {
-                    <button class="btn btn-success" @onclick="NavigateToIndex">My Cart</button>
-                }
-                else
-                {
-                    <button class="btn btn-success" @onclick="NavigateToGroups">Cart Groups</button>
-                }
-                <div class="profile-menu-container">
-                    <button id="profile-btn" class="profile-btn" @onclick="ToggleUserMenuOpen">@GetUserInitials(loggedInUserInfo)</button>
-                    @if (userMenuOpen)
-                    {
-                        <div class="profile-menu">
-                            @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "name")?.Value is not null)
-                            {
-                                <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "name")!.Value</p>
-                            }
-                            @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "preferred_username")?.Value is not null)
-                            {
-                                <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "preferred_username")!.Value</p>
-                            }
-                            <form id="signout-form" method="post" action="api/Account/Logout">
-                                <AntiForgeryTokenInput />
-                                <button id="signout-btn" class="profile-menu-btn" type="submit">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
-                                    Sign out
-                                </button>
-                            </form>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <a id="login-link" class="nav-link" href="api/Account/Login">Log in</a>
-            }
-        </div>
-    </nav>
-
-    <div id="content">
-        @Body
+<nav class="flex justify-center bg-gray-300 h-14 w-full dark:bg-gray-400">
+  <div class="flex justify-between w-full max-w-[--content-max-width] items-center">
+    <div class="ml-4 flex items-center select-none">
+      <a href="/"><img width="48" src="/cart128.png" alt="Logo" /></a>
+      <h3 class="font-bold text-xl dark:text-gray-100">Grocery List Helper</h3>
     </div>
+    @if (loggedInUserInfo?.IsAuthenticated == true)
+    { @if (Navigation.Uri.Contains("group"))
+      {
+        <button class="btn btn-success" @onclick="NavigateToIndex">My Cart</button>
+      }
+      else
+      {
+        <button class="btn btn-success" @onclick="NavigateToGroups">Cart Groups</button>
+      }
+      <div class="relative z-20 m-4">
+        <button class="bg-green-400 border-2 border-green-600 w-9 h-9 rounded-full hover:bg-green-500" @onclick="ToggleUserMenuOpen">@GetUserInitials(loggedInUserInfo)</button>
+        @if (userMenuOpen)
+        {
+          <div class="absolute border-2 border-white rounded-lg right-0 bg-gray-800 text-white p-2">
+            @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "name")?.Value is not null)
+            {
+              <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "name")!.Value</p>
+            } @if (loggedInUserInfo?.Claims?.FirstOrDefault(x => x.Type == "preferred_username")?.Value is not null)
+            {
+              <p>@loggedInUserInfo.Claims.FirstOrDefault(x=>x.Type == "preferred_username")!.Value</p>
+            }
+            <form method="post" action="api/Account/Logout">
+              <AntiForgeryTokenInput />
+              <button class="font-semibold hover:text-gray-400 hover:underline" type="submit">
+                Sign out
+                <i class="fa fa-sign-out" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        }
+      </div>
+    }
+    else
+    {
+      <a id="login-link" class="text-blue-700 text-lg mx-4 align-middle" href="api/Account/Login">Log in</a>
+    }
+  </div>
+</nav>
+
+<main class="min-h-full bg-[url('../store-transparent.webp')] bg-cover">
+  <div class="bg-gray-300 mx-auto max-w-[--content-max-width] dark:bg-gray-800 dark:text-white">
+    @Body
+  </div>
 </main>
 
 <Modal />
+

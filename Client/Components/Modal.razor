@@ -1,15 +1,15 @@
 ﻿@inherits ModalBase
 
-<dialog id="modal" class="modal" @ref=modal>
-    <div class="modal-content">
-        <div class="modal-header @GetHeaderBackgroundClass()">
-            <h3 class="header-text">@ViewModel.Header</h3>
+<dialog id="modal" class="border-2 border-gray-500 rounded max-w-md animate-fade-in-down p-0" @ref=modal>
+    <div class="font-semibold">
+        <div class="flex justify-between items-center h-8 text-white p-2 @HeaderBackgroundClass">
+            <h3 class="text-xl font-semibold">@ViewModel.Header</h3>
             <form method="dialog">
-                <button class="close" autofocus @onclick=CloseModal>&times;</button>
+                <button class="text-white font-bold border-0 bg-transparent" autofocus @onclick=CloseModal>&times;</button>
             </form>
         </div>
-        <div class="modal-body">
-            <h4 class="body-text">@ViewModel.Message</h4>
+        <div class="p-4">
+            <h4 class="">@ViewModel.Message</h4>
         </div>
     </div>
 </dialog>
