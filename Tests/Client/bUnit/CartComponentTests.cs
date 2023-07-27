@@ -73,7 +73,7 @@ public class CartComponentTests : TestContext
             Assert.NotNull(cut.Find($"td:contains(\"{p.Total:N2}\")"));
         }
         Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("input[checked]").Count);
-        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.checked-item").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.bg-gray-400").Count);
     }
 
     [Theory]
@@ -97,7 +97,7 @@ public class CartComponentTests : TestContext
             Assert.NotNull(cut.Find($"td:contains(\"{p.Total:N2}\")"));
         }
         Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("input[checked]").Count);
-        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.checked-item").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.bg-gray-400").Count);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class CartComponentTests : TestContext
         cartProductsServiceMock.GetCartProducts().Returns(products);
         storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        IElement element = cut.Find("th.product-col");
+        IElement element = cut.Find("table>thead>tr>th:nth-child(3)");
         await element.ClickAsync(new MouseEventArgs());
         IRefreshableElementCollection<IElement> names = cut.FindAll("td[aria-label='Product name']");
         foreach ((string name, IElement elem) in products.Select(x => x.Name).Order().Zip(names))
@@ -137,7 +137,7 @@ public class CartComponentTests : TestContext
         cartProductsServiceMock.GetCartProducts().Returns(products);
         storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        IElement element = cut.Find("th.product-col");
+        IElement element = cut.Find("table>thead>tr>th:nth-child(3)");
         await element.ClickAsync(new MouseEventArgs());
         await Task.Delay(100);
         await element.ClickAsync(new MouseEventArgs());

@@ -35,7 +35,7 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = true,
+            Headless = false,
             SlowMo = 200,
         });
     }

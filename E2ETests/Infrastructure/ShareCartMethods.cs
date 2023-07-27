@@ -16,7 +16,8 @@ internal static class ShareCartMethods
 
     internal static async Task StartShare(IPage page1, IPage page2, string user2Email)
     {
-        await page1.GetByRole(AriaRole.Button, new() { Name = "Cart Groups" }).ClickAsync();
+        await page1.GetByRole(AriaRole.Button, new() { Name = "TU" }).ClickAsync();
+        await page1.GetByRole(AriaRole.Link, new() { Name = "Manage Groups" }).ClickAsync();
         foreach (ILocator item in await page1.GetByRole(AriaRole.Button, new() { Name = "Delete group" }).AllAsync())
         {
             await item.ClickAsync();
@@ -30,7 +31,8 @@ internal static class ShareCartMethods
         await page1.GetByRole(AriaRole.Button, new() { Name = "Select group cart" }).ClickAsync();
         await page1.GetByRole(AriaRole.Button, new() { Name = "Join cart sharing" }).ClickAsync();
 
-        await page2.GetByRole(AriaRole.Button, new() { Name = "Cart Groups" }).ClickAsync();
+        await page2.GetByRole(AriaRole.Button, new() { Name = "TU" }).ClickAsync();
+        await page2.GetByRole(AriaRole.Link, new() { Name = "Manage Groups" }).ClickAsync();
         await page2.GetByRole(AriaRole.Button, new() { Name = "Select group cart" }).ClickAsync();
         await page2.GetByRole(AriaRole.Button, new() { Name = "Join cart sharing" }).ClickAsync();
     }

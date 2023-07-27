@@ -39,11 +39,11 @@ public class ManageGroupsTests : TestContext
         TestAuthorizationContext authContext = this.AddTestAuthorization();
         authContext.SetAuthorized("TEST USER");
         IRenderedComponent<ManageGroups> cut = RenderComponent<ManageGroups>();
-        cut.Find(".create-btn").Click();
+        cut.Find("#create-group-btn").Click();
         cut.Find("#create-group-name").Change("Test Group");
         cut.Find("#add-user-to-group").Change("test1@email.com");
-        cut.Find(".add-btn").Click();
-        cut.Find(".create-btn").Click();
-        Assert.Contains("You, test1@email.com", cut.Find("p.group-members").InnerHtml);
+        cut.Find("#add-member-btn").Click();
+        cut.Find("#create-group-btn").Click();
+        Assert.Contains("Members: You, test1@email.com", cut.Markup);
     }
 }

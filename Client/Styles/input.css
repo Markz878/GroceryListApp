@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --content-max-width: 60rem;
+  --content-max-width: 58rem;
   --content-min-width: 45rem;
 }
 

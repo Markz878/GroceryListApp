@@ -14,6 +14,6 @@ public class ModalTests : TestContext
         IRenderedComponent<Modal> cut = RenderComponent<Modal>();
         cut.Instance.ViewModel.ShowError("This is an error message");
         Assert.Single(module.Invocations);
-        Assert.Contains("<dialog id=\"modal\" class=\"modal\"", cut.Markup);
+        Assert.Contains("<dialog id=\"modal\"", cut.Markup);
     }
 }

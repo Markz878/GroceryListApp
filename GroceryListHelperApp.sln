@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2ETests", "E2ETests\E2ETests.csproj", "{AB839C83-DA00-4CFA-BEEC-82C057CC52AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroceryListHelper.Core", "GroceryListHelper.Core\GroceryListHelper.Core.csproj", "{803C5D01-7707-471B-ABF5-9F83782C2B74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Core", "GroceryListHelper.Core\GroceryListHelper.Core.csproj", "{803C5D01-7707-471B-ABF5-9F83782C2B74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
