@@ -25,7 +25,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
 
     protected override async Task OnInitializedAsync()
     {
-        if (!ApplicationState.TryTakeFromJson(nameof(cartGroups), out cartGroups))
+        if (!ApplicationState.TryTakeFromJson(nameof(cartGroups), out cartGroups!))
         {
             cartGroups = await GroupsService.GetCartGroups();
         }

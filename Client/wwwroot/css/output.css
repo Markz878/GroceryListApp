@@ -718,36 +718,8 @@ td {
   right: 0px;
 }
 
-.top-2 {
-  top: 0.5rem;
-}
-
-.top-full {
-  top: 100%;
-}
-
-.top-16 {
-  top: 4rem;
-}
-
-.top-12 {
-  top: 3rem;
-}
-
 .z-20 {
   z-index: 20;
-}
-
-.m-1 {
-  margin: 0.25rem;
-}
-
-.m-4 {
-  margin: 1rem;
-}
-
-.m-2 {
-  margin: 0.5rem;
 }
 
 .mx-3 {
@@ -787,12 +759,20 @@ td {
   margin-bottom: 0.5rem;
 }
 
+.mb-\[2\.75px\] {
+  margin-bottom: 2.75px;
+}
+
 .ml-1 {
   margin-left: 0.25rem;
 }
 
 .ml-2 {
   margin-left: 0.5rem;
+}
+
+.ml-3 {
+  margin-left: 0.75rem;
 }
 
 .ml-4 {
@@ -807,56 +787,16 @@ td {
   margin-right: 0.5rem;
 }
 
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
 
 .mt-4 {
   margin-top: 1rem;
-}
-
-.mt-1 {
-  margin-top: 0.25rem;
-}
-
-.mr-1 {
-  margin-right: 0.25rem;
-}
-
-.ml-3 {
-  margin-left: 0.75rem;
-}
-
-.mb-\[0\.5px\] {
-  margin-bottom: 0.5px;
-}
-
-.mb-\[0\.75px\] {
-  margin-bottom: 0.75px;
-}
-
-.mb-\[0\.85px\] {
-  margin-bottom: 0.85px;
-}
-
-.mb-\[0\.95px\] {
-  margin-bottom: 0.95px;
-}
-
-.mb-\[1px\] {
-  margin-bottom: 1px;
-}
-
-.mb-\[1\.5px\] {
-  margin-bottom: 1.5px;
-}
-
-.mb-\[1\.75px\] {
-  margin-bottom: 1.75px;
-}
-
-.mb-\[2\.75px\] {
-  margin-bottom: 2.75px;
 }
 
 .block {
@@ -1140,11 +1080,6 @@ td {
   background-color: transparent;
 }
 
-.bg-white {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
 .bg-\[url\(\'\.\.\/store-transparent\.webp\'\)\] {
   background-image: url('../store-transparent.webp');
 }
@@ -1161,12 +1096,12 @@ td {
   padding: 0.5rem;
 }
 
-.p-4 {
-  padding: 1rem;
-}
-
 .p-3 {
   padding: 0.75rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .px-1 {
