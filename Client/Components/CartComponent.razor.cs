@@ -174,7 +174,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
 
     protected static string GetRowClass(CartProductUIModel cartProduct)
     {
-        return cartProduct.IsCollected ? "checked-item" : "";
+        return cartProduct.IsCollected ? "bg-gray-400 dark:bg-gray-600" : "";
     }
 
     protected async Task MarkItemCollected(ChangeEventArgs e, CartProductUIModel product)

@@ -3,14 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --disabled-btn-background: #d2d2d2;
-  --disabled-btn-color: #ababab;
   --content-max-width: 60rem;
-  --color-light: #fff;
-  --color-dark: #111;
-  --color-light-gray: #aaa;
-  --color-dark-gray: #555;
-  --color-darker-gray: #383838;
+  --content-min-width: 45rem;
 }
 
 @layer base {
@@ -27,11 +21,11 @@
   }
 
   thead {
-    @apply border-b-2 border-b-gray-100;
+    @apply border-b-2;
   }
 
   tr {
-    @apply border-t-2 border-t-gray-100;
+    @apply border-t-2 h-14 border-t-gray-500/50 dark:border-t-gray-100;
   }
 
   th {
@@ -45,16 +39,16 @@
 
 @layer components {
   .btn {
-    @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white transition-colors;
+    @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white transition-colors disabled:bg-gray-500;
   }
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700;
+    @apply bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500;
   }
   .btn-success {
-    @apply bg-green-600 hover:bg-green-700;
+    @apply bg-green-600 hover:bg-green-700 disabled:bg-gray-500;
   }
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700;
+    @apply bg-red-600 hover:bg-red-700  disabled:bg-gray-500;
   }
   .form-control {
     @apply box-border block h-9 w-full rounded-md border-[1px] border-gray-100 bg-clip-padding px-1 py-3 leading-6 text-gray-800 shadow transition-all focus:border-gray-400 dark:bg-gray-900 dark:text-white;

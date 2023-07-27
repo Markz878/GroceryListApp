@@ -9,6 +9,8 @@ module.exports = {
     safelist: [
         'bg-red-600',
         'bg-green-600',
+        'bg-gray-400',
+        'bg-gray-600'
     ],
     theme: {
         extend: {

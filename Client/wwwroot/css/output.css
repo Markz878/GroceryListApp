@@ -442,14 +442,19 @@ table {
 
 thead {
   border-bottom-width: 2px;
-  --tw-border-opacity: 1;
-  border-bottom-color: rgb(243 244 246 / var(--tw-border-opacity));
 }
 
 tr {
+  height: 3.5rem;
   border-top-width: 2px;
-  --tw-border-opacity: 1;
-  border-top-color: rgb(243 244 246 / var(--tw-border-opacity));
+  border-top-color: rgb(107 114 128 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  tr {
+    --tw-border-opacity: 1;
+    border-top-color: rgb(243 244 246 / var(--tw-border-opacity));
+  }
 }
 
 th {
@@ -575,6 +580,11 @@ td {
   transition-duration: 150ms;
 }
 
+.btn:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
+}
+
 .btn-primary {
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity));
@@ -583,6 +593,11 @@ td {
 .btn-primary:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+
+.btn-primary:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
 }
 
 .btn-success {
@@ -595,6 +610,11 @@ td {
   background-color: rgb(21 128 61 / var(--tw-bg-opacity));
 }
 
+.btn-success:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
+}
+
 .btn-danger {
   --tw-bg-opacity: 1;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
@@ -603,6 +623,11 @@ td {
 .btn-danger:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(185 28 28 / var(--tw-bg-opacity));
+}
+
+.btn-danger:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
 }
 
 .form-control {
@@ -734,6 +759,10 @@ td {
   margin-bottom: 0px;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -766,6 +795,14 @@ td {
   margin-top: 1rem;
 }
 
+.block {
+  display: block;
+}
+
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
@@ -778,16 +815,8 @@ td {
   display: table;
 }
 
-.grid {
-  display: grid;
-}
-
 .hidden {
   display: none;
-}
-
-.h-14 {
-  height: 3.5rem;
 }
 
 .h-4 {
@@ -842,6 +871,14 @@ td {
   min-width: 150px;
 }
 
+.min-w-\[716px\] {
+  min-width: 716px;
+}
+
+.min-w-\[--content-min-width\] {
+  min-width: var(--content-min-width);
+}
+
 .max-w-\[--content-max-width\] {
   max-width: var(--content-max-width);
 }
@@ -888,10 +925,6 @@ td {
           user-select: none;
 }
 
-.grid-cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .flex-wrap {
   flex-wrap: wrap;
 }
@@ -914,6 +947,10 @@ td {
 
 .gap-2 {
   gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .justify-self-start {
@@ -982,9 +1019,29 @@ td {
   background-color: rgb(40 167 69 / var(--tw-bg-opacity));
 }
 
-.bg-gray-300 {
+.bg-blue-800 {
   --tw-bg-opacity: 1;
-  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
+  background-color: rgb(30 64 175 / var(--tw-bg-opacity));
+}
+
+.bg-gray-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+}
+
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+}
+
+.bg-gray-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(156 163 175 / var(--tw-bg-opacity));
+}
+
+.bg-gray-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
 }
 
 .bg-gray-800 {
@@ -1058,6 +1115,10 @@ td {
   padding-left: 1rem;
 }
 
+.pt-2 {
+  padding-top: 0.5rem;
+}
+
 .pt-4 {
   padding-top: 1rem;
 }
@@ -1106,6 +1167,10 @@ td {
   line-height: 1rem;
 }
 
+.leading-5 {
+  line-height: 1.25rem;
+}
+
 .text-blue-700 {
   --tw-text-opacity: 1;
   color: rgb(29 78 216 / var(--tw-text-opacity));
@@ -1126,14 +1191,12 @@ td {
 }
 
 :root {
-  --disabled-btn-background: #d2d2d2;
-  --disabled-btn-color: #ababab;
   --content-max-width: 60rem;
-  --color-light: #fff;
-  --color-dark: #111;
-  --color-light-gray: #aaa;
-  --color-dark-gray: #555;
-  --color-darker-gray: #383838;
+  --content-min-width: 45rem;
+}
+
+.backdrop\:bg-gray-900\/60::backdrop {
+  background-color: rgb(17 24 39 / 0.6);
 }
 
 .hover\:bg-green-500:hover {
@@ -1151,9 +1214,9 @@ td {
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark\:bg-gray-400 {
+  .dark\:bg-gray-500 {
     --tw-bg-opacity: 1;
-    background-color: rgb(156 163 175 / var(--tw-bg-opacity));
+    background-color: rgb(107 114 128 / var(--tw-bg-opacity));
   }
 
   .dark\:bg-gray-800 {
