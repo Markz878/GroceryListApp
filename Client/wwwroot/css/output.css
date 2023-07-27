@@ -863,20 +863,16 @@ td {
   width: 100%;
 }
 
+.min-w-\[--content-min-width\] {
+  min-width: var(--content-min-width);
+}
+
 .min-w-\[100px\] {
   min-width: 100px;
 }
 
 .min-w-\[150px\] {
   min-width: 150px;
-}
-
-.min-w-\[716px\] {
-  min-width: 716px;
-}
-
-.min-w-\[--content-min-width\] {
-  min-width: var(--content-min-width);
 }
 
 .max-w-\[--content-max-width\] {
