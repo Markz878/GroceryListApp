@@ -286,20 +286,19 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
     }
 
-    protected double GetTop(CartProductUIModel cartProduct)
+    protected double GetRowTop(CartProductUIModel cartProduct)
     {
-        int index = -1;
-        foreach ((CartProductUIModel x, int i) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((x, i) => (x, i)))
+        int productIndex = -1;
+        foreach ((CartProductUIModel product, int index) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((product, index) => (product, index)))
         {
-            if (cartProduct == x)
+            if (cartProduct == product)
             {
-                index = i;
+                productIndex = index;
                 break;
             }
         }
-        return 0.5 + index * 3;
+        return 0.5 + productIndex * 3;
     }
-
 
     protected async Task RemoveProduct(CartProductUIModel product)
     {

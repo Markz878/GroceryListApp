@@ -435,37 +435,6 @@ body {
   padding: 0px;
 }
 
-table {
-  margin-bottom: 1rem;
-  border-collapse: collapse;
-}
-
-thead {
-  border-bottom-width: 2px;
-}
-
-tr {
-  height: 3.5rem;
-  border-top-width: 2px;
-  border-top-color: rgb(107 114 128 / 0.5);
-}
-
-@media (prefers-color-scheme: dark) {
-  tr {
-    --tw-border-opacity: 1;
-    border-top-color: rgb(243 244 246 / var(--tw-border-opacity));
-  }
-}
-
-th {
-  padding: 1rem;
-}
-
-td {
-  padding: 0.5rem;
-  text-align: center;
-}
-
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -1224,6 +1193,12 @@ td {
 
 .transition-\[top\] {
   transition-property: top;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-\[height\] {
+  transition-property: height;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
