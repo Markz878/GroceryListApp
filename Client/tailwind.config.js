@@ -28,6 +28,9 @@ module.exports = {
             },
             animation: {
                 'fade-in-down': 'fade-in-down 0.5s ease-out',
+            },
+            gridTemplateColumns: {
+                'cart': '1fr 1fr 3fr repeat(4,1fr)'
             }
         },
     },

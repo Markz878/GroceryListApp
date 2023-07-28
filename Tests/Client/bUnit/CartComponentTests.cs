@@ -67,13 +67,13 @@ public class CartComponentTests : TestContext
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
         foreach (CartProductUIModel p in products)
         {
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Name}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Amount}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.UnitPrice:N2}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Total:N2}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Name}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Amount}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.UnitPrice:N2}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Total:N2}\")"));
         }
         Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("input[checked]").Count);
-        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.bg-gray-400").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("div[role='row'].bg-gray-400").Count);
     }
 
     [Theory]
@@ -91,13 +91,13 @@ public class CartComponentTests : TestContext
         Assert.Equal(products.Count, persistedProducts.Count);
         foreach (CartProductUIModel p in products)
         {
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Name}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Amount}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.UnitPrice:N2}\")"));
-            Assert.NotNull(cut.Find($"td:contains(\"{p.Total:N2}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Name}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Amount}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.UnitPrice:N2}\")"));
+            Assert.NotNull(cut.Find($"span:contains(\"{p.Total:N2}\")"));
         }
         Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("input[checked]").Count);
-        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("tr.bg-gray-400").Count);
+        Assert.Equal(products.Count(x => x.IsCollected), cut.FindAll("div[role='row'].bg-gray-400").Count);
     }
 
     [Fact]
@@ -105,21 +105,22 @@ public class CartComponentTests : TestContext
     {
         List<CartProductUIModel> products = new()
         {
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "DProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "EProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "AProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 1000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "CProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 2000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "DProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 1000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "EProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 2000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "AProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "CProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 4000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 5000 },
         };
         cartProductsServiceMock.GetCartProducts().Returns(products);
         storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        IElement element = cut.Find("table>thead>tr>th:nth-child(3)");
+        IElement element = cut.Find("div[role='rowheader']>div>button[aria-label='Sort items']");
         await element.ClickAsync(new MouseEventArgs());
-        IRefreshableElementCollection<IElement> names = cut.FindAll("td[aria-label='Product name']");
-        foreach ((string name, IElement elem) in products.Select(x => x.Name).Order().Zip(names))
+        IRefreshableElementCollection<IElement> rows = cut.FindAll("div[role=row]");
+        IEnumerable<double> tops = rows.Select(x => double.Parse(x.Attributes["style"]?.Value.Replace("top: ", "").Replace("rem;", "") ?? ""));
+        foreach (((string Name, int productIndex) First, (double top, int topIndex) Second) in products.Select((product, productIndex) => (product.Name, productIndex)).OrderBy(x => x.Name).Zip(tops.Select((top, topIndex) => (top, topIndex)).OrderBy(x => x.top)))
         {
-            Assert.Equal(name, elem.InnerHtml);
+            Assert.Equal(First.productIndex, Second.topIndex);
         }
     }
 
@@ -128,23 +129,24 @@ public class CartComponentTests : TestContext
     {
         List<CartProductUIModel> products = new()
         {
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "DProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "EProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "AProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 1000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "CProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
-            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 2000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "DProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 1000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "EProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 2000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "AProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 3000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "CProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 4000 },
+            new CartProductUIModel() { Amount = Random.Shared.Next(1,5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble()*10, Order = 5000 },
         };
         cartProductsServiceMock.GetCartProducts().Returns(products);
         storeProductsServiceMock.GetStoreProducts().Returns(new List<StoreProduct>());
         IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
-        IElement element = cut.Find("table>thead>tr>th:nth-child(3)");
+        IElement element = cut.Find("div[role='rowheader']>div>button[aria-label='Sort items']");
         await element.ClickAsync(new MouseEventArgs());
         await Task.Delay(100);
         await element.ClickAsync(new MouseEventArgs());
-        IRefreshableElementCollection<IElement> names = cut.FindAll("td[aria-label='Product name']");
-        foreach ((string name, IElement elem) in products.Select(x => x.Name).OrderDescending().Zip(names))
+        IRefreshableElementCollection<IElement> rows = cut.FindAll("div[role=row]");
+        IEnumerable<double> tops = rows.Select(x => double.Parse(x.Attributes["style"]?.Value.Replace("top: ", "").Replace("rem;", "") ?? ""));
+        foreach (((string Name, int productIndex) First, (double top, int topIndex) Second) in products.Select((product, productIndex) => (product.Name, productIndex)).OrderByDescending(x => x.Name).Zip(tops.Select((top, topIndex) => (top, topIndex)).OrderBy(x => x.top)))
         {
-            Assert.Equal(name, elem.InnerHtml);
+            Assert.Equal(First.productIndex, Second.topIndex);
         }
     }
 
@@ -160,7 +162,7 @@ public class CartComponentTests : TestContext
         await cut.Find("button#add-cartproduct-button").ClickAsync(new MouseEventArgs());
         await cartProductsServiceMock.Received().SaveCartProduct(Arg.Is<CartProduct>(x => x.Name == "Product" && x.Amount == 2 && x.UnitPrice == 3.2));
         await storeProductsServiceMock.Received().SaveStoreProduct(Arg.Is<StoreProduct>(x => x.Name == "Product" && x.UnitPrice == 3.2));
-        Assert.Equal("Product", cut.Find("td#item-name-0").InnerHtml);
+        Assert.Equal("Product", cut.Find("div[role='row']>span[aria-label='Product name']").InnerHtml);
     }
 
     [Fact]

@@ -59,7 +59,7 @@ public sealed class CartProductsTests : BaseTest
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         string responseString = await response.Content.ReadAsStringAsync();
         Assert.False(string.IsNullOrWhiteSpace(responseString));
-        Assert.Contains("The length of 'Name' must be 30 characters or fewer. You entered 31 characters.", responseString);
+        Assert.Contains("The length of 'Product Name' must be 30 characters or fewer. You entered 31 characters.", responseString);
         Assert.Contains("'Amount' must be between 0", responseString);
         Assert.Contains("'Unit Price' must be between 0 and", responseString);
     }

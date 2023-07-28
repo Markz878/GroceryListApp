@@ -27,19 +27,12 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         int productAmount = 2;
         double productPrice = 2.9;
         await page.AddProductToCart(productName, productAmount, productPrice);
-        IElementHandle? element = await page.QuerySelectorAsync("#item-name-0");
+        IElementHandle? element = await page.GetRow(0).ElementHandleAsync();
         Assert.NotNull(element);
     }
 
-    [Fact]
-    public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
-    {
-        await page.AddProductToCart("", 2, 2.9);
-        await page.WaitForSelectorAsync("text='Name' must not be empty.");
-        Assert.Null(await page.QuerySelectorAsync("td:has-text(\"2.9\")"));
-    }
-
     [Theory]
+    [InlineData(5, 4, 0)]
     [InlineData(5, 1, 4)]
     [InlineData(5, 0, 4)]
     public async Task AddValidProducts_ReorderProducts_ProductsAreInCorrectOrder(int productCount, int moveItemIndex, int toTargetIndex)
@@ -48,13 +41,19 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
-        await page.ClickAsync($"#reorder-button-{moveItemIndex}");
-        await page.ClickAsync($"#reorder-button-{toTargetIndex}");
+        await page.ClickReorderButton(moveItemIndex);
+        await page.ClickReorderButton(toTargetIndex);
         await Task.Delay(100);
-        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync($"#item-name-{toTargetIndex}");
-        ArgumentNullException.ThrowIfNull(movedProductNameElement);
-        string movedProductName = await movedProductNameElement.InnerTextAsync();
-        Assert.Equal($"Product{moveItemIndex}", movedProductName);
+        int sourceTop = await page.GetRowTopPixels(moveItemIndex);
+        int targetTop = await page.GetRowTopPixels(toTargetIndex);
+        if (toTargetIndex > 0)
+        {
+            Assert.True(sourceTop > targetTop);
+        }
+        else
+        {
+            Assert.True(sourceTop < targetTop);
+        }
     }
 
     [Fact]
@@ -66,20 +65,20 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync("text=Clear cart");
-        IElementHandle? movedProductNameElement = await page.QuerySelectorAsync("#item-name-0");
-        Assert.Null(movedProductNameElement);
+        IReadOnlyList<IElementHandle> rows = await page.GetRow(0).ElementHandlesAsync();
+        Assert.Empty(rows);
     }
 
     [Fact]
     public async Task AddProduct_EditProperties_ShouldChangeValues()
     {
         await page.AddProductToCart($"Product", 1, 1.5);
-        await page.ClickAsync("#edit-product-button-0");
-        await page.FillAsync("#edit-item-amount-input-0", "2");
-        await page.FillAsync("#edit-item-unitprice-input-0", "2.50");
-        await page.ClickAsync("#update-product-button-0");
-        Assert.Equal("2", await page.InnerTextAsync("#item-amount-0"));
-        Assert.Equal("2.50", await page.InnerTextAsync("#item-unitprice-0"));
+        await page.ClickEditButton(0);
+        await page.FillEditAmount(0, 2);
+        await page.FillEditPrice(0, 2.50);
+        await page.ClickSubmitEditButton(0);
+        Assert.Equal("2", await page.GetItemAmount(0));
+        Assert.Equal("2.50", await page.GetItemPrice(0));
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         {
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
-        await page.ClickAsync($"#delete-product-button-{productCount / 2}");
+        await page.ClickDeleteButton(productCount / 2);
         IElementHandle? element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
     }

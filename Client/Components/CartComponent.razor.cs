@@ -117,9 +117,9 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         await cartProductsService.SortCartProducts(sortState == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
     }
 
-    private static double GetNewCartProductOrder(ObservableCollection<CartProductUIModel> cartProducts)
+    private static double GetNewCartProductOrder(IEnumerable<CartProductUIModel> cartProducts)
     {
-        if (cartProducts.Count == 0)
+        if (!cartProducts.Any())
         {
             return 1000;
         }
@@ -270,6 +270,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         {
             sortState = SortState.None;
             movingItem.Order = SortOrderMethods.GetNewOrder(ViewModel.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
+            StateHasChanged();
             try
             {
                 await cartProductsService.UpdateCartProduct(movingItem);
@@ -284,6 +285,21 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             }
         }
     }
+
+    protected double GetTop(CartProductUIModel cartProduct)
+    {
+        int index = -1;
+        foreach ((CartProductUIModel x, int i) in ViewModel.CartProducts.Where(x => !ViewModel.ShowOnlyUncollected || !x.IsCollected).OrderBy(x => x.Order).Select((x, i) => (x, i)))
+        {
+            if (cartProduct == x)
+            {
+                index = i;
+                break;
+            }
+        }
+        return 0.5 + index * 3;
+    }
+
 
     protected async Task RemoveProduct(CartProductUIModel product)
     {
