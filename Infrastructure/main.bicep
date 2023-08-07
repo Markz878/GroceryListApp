@@ -88,7 +88,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       defaultAction: 'Deny'
       virtualNetworkRules: [
         {
-          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, vnetName, vnet.properties.subnets[0].name)
+          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
           action: 'Allow'
         }
       ]
