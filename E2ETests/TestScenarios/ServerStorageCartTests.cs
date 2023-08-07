@@ -65,6 +65,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
             await page.AddProductToCart($"Product{i}", i + 1, i * 1.5 + 0.5);
         }
         await page.ClickAsync("text=Clear cart");
+        await page.ClickAsync("text=Yes");
         IReadOnlyList<IElementHandle> rows = await page.GetRow(0).ElementHandlesAsync();
         Assert.Empty(rows);
     }

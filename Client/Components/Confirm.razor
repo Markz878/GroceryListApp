@@ -6,8 +6,8 @@
         <div class="p-2">
             <p class="pb-2">@Message</p>
             <form method="dialog" class="flex justify-around">
-                <button class="btn btn-success" autofocus @onclick=OkCallback>Yes</button>
-                <button class="btn btn-danger" @onclick=CancelCallback>No</button>
+                <button class="btn btn-success" autofocus @onclick=OkCallback aria-label="Yes">Yes</button>
+                <button class="btn btn-danger" @onclick=CancelCallback aria-label="No">No</button>
             </form>
         </div>
     </div>

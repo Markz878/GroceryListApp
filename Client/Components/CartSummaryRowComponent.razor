@@ -7,7 +7,7 @@
         <label id="filter-collected-label" class="ml-3 mb-[2.75px] font-bold whitespace-nowrap" for="filter-collected-checkbox">Filter collected</label>
     </div>
     <b id="cart-total">Total: @Total.ToString("N2", CultureInfo.InvariantCulture) €</b>
-    <button class="btn btn-primary mx-4" disabled="@ViewModel.IsPolling" @onclick=@(() => ShowDeleteConfirm("Delete all current cart items?", ClearCartProducts)) aria-label=" Clear cart">Clear cart</button>
+    <button class="btn btn-primary mx-4" disabled="@ViewModel.IsPolling" @onclick=@(() => ShowDeleteConfirm("Delete all current cart items?", ClearCartProducts)) aria-label="Clear cart">Clear cart</button>
     <button class="btn btn-primary mx-4" disabled="@ViewModel.IsPolling" @onclick=@(() => ShowDeleteConfirm("Delete all stored shop items?", ClearStoreProducts)) aria-label="Clear store products">Clear shop</button>
 </div>
 <Confirm Header="Confirm delete" Message=@confirmMessage OkCallback=@(confirmCallback) @ref=confirmDeleteRef />

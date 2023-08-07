@@ -18,6 +18,8 @@ public class CartSummaryRowComponentTests : TestContext
 
     public CartSummaryRowComponentTests()
     {
+        BunitJSModuleInterop module = JSInterop.SetupModule("./Components/Confirm.razor.js");
+        module.SetupVoid("showModal", _ => true).SetVoidResult();
         cartProductsServiceFactoryMock.GetCartProductsService().Returns(cartProductsServiceMock);
         storeProductsServiceFactoryMock.GetStoreProductsService().Returns(storeProductsServiceMock);
         Services.AddSingleton(cartProductsServiceFactoryMock);
@@ -74,8 +76,8 @@ public class CartSummaryRowComponentTests : TestContext
             vm.CartProducts.Add(p);
         }
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
-        IElement buttonElement = cut.Find("button[aria-label=\"Clear cart\"]");
-        buttonElement.Click();
+        cut.Find("button[aria-label=\"Clear cart\"]").Click();
+        cut.Find("button[aria-label=\"Yes\"]").Click();
         Assert.Contains("Total: 0", cut.Markup);
     }
 
@@ -83,8 +85,8 @@ public class CartSummaryRowComponentTests : TestContext
     public void WhenStoreProductHasItems_AndClearStoreProductsButtonIsPressed_StoreProductsIsCleared()
     {
         IRenderedComponent<CartSummaryRowComponent> cut = RenderComponent<CartSummaryRowComponent>();
-        IElement buttonElement = cut.Find("button[aria-label=\"Clear store products\"]");
-        buttonElement.Click();
+        cut.Find("button[aria-label=\"Clear store products\"]").Click();
+        cut.Find("button[aria-label=\"Yes\"]").Click();
         Assert.Empty(vm.StoreProducts);
         storeProductsServiceMock.Received(1).ClearStoreProducts();
     }
