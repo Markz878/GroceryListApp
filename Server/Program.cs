@@ -2,7 +2,6 @@
 global using FluentValidation;
 global using FluentValidation.Results;
 global using GroceryListHelper.DataAccess.HelperMethods;
-global using GroceryListHelper.DataAccess.Repositories;
 global using GroceryListHelper.Server.Endpoints;
 global using GroceryListHelper.Server.HelperMethods;
 global using GroceryListHelper.Server.Hubs;

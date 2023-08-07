@@ -3,9 +3,11 @@
 public abstract class ModalBase : BasePage<ModalViewModel>
 {
     [Inject] public required IJSRuntime JS { get; set; }
+    protected string? HeaderBackgroundClass { get; set; }
+
     protected ElementReference modal;
     private IJSObjectReference? module;
-    protected string? HeaderBackgroundClass { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
