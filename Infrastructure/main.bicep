@@ -88,7 +88,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       defaultAction: 'Deny'
       virtualNetworkRules: [
         {
-          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, vnet.properties.subnets[0].name)
+          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, vnetName, vnet.properties.subnets[0].name)
           action: 'Allow'
         }
       ]
@@ -97,7 +97,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: planName
   location: location
   kind: 'linux'
@@ -153,7 +153,7 @@ resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections
   }
 }
 
-resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(resourceGroup().id, appService.id, storage_table_contributor.id)
   scope: storageAccount
   properties: {

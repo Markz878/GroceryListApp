@@ -7,6 +7,20 @@ public abstract class CartSummaryRowComponentBase : BasePage<MainViewModel>
     public bool AllCollected => ViewModel.CartProducts.Count > 0 && ViewModel.CartProducts.All(x => x.IsCollected);
     public double Total => ViewModel.CartProducts.Sum(x => x.Total);
 
+    protected string confirmMessage = "";
+    protected Func<Task> confirmCallback = () => Task.CompletedTask;
+    protected Confirm? confirmDeleteRef;
+
+    public async Task ShowDeleteConfirm(string confirmMessage, Func<Task> confirmCallback)
+    {
+        this.confirmMessage = confirmMessage;
+        this.confirmCallback = confirmCallback;
+        if (confirmDeleteRef is not null)
+        {
+            await confirmDeleteRef.ShowConfirm();
+        }
+    }
+
     public async Task ClearCartProducts()
     {
         ViewModel.CartProducts.Clear();
