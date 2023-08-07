@@ -7,7 +7,7 @@ param appInsightsName string = 'ai-${webSiteName}'
 param storageName string = 'st${webSiteName}'
 param sku string = 'B1'
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: logAnalyticsName
   location: location
   properties: {
@@ -32,7 +32,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   name: vnetName
   location: location
   properties: {
@@ -85,14 +85,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     networkAcls: {
       bypass: 'None'
+      defaultAction: 'Deny'
       virtualNetworkRules: [
         {
-          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
+          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, vnet.properties.subnets[0].name)
           action: 'Allow'
         }
       ]
       ipRules: []
-      defaultAction: 'Deny'
     }
   }
 }
