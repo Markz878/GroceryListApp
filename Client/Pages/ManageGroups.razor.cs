@@ -7,7 +7,6 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
 {
     [Inject] public required ICartGroupsService GroupsService { get; set; }
     [Inject] public required NavigationManager Navigation { get; set; }
-    [Inject] public required ModalViewModel Modal { get; set; }
     [Inject] public required PersistentComponentState ApplicationState { get; set; }
 
     protected List<CartGroup> cartGroups = new();
@@ -45,7 +44,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
             ValidationResult validationResult = cartGroupValidator.Validate(createCartGroupRequest);
             if (validationResult.IsValid is false)
             {
-                Modal.ShowError(validationResult.Errors.First().ErrorMessage);
+                ViewModel.ShowError(validationResult.Errors.First().ErrorMessage);
                 return;
             }
             try
@@ -60,12 +59,12 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
                 },
                 e =>
                 {
-                    Modal.ShowError(e.Message);
+                    ViewModel.ShowError(e.Message);
                 });
             }
             catch (Exception ex)
             {
-                Modal.ShowError(ex.Message);
+                ViewModel.ShowError(ex.Message);
             }
             finally
             {
@@ -88,7 +87,7 @@ public abstract class ManageGroupsBase : BasePage<MainViewModel>
         ValidationResult validationResult = emailValidator.Validate(newMemberEmail);
         if (validationResult.IsValid is false)
         {
-            Modal.ShowError(validationResult.Errors.First().ErrorMessage);
+            ViewModel.ShowError(validationResult.Errors.First().ErrorMessage);
             return;
         }
         createCartGroupRequest.OtherUsers.Add(newMemberEmail.Email);

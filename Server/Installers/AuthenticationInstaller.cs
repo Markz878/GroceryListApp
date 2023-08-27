@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.Core.RepositoryContracts;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace GroceryListHelper.Server.Installers;
 
@@ -22,6 +23,14 @@ public sealed class AuthenticationInstaller : IInstaller
                 ArgumentNullException.ThrowIfNull(userId);
                 string? name = context.Principal.GetUserName();
                 await userRepository.AddUser(email, userId.Value, name);
+            };
+        });
+        builder.Services.Configure(OpenIdConnectDefaults.AuthenticationScheme, (OpenIdConnectOptions options) =>
+        {
+            options.Events.OnRedirectToIdentityProvider = context =>
+            {
+                context.ProtocolMessage.Prompt = "select_account";
+                return Task.CompletedTask;
             };
         });
     }

@@ -5,13 +5,11 @@ namespace GroceryListHelper.Client.HelperMethods;
 public sealed class CartHubClient : ICartHubClient
 {
     private readonly MainViewModel indexViewModel;
-    private readonly ModalViewModel modalViewModel;
     private readonly HubConnection hub;
 
-    public CartHubClient(Uri hubUri, MainViewModel indexViewModel, ModalViewModel modalViewModel, Action<HttpConnectionOptions>? configureHttpConnection = null)
+    public CartHubClient(Uri hubUri, MainViewModel indexViewModel, Action<HttpConnectionOptions>? configureHttpConnection = null)
     {
         this.indexViewModel = indexViewModel;
-        this.modalViewModel = modalViewModel;
         hub = BuildCartHubConnection(hubUri, configureHttpConnection);
     }
 
@@ -45,37 +43,47 @@ public sealed class CartHubClient : ICartHubClient
 
         hub.On<CartProductCollectable>(nameof(ICartHubNotifications.ItemModified), (cartProduct) =>
         {
-            CartProductUIModel product = indexViewModel.CartProducts.First(x => x.Name == cartProduct.Name);
-            product.Amount = cartProduct.Amount;
-            product.UnitPrice = cartProduct.UnitPrice;
-            product.Order = cartProduct.Order;
-            product.IsCollected = cartProduct.IsCollected;
-            product.Name = cartProduct.Name;
-            indexViewModel.OnPropertyChanged();
+            CartProductUIModel? product = indexViewModel.CartProducts.FirstOrDefault(x => x.Name == cartProduct.Name);
+            if (product is not null)
+            {
+                product.Amount = cartProduct.Amount;
+                product.UnitPrice = cartProduct.UnitPrice;
+                product.Order = cartProduct.Order;
+                product.IsCollected = cartProduct.IsCollected;
+                product.Name = cartProduct.Name;
+                indexViewModel.OnPropertyChanged();
+            }
         });
 
         hub.On<string>(nameof(ICartHubNotifications.ItemDeleted), (name) =>
         {
-            indexViewModel.CartProducts.Remove(indexViewModel.CartProducts.First(x => x.Name == name));
+            CartProductUIModel? productToRemove = indexViewModel.CartProducts.FirstOrDefault(x => x.Name == name);
+            if (productToRemove is not null)
+            {
+                indexViewModel.CartProducts.Remove(productToRemove);
+            }
         });
         return hub;
     }
 
     private Task CartHub_Reconnecting(Exception arg)
     {
-        modalViewModel.ShowInfo($"Cart sharing reconnecting, reason: {arg.Message}");
+        Console.WriteLine(arg.Message);
+        indexViewModel.ShowInfo($"Cart sharing connection lost, trying to reconnect...");
         return Task.CompletedTask;
     }
 
     private Task CartHub_Reconnected(string arg)
     {
-        modalViewModel.ShowInfo($"Cart sharing reconnected, reason: {arg}");
+        indexViewModel.ShowInfo($"Cart sharing reconnected!");
         return Task.CompletedTask;
     }
 
-    private Task CartHub_Closed(Exception arg)
+    private Task CartHub_Closed(Exception ex)
     {
-        modalViewModel.ShowInfo($"Cart sharing connection closed unexpectedly, reason: {arg.Message}");
+        Console.WriteLine(ex.Message);
+        indexViewModel.ShareCartInfo = ex is null ? "" : "Cart sharing connection closed due to connection errors";
+        indexViewModel.IsPolling = false;
         return Task.CompletedTask;
     }
 

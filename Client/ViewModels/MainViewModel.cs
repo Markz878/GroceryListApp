@@ -10,4 +10,23 @@ public sealed class MainViewModel : BaseViewModel
     private bool isPolling;
     public bool ShowOnlyUncollected { get => showOnlyUncollected; set => SetProperty(ref showOnlyUncollected, value); }
     private bool showOnlyUncollected;
+    public string Header { get => header; private set => SetProperty(ref header, value); }
+    private string header = string.Empty;
+    public string Message { get => message; private set => SetProperty(ref message, value); }
+    private string message = string.Empty;
+    public void ShowInfo(string message)
+    {
+        Header = "Info";
+        Message = message;
+    }
+    public void ShowError(string message)
+    {
+        Header = "Error";
+        Message = message;
+    }
+    public void Clear()
+    {
+        Header = string.Empty;
+        Message = string.Empty;
+    }
 }

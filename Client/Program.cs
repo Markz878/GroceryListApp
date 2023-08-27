@@ -51,8 +51,7 @@ builder.Services.AddScoped<ICartHubClient>(x =>
 {
     NavigationManager nav = x.GetRequiredService<NavigationManager>();
     MainViewModel mainVM = x.GetRequiredService<MainViewModel>();
-    ModalViewModel modalVM = x.GetRequiredService<ModalViewModel>();
-    return new CartHubClient(nav.ToAbsoluteUri("carthub"), mainVM, modalVM);
+    return new CartHubClient(nav.ToAbsoluteUri("carthub"), mainVM);
 });
 builder.Services.AddScoped<ICartProductsServiceFactory, CartProductServiceFactory>();
 builder.Services.AddScoped<ICartProductsService, CartProductsApiService>();
@@ -68,6 +67,5 @@ builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
 builder.Services.AddScoped<ICartGroupsService, CartGroupsService>();
 
 builder.Services.AddScoped<MainViewModel>();
-builder.Services.AddScoped<ModalViewModel>();
 
 await builder.Build().RunAsync();

@@ -1,9 +1,9 @@
 ﻿namespace GroceryListHelper.Client.Components;
 
-public abstract class ModalBase : BasePage<ModalViewModel>
+public abstract class ModalBase : BasePage<MainViewModel>
 {
     [Inject] public required IJSRuntime JS { get; set; }
-    protected string? HeaderBackgroundClass { get; set; }
+    protected string? HeaderBackgroundClass => ViewModel.Header == "Error" ? "bg-red-600" : "bg-green-600";
 
     protected ElementReference modal;
     private IJSObjectReference? module;
@@ -19,9 +19,8 @@ public abstract class ModalBase : BasePage<ModalViewModel>
 
     private async Task PropertyChanged()
     {
-        if (!string.IsNullOrWhiteSpace(ViewModel.Header) && !string.IsNullOrWhiteSpace(ViewModel.Message) && module is not null)
+        if (module is not null && !string.IsNullOrWhiteSpace(ViewModel.Header) && !string.IsNullOrWhiteSpace(ViewModel.Message))
         {
-            SetHeaderBackgroundClass();
             await module.InvokeVoidAsync("showModal", modal);
         }
     }
@@ -29,11 +28,6 @@ public abstract class ModalBase : BasePage<ModalViewModel>
     public void CloseModal()
     {
         ViewModel.Clear();
-    }
-
-    protected void SetHeaderBackgroundClass()
-    {
-        HeaderBackgroundClass = ViewModel.Header == "Error" ? "bg-red-600" : "bg-green-600";
     }
 
     public override ValueTask DisposeAsync()

@@ -9,9 +9,9 @@ public abstract class BasePage<T> : ComponentBase, IAsyncDisposable where T : Ba
         ViewModel.StateChanged += PropertyChanged;
     }
 
-    private async Task PropertyChanged()
+    private Task PropertyChanged()
     {
-        await InvokeAsync(StateHasChanged);
+        return InvokeAsync(StateHasChanged);
     }
 
     public virtual ValueTask DisposeAsync()

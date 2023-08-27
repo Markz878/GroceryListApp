@@ -4,7 +4,6 @@ namespace GroceryListHelper.Client.Components;
 
 public abstract class CartComponentBase : BasePage<MainViewModel>
 {
-    [Inject] public required ModalViewModel ModalViewModel { get; set; }
     [Inject] public required ICartProductsServiceFactory CartProductServiceFactory { get; set; }
     [Inject] public required IStoreProductsServiceFactory StoreProductsServiceFactory { get; set; }
     [Inject] public required PersistentComponentState ApplicationState { get; set; }
@@ -140,7 +139,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         catch (Exception ex)
         {
-            ModalViewModel.ShowError(ex.Message);
+            ViewModel.ShowError(ex.Message);
         }
     }
 
@@ -238,12 +237,12 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             }
             catch (Exception ex)
             {
-                ModalViewModel.ShowError(ex.Message);
+                ViewModel.ShowError(ex.Message);
             }
         }
         else
         {
-            ModalViewModel.ShowError(string.Join(" ", validationResult.Errors.Select(x => x.ErrorMessage)));
+            ViewModel.ShowError(string.Join(" ", validationResult.Errors.Select(x => x.ErrorMessage)));
         }
     }
 
@@ -277,7 +276,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
             }
             catch (Exception ex)
             {
-                ModalViewModel.ShowError(ex.Message);
+                ViewModel.ShowError(ex.Message);
             }
             finally
             {
@@ -309,7 +308,7 @@ public abstract class CartComponentBase : BasePage<MainViewModel>
         }
         catch (Exception ex)
         {
-            ModalViewModel.Message = ex.Message;
+            ViewModel.ShowError(ex.Message);
         }
     }
 

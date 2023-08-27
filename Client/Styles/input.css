@@ -3,37 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --content-max-width: 58rem;
-  --content-min-width: 45rem;
+    --content-max-width: 58rem;
+    --content-min-width: 45rem;
 }
 
 @layer base {
-  html {
-    @apply m-0 h-full p-0 font-sans;
-  }
+    html {
+        @apply m-0 h-full p-0 font-sans;
+    }
 
-  body {
-    @apply m-0 h-full p-0;
-  }
+    body {
+        @apply m-0 h-full p-0;
+    }
 }
 
 @layer components {
-  .btn {
-    @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white transition-colors disabled:bg-gray-500;
-  }
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500;
-  }
-  .btn-success {
-    @apply bg-green-600 hover:bg-green-700 disabled:bg-gray-500;
-  }
-  .btn-danger {
-    @apply bg-red-600 hover:bg-red-700  disabled:bg-gray-500;
-  }
-  .form-control {
-    @apply box-border block h-9 w-full rounded-md border-[1px] border-gray-100 bg-clip-padding px-1 py-3 leading-6 text-gray-800 shadow transition-all focus:border-gray-400 dark:bg-gray-900 dark:text-white;
-  }
-  .form-control-small {
-    @apply inline-block rounded-md border-[1px] border-gray-100 bg-clip-padding px-1 py-2 leading-5 text-gray-800 shadow transition-all focus:box-border focus:border-gray-400 dark:bg-gray-800 dark:text-white;
-  }
+    .btn {
+        @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed;
+    }
+
+    .btn-primary {
+        @apply bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500;
+    }
+
+    .btn-success {
+        @apply bg-green-600 hover:bg-green-700 disabled:bg-gray-500;
+    }
+
+    .btn-danger {
+        @apply bg-red-600 hover:bg-red-700 disabled:bg-gray-500;
+    }
+
+    .form-control {
+        @apply box-border block h-9 w-full rounded-md border-[1px] border-gray-100 bg-clip-padding px-1 py-3 leading-6 text-gray-800 shadow transition-all focus:border-gray-400 dark:bg-gray-900 dark:text-white;
+    }
+
+    .form-control-small {
+        @apply inline-block rounded-md border-[1px] border-gray-100 bg-clip-padding px-1 py-2 leading-5 text-gray-800 shadow transition-all focus:box-border focus:border-gray-400 dark:bg-gray-800 dark:text-white;
+    }
 }

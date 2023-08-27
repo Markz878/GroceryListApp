@@ -9,18 +9,24 @@
             <p class="my-2"><b>Members: </b>@string.Join(", ", group.OtherUsers)</p>
         </div>
     }
-    <CartComponent @ref=cartComponent />
-    <CartSummaryRowComponent />
-
-    <div class="ml-4 pb-4">
-        @if (ViewModel.IsPolling)
-        {
-            <button class="btn btn-danger" @onclick="ExitCart">Stop sharing</button>
-            <span id="share-cart-info">@ViewModel.ShareCartInfo</span>
-        }
-        else
-        {
-            <button class="btn btn-success" @onclick="JoinCart">Join cart sharing</button>
-        }
-    </div>
+    <ErrorBoundary>
+        <ChildContent>
+            <CartComponent @ref=cartComponent />
+            <CartSummaryRowComponent />
+            <div class="ml-4 pb-4">
+                @if (ViewModel.IsPolling)
+                {
+                    <button class="btn btn-danger" @onclick="ExitCart">Stop sharing</button>
+                }
+                else
+                {
+                    <button class="btn btn-success" @onclick="JoinCart">Join cart sharing</button>
+                }
+                <span id="share-cart-info" class="m-2">@ViewModel.ShareCartInfo</span>
+            </div>
+        </ChildContent>
+        <ErrorContent>
+            <p class="p-4">Problem connecting to server...</p>
+        </ErrorContent>
+    </ErrorBoundary>
 </AuthorizedView>

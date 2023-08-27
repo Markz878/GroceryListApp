@@ -15,7 +15,6 @@ public sealed class DataAccessInstaller : IInstaller
         builder.Services.AddScoped<IStoreProductsService, ServerStoreProductsServiceProvider>();
         builder.Services.AddScoped<ICartGroupsService, ServerCartGroupsService>();
         builder.Services.AddScoped<MainViewModel>();
-        builder.Services.AddScoped<ModalViewModel>();
         builder.Services.AddSingleton<RenderLocation, ServerRenderedLocation>();
     }
 }

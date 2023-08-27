@@ -36,20 +36,28 @@ public abstract class GroupCartBase : BasePage<MainViewModel>
 
     public async Task JoinCart()
     {
-        ViewModel.IsPolling = true;
-        await CartHubClient.Start();
-        HubResponse response = await CartHubClient.JoinGroup(GroupId);
-        if (!string.IsNullOrEmpty(response.ErrorMessage))
+        try
         {
-            ViewModel.IsPolling = false;
-            await CartHubClient.Stop();
-            ViewModel.ShareCartInfo = response.ErrorMessage;
+            ViewModel.IsPolling = true;
+            await CartHubClient.Start();
+            HubResponse response = await CartHubClient.JoinGroup(GroupId);
+            if (!string.IsNullOrEmpty(response.ErrorMessage))
+            {
+                ViewModel.IsPolling = false;
+                await CartHubClient.Stop();
+                ViewModel.ShareCartInfo = response.ErrorMessage;
+            }
+            else if (group is not null)
+            {
+                ViewModel.ShareCartInfo = $"You have joined cart {group.Name}.";
+                ArgumentNullException.ThrowIfNull(cartComponent);
+                await cartComponent.RefreshCartProductsService();
+            }
         }
-        else if (group is not null)
+        catch (Exception ex)
         {
-            ViewModel.ShareCartInfo = $"You have joined cart {group.Name}.";
-            ArgumentNullException.ThrowIfNull(cartComponent);
-            await cartComponent.RefreshCartProductsService();
+            ViewModel.ShareCartInfo = $"Problem connecting: {ex.Message}";
+            ViewModel.IsPolling = false;
         }
     }
 
