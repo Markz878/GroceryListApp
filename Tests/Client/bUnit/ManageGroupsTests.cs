@@ -16,7 +16,6 @@ public class ManageGroupsTests : TestContext
     public ManageGroupsTests()
     {
         Services.AddSingleton(new MainViewModel());
-        Services.AddSingleton(new ModalViewModel());
         Services.AddSingleton(cartGroupsService);
         this.AddFakePersistentComponentState();
         BunitJSModuleInterop module = JSInterop.SetupModule("./Components/Confirm.razor.js");

@@ -10,7 +10,7 @@ public class ModalTests : TestContext
     {
         BunitJSModuleInterop module = JSInterop.SetupModule("./Components/Modal.razor.js");
         module.SetupVoid("showModal", _ => true).SetVoidResult();
-        Services.AddSingleton(new ModalViewModel());
+        Services.AddSingleton(new MainViewModel());
         IRenderedComponent<Modal> cut = RenderComponent<Modal>();
         cut.Instance.ViewModel.ShowError("This is an error message");
         Assert.Single(module.Invocations);

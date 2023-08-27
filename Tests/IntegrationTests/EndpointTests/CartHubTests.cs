@@ -9,11 +9,10 @@ public class CartHubTests : BaseTest, IAsyncLifetime
 {
     private readonly CartHubClient hub;
     private readonly MainViewModel mainVM = new();
-    private readonly ModalViewModel modalVM = new();
 
     public CartHubTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
     {
-        hub = new(new Uri(factory.Server.BaseAddress, "carthub"), mainVM, modalVM, o => o.HttpMessageHandlerFactory = _ => factory.Server.CreateHandler());
+        hub = new(new Uri(factory.Server.BaseAddress, "carthub"), mainVM, o => o.HttpMessageHandlerFactory = _ => factory.Server.CreateHandler());
     }
 
     public async Task InitializeAsync()

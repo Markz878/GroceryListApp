@@ -13,7 +13,6 @@ namespace GroceryListHelper.Tests.Client.bUnit;
 public class CartComponentTests : TestContext
 {
     private readonly MainViewModel mainVM = new();
-    private readonly ModalViewModel modalVm = new();
     private readonly ICartProductsServiceFactory cartProductsServiceFactoryMock = Substitute.For<ICartProductsServiceFactory>();
     private readonly IStoreProductsServiceFactory storeProductsServiceFactoryMock = Substitute.For<IStoreProductsServiceFactory>();
     private readonly ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
@@ -27,7 +26,6 @@ public class CartComponentTests : TestContext
         cartProductsServiceFactoryMock.GetCartProductsService().Returns(cartProductsServiceMock);
         storeProductsServiceFactoryMock.GetStoreProductsService().Returns(storeProductsServiceMock);
         Services.AddSingleton(mainVM);
-        Services.AddSingleton(modalVm);
     }
     public static TheoryData<List<CartProductUIModel>> CartProductListData => new()
     {
