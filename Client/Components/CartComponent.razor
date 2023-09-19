@@ -4,10 +4,10 @@
     <span class="text-center">Reorder</span>
     <span class="text-center">Collected</span>
     <div class="flex justify-center">
-        <button @onclick="ChangeSortDirectionAndSortItems" style="@(ViewModel.IsPolling ? "" : "cursor: pointer;")" aria-label="Sort items">
+        <button @onclick="ChangeSortDirectionAndSortItems" class="@(ViewModel.IsPolling ? "cursor-auto" : "cursor-pointer")" aria-label="Sort items" disabled="@ViewModel.IsPolling">
             Product
         </button>
-        @if (sortState != SortState.None)
+        @if (sortState != SortState.None && !ViewModel.IsPolling)
         {
             <img class="scale-50 h-6" src=@(sortState == SortState.Ascending ? "arrow-down.svg" : "arrow-up.svg") />
         }

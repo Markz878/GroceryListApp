@@ -913,6 +913,18 @@ body {
   animation: spin 1s linear infinite;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-none {
+  cursor: none;
+}
+
+.cursor-auto {
+  cursor: auto;
+}
+
 .select-none {
   -webkit-user-select: none;
      -moz-user-select: none;
