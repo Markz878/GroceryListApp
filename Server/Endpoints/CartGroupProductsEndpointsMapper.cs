@@ -30,7 +30,7 @@ public static class CartGroupProductsEndpointsMapper
         group.MapPatch("/{groupId:guid}/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
 
-    public static async Task<Ok<List<CartProductCollectable>>> GetAll(Guid groupId, ICartProductRepository cartProductsRepository, ICartGroupRepository cartGroupRepository)
+    public static async Task<Ok<List<CartProductCollectable>>> GetAll(Guid groupId, ICartProductRepository cartProductsRepository)
     {
         List<CartProductCollectable> results = await cartProductsRepository.GetCartProducts(groupId);
         return TypedResults.Ok(results);
