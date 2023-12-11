@@ -53,8 +53,6 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600000")
