@@ -1,0 +1,33 @@
+﻿@inject NavigationManager navigation
+
+<div class="relative z-20 select-none">
+    <label for="profile-btn" class="block relative z-10 bg-green-500 border-2 text-center leading-8 border-green-600 w-9 h-9 rounded-full hover:border-white" aria-label="profile-btn">@GetUserInitials(_userName, _email)</label>
+    <input type="checkbox" id="profile-btn" class="appearance-none absolute top-0 w-9 h-9 rounded-full" />
+    <div id="profile-menu" class="min-w-max hidden absolute rounded-lg right-0 p-3 mt-1 border-2 border-black bg-[#FEF9F3] dark:bg-gray-800 dark:border-white">
+        @if (string.IsNullOrEmpty(_userName) is false)
+        {
+            <p class="flex items-center">
+                <img src="icons/user.svg" alt="User" class="h-4 mr-2 dark:invert" aria-hidden="true" />
+                @_userName
+            </p>
+        }
+        @if (string.IsNullOrEmpty(_email) is false)
+        {
+            <p class="flex text-sm items-center">
+                <img src="icons/email.svg" alt="User" class="h-4 mr-2 dark:invert" aria-hidden="true" />
+                @_email
+            </p>
+        }
+        <p class="flex items-center">
+            <img class="h-4 mr-2 dark:invert" src="icons/group.svg" alt="Group" aria-hidden="true" />
+            <a href="/managegroups" class="hover:text-gray-400 hover:underline">Manage groups</a>
+        </p>
+        <form id="signout-form" method="post" action="api/Account/Logout" class="flex items-center">
+            <img src="icons/logout.svg" class="h-4 mr-2 dark:invert" aria-hidden="true" />
+            <button id="signout-btn" class="hover:text-gray-400 hover:underline" type="submit">
+                Sign out
+            </button>
+        </form>
+    </div>
+</div>
+

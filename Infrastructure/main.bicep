@@ -5,6 +5,7 @@ param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
 param storageName string = 'st${webSiteName}'
+param signalRName string = 'sigr-${webSiteName}'
 param sku string = 'B1'
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
@@ -139,6 +140,10 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
           name: 'TableStorageUri'
           value: storageAccount.properties.primaryEndpoints.table
         }
+        {
+          name: 'Azure__SignalR__ConnectionString'
+          value: 'Endpoint=https://${signalR.properties.hostName};AuthType=azure.msi;Version=1.0;'
+        }
       ]
     }
   }
@@ -166,4 +171,70 @@ resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@202
 resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: storageAccount
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+}
+
+resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {
+  name: signalRName
+  location: location
+  sku: {
+      capacity: 1
+      name: 'Free_F1'
+  }
+  kind: 'SignalR'
+  identity: {
+      type: 'None'
+  }
+  properties: {
+      tls: {
+          clientCertEnabled: false
+      }
+      disableLocalAuth: true
+      features: [
+          {
+              flag: 'ServiceMode'
+              value: 'Default'
+          }
+          {
+              flag: 'EnableConnectivityLogs'
+              value: 'True'
+          }
+          {
+              flag: 'EnableMessagingLogs'
+              value: 'False'
+          }
+          {
+              flag: 'EnableLiveTrace'
+              value: 'False'
+          }
+      ]
+      cors: {
+          allowedOrigins: [
+              '*'
+          ]
+      }
+      networkACLs: {
+          defaultAction: 'Deny'
+          publicNetwork: {
+              allow: [
+                  'ClientConnection'
+                  'ServerConnection'
+                  'RESTAPI'
+                  'Trace'
+              ]
+          }
+      }
+  }
+}
+resource signalRAppServerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: signalR
+  name: '420fcaa2-552c-430f-98ca-3264be4806c7'
+}
+resource webappSignalRRoleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, appService.id, signalRAppServerRole.id)
+  scope: signalR
+  properties: {
+      roleDefinitionId: signalRAppServerRole.id
+      principalId: appService.identity.principalId
+      principalType: 'ServicePrincipal'
+  }
 }

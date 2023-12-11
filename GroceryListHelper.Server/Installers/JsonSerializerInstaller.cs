@@ -1,0 +1,30 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace GroceryListHelper.Server.Installers;
+
+public class JsonSerializerInstaller : IInstaller
+{
+    public void Install(WebApplicationBuilder builder)
+    {
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+        });
+    }
+}
+
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+[JsonSerializable(typeof(HttpValidationProblemDetails))]
+[JsonSerializable(typeof(ProblemDetails))]
+[JsonSerializable(typeof(ValidationProblem))]
+[JsonSerializable(typeof(CartProductCollectable))]
+[JsonSerializable(typeof(CartProduct))]
+[JsonSerializable(typeof(CartGroup))]
+[JsonSerializable(typeof(CreateCartGroupRequest))]
+[JsonSerializable(typeof(UpdateCartGroupNameRequest))]
+[JsonSerializable(typeof(StoreProduct))]
+[JsonSerializable(typeof(StoreProduct))]
+internal partial class AppJsonSerializerContext : JsonSerializerContext
+{ }

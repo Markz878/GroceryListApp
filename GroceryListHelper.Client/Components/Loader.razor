@@ -1,0 +1,11 @@
+﻿<div class="flex gap-2 items-center @Classes">
+    <div class="text-center">@Text</div>
+    <div class="w-4 h-4 rounded-full bg-blue-700 animate-bounce"></div>
+    <div class="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.3s]"></div>
+    <div class="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.5s]"></div>
+</div>
+
+@code {
+    [Parameter] public string? Text { get; init; }
+    [Parameter] public string? Classes { get; init; }
+}

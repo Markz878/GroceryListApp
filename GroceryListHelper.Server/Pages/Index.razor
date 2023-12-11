@@ -1,0 +1,8 @@
+﻿@page "/"
+@using GroceryListHelper.Client.Components
+<PageTitle>Grocery List Helper</PageTitle>
+
+@if (_cartProducts is not null && _storeProducts is not null)
+{
+    <IndexClientComponent CartProducts="_cartProducts" StoreProducts="_storeProducts" @rendermode="RenderMode.InteractiveWebAssembly" />
+}

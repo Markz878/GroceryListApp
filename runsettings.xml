@@ -5,10 +5,7 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Exclude>
-            [*]GroceryListHelper.Server.Filters.AntiForgeryTokenFilter,
             [*]GroceryListHelper.Server.Installers.*,
-            [*]GroceryListHelper.Server.Services.Server*,
-            [*]GroceryListHelper.Server.Pages.*
             [GroceryListHelper.Client]Program.cs
           </Exclude>  <!-- [Assembly-Filter]Type-Filter -->
           <ExcludeByFile>**/*/Program.cs</ExcludeByFile> <!-- Globbing filter -->
