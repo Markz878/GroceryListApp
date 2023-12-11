@@ -59,7 +59,7 @@ jobs:
 
       - name: Install Playwright
         run: |
-          dotnet build E2ETests -c Release
+          dotnet build GroceryListHelper.E2ETests -c Release
           pwsh GroceryListHelper.E2ETests/bin/Release/net8.0/playwright.ps1 install
 
       - name: Run E2E Tests
