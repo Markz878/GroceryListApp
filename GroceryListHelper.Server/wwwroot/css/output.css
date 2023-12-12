@@ -530,6 +530,9 @@ body {
 }
 
 .btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   white-space: nowrap;
   border-radius: 0.25rem;
   border-width: 2px;
@@ -696,18 +699,6 @@ body {
   top: 0px;
 }
 
-.top-\[2rem\] {
-  top: 2rem;
-}
-
-.top-\[1\.5rem\] {
-  top: 1.5rem;
-}
-
-.top-\[1rem\] {
-  top: 1rem;
-}
-
 .top-\[0\.5rem\] {
   top: 0.5rem;
 }
@@ -807,10 +798,6 @@ body {
   margin-top: 1rem;
 }
 
-.mr-12 {
-  margin-right: 3rem;
-}
-
 .block {
   display: block;
 }
@@ -908,6 +895,22 @@ body {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
 @keyframes fade-in-down {
   0% {
     opacity: 0;
@@ -934,22 +937,6 @@ body {
   animation: spin 1s linear infinite;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8,0,1,1);
-  }
-
-  50% {
-    transform: none;
-    animation-timing-function: cubic-bezier(0,0,0.2,1);
-  }
-}
-
-.animate-bounce {
-  animation: bounce 1s infinite;
-}
-
 .cursor-pointer {
   cursor: pointer;
 }
@@ -972,10 +959,6 @@ body {
 
 .grid-cols-cart {
   grid-template-columns: 1fr 1fr 3fr repeat(4,1fr);
-}
-
-.flex-row {
-  flex-direction: row;
 }
 
 .flex-wrap {
@@ -1085,6 +1068,11 @@ body {
   background-color: rgb(254 249 243 / var(--tw-bg-opacity));
 }
 
+.bg-blue-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+
 .bg-blue-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(30 64 175 / var(--tw-bg-opacity));
@@ -1127,11 +1115,6 @@ body {
 
 .bg-transparent {
   background-color: transparent;
-}
-
-.bg-blue-700 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
 }
 
 .bg-\[url\(\'\.\.\/store-transparent\.webp\'\)\] {
@@ -1206,20 +1189,16 @@ body {
   padding-left: 1rem;
 }
 
+.pr-12 {
+  padding-right: 3rem;
+}
+
 .pt-2 {
   padding-top: 0.5rem;
 }
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pr-12 {
-  padding-right: 3rem;
-}
-
-.pr-24 {
-  padding-right: 6rem;
 }
 
 .text-center {

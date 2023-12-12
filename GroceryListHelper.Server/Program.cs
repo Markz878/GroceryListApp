@@ -62,7 +62,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 app.UseRateLimiter();
-//app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.MapAPIEndpoints();
 app.MapHub<CartHub>("/carthub", options => options.AllowStatefulReconnects = true);
 app.MapHealthChecks("/health");

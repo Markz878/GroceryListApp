@@ -19,7 +19,7 @@
 
 @layer components {
     .btn {
-        @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed;
+        @apply whitespace-nowrap rounded border-2 border-gray-600 px-2 py-1 align-middle font-semibold leading-6 text-white select-none transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed;
     }
 
     .btn-primary {
