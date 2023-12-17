@@ -9,12 +9,12 @@ public sealed class StoreProductsLocalService(ILocalStorageService localStorage,
         return await localStorage.GetItemAsync<List<StoreProduct>>(storeProductsKey) ?? [];
     }
 
-    public async Task SaveStoreProduct(StoreProduct product)
+    public async Task CreateStoreProduct(StoreProduct product)
     {
         await localStorage.SetItemAsync(storeProductsKey, appState.StoreProducts);
     }
 
-    public async Task ClearStoreProducts()
+    public async Task DeleteStoreProducts()
     {
         await localStorage.RemoveItemAsync(storeProductsKey);
     }

@@ -1,9 +1,11 @@
+using GroceryListHelper.Client.Features.CartProducts;
+using GroceryListHelper.Client.Features.StoreProducts;
+
 namespace GroceryListHelper.Client.Components;
 
 public partial class CartSummaryRowComponent
 {
-    [Parameter][EditorRequired] public required ICartProductsService CartProductsService { get; init; }
-    [Parameter][EditorRequired] public required IStoreProductsService StoreProductsService { get; init; }
+    [Inject] public required IMediator Mediator { get; init; }
     [CascadingParameter] public required AppState AppState { get; init; }
     public bool AllCollected => AppState.CartProducts.Count > 0 && AppState.CartProducts.All(x => x.IsCollected);
     public double Total => AppState.CartProducts.Sum(x => x.UnitPrice * x.Amount);
@@ -25,12 +27,12 @@ public partial class CartSummaryRowComponent
     public async Task ClearCartProducts()
     {
         AppState.CartProducts.Clear();
-        await CartProductsService.DeleteAllCartProducts();
+        await Mediator.Send(new DeleteAllCartProductsCommand());
     }
 
     public async Task ClearStoreProducts()
     {
         AppState.StoreProducts.Clear();
-        await StoreProductsService.ClearStoreProducts();
+        await Mediator.Send(new DeleteAllStoreProductsCommand());
     }
 }

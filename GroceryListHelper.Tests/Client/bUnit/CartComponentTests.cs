@@ -1,7 +1,7 @@
 ﻿using AngleSharp.Diffing.Extensions;
 using AngleSharp.Dom;
-using Bunit.TestDoubles;
-using GroceryListHelper.Shared.Models.StoreProducts;
+using GroceryListHelper.Client.Features.CartProducts;
+using GroceryListHelper.Client.Features.StoreProducts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -9,13 +9,13 @@ namespace GroceryListHelper.Tests.Client.bUnit;
 public class CartComponentTests : TestContext
 {
     private readonly AppState mainVM = new();
-    private readonly ICartProductsService cartProductsServiceMock = Substitute.For<ICartProductsService>();
-    private readonly IStoreProductsService storeProductsServiceMock = Substitute.For<IStoreProductsService>();
-    //private readonly FakePersistentComponentState persist;
+    private readonly IMediator mediatorMock = Substitute.For<IMediator>();
+
     public CartComponentTests()
     {
         Services.AddCascadingValue(sp => mainVM);
         Services.AddSingleton(mainVM);
+        Services.AddSingleton(mediatorMock);
     }
     public static TheoryData<List<CartProductCollectable>> CartProductListData => new()
     {
@@ -75,9 +75,7 @@ public class CartComponentTests : TestContext
             new CartProductCollectable() { Amount = Random.Shared.Next(1, 5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble() * 10, Order = 5000 },
         ];
         mainVM.CartProducts.AddRange(products);
-        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>(p => p
-            .Add(x => x.CartProductsService, cartProductsServiceMock)
-            .Add(x => x.StoreProductsService, storeProductsServiceMock));
+        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
         IElement element = cut.Find("div[role='rowheader']>div>button[aria-label='Sort items']");
         await element.ClickAsync(new MouseEventArgs());
         IRefreshableElementCollection<IElement> rows = cut.FindAll("div[role=row]");
@@ -99,11 +97,7 @@ public class CartComponentTests : TestContext
             new CartProductCollectable() { Amount = Random.Shared.Next(1, 5), Name = "CProduct", UnitPrice = Random.Shared.NextDouble() * 10, Order = 4000 },
             new CartProductCollectable() { Amount = Random.Shared.Next(1, 5), Name = "BProduct", UnitPrice = Random.Shared.NextDouble() * 10, Order = 5000 },
         ];
-        cartProductsServiceMock.GetCartProducts().Returns(products);
-        storeProductsServiceMock.GetStoreProducts().Returns([]);
-        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>(p => p
-            .Add(x => x.CartProductsService, cartProductsServiceMock)
-            .Add(x => x.StoreProductsService, storeProductsServiceMock));
+        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
         IElement element = cut.Find("div[role='rowheader']>div>button[aria-label='Sort items']");
         await element.ClickAsync(new MouseEventArgs());
         await Task.Delay(100);
@@ -119,28 +113,24 @@ public class CartComponentTests : TestContext
     [Fact]
     public async Task WhenCartProductIsAdded_ServicesAreCalledAndItIsShownInTable()
     {
-        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>(p => p
-            .Add(x => x.CartProductsService, cartProductsServiceMock)
-            .Add(x => x.StoreProductsService, storeProductsServiceMock));
+        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
         await cut.Find("input#newproduct-name-input").ChangeAsync(new ChangeEventArgs() { Value = "Product" });
         await cut.Find("input#newproduct-amount-input").ChangeAsync(new ChangeEventArgs() { Value = "2" });
         await cut.Find("input#newproduct-price-input").ChangeAsync(new ChangeEventArgs() { Value = "3.2" });
         await cut.Find("button#add-cartproduct-button").ClickAsync(new MouseEventArgs());
-        await cartProductsServiceMock.Received().SaveCartProduct(Arg.Is<CartProduct>(x => x.Name == "Product" && x.Amount == 2 && x.UnitPrice == 3.2));
-        await storeProductsServiceMock.Received().SaveStoreProduct(Arg.Is<StoreProduct>(x => x.Name == "Product" && x.UnitPrice == 3.2));
+        await mediatorMock.Received().Send(Arg.Is<CreateCartProductCommand>(x => x.Product.Name == "Product" && x.Product.Amount == 2 && x.Product.UnitPrice == 3.2));
+        await mediatorMock.Received().Send(Arg.Is<CreateStoreProductCommand>(x => x.Product.Name == "Product" && x.Product.UnitPrice == 3.2));
         Assert.Equal("Product", cut.Find("div[role='row']>span[aria-label='Product name']").InnerHtml);
     }
 
     [Fact]
     public async Task WhenInvalidCartProductIsAdded_ServicesAreNotCalledAndErrorIsShown()
     {
-        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>(p => p
-            .Add(x => x.CartProductsService, cartProductsServiceMock)
-            .Add(x => x.StoreProductsService, storeProductsServiceMock));
+        IRenderedComponent<CartComponent> cut = RenderComponent<CartComponent>();
         await cut.Find("input#newproduct-name-input").ChangeAsync(new ChangeEventArgs());
         await cut.Find("button#add-cartproduct-button").ClickAsync(new MouseEventArgs());
-        await cartProductsServiceMock.DidNotReceive().SaveCartProduct(Arg.Any<CartProduct>());
-        await storeProductsServiceMock.DidNotReceive().SaveStoreProduct(Arg.Any<StoreProduct>());
+        await mediatorMock.DidNotReceive().Send(Arg.Any<CreateCartProductCommand>());
+        await mediatorMock.DidNotReceive().Send(Arg.Any<CreateStoreProductCommand>());
         Assert.Throws<ElementNotFoundException>(() => cut.Find("td#item-name-0"));
     }
 }

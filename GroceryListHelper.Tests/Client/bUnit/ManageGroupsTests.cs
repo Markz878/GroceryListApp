@@ -1,4 +1,5 @@
 ﻿using Bunit.TestDoubles;
+using GroceryListHelper.Client.Features.CartProducts;
 using GroceryListHelper.Client.Features.ManageGroups;
 using GroceryListHelper.Core.Features.CartGroups;
 using GroceryListHelper.Server.Pages;

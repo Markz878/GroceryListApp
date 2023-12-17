@@ -30,6 +30,15 @@ public static class AuthenticationHelpers
         return name;
     }
 
+    public static UserInfo GetUserInfo(this ClaimsPrincipal user)
+    {
+        return new UserInfo()
+        {
+            IsAuthenticated = user.Identity?.IsAuthenticated == true,
+            Claims = user.Claims.Select(x => new ClaimValue(x.Type, x.Value)).ToList(),
+        };
+    }
+
     public static async Task<UserInfo> GetUserInfo(this Task<AuthenticationState> authenticationStateTask)
     {
         AuthenticationState authenticationState = await authenticationStateTask;

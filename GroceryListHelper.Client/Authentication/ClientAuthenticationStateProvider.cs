@@ -2,24 +2,30 @@
 
 namespace GroceryListHelper.Client.Authentication;
 
-public sealed class ClientAuthenticationStateProvider(PersistentComponentState persistentState) : AuthenticationStateProvider
+public sealed class ClientAuthenticationStateProvider(IHttpClientFactory httpClientFactory) : AuthenticationStateProvider
 {
-    private static readonly Task<AuthenticationState> _unauthenticatedTask =
-        Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+    private AuthenticationState? cachedAuthState;
 
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (!persistentState.TryTakeFromJson(nameof(UserInfo), out UserInfo? userInfo) || userInfo is null)
+        if (cachedAuthState is null)
         {
-            return _unauthenticatedTask;
+            UserInfo? userInfo = await httpClientFactory.CreateClient("Client").GetFromJsonAsync<UserInfo>("api/account/user");
+            if (userInfo is not null && userInfo.IsAuthenticated)
+            {
+                Claim[] claims = [
+                    new Claim(AuthenticationConstants.IdClaimName, userInfo.GetUserId().ToString() ?? ""),
+                    new Claim(AuthenticationConstants.EmailClaimName, userInfo.GetUserEmail() ?? ""),
+                    new Claim(AuthenticationConstants.NameClaimName, userInfo.GetUserName() ?? "")];
+                cachedAuthState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies")));
+            }
+            else
+            {
+                cachedAuthState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
         }
 
-        Claim[] claims = [
-            new Claim(AuthenticationConstants.IdClaimName, userInfo.GetUserId().ToString() ?? ""),
-            new Claim(AuthenticationConstants.EmailClaimName, userInfo.GetUserEmail() ?? ""),
-            new Claim(AuthenticationConstants.NameClaimName, userInfo.GetUserName() ?? "")];
 
-        return Task.FromResult(
-            new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies"))));
+        return cachedAuthState;
     }
 }

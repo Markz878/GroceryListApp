@@ -11,7 +11,7 @@ internal sealed class DeleteCartProductCommandHandler(TableServiceClient db) : I
     public async Task<NotFoundError?> Handle(DeleteCartProductCommand request, CancellationToken cancellationToken = default)
     {
         Response response = await db.GetTableClient(CartProductDbModel.GetTableName())
-            .DeleteEntityAsync(request.UserId.ToString(), request.ProductName);
+            .DeleteEntityAsync(request.UserId.ToString(), request.ProductName, cancellationToken: cancellationToken);
         return response.Status == 404 ? new NotFoundError() : null;
     }
 }

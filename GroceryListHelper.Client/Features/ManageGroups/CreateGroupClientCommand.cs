@@ -1,5 +1,4 @@
 ﻿using GroceryListHelper.Shared.Models.CartGroups;
-using MediatR;
 
 namespace GroceryListHelper.Client.Features.ManageGroups;
 

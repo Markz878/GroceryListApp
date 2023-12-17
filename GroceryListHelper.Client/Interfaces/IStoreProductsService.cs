@@ -3,7 +3,7 @@
 public interface IStoreProductsService
 {
     Task<List<StoreProduct>> GetStoreProducts();
-    Task ClearStoreProducts();
-    Task SaveStoreProduct(StoreProduct product);
+    Task DeleteStoreProducts();
+    Task CreateStoreProduct(StoreProduct product);
     Task UpdateStoreProduct(StoreProduct storeProduct);
 }

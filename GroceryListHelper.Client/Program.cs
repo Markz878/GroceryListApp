@@ -16,6 +16,8 @@ global using GroceryListHelper.Client.HelperMethods;
 global using GroceryListHelper.Client.Services;
 global using GroceryListHelper.Shared.Interfaces;
 global using MediatR;
+using GroceryListHelper.Client.Features.CartProducts;
+using GroceryListHelper.Client.Features.StoreProducts;
 
 WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -26,8 +28,9 @@ builder.Services.AddHttpClient("Client", client => client.BaseAddress = new Uri(
     .AddStandardResilienceHandler();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
-AppState vm = new();
-builder.Services.AddSingleton(vm);
+builder.Services.AddScoped<AppState>();
+builder.Services.AddScoped<CartProductsServiceProvider>();
+builder.Services.AddScoped<StoreProductsServiceProvider>();
 builder.Services.AddKeyedScoped<ICartProductsService, CartProductsLocalService>(ServiceKey.Local);
 builder.Services.AddKeyedScoped<ICartProductsService, CartProductsApiService>(ServiceKey.Api);
 builder.Services.AddKeyedScoped<ICartProductsService, CartProductsGroupService>(ServiceKey.Group);

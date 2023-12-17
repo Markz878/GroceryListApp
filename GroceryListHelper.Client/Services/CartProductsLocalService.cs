@@ -10,7 +10,7 @@ public sealed class CartProductsLocalService(ILocalStorageService localStorage, 
         return products;
     }
 
-    public async Task SaveCartProduct(CartProduct product)
+    public async Task CreateCartProduct(CartProduct product)
     {
         await localStorage.SetItemAsync(cartProductsKey, appState.CartProducts);
     }

@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Shared.Interfaces;
-
-namespace GroceryListHelper.Client.Services;
+﻿namespace GroceryListHelper.Client.Services;
 
 public sealed class CartProductsGroupService : ICartProductsService
 {
@@ -20,7 +18,7 @@ public sealed class CartProductsGroupService : ICartProductsService
         throw new NotImplementedException();
     }
 
-    public async Task SaveCartProduct(CartProduct product)
+    public async Task CreateCartProduct(CartProduct product)
     {
         Guid groupId = GetGroupId();
         await _cartHubClient.JoinGroup(groupId);

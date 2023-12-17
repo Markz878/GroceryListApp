@@ -1,15 +1,16 @@
+using GroceryListHelper.Client.Features.CartProducts;
+using GroceryListHelper.Client.Features.StoreProducts;
+
 namespace GroceryListHelper.Client.Components;
 public sealed partial class IndexClientComponent : IDisposable
 {
     [Parameter][EditorRequired] public required List<CartProductCollectable> CartProducts { get; init; }
     [Parameter][EditorRequired] public required List<StoreProduct> StoreProducts { get; init; }
     [CascadingParameter] public required Task<AuthenticationState> AuthenticationStateTask { get; init; }
-    [Inject] public required IServiceProvider ServiceProvider { get; init; }
+    [Inject] public required IMediator Mediator { get; init; }
     [Inject] public required RenderLocation RenderLocation { get; init; }
     [Inject] public required AppState AppState { get; init; }
 
-    private ICartProductsService? _cartProductsService;
-    private IStoreProductsService? _storeProductsService;
     private bool _showLoading;
 
     protected override async Task OnInitializedAsync()
@@ -19,18 +20,11 @@ public sealed partial class IndexClientComponent : IDisposable
         AppState.StoreProducts.Clear();
         if (RenderLocation is ClientRenderLocation)
         {
-            if (user.IsAuthenticated)
+            if (!user.IsAuthenticated)
             {
-                _cartProductsService = ServiceProvider.GetRequiredKeyedService<ICartProductsService>(ServiceKey.Api);
-                _storeProductsService = ServiceProvider.GetRequiredKeyedService<IStoreProductsService>(ServiceKey.Api);
-            }
-            else
-            {
-                _cartProductsService = ServiceProvider.GetRequiredKeyedService<ICartProductsService>(ServiceKey.Local);
-                _storeProductsService = ServiceProvider.GetRequiredKeyedService<IStoreProductsService>(ServiceKey.Local);
-                List<CartProductCollectable> cartProducts = await _cartProductsService.GetCartProducts();
+                List<CartProductCollectable> cartProducts = await Mediator.Send(new GetCartProductsQuery());
                 CartProducts.AddRange(cartProducts);
-                List<StoreProduct> storeProducts = await _storeProductsService.GetStoreProducts();
+                List<StoreProduct> storeProducts = await Mediator.Send(new GetStoreProductsQuery());
                 StoreProducts.AddRange(storeProducts);
             }
             AppState.StateChanged += StateChanged;

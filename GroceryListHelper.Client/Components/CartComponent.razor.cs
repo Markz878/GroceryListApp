@@ -1,4 +1,6 @@
 ﻿using FluentValidation.Results;
+using GroceryListHelper.Client.Features.CartProducts;
+using GroceryListHelper.Client.Features.StoreProducts;
 using GroceryListHelper.Client.Validators;
 using System.Diagnostics;
 
@@ -7,9 +9,8 @@ namespace GroceryListHelper.Client.Components;
 public partial class CartComponent
 {
     [CascadingParameter] public required AppState AppState { get; init; }
-    [Parameter][EditorRequired] public required ICartProductsService CartProductsService { get; init; }
-    [Parameter][EditorRequired] public required IStoreProductsService StoreProductsService { get; init; }
-    [Parameter] public bool ShowLoading { get; init; } 
+    [Inject] public required IMediator Mediator { get; init; }
+    [Parameter] public bool ShowLoading { get; init; }
 
     private CartProduct newProduct = new();
     private CartProductCollectable? editingItem;
@@ -39,8 +40,9 @@ public partial class CartComponent
         {
             return;
         }
-        ProductSortMethods.SortProducts(AppState.CartProducts, AppState.SortDirection == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
-        await CartProductsService.SortCartProducts(AppState.SortDirection == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
+        ListSortDirection sortDirection = AppState.SortDirection == SortState.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending;
+        ProductSortMethods.SortProducts(AppState.CartProducts, sortDirection);
+        await Mediator.Send(new SortCartProductsCommand() { SortDirection = sortDirection });
     }
 
     private static double GetNewCartProductOrder(IEnumerable<CartProductCollectable> cartProducts)
@@ -89,7 +91,7 @@ public partial class CartComponent
         AppState.CartProducts.Add(newCartProductCollectable);
         try
         {
-            await CartProductsService.SaveCartProduct(product);
+            await Mediator.Send(new CreateCartProductCommand() { Product = product });
         }
         catch
         {
@@ -107,7 +109,7 @@ public partial class CartComponent
     {
         product.IsCollected = (bool)e.Value!;
         await InvokeAsync(StateHasChanged);
-        await CartProductsService.UpdateCartProduct(product);
+        await Mediator.Send(new UpdateCartProductCommand() { Product = product });
     }
 
     private async Task SaveStoreProduct(StoreProduct storeProduct)
@@ -123,14 +125,14 @@ public partial class CartComponent
             }
             product = storeProduct with { };
             AppState.StoreProducts.Add(product);
-            await StoreProductsService.SaveStoreProduct(storeProduct);
+            await Mediator.Send(new CreateStoreProductCommand() { Product = product });
         }
         else
         {
             if (product.UnitPrice != storeProduct.UnitPrice)
             {
                 product.UnitPrice = storeProduct.UnitPrice;
-                await StoreProductsService.UpdateStoreProduct(product);
+                await Mediator.Send(new UpdateStoreProductCommand() { Product = product });
             }
         }
     }
@@ -150,12 +152,12 @@ public partial class CartComponent
             AppState.OnPropertyChanged();
             try
             {
-                await CartProductsService.UpdateCartProduct(product);
+                await Mediator.Send(new UpdateCartProductCommand() { Product = product });
                 StoreProduct? storeProduct = AppState.StoreProducts.FirstOrDefault(x => x.Name == product.Name);
                 if (storeProduct is not null && storeProduct.UnitPrice != product.UnitPrice)
                 {
                     storeProduct.UnitPrice = product.UnitPrice;
-                    await StoreProductsService.UpdateStoreProduct(storeProduct);
+                    await Mediator.Send(new UpdateStoreProductCommand() { Product = product });
                 }
             }
             catch (Exception ex)
@@ -194,7 +196,7 @@ public partial class CartComponent
             movingItem.Order = SortOrderMethods.GetNewOrder(AppState.CartProducts.Select(x => x.Order), movingItem.Order, cartProduct.Order);
             try
             {
-                await CartProductsService.UpdateCartProduct(movingItem);
+                await Mediator.Send(new UpdateCartProductCommand() { Product = movingItem });
             }
             catch (Exception ex)
             {
@@ -226,7 +228,7 @@ public partial class CartComponent
         AppState.CartProducts.Remove(product);
         try
         {
-            await CartProductsService.DeleteCartProduct(product.Name);
+            await Mediator.Send(new DeleteCartProductCommand() { ProductName = product.Name });
         }
         catch (Exception ex)
         {

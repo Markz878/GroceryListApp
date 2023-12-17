@@ -1,4 +1,3 @@
-using GroceryListHelper.Shared.Interfaces;
 using GroceryListHelper.Shared.Models.CartGroups;
 using Microsoft.AspNetCore.Authorization;
 
@@ -10,14 +9,11 @@ public sealed partial class CartGroupComponent : IAsyncDisposable
     [Parameter][EditorRequired] public required CartGroup CartGroup { get; init; }
     [Parameter][EditorRequired] public required List<CartProductCollectable> CartProducts { get; init; }
     [Parameter][EditorRequired] public required List<StoreProduct> StoreProducts { get; init; }
-    [CascadingParameter] public required Task<AuthenticationState> AuthenticationStateTask { get; init; }
     [Inject] public required IServiceProvider ServiceProvider { get; init; }
     [Inject] public required AppState AppState { get; init; }
+    [CascadingParameter] public required Task<AuthenticationState> AuthenticationStateTask { get; init; }
     [Inject] public required RenderLocation RenderLocation { get; init; }
-    [Inject] public required NavigationManager Navigation { get; init; }
 
-    private ICartProductsService? _cartProductsService;
-    private IStoreProductsService? _storeProductsService;
     private ICartHubClient? _cartHubClient;
 
     protected override async Task OnInitializedAsync()
@@ -36,8 +32,6 @@ public sealed partial class CartGroupComponent : IAsyncDisposable
         {
             _cartHubClient = ServiceProvider.GetRequiredService<ICartHubClient>();
             await _cartHubClient.JoinGroup(CartGroup.Id);
-            _cartProductsService = ServiceProvider.GetRequiredKeyedService<ICartProductsService>(ServiceKey.Group);
-            _storeProductsService = ServiceProvider.GetRequiredKeyedService<IStoreProductsService>(ServiceKey.Api);
             AppState.StateChanged += StateChanged;
         }
     }

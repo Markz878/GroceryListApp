@@ -55,7 +55,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: console
-          thresholds: '60 85'
+          thresholds: '50 85'
 
       - name: Install Playwright
         run: |

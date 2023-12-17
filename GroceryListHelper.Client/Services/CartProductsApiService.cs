@@ -10,7 +10,7 @@ public sealed class CartProductsApiService(IHttpClientFactory clientFactory) : I
         return await client.GetFromJsonAsync<List<CartProductCollectable>>(uri) ?? [];
     }
 
-    public async Task SaveCartProduct(CartProduct product)
+    public async Task CreateCartProduct(CartProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         response.EnsureSuccessStatusCode();

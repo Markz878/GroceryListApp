@@ -10,13 +10,13 @@ public sealed class StoreProductsAPIService(IHttpClientFactory clientFactory) : 
         return await client.GetFromJsonAsync<List<StoreProduct>>(uri) ?? [];
     }
 
-    public async Task SaveStoreProduct(StoreProduct product)
+    public async Task CreateStoreProduct(StoreProduct product)
     {
         HttpResponseMessage response = await client.PostAsJsonAsync(uri, product);
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task ClearStoreProducts()
+    public async Task DeleteStoreProducts()
     {
         HttpResponseMessage response = await client.DeleteAsync(uri);
         response.EnsureSuccessStatusCode();

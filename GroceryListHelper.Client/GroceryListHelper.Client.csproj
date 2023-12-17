@@ -21,6 +21,8 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\GroceryListHelper.Shared\GroceryListHelper.Shared.csproj" />
+		<InternalsVisibleTo Include="GroceryListHelper.Tests"/>
 	</ItemGroup>
 
+	
 </Project>
