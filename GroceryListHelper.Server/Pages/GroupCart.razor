@@ -4,10 +4,7 @@
 @if (string.IsNullOrWhiteSpace(error) && group is not null)
 {
     <PageTitle>@group?.Name</PageTitle>
-    <div class="pt-4 pl-4">
-        <h3 class="text-2xl">Group @group.Name</h3>
-        <p class="my-2"><b>Members: </b>@string.Join(", ", group.OtherUsers)</p>
-    </div>
+
     <CartGroupComponent CartProducts="cartProducts" StoreProducts="storeProducts" CartGroup="group" @rendermode="RenderMode.InteractiveWebAssembly" />
 }
 else

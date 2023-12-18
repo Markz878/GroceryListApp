@@ -9,6 +9,8 @@ public sealed class AppState : IDisposable
     public ObservableCollection<StoreProduct> StoreProducts { get; } = [];
     public SortState SortDirection { get => sortDirection; set => SetProperty(ref sortDirection, value); }
     private SortState sortDirection;
+    public bool IsSharing { get => isSharing; set => SetProperty(ref isSharing, value); }
+    private bool isSharing;
     public bool ShowOnlyUncollected { get => showOnlyUncollected; set => SetProperty(ref showOnlyUncollected, value); }
     private bool showOnlyUncollected;
     public string Header { get => header; private set => SetProperty(ref header, value); }

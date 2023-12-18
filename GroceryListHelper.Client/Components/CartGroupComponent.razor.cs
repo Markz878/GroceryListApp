@@ -31,8 +31,8 @@ public sealed partial class CartGroupComponent : IAsyncDisposable
         if (RenderLocation is ClientRenderLocation)
         {
             _cartHubClient = ServiceProvider.GetRequiredService<ICartHubClient>();
-            await _cartHubClient.JoinGroup(CartGroup.Id);
             AppState.StateChanged += StateChanged;
+            await _cartHubClient.JoinGroup(CartGroup.Id);
         }
     }
 

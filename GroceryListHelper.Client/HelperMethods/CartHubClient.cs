@@ -92,13 +92,13 @@ public sealed class CartHubClient : ICartHubClient
     private Task CartHub_Reconnecting(Exception ex)
     {
         Console.WriteLine(ex.Message);
-        _appState.ShowError($"Connection lost: {ex.Message}. Trying to reconnect...");
+        _appState.IsSharing = false;
         return Task.CompletedTask;
     }
 
     private Task CartHub_Reconnected(string arg)
     {
-        _appState.ShowInfo($"Reconnected: {arg}");
+        _appState.IsSharing = true;
         return Task.CompletedTask;
     }
 
@@ -107,7 +107,7 @@ public sealed class CartHubClient : ICartHubClient
         if (ex is not null)
         {
             Console.WriteLine(ex.Message);
-            _appState.ShowError($"Sharing ended: {ex.Message}");
+            _appState.IsSharing = false;
         }
         return Task.CompletedTask;
     }
@@ -120,6 +120,7 @@ public sealed class CartHubClient : ICartHubClient
             {
                 await _hub.StartAsync();
                 await _hub.InvokeAsync(nameof(ICartHubClient.JoinGroup), groupId);
+                _appState.IsSharing = true;
             }
         }
         catch (Exception ex)
@@ -135,13 +136,6 @@ public sealed class CartHubClient : ICartHubClient
         _hub.Reconnecting -= CartHub_Reconnecting!;
         await _hub.InvokeAsync(nameof(LeaveGroup), groupId);
         await _hub.StopAsync();
-    }
-
-    private async Task EnsureConnection(Guid groupId)
-    {
-        if (_hub.State == HubConnectionState.Disconnected)
-        {
-            await JoinGroup(groupId);
-        }
+        _appState.IsSharing = false;
     }
 }
