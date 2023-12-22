@@ -15,28 +15,36 @@ public sealed partial class IndexClientComponent : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        UserInfo user = await AuthenticationStateTask.GetUserInfo();
         AppState.CartProducts.Clear();
-        AppState.StoreProducts.Clear();
-        if (RenderLocation is ClientRenderLocation)
-        {
-            if (!user.IsAuthenticated)
-            {
-                List<CartProductCollectable> cartProducts = await Mediator.Send(new GetCartProductsQuery());
-                CartProducts.AddRange(cartProducts);
-                List<StoreProduct> storeProducts = await Mediator.Send(new GetStoreProductsQuery());
-                StoreProducts.AddRange(storeProducts);
-            }
-            AppState.StateChanged += StateChanged;
-        }
-        _showLoading = RenderLocation is ServerRenderedLocation && user.IsAuthenticated is false;
         foreach (CartProductCollectable cartProduct in CartProducts)
         {
             AppState.CartProducts.Add(cartProduct);
         }
+        AppState.StoreProducts.Clear();
         foreach (StoreProduct storeProduct in StoreProducts)
         {
             AppState.StoreProducts.Add(storeProduct);
+        }
+        UserInfo user = await AuthenticationStateTask.GetUserInfo();
+        if (RenderLocation is ClientRenderLocation && !user.IsAuthenticated)
+        {
+            List<CartProductCollectable> cartProducts = await Mediator.Send(new GetCartProductsQuery());
+            CartProducts.AddRange(cartProducts);
+            List<StoreProduct> storeProducts = await Mediator.Send(new GetStoreProductsQuery());
+            StoreProducts.AddRange(storeProducts);
+            foreach (CartProductCollectable cartProduct in CartProducts)
+            {
+                AppState.CartProducts.Add(cartProduct);
+            }
+            foreach (StoreProduct storeProduct in StoreProducts)
+            {
+                AppState.StoreProducts.Add(storeProduct);
+            }
+        }
+        _showLoading = RenderLocation is ServerRenderedLocation && user.IsAuthenticated is false;
+        if(RenderLocation is ClientRenderLocation)
+        {
+            AppState.StateChanged += StateChanged;
         }
     }
 
