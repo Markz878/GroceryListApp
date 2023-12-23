@@ -52,31 +52,37 @@
         {
             @foreach (CartGroup group in CartGroups)
             {
-                <fieldset class="mt-4 p-4 border-2 border-gray-300 rounded-lg">
+                <fieldset class="flex flex-wrap items-center gap-3 mt-4 p-4 border-2 border-gray-300 rounded-lg">
                     @if (isEditingGroup != group)
                     {
-                        <a href="groupcart/@group.Id" class="btn btn-primary inline-flex align-middle gap-2" aria-label="Select group cart">
-                            <svg class="w-4 invert" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                <path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
-                            </svg>
-                            <span>@group.Name</span>
-                        </a>
-                        <button class="btn btn-success h-8 w-8 p-[3px]" @onclick="() => EditGroup(group)" aria-label="Edit group name" disabled="@(isEditingGroup != null)">
-                            <img src="icons/edit.svg" class="m-auto invert" />
-                        </button>
-                        <button class="btn btn-danger p-[4px] w-8 h-8 text-lg leading-4" @onclick="() => ShowDeleteConfirm(group)" aria-label="Delete group">
-                            <img src="icons/delete.svg" class="m-auto invert" />
-                        </button>
+                        <div class="flex items-center gap-1">
+                            <a href="groupcart/@group.Id" class="btn btn-primary inline-flex gap-2">
+                                <svg class="w-4 invert" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
+                                </svg>
+                                <span>@group.Name</span>
+                            </a>
+                            <button class="btn btn-success h-8 w-8 p-[3px]" @onclick="() => EditGroup(group)" aria-label="Edit group name" disabled="@(isEditingGroup != null)">
+                                <img src="icons/edit.svg" alt="Edit" class="m-auto invert" />
+                            </button>
+                            <button class="btn btn-danger p-[4px] w-8 h-8 text-lg leading-4" @onclick="() => ShowDeleteConfirm(group)" aria-label="Delete group">
+                                <img src="icons/delete.svg" alt="Delete" class="m-auto invert" />
+                            </button>
+                        </div>
                     }
                     else
                     {
-                        <input id="edit-group-name-input" class="h-8 form-control-small" aria-label="Group name input" @bind="group.Name" />
-                        <button class="btn btn-success h-8 w-8 p-0" aria-label="Submit name edit" @onclick="() => SubmitEditGroup(group)">
-                            <img src="icons/check.svg" class="p-0" aria-hidden="true" />
-                        </button>
-                        <button class="btn btn-danger p-0 w-8 h-8 text-lg" aria-label="Cancel name edit" @onclick="() => StopEditGroup()">&times;</button>
+                        <div class="flex items-center gap-1">
+                            <input id="edit-group-name-input" class="form-control-small" aria-label="Group name input" @bind="group.Name" />
+                            <button class="btn btn-success h-8 w-8 p-0" aria-label="Submit name edit" @onclick="() => SubmitEditGroup(group)">
+                                <img src="icons/check.svg" alt="Accept" class="p-[2px] invert" aria-hidden="true" />
+                            </button>
+                            <button class="btn btn-danger px-1 leading-4 h-8" aria-label="Cancel name edit" @onclick="() => StopEditGroup()">
+                                Cancel
+                            </button>
+                        </div>
                     }
-                    <p class="mt-2 mb-0">Members: You, @string.Join(", ", group.OtherUsers)</p>
+                    <p>Members: You, @string.Join(", ", group.OtherUsers)</p>
                 </fieldset>
             }
         }

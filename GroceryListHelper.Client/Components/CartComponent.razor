@@ -5,12 +5,12 @@
     <span class="text-center">Reorder</span>
     <span class="text-center">Collected</span>
     <div class="flex justify-center">
-        <button @onclick="ChangeSortDirectionAndSortItems" class="cursor-pointer" aria-label="Sort items">
+        <button @onclick="ChangeSortDirectionAndSortItems" class="cursor-pointer">
             Product
         </button>
         @if (AppState.SortDirection != SortState.None)
         {
-            <img class="scale-50 h-6 dark:invert" src=@(AppState.SortDirection == SortState.Ascending ? "icons/arrow-down.svg" : "icons/arrow-up.svg") />
+            <img class="scale-50 h-6 dark:invert" alt="@(AppState.SortDirection == SortState.Ascending ? "sort down" : "sort up")" src=@(AppState.SortDirection == SortState.Ascending ? "icons/arrow-down.svg" : "icons/arrow-up.svg") />
         }
     </div>
     <span class="text-center hidden md:block">Amount</span>
@@ -46,7 +46,7 @@
                 @if (item != editingItem)
                 {
                     <button class="btn btn-primary w-9 h-9 p-[2px] m-auto @(item==movingItem ? "bg-blue-800" : "")" aria-label="Reorder" @onclick="()=>Move(item)">
-                        <img class="m-auto invert" src="icons/swap.svg" />
+                        <img class="m-auto invert" src="icons/swap.svg" alt="Swap" aria-hidden="true" />
                     </button>
                     <input type="checkbox" class="scale-150 m-auto" checked="@item.IsCollected" aria-label="Product collected" @onchange=@((e)=>MarkItemCollected(e, item)) />
                     <span class="m-auto @(item.IsCollected ? "line-through" : "")" aria-label="Product name">@item.Name</span>
@@ -55,10 +55,10 @@
                     <span class="m-auto hidden lg:block" aria-label="Total price">@((item.UnitPrice * item.Amount).ToString("N2"))</span>
                     <div class="flex">
                         <button class="btn btn-success w-9 h-9 p-[2px] m-auto hidden sm:block" @onclick="()=>StartEditItem(item)" aria-label="Edit product" disabled=@item.IsCollected>
-                            <img class="m-auto invert" src="icons/edit.svg" />
+                            <img class="m-auto invert" src="icons/edit.svg" alt="Edit" aria-hidden="true" />
                         </button>
                         <button class="btn btn-danger w-9 h-9 p-[5px] m-auto" @onclick="()=>RemoveProduct(item)" aria-label="Delete product" disabled=@item.IsCollected>
-                            <img class="m-auto invert" src="icons/delete.svg" />
+                            <img class="m-auto invert" src="icons/delete.svg" alt="Delete" aria-hidden="true" />
                         </button>
                     </div>
                 }
@@ -71,7 +71,7 @@
                     <input type="number" step="0.01" min="0" class="form-control text-center my-auto mx-2 hidden sm:block" aria-label="Edit unit price" @bind="item.UnitPrice" />
                     <span class="m-auto hidden lg:block" aria-label="Total price">@((item.UnitPrice * item.Amount).ToString("N2"))</span>
                     <button class="btn btn-success m-auto h-9 w-9 p-1" @onclick=@(()=>UpdateCartProduct(item)) aria-label="Submit edit" disabled=@item.IsCollected>
-                        <img class="m-auto invert" src="icons/check.svg" />
+                        <img class="m-auto invert" src="icons/check.svg" alt="Accept" aria-hidden="true" />
                     </button>
                 }
             </div>
