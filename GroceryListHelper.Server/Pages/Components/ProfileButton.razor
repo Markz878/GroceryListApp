@@ -23,6 +23,7 @@
             <a href="/managegroups" class="hover:text-gray-400 hover:underline">Manage groups</a>
         </p>
         <form id="signout-form" method="post" action="api/Account/Logout" class="flex items-center">
+            <AntiforgeryToken/>
             <img src="icons/logout.svg" class="h-4 mr-2 dark:invert" aria-hidden="true" />
             <button id="signout-btn" class="hover:text-gray-400 hover:underline" type="submit">
                 Sign out

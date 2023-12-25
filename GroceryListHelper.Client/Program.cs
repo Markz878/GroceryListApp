@@ -24,7 +24,9 @@ WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, ClientAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AntiforgeryTokenHandler>();
 builder.Services.AddHttpClient("Client", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddHttpMessageHandler<AntiforgeryTokenHandler>()
     .AddStandardResilienceHandler();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<RenderLocation, ClientRenderLocation>();
