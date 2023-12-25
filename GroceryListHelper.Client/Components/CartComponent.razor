@@ -5,7 +5,7 @@
     <span class="text-center">Reorder</span>
     <span class="text-center">Collected</span>
     <div class="flex justify-center">
-        <button @onclick="ChangeSortDirectionAndSortItems" class="cursor-pointer">
+        <button @onclick="ChangeSortDirectionAndSortItems" aria-label="Sort items" class="cursor-pointer">
             Product
         </button>
         @if (AppState.SortDirection != SortState.None)
