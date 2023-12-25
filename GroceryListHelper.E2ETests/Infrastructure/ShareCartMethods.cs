@@ -18,11 +18,11 @@ internal static class ShareCartMethods
         await page1.GetByPlaceholder("New member email").FillAsync(user2Email);
         await page1.GetByRole(AriaRole.Button, new() { Name = "+" }).ClickAsync();
         await page1.GetByRole(AriaRole.Button, new() { Name = "Create group" }).ClickAsync();
-        await page1.GetByLabel("Select group cart").ClickAsync();
+        await page1.GetByRole(AriaRole.Link, new() { Name = "Test Group" }).ClickAsync();
 
         await page2.GetByLabel("profile-btn").ClickAsync();
         await page2.GetByRole(AriaRole.Link, new() { Name = "Manage Groups" }).ClickAsync();
-        await page2.GetByLabel("Select group cart").ClickAsync();
+        await page2.GetByRole(AriaRole.Link, new() { Name = "Test Group" }).ClickAsync();
 
         await page1.GetByRole(AriaRole.Button, new() { Name = "×" }).ClickAsync();
     }

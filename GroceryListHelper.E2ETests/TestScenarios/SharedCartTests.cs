@@ -21,7 +21,6 @@ public sealed class SharedCartTests : IAsyncLifetime
         this.server = server;
     }
 
-
     public async Task InitializeAsync()
     {
         using IServiceScope scope = server.Services.CreateScope();
