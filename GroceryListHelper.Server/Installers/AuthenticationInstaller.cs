@@ -8,10 +8,8 @@ public sealed class AuthenticationInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddCascadingAuthenticationState();
+        builder.Services.AddAntiforgery();
         builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
-        builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
         builder.Services.Configure(CookieAuthenticationDefaults.AuthenticationScheme, (CookieAuthenticationOptions options) =>
         {
             options.Events.OnSignedIn = async context =>

@@ -13,11 +13,11 @@ public sealed class CartHubInstaller : IInstaller
         else
         {
             builder.Services.AddSignalR().AddMessagePackProtocol().AddAzureSignalR();
-            builder.Services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Append(octetStream);
-            });
         }
-
+        builder.Services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Append(octetStream);
+        });
     }
 }

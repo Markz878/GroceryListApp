@@ -31,7 +31,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         double productPrice = 2.9;
         await page.AddProductToCart(productName, productAmount, productPrice);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(productName, models[0].Name);
         Assert.Equal(productAmount, models[0].Amount);
@@ -43,7 +43,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     public async Task AddEmptyProductNameToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await page.AddProductToCart("", 2, 2.9);
-        await page.WaitForSelectorAsync("text='Product Name' must not be empty.");
+        await page.WaitForSelectorAsync("text=Product name not given");
         Assert.Empty(await page.GetRow(0).ElementHandlesAsync());
     }
 
@@ -51,7 +51,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     public async Task AddNegativeProductAmountToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await page.AddProductToCart("Maito", -2, 2.9);
-        await page.WaitForSelectorAsync("text='Amount' must be between 0 and 10000.");
+        await page.WaitForSelectorAsync("text=Amount must be between 0 and 10 000");
         Assert.Empty(await page.GetRow(0).ElementHandlesAsync());
     }
 
@@ -59,7 +59,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     public async Task AddNegativePriceToCart_ShowsModalWithMessage_WithoutAddingProduct()
     {
         await page.AddProductToCart("Maito", 2, -2.9);
-        await page.WaitForSelectorAsync("text='Unit Price' must be between 0 and 10000.");
+        await page.WaitForSelectorAsync("text=Price must be between 0 and 10 000");
         Assert.Empty(await page.GetRow(0).ElementHandlesAsync());
     }
 
@@ -101,7 +101,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         IReadOnlyList<IElementHandle> rows = await page.GetRow(0).ElementHandlesAsync();
         Assert.Empty(rows);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        Assert.Null(cartProductsJson);
+        Assert.Equal("[]", cartProductsJson);
     }
 
     [Fact]
@@ -113,9 +113,9 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         await page.FillEditPrice(0, 2.50);
         await page.ClickSubmitEditButton(0);
         Assert.Equal("2", await page.GetItemAmount(0));
-        Assert.Equal("2.50", await page.GetItemPrice(0));
+        Assert.Equal("2.5", await page.GetItemPrice(0));
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(2, models[0].Amount);
         Assert.Equal(2.5, models[0].UnitPrice);
@@ -133,7 +133,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         IElementHandle? element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson);
+        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(productCount - 1, models.Length);
     }

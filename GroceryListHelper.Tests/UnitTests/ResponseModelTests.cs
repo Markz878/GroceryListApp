@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.Core.Errors;
-using GroceryListHelper.Shared.Models.HelperModels;
-
-namespace GroceryListHelper.Tests.UnitTests;
+﻿namespace GroceryListHelper.Tests.UnitTests;
 public class ResponseModelTests
 {
     [Fact]

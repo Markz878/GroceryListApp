@@ -60,7 +60,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         string amountText = await page1.GetItemAmount(0);
         Assert.Equal("3", amountText);
         string priceText = await page1.GetItemPrice(0);
-        Assert.Equal("3.10", priceText);
+        Assert.Equal("3.1", priceText);
 
         await page2.ClickDeleteButton(0);
         string currentTopItemName = await page1.GetItemName(0);

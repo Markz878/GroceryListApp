@@ -15,6 +15,6 @@ public class CreateCartGroupRequestValidator : AbstractValidator<CreateCartGroup
         RuleFor(x => x.Name).NotEmpty().MaximumLength(30);
         RuleFor(x => x.OtherUsers)
             .Must(x => x.Count is > 0 and < 10).WithMessage("Group size must be between 2 and 10");
-        RuleForEach(x => x.OtherUsers).EmailAddress();
+        RuleForEach(x => x.OtherUsers).EmailAddress().WithMessage((r, x) => $"{x} is not a valid email");
     }
 }

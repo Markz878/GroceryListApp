@@ -12,12 +12,6 @@ public static class CartGroupProductsEndpointsMapper
             .AddEndpointFilter<GroupAccessFilter>()
             .WithTags("Cart Group Products");
 
-        //group.MapPost("/join/{groupId:guid}", JoinCartGroup)
-        //    .AddEndpointFilter<GroupAccessFilter>();
-
-        //group.MapPost("/leave/{groupId:guid}", LeaveCartGroup)
-        //    .AddEndpointFilter<GroupAccessFilter>();
-
         group.MapGet("/{groupId:guid}", GetAll)
             .WithName("Get cart products for a group");
 
@@ -33,21 +27,6 @@ public static class CartGroupProductsEndpointsMapper
 
         group.MapPatch("/{groupId:guid}/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
-
-
-    //public static async Task<Results<NoContent, UnauthorizedHttpResult>> JoinCartGroup(Guid groupId, [FromHeader] string connectionId, ClaimsPrincipal user, IHubContext<CartHub> hub)
-    //{
-    //    await hub.Groups.AddToGroupAsync(connectionId, groupId.ToString());
-    //    await hub.Clients.GroupExcept(groupId.ToString(), connectionId).SendAsync(nameof(ICartHubNotifications.GetMessage), $"User {user.GetUserEmail()} joined sharing");
-    //    return TypedResults.NoContent();
-    //}
-
-    //public static async Task<Results<NoContent, UnauthorizedHttpResult>> LeaveCartGroup(Guid groupId, [FromHeader] string connectionId, ClaimsPrincipal user, IHubContext<CartHub> hub)
-    //{
-    //    await hub.Groups.RemoveFromGroupAsync(connectionId, groupId.ToString());
-    //    await hub.Clients.GroupExcept(groupId.ToString(), connectionId).SendAsync(nameof(ICartHubNotifications.GetMessage), $"User {user.GetUserEmail()} left sharing");
-    //    return TypedResults.NoContent();
-    //}
 
     public static async Task<Ok<List<CartProductCollectable>>> GetAll(Guid groupId, IMediator mediator)
     {

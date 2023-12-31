@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 
 namespace GroceryListHelper.E2ETests.Infrastructure;
 
@@ -12,6 +13,7 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
     public IPlaywright? PlaywrightInstance { get; private set; }
     public IBrowser? BrowserInstance { get; private set; }
     public string BaseUrl { get; } = $"https://localhost:{GetRandomUnusedPort()}";
+    public JsonSerializerOptions JsonOptions { get; } = new(JsonSerializerDefaults.Web);
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)
     {

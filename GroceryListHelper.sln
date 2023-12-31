@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Server", "GroceryListHelper.Server\GroceryListHelper.Server.csproj", "{85924093-F794-4209-BF66-A947D0DB0981}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Client", "GroceryListHelper.Client\GroceryListHelper.Client.csproj", "{CFAF965C-DB7C-4FC0-A9D8-0E1951A74E9B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroceryListHelper.Shared", "GroceryListHelper.Shared\GroceryListHelper.Shared.csproj", "{55A7E070-979E-4135-8C2B-C44F831180D3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B1A5C5B5-A2B0-404C-A954-CF8C2C6490F8}"

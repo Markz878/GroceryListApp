@@ -74,7 +74,7 @@ public sealed class ServerStorageCartTests : IAsyncLifetime
         await page.FillEditPrice(0, 2.50);
         await page.ClickSubmitEditButton(0);
         Assert.Equal("2", await page.GetItemAmount(0));
-        Assert.Equal("2.50", await page.GetItemPrice(0));
+        Assert.Equal("2.5", await page.GetItemPrice(0));
     }
 
     [Fact]

@@ -1,0 +1,35 @@
+<script lang="ts">
+  import { onDestroy, onMount } from "svelte";
+  import type { CartGroup } from "../types/CartGroup";
+  import { getCartGroup } from "../services/CartGroupsService";
+  import CartComponent from "../components/CartComponent.svelte";
+  import CartSummaryRow from "../components/CartSummaryRow.svelte";
+  import GroupName from "../components/GroupName.svelte";
+  import { joinGroup, leaveGroup } from "../helpers/cartHubClient";
+  import { showError } from "../helpers/store";
+  interface GroupCartParams {
+    groupid: string;
+  }
+  export let params = {} as GroupCartParams;
+  let groupInfo: CartGroup | null;
+
+  onMount(async () => {
+    const groupInfoResponse = await getCartGroup(params.groupid);
+    if (groupInfoResponse instanceof Error) {
+      showError(groupInfoResponse.message);
+    } else {
+      groupInfo = groupInfoResponse;
+    }
+    await joinGroup(params.groupid);
+  });
+
+  onDestroy(async () => {
+    await leaveGroup(params.groupid);
+  });
+</script>
+
+{#if groupInfo}
+  <GroupName {groupInfo} />
+{/if}
+<CartComponent />
+<CartSummaryRow />
