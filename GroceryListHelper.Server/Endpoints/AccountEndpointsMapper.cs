@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
@@ -10,9 +11,21 @@ public static class AccountEndpointsMapper
     {
         RouteGroupBuilder accountGroup = builder.MapGroup("account").WithTags("Account");
         accountGroup.MapGet("user", GetUserInfo).AllowAnonymous();
+        accountGroup.MapGet("token", GetToken);
         accountGroup.MapGet("login", Login).AllowAnonymous();
         accountGroup.MapPost("logout", Logout);
         accountGroup.MapGet("signout", PostLogoutRedirect).AllowAnonymous().ExcludeFromDescription();
+    }
+
+    private static readonly CookieOptions csrfTokenOptions = new() { HttpOnly = false, Secure = true };
+    public static NoContent GetToken(IAntiforgery antiforgery, HttpContext context)
+    {
+        AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
+        if (!string.IsNullOrWhiteSpace(tokens.RequestToken))
+        {
+            context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, csrfTokenOptions);
+        }
+        return TypedResults.NoContent();
     }
 
     public static Ok<UserInfo> GetUserInfo(ClaimsPrincipal user)

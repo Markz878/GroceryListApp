@@ -12,6 +12,8 @@ export async function get<T, U>(url: string, method: HttpMethod, returnFunc: (re
     return (await makeRequest<T, U>(url, method, returnFunc, body, headers)) as U | Error;
 }
 
+let xsrfToken = "";
+
 async function makeRequest<T, U>(
     url: string,
     method: HttpMethod,
@@ -21,12 +23,25 @@ async function makeRequest<T, U>(
 ): Promise<U | Error | null> {
     try {
         const request: RequestInit = { method: method, headers: headers };
+        if (method !== "GET") {
+            if (!xsrfToken) {
+                const antiForgeryResponse = await fetch("api/account/token", { method: "GET" });
+                if (antiForgeryResponse.ok) {
+                    const xsrfSection = document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN="));
+                    if (xsrfSection) {
+                        xsrfToken = xsrfSection.split("=")[1];
+                    }
+                }
+            }
+            if (xsrfToken) {
+                request.headers = { ...request.headers, "X-XSRF-TOKEN": xsrfToken };
+            }
+        }
         if (body) {
             request.body = JSON.stringify(body);
-            request.headers = { ...headers, 'Content-Type': 'application/json' };
+            request.headers = { ...request.headers, "Content-Type": "application/json" };
         }
         const response = await fetch(url, request);
-
         if (response.ok) {
             return returnFunc ? await returnFunc(response) : null;
         } else {
