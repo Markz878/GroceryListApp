@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Tests.UnitTests;
+﻿using GroceryListHelper.Core.Domain.HelperModels;
+
+namespace GroceryListHelper.Tests.UnitTests;
 public class ResponseModelTests
 {
     [Fact]

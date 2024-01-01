@@ -1,4 +1,6 @@
-﻿using GroceryListHelper.Core.Features.CartGroups;
+﻿using GroceryListHelper.Core.Domain.CartProducts;
+using GroceryListHelper.Core.Domain.HelperModels;
+using GroceryListHelper.Core.Features.CartGroups;
 using GroceryListHelper.Core.Features.CartProducts;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
@@ -39,7 +41,7 @@ public sealed class CartGroupProductsTests : BaseTest, IAsyncLifetime
             UnitPrice = Random.Shared.NextDouble() * 10
         };
         HttpResponseMessage response = await _client.PostAsJsonAsync(_uri, cartProduct);
-        var x = await response.Content.ReadAsStringAsync();
+        string x = await response.Content.ReadAsStringAsync();
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         Assert.Contains(products, x =>

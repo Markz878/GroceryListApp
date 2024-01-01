@@ -1,4 +1,7 @@
-﻿using GroceryListHelper.Core.Features.CartGroups;
+﻿using GroceryListHelper.Core.Domain.CartGroups;
+using GroceryListHelper.Core.Domain.HelperModels;
+using GroceryListHelper.Core.Features.CartGroups;
+using GroceryListHelper.Server.Models.CartGroups;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 

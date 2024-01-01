@@ -1,5 +1,8 @@
-﻿using GroceryListHelper.Core.Features.CartGroups;
-using GroceryListHelper.Shared.Models.HelperModels;
+﻿using GroceryListHelper.Core.Domain.CartGroups;
+using GroceryListHelper.Core.Domain.HelperModels;
+using GroceryListHelper.Core.Features.CartGroups;
+using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Models.CartGroups;
 
 namespace GroceryListHelper.Server.Endpoints;
 

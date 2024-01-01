@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.Core.Features.CartGroups;
-using GroceryListHelper.Shared.Interfaces;
+using GroceryListHelper.Server.HelperMethods;
+using GroceryListHelper.Server.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GroceryListHelper.Server.Hubs;

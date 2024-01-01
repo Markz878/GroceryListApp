@@ -1,5 +1,5 @@
-﻿using GroceryListHelper.Core.Features.Users;
-using GroceryListHelper.Core.HelperMethods;
+﻿using GroceryListHelper.Core.DataAccess.HelperMethods;
+using GroceryListHelper.Core.Features.Users;
 
 namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 

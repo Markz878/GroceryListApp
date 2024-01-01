@@ -1,5 +1,5 @@
-﻿using GroceryListHelper.Core.Features.StoreProducts;
-using GroceryListHelper.Shared.Models.StoreProducts;
+﻿using GroceryListHelper.Core.Domain.StoreProducts;
+using GroceryListHelper.Core.Features.StoreProducts;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 

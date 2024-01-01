@@ -1,4 +1,4 @@
-using GroceryListHelper.Shared.Models.CartProducts;
+using GroceryListHelper.Core.Domain.CartProducts;
 using System.Text.Json;
 
 namespace GroceryListHelper.E2ETests.TestScenarios;

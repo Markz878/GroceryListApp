@@ -1,6 +1,4 @@
-﻿using Microsoft.Playwright;
-
-namespace GroceryListHelper.E2ETests.Infrastructure;
+﻿namespace GroceryListHelper.E2ETests.Infrastructure;
 
 internal static class ShareCartMethods
 {

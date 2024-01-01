@@ -1,6 +1,4 @@
-﻿using GroceryListHelper.Core.Errors;
-
-namespace GroceryListHelper.Core.Features.StoreProducts;
+﻿namespace GroceryListHelper.Core.Features.StoreProducts;
 
 public sealed record AddStoreProductCommand : IRequest<ConflictError?>
 {

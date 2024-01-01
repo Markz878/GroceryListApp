@@ -1,6 +1,5 @@
 ﻿using Azure;
 using Azure.Data.Tables;
-using GroceryListHelper.Shared.Models.HelperModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;

@@ -1,7 +1,4 @@
 global using GroceryListHelper.Core.Errors;
-global using GroceryListHelper.Shared.Models.CartGroups;
-global using GroceryListHelper.Shared.Models.CartProducts;
-global using GroceryListHelper.Shared.Models.HelperModels;
 global using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 global using MediatR;
 global using Microsoft.AspNetCore.Authentication;

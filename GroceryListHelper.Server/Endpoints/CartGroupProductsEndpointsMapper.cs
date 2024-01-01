@@ -1,4 +1,5 @@
-﻿using GroceryListHelper.Shared.Interfaces;
+﻿using GroceryListHelper.Core.Domain.CartProducts;
+using GroceryListHelper.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 

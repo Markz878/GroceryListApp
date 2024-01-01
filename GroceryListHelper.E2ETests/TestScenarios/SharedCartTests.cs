@@ -11,8 +11,8 @@ public sealed class SharedCartTests : IAsyncLifetime
     private IPage page1 = default!;
     private IBrowserContext browserContext2 = default!;
     private IPage page2 = default!;
-    private FakeAuthInfo FakeAuth1 = new("Test User 1", "test_user1@email.com", Guid.NewGuid());
-    private FakeAuthInfo FakeAuth2 = new("Test User 2", "test_user2@email.com", Guid.NewGuid());
+    private readonly FakeAuthInfo FakeAuth1 = new("Test User 1", "test_user1@email.com", Guid.NewGuid());
+    private readonly FakeAuthInfo FakeAuth2 = new("Test User 2", "test_user2@email.com", Guid.NewGuid());
 
     public SharedCartTests(WebApplicationFactoryFixture server, ITestOutputHelper testOutputHelper)
     {

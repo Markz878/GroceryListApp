@@ -56,6 +56,7 @@
           cartGroups?.push(cartGroup);
           cartGroups = cartGroups;
           isCreatingNewGroup = false;
+          createCartGroupRequest = new CreateCartGroupRequest();
         }
       } catch (e) {
         if (e instanceof Error) {
@@ -101,6 +102,7 @@
     }
     oldGroupName = "";
   }
+  
   function stopEditGroup() {
     editingGroup = null;
     oldGroupName = "";

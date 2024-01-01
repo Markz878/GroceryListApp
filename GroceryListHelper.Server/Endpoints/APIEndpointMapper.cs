@@ -1,6 +1,4 @@
-﻿using BlazeGag.Server.Filters;
-
-namespace GroceryListHelper.Server.Endpoints;
+﻿namespace GroceryListHelper.Server.Endpoints;
 
 public static class APIEndpointMapper
 {

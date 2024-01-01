@@ -1,4 +1,7 @@
-﻿namespace GroceryListHelper.Server.Endpoints;
+﻿using GroceryListHelper.Core.Domain.CartProducts;
+using GroceryListHelper.Server.HelperMethods;
+
+namespace GroceryListHelper.Server.Endpoints;
 
 public static class CartProductsEndpointsMapper
 {

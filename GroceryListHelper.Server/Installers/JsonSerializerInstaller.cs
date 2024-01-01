@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GroceryListHelper.Core.Domain.CartGroups;
+using GroceryListHelper.Core.Domain.CartProducts;
+using GroceryListHelper.Core.Domain.StoreProducts;
+using GroceryListHelper.Server.Models.CartGroups;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 
-namespace BlazeGag.Server.Filters;
+namespace GroceryListHelper.Server.Filters;
 
 public class AntiforgeryTokenFilter(IAntiforgery antiforgery) : IEndpointFilter
 {

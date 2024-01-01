@@ -13,18 +13,11 @@ public sealed class HealthChecksInstaller : IInstaller
     }
 }
 
-internal class DbHealthCheck : IHealthCheck
+internal class DbHealthCheck(TableServiceClient tableServiceClient, ILogger<DbHealthCheck> logger) : IHealthCheck
 {
-    private readonly TableServiceClient tableServiceClient;
-    private readonly ILogger<DbHealthCheck> logger;
-    private readonly string[] tableNames;
-
-    public DbHealthCheck(TableServiceClient tableServiceClient, ILogger<DbHealthCheck> logger)
-    {
-        this.tableServiceClient = tableServiceClient;
-        this.logger = logger;
-        tableNames = ServiceExtensions.GetTables();
-    }
+    private readonly TableServiceClient tableServiceClient = tableServiceClient;
+    private readonly ILogger<DbHealthCheck> logger = logger;
+    private readonly string[] tableNames = ServiceExtensions.GetTables();
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {

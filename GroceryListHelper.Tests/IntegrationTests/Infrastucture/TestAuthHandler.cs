@@ -1,4 +1,4 @@
-﻿using GroceryListHelper.Shared.Models.Authentication;
+﻿using GroceryListHelper.Server.HelperMethods;
 
 namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 

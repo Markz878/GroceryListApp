@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Installers;
+﻿using GroceryListHelper.Server.HelperMethods;
+
+namespace GroceryListHelper.Server.Installers;
 
 public class FakeAuthenticationInstaller : IInstaller
 {

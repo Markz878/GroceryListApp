@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.DataAccess.HelperMethods;
-using GroceryListHelper.Shared.Models.StoreProducts;
-
-namespace GroceryListHelper.Core.Features.StoreProducts;
+﻿namespace GroceryListHelper.Core.Features.StoreProducts;
 
 public sealed record GetUserStoreProductsQuery : IRequest<List<StoreProduct>>
 {

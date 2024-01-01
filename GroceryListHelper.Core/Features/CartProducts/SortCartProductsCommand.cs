@@ -1,7 +1,4 @@
-﻿using GroceryListHelper.Shared.HelperMethods;
-using System.ComponentModel;
-
-namespace GroceryListHelper.Core.Features.CartProducts;
+﻿namespace GroceryListHelper.Core.Features.CartProducts;
 
 public sealed record SortCartProductsCommand : IRequest
 {
