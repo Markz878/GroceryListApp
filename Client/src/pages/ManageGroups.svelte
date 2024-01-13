@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { CreateCartGroupRequest, CartGroup } from "../types/CartGroup";
-  import { getAuthenticationStateAsync } from "../services/AuthenticationStateProvider";
+  import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
   import { createCartGroup, deleteCartGroup, getCartGroups, updateCartGroupName } from "../services/CartGroupsService";
   import { showError } from "../helpers/store";
   import Confirm from "../components/Confirm.svelte";
@@ -18,7 +18,7 @@
   let confirm: Confirm | undefined;
 
   onMount(async () => {
-    const userInfo = await getAuthenticationStateAsync();
+    const userInfo = await forceAuthenticationAsync();
     if (userInfo.isAuthenticated) {
       const groupsResponse = await getCartGroups();
       if (groupsResponse instanceof Error) {
@@ -27,6 +27,8 @@
       } else {
         cartGroups = groupsResponse;
       }
+    } else {
+
     }
   });
 
@@ -102,7 +104,7 @@
     }
     oldGroupName = "";
   }
-  
+
   function stopEditGroup() {
     editingGroup = null;
     oldGroupName = "";

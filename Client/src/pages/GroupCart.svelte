@@ -7,13 +7,17 @@
   import GroupName from "../components/GroupName.svelte";
   import { joinGroup, leaveGroup } from "../helpers/cartHubClient";
   import { showError } from "../helpers/store";
+  import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
+  
   interface GroupCartParams {
     groupid: string;
   }
   export let params = {} as GroupCartParams;
+  
   let groupInfo: CartGroup | null;
 
   onMount(async () => {
+    await forceAuthenticationAsync();
     const groupInfoResponse = await getCartGroup(params.groupid);
     if (groupInfoResponse instanceof Error) {
       showError(groupInfoResponse.message);
