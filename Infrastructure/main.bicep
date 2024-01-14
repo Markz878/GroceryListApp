@@ -30,6 +30,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalytics.id
+    DisableLocalAuth: true
   }
 }
 
@@ -171,6 +172,21 @@ resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@202
 resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: storageAccount
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+}
+
+resource appinsights_monitoring_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, appService.id, appinsights_monitoring_publisher.id)
+  scope: appInsights
+  properties: {
+    roleDefinitionId: appinsights_monitoring_publisher.id
+    principalId: appService.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource appinsights_monitoring_publisher 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: appInsights
+  name: '3913510d-42f4-4e42-8a64-420c390055eb'
 }
 
 resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {

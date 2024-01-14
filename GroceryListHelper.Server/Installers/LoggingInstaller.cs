@@ -25,6 +25,10 @@ public class LoggingInstaller : IInstaller
             builder.Logging.AddApplicationInsights();
             builder.Services.AddApplicationInsightsTelemetry(x => x.EnableDependencyTrackingTelemetryModule = false);
             builder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+            builder.Services.Configure<TelemetryConfiguration>(c =>
+            {
+                c.SetAzureTokenCredential(new ManagedIdentityCredential());
+            });
         }
     }
 }
