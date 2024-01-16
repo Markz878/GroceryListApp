@@ -35,11 +35,18 @@ public static class CartGroupProductsEndpointsMapper
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Created> AddProductToGroup(Guid groupId, [FromHeader] string? connectionId, CartProduct product, IMediator mediator, IHubContext<CartHub> hub)
+    public static async Task<Results<Created, Conflict>> AddProductToGroup(Guid groupId, [FromHeader] string? connectionId, CartProduct product, IMediator mediator, IHubContext<CartHub> hub)
     {
-        await mediator.Send(new AddCartProductCommand() { UserId = groupId, CartProduct = product });
-        await hub.Clients.GroupExcept(groupId.ToString(), connectionId ?? "").SendAsync(nameof(ICartHubNotifications.ProductAdded), product);
-        return TypedResults.Created($"api/cartgroupproducts/{groupId}");
+        ConflictError? error = await mediator.Send(new AddCartProductCommand() { UserId = groupId, CartProduct = product });
+        if (error is null)
+        {
+            await hub.Clients.GroupExcept(groupId.ToString(), connectionId ?? "").SendAsync(nameof(ICartHubNotifications.ProductAdded), product);
+            return TypedResults.Created($"api/cartgroupproducts/{groupId}");
+        }
+        else
+        {
+            return TypedResults.Conflict();
+        }
     }
 
     public static async Task<NoContent> DeleteAllProducts(Guid groupId, [FromHeader] string? connectionId, IMediator mediator, IHubContext<CartHub> hub)
@@ -53,14 +60,14 @@ public static class CartGroupProductsEndpointsMapper
     {
         NotFoundError? ex = await mediator.Send(new DeleteCartProductCommand() { UserId = groupId, ProductName = productName });
         await hub.Clients.GroupExcept(groupId.ToString(), connectionId ?? "").SendAsync(nameof(ICartHubNotifications.ProductDeleted), productName);
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
+        return ex is null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, [FromHeader] string? connectionId, IMediator mediator, IHubContext<CartHub> hub)
     {
         NotFoundError? ex = await mediator.Send(new UpdateProductCommand() { UserId = groupId, CartProduct = updatedProduct });
         await hub.Clients.GroupExcept(groupId.ToString(), connectionId ?? "").SendAsync(nameof(ICartHubNotifications.ProductModified), updatedProduct);
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
+        return ex is null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
     public static async Task<NoContent> SortCartProducts(Guid groupId, ListSortDirection sortDirection, [FromHeader] string? connectionId, IMediator mediator, IHubContext<CartHub> hub)

@@ -6,15 +6,10 @@ using GroceryListHelper.Core.Features.CartProducts;
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public sealed class CartGroupProductsTests : BaseTest, IAsyncLifetime
+public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : BaseTest(factory, testOutputHelper)
 {
     private string _uri = "api/cartgroupproducts/";
     private Guid groupId;
-
-    public CartGroupProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
-    {
-    }
-
 
     [Fact]
     public async Task GetCartProducts()
@@ -196,15 +191,17 @@ public sealed class CartGroupProductsTests : BaseTest, IAsyncLifetime
         }
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync();
         Result<Guid, NotFoundError> response = await _mediator.Send(new CreateGroupCommand() { GroupName = Guid.NewGuid().ToString().Replace("-", ""), UserEmails = [TestAuthHandler.UserEmail, TestAuthHandler.RandomEmail1] });
         groupId = response.Map(x => x, e => throw new InvalidOperationException("No user in database"));
         _uri += groupId;
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
         await _mediator.Send(new DeleteCartGroupCommand() { GroupId = groupId, UserEmail = TestAuthHandler.UserEmail });
+        await base.DisposeAsync();
     }
 }

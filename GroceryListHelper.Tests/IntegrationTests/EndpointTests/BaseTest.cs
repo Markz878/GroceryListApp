@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
-public abstract class BaseTest : IDisposable
+public abstract class BaseTest : IAsyncLifetime
 {
     protected readonly WebApplicationFactoryFixture _factory;
     protected readonly HttpClient _client;
@@ -23,6 +23,18 @@ public abstract class BaseTest : IDisposable
         _client = factory.CreateClient();
         _scope = _factory.Services.CreateScope();
         _mediator = _scope.ServiceProvider.GetRequiredService<IMediator>();
+    }
+
+
+    public virtual async Task InitializeAsync()
+    {
+        HttpResponseMessage csrfTokenResponse = await _client.GetAsync("api/account/token");
+        IEnumerable<string> setCookieHeaders = csrfTokenResponse.Headers.GetValues("Set-Cookie");
+        string xsrfTokenHeaderValue = setCookieHeaders.First(x => x.StartsWith("XSRF-TOKEN"));
+        int i1 = xsrfTokenHeaderValue.IndexOf('=') + 1;
+        int i2 = xsrfTokenHeaderValue.IndexOf(';');
+        string xsrfToken = xsrfTokenHeaderValue[i1..i2];
+        _client.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrfToken);
     }
 
     protected async Task<List<CartProduct>> SaveCartProducts(int n, Guid? ownerId = null)
@@ -82,9 +94,9 @@ public abstract class BaseTest : IDisposable
         return response.Map(x => x, e => throw new Exception());
     }
 
-    public void Dispose()
+    public virtual Task DisposeAsync()
     {
         _scope.Dispose();
-        GC.SuppressFinalize(this);
+        return Task.CompletedTask;
     }
 }

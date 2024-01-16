@@ -6,13 +6,9 @@ using GroceryListHelper.Server.Models.CartGroups;
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public sealed class CartGroupTests : BaseTest
+public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : BaseTest(factory, testOutputHelper)
 {
     private readonly string _uri = "api/cartgroups";
-
-    public CartGroupTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
-    {
-    }
 
     [Fact]
     public async Task GetGroupsForUser()

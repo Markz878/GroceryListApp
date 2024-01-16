@@ -1,12 +1,8 @@
 ﻿namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public class HealthTests : BaseTest
+public class HealthTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : BaseTest(factory, testOutputHelper)
 {
-    public HealthTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
-    {
-    }
-
     [Fact]
     public async Task PingHealth_Success()
     {

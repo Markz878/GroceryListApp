@@ -10,7 +10,6 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
     public async Task InitializeAsync()
     {
         using IServiceScope scope = Server.Services.CreateScope();
-
         scope.ServiceProvider.DeleteDatabase();
         scope.ServiceProvider.InitDatabase();
         IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();

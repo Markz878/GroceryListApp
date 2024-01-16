@@ -31,6 +31,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalytics.id
     DisableLocalAuth: true
+    RetentionInDays: 30
   }
 }
 

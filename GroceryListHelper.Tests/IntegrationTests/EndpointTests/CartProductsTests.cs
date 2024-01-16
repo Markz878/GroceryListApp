@@ -4,12 +4,9 @@ using GroceryListHelper.Core.Features.CartProducts;
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
-public sealed class CartProductsTests : BaseTest
+public sealed class CartProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : BaseTest(factory, testOutputHelper)
 {
     private const string _uri = "api/cartproducts";
-    public CartProductsTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : base(factory, testOutputHelper)
-    {
-    }
 
     [Fact]
     public async Task GetCartProducts()

@@ -1,14 +1,9 @@
 ﻿namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
-internal class XUnitLoggingProvider : ILoggerProvider
+internal class XUnitLoggingProvider(ITestOutputHelper testOutputHelper) : ILoggerProvider
 {
-    private readonly ITestOutputHelper testOutputHelper;
+    private readonly ITestOutputHelper testOutputHelper = testOutputHelper;
     private readonly LoggerExternalScopeProvider scopeProvider = new();
-
-    public XUnitLoggingProvider(ITestOutputHelper testOutputHelper)
-    {
-        this.testOutputHelper = testOutputHelper;
-    }
 
     public ILogger CreateLogger(string categoryName)
     {
@@ -20,19 +15,15 @@ internal class XUnitLoggingProvider : ILoggerProvider
     }
 }
 
-internal class XUnitLogger<T> : XUnitLogger, ILogger<T>
+internal class XUnitLogger<T>(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider) : XUnitLogger(testOutputHelper, scopeProvider, typeof(T).FullName ?? throw new ArgumentException("ILogger generic type T name is null")), ILogger<T>
 {
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-    : base(testOutputHelper, scopeProvider, typeof(T).FullName ?? throw new ArgumentException("ILogger generic type T name is null"))
-    {
-    }
 }
 
-internal class XUnitLogger : ILogger
+internal class XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider, string categoryName) : ILogger
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-    private readonly string _categoryName;
-    private readonly LoggerExternalScopeProvider _scopeProvider;
+    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
+    private readonly string _categoryName = categoryName;
+    private readonly LoggerExternalScopeProvider _scopeProvider = scopeProvider;
 
     public static ILogger CreateLogger(ITestOutputHelper testOutputHelper)
     {
@@ -42,13 +33,6 @@ internal class XUnitLogger : ILogger
     public static ILogger<T> CreateLogger<T>(ITestOutputHelper testOutputHelper)
     {
         return new XUnitLogger<T>(testOutputHelper, new LoggerExternalScopeProvider());
-    }
-
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider, string categoryName)
-    {
-        _testOutputHelper = testOutputHelper;
-        _scopeProvider = scopeProvider;
-        _categoryName = categoryName;
     }
 
     public bool IsEnabled(LogLevel logLevel)
