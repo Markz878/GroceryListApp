@@ -50,7 +50,7 @@ public static class CartProductsEndpointsMapper
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, IMediator mediator)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult, ProblemHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, IMediator mediator)
     {
         NotFoundError? ex = await mediator.Send(new UpdateProductCommand() { UserId = user.GetUserId(), CartProduct = updatedProduct });
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();

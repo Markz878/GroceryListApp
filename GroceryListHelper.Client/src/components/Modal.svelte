@@ -29,7 +29,7 @@
       </form>
     </div>
     <div class="p-4 dark:bg-slate-900 dark:text-white">
-      <h4>{$modalState.message}</h4>
+      <p class="text-wrap break-words">{$modalState.message}</p>
     </div>
   </div>
 </dialog>
