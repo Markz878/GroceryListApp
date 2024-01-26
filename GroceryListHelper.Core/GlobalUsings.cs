@@ -8,6 +8,5 @@ global using GroceryListHelper.Core.Domain.CartProducts;
 global using GroceryListHelper.Core.Domain.HelperModels;
 global using GroceryListHelper.Core.Domain.StoreProducts;
 global using GroceryListHelper.Core.Errors;
-global using GroceryListHelper.Core.HelperMethods;
 global using MediatR;
 global using System.ComponentModel;

@@ -41,7 +41,7 @@
     const sorted = filtered.toSorted((a, b) => a.order - b.order);
     const topMap = new Map<string, number>();
     for (let i = 0; i < sorted.length; i++) {
-      topMap.set(sorted[i].name, 0.5 + 3 * i);
+      topMap.set(sorted[i]!.name, 0.5 + 3 * i);
     }
     for (const p of filtered) {
       result.push({ product: p, top: topMap.get(p.name) ?? 0 });
@@ -80,6 +80,9 @@
       return;
     } else if (newProduct.unitPrice < 0 || newProduct.unitPrice > 1000) {
       showError("Price must be between 0 and 10 000");
+      return;
+    } else if ($cartProducts.length > 150) {
+      showError("Cart can have a maximum of 150 items");
       return;
     }
     const cartProduct = { ...newProduct };
@@ -120,10 +123,12 @@
     return product.isCollected ? "bg-gray-400 dark:bg-gray-600" : "";
   }
 
-  async function markItemCollected(product: CartProduct) {
-    product.isCollected = !product.isCollected;
-    cartProducts.update((x) => x);
-    checkError(await cartProductService?.updateCartProduct(product));
+  async function markItemCollected(product: CartProduct, e: Event) {
+    if (e.target instanceof HTMLInputElement) {
+      product.isCollected = e.target.checked;
+      cartProducts.update((x) => x);
+      checkError(await cartProductService?.updateCartProduct(product));
+    }
   }
 
   function startEditItem(product: CartProduct) {
@@ -171,13 +176,15 @@
   }
 
   async function setProductAmount(e: Event, product: CartProduct) {
-    const input = e.target as HTMLInputElement;
-    product.amount = parseFloat(input.value);
+    if (e.target instanceof HTMLInputElement) {
+      product.amount = parseFloat(e.target.value);
+    }
   }
 
   async function setProductPrice(e: Event, product: CartProduct) {
-    const input = e.target as HTMLInputElement;
-    product.unitPrice = parseFloat(input.value);
+    if (e.target instanceof HTMLInputElement) {
+      product.unitPrice = parseFloat(e.target.value);
+    }
   }
 </script>
 
@@ -217,7 +224,7 @@
         <button class="btn btn-primary w-9 h-9 p-0 m-auto {cartProduct.product == movingItem ? 'bg-blue-800' : ''}" aria-label="Reorder" on:click={() => move(cartProduct.product)}>
           <img class="m-auto invert w-7 h-7" src="icons/swap.svg" alt="Swap" aria-hidden="true" />
         </button>
-        <input type="checkbox" class="scale-150 m-auto" checked={cartProduct.product.isCollected} aria-label="Mark collected" on:change={(e) => markItemCollected(cartProduct.product)} />
+        <input type="checkbox" class="scale-150 m-auto" checked={cartProduct.product.isCollected} aria-label="Mark collected" on:change={(e) => markItemCollected(cartProduct.product, e)} />
         <span class="m-auto {cartProduct.product.isCollected ? 'line-through' : ''}" aria-label="Product name">{cartProduct.product.name}</span>
         <span class="m-auto hidden md:block" aria-label="Amount">{cartProduct.product.amount}</span>
         <span class="m-auto hidden sm:block" aria-label="Unit price">{cartProduct.product.unitPrice}</span>

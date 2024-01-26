@@ -21,9 +21,9 @@ export function getNewOrder(orders: number[], movingOrder: number, movingToOrder
 
 function getNextLargerOrder(orders: number[], movingToOrder: number) {
     let result = Number.MAX_VALUE;
-    for (const x of orders) {
-        if (x > movingToOrder && x < result) {
-            result = x;
+    for (const order of orders) {
+        if (order > movingToOrder && order < result) {
+            result = order;
         }
     }
     return result;
@@ -31,9 +31,9 @@ function getNextLargerOrder(orders: number[], movingToOrder: number) {
 
 function getNextSmallerOrder(orders: number[], movingToOrder: number) {
     let result = Number.MIN_VALUE;
-    for (const x of orders) {
-        if (x < movingToOrder && x > result) {
-            result = x;
+    for (const order of orders) {
+        if (order < movingToOrder && order > result) {
+            result = order;
         }
     }
     return result;

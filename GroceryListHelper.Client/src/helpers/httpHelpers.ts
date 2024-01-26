@@ -27,10 +27,10 @@ async function makeRequest<T, U>(
             if (!xsrfToken) {
                 const antiForgeryResponse = await resilientFetch("api/account/token", { method: "GET" });
                 if (antiForgeryResponse.ok) {
-                    const xsrfSection = document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN="));
-                    if (xsrfSection) {
-                        xsrfToken = xsrfSection.split("=")[1];
-                    }
+                    const keyString = "XSRF-TOKEN=";
+                    const startIndex = document.cookie.indexOf(keyString);
+                    const endIndex = document.cookie.indexOf("; ", startIndex + keyString.length);
+                    xsrfToken = document.cookie.substring(startIndex + keyString.length, endIndex > 0 ? endIndex : undefined);
                 }
                 else {
                     console.error("Error fetching token.")

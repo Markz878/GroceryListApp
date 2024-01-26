@@ -8,12 +8,12 @@
   import { joinGroup, leaveGroup } from "../helpers/cartHubClient";
   import { showError } from "../helpers/store";
   import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
-  
+
   interface GroupCartParams {
     groupid: string;
   }
-  export let params = {} as GroupCartParams;
-  
+  export let params: GroupCartParams = { groupid: "" };
+
   let groupInfo: CartGroup | null;
 
   onMount(async () => {

@@ -30,9 +30,10 @@
   }
 
   function setFilterCollected(e: Event) {
-    const checkbox = e.target as HTMLInputElement;
-    showOnlyUncollected.set(checkbox.checked);
-    $showOnlyUncollected = $showOnlyUncollected;
+    if (e.target instanceof HTMLInputElement) {
+      showOnlyUncollected.set(e.target.checked);
+      $showOnlyUncollected = $showOnlyUncollected;
+    }
   }
 
   async function clearCartProducts() {
