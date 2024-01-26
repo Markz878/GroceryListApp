@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { join } from 'path';
 import { readFileSync, existsSync } from 'fs'
 import { spawnSync } from 'child_process';
+import { checker } from "vite-plugin-checker"
 
 const baseFolder =
   process.env.APPDATA !== undefined && process.env.APPDATA !== ''
@@ -36,7 +37,7 @@ if (!existsSync(certFilePath) || !existsSync(keyFilePath)) {
 }
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [svelte(), checker({ typescript: true })],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

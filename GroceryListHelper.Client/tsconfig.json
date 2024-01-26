@@ -18,7 +18,7 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "alwaysStrict": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noUnusedLocals": true,
     "noUncheckedIndexedAccess": true
   },

@@ -1,7 +1,7 @@
 import type { CartProduct } from "../types/CartProduct";
 import type { ICartProductsService } from "../types/ICartProductsService";
 import type { SortDirection } from "../types/SortState";
-import { get, send } from "../helpers/httpHelpers";
+import { send } from "../helpers/httpHelpers";
 
 export class CartProductsApiService implements ICartProductsService {
     readonly url = "api/cartproducts/";
