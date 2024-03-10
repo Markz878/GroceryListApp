@@ -1,6 +1,6 @@
 ﻿namespace GroceryListHelper.Core.DataAccess.Models;
 
-internal sealed record CartProductDbModel : CartProductCollectable, ITable
+internal sealed record CartProductDbModel : CartProduct, ITable
 {
     public Guid OwnerId { get; set; }
     public string PartitionKey { get => OwnerId.ToString(); set => OwnerId = Guid.Parse(value); }

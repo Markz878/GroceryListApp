@@ -29,9 +29,9 @@ public static class CartGroupProductsEndpointsMapper
         group.MapPatch("/{groupId:guid}/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
 
-    public static async Task<Ok<List<CartProductCollectable>>> GetAll(Guid groupId, IMediator mediator)
+    public static async Task<Ok<List<CartProduct>>> GetAll(Guid groupId, IMediator mediator)
     {
-        List<CartProductCollectable> results = await mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> results = await mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         return TypedResults.Ok(results);
     }
 
@@ -63,7 +63,7 @@ public static class CartGroupProductsEndpointsMapper
         return ex is null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProductCollectable updatedProduct, [FromHeader] string? connectionId, IMediator mediator, IHubContext<CartHub> hub)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> UpdateProduct(Guid groupId, CartProduct updatedProduct, [FromHeader] string? connectionId, IMediator mediator, IHubContext<CartHub> hub)
     {
         NotFoundError? ex = await mediator.Send(new UpdateProductCommand() { UserId = groupId, CartProduct = updatedProduct });
         await hub.Clients.GroupExcept(groupId.ToString(), connectionId ?? "").SendAsync(nameof(ICartHubNotifications.ProductModified), updatedProduct);

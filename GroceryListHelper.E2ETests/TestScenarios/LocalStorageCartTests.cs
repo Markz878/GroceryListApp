@@ -31,7 +31,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         double productPrice = 2.9;
         await page.AddProductToCart(productName, productAmount, productPrice);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
+        CartProduct[]? models = JsonSerializer.Deserialize<CartProduct[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(productName, models[0].Name);
         Assert.Equal(productAmount, models[0].Amount);
@@ -115,7 +115,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         Assert.Equal("2", await page.GetItemAmount(0));
         Assert.Equal("2.5", await page.GetItemPrice(0));
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
+        CartProduct[]? models = JsonSerializer.Deserialize<CartProduct[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(2, models[0].Amount);
         Assert.Equal(2.5, models[0].UnitPrice);
@@ -133,7 +133,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         IElementHandle? element = await page.QuerySelectorAsync($"text=Product{productCount / 2}");
         Assert.Null(element);
         string cartProductsJson = await page.EvaluateAsync<string>("localStorage.getItem('cartProducts')");
-        CartProductCollectable[]? models = JsonSerializer.Deserialize<CartProductCollectable[]>(cartProductsJson, server.JsonOptions);
+        CartProduct[]? models = JsonSerializer.Deserialize<CartProduct[]>(cartProductsJson, server.JsonOptions);
         ArgumentNullException.ThrowIfNull(models);
         Assert.Equal(productCount - 1, models.Length);
     }

@@ -3,7 +3,7 @@
 public sealed record UpdateProductCommand : IRequest<NotFoundError?>
 {
     public required Guid UserId { get; init; }
-    public required CartProductCollectable CartProduct { get; init; }
+    public required CartProduct CartProduct { get; init; }
 }
 
 

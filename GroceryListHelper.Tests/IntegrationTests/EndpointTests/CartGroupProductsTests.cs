@@ -17,7 +17,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         List<CartProduct> insertedProducts = await SaveCartProducts(1, groupId);
         HttpResponseMessage response = await _client.GetAsync(_uri);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        List<CartProductCollectable>? products = await response.Content.ReadFromJsonAsync<List<CartProductCollectable>>(_jsonOptions);
+        List<CartProduct>? products = await response.Content.ReadFromJsonAsync<List<CartProduct>>(_jsonOptions);
         Assert.NotNull(products);
         Assert.Equal(insertedProducts[0].Amount, products[0].Amount);
         Assert.Equal(insertedProducts[0].Name, products[0].Name);
@@ -38,7 +38,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         HttpResponseMessage response = await _client.PostAsJsonAsync(_uri, cartProduct);
         string x = await response.Content.ReadAsStringAsync();
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         Assert.Contains(products, x =>
             x.Name == cartProduct.Name &&
             x.Amount == cartProduct.Amount &&
@@ -71,7 +71,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         await SaveCartProducts(Random.Shared.Next(1, 5), groupId);
         HttpResponseMessage response = await _client.DeleteAsync(_uri);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         Assert.Empty(products);
     }
 
@@ -81,7 +81,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         List<CartProduct> savedProducts = await SaveCartProducts(3, groupId);
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{savedProducts[1].Name}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         Assert.Equal(2, products.Count);
     }
 
@@ -91,7 +91,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         await SaveCartProducts(3, groupId);
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{Guid.NewGuid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         Assert.Equal(3, products.Count);
     }
 
@@ -102,7 +102,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         List<CartProduct> savedProducts = await SaveCartProducts(3, invalidGroupId);
         HttpResponseMessage response = await _client.DeleteAsync($"api/cartgroupproducts/{invalidGroupId}/{savedProducts[1].Name}");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = invalidGroupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = invalidGroupId });
         Assert.Equal(3, products.Count);
     }
 
@@ -110,7 +110,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
     public async Task UpdateCartProduct_Success_ReturnsOk()
     {
         List<CartProduct> insertedProducts = await SaveCartProducts(1, groupId);
-        CartProductCollectable cartProduct = new()
+        CartProduct cartProduct = new()
         {
             Amount = insertedProducts[0].Amount + 1,
             Name = insertedProducts[0].Name,
@@ -120,8 +120,8 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
-        CartProductCollectable product = products.First(x => x.Name == cartProduct.Name);
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        CartProduct product = products.First(x => x.Name == cartProduct.Name);
         Assert.Equal(cartProduct.Amount, product.Amount);
         Assert.Equal(cartProduct.Name, product.Name);
         Assert.Equal(cartProduct.Order, product.Order);
@@ -133,7 +133,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
     public async Task UpdateCartProduct_InvalidProduct_ReturnsBadRequest()
     {
         await SaveCartProducts(1, groupId);
-        CartProductCollectable cartProduct = new()
+        CartProduct cartProduct = new()
         {
             Amount = -Random.Shared.NextDouble() * 10,
             Name = new string('x', 31),
@@ -149,7 +149,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
     public async Task UpdateCartProduct_InvalidProductName_ReturnsNotFound()
     {
         List<CartProduct> insertedProducts = await SaveCartProducts(1, groupId);
-        CartProductCollectable cartProduct = new()
+        CartProduct cartProduct = new()
         {
             Amount = insertedProducts[0].Amount + 1,
             Name = insertedProducts[0].Name + 'A',
@@ -167,9 +167,9 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         List<CartProduct> insertedProducts = await SaveCartProducts(5, groupId);
         HttpResponseMessage response = await _client.PatchAsync($"{_uri}/sort/0", null);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         double order = double.MinValue;
-        foreach (CartProductCollectable product in products.OrderBy(x => x.Name))
+        foreach (CartProduct product in products.OrderBy(x => x.Name))
         {
             Assert.True(product.Order > order);
             order = product.Order;
@@ -182,9 +182,9 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         List<CartProduct> insertedProducts = await SaveCartProducts(5, groupId);
         HttpResponseMessage response = await _client.PatchAsync($"{_uri}/sort/1", null);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProductCollectable> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
+        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = groupId });
         double order = double.MinValue;
-        foreach (CartProductCollectable product in products.OrderByDescending(x => x.Name))
+        foreach (CartProduct product in products.OrderByDescending(x => x.Name))
         {
             Assert.True(product.Order > order);
             order = product.Order;

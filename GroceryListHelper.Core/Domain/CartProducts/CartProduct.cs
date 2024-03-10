@@ -4,6 +4,7 @@ public record CartProduct : StoreProduct
 {
     public double Amount { get; set; } = 1;
     public double Order { get; set; }
+    public bool IsCollected { get; set; }
 }
 
 public class CartProductValidator : AbstractValidator<CartProduct>

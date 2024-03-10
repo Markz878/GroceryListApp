@@ -23,7 +23,6 @@ public class JsonSerializerInstaller : IInstaller
 [JsonSerializable(typeof(HttpValidationProblemDetails))]
 [JsonSerializable(typeof(ProblemDetails))]
 [JsonSerializable(typeof(ValidationProblem))]
-[JsonSerializable(typeof(CartProductCollectable))]
 [JsonSerializable(typeof(CartProduct))]
 [JsonSerializable(typeof(CartGroup))]
 [JsonSerializable(typeof(CreateCartGroupRequest))]

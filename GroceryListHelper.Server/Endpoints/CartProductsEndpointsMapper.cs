@@ -26,9 +26,9 @@ public static class CartProductsEndpointsMapper
         group.MapPatch("/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
 
-    public static async Task<Ok<List<CartProductCollectable>>> GetAll(ClaimsPrincipal user, IMediator mediator)
+    public static async Task<Ok<List<CartProduct>>> GetAll(ClaimsPrincipal user, IMediator mediator)
     {
-        List<CartProductCollectable> results = await mediator.Send(new GetUserCartProductsQuery() { UserId = user.GetUserId() });
+        List<CartProduct> results = await mediator.Send(new GetUserCartProductsQuery() { UserId = user.GetUserId() });
         return TypedResults.Ok(results);
     }
 
@@ -50,7 +50,7 @@ public static class CartProductsEndpointsMapper
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult, ProblemHttpResult>> UpdateProduct(CartProductCollectable updatedProduct, ClaimsPrincipal user, IMediator mediator)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult, ProblemHttpResult>> UpdateProduct(CartProduct updatedProduct, ClaimsPrincipal user, IMediator mediator)
     {
         NotFoundError? ex = await mediator.Send(new UpdateProductCommand() { UserId = user.GetUserId(), CartProduct = updatedProduct });
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
