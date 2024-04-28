@@ -24,7 +24,7 @@ public static class DataProtectionExtensions
         builder.Services.Configure<KeyManagementOptions>(options =>
         {
             TableServiceClient tableServiceClient = isDevelopment ?
-            new TableServiceClient("DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;") :
+            new TableServiceClient("UseDevelopmentStorage=true") :
             new TableServiceClient(new Uri($"{configuration["TableStorageUri"] ?? throw new ArgumentNullException("TableStorageUri configuration value")}"), new ManagedIdentityCredential());
             options.XmlRepository = new AzureTableStorageRepository(tableServiceClient);
         });
