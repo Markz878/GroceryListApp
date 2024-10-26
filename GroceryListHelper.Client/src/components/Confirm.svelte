@@ -1,10 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  let dialog: HTMLDialogElement | null;
+  let dialog = $state<HTMLDialogElement>();
 
-  export let header: string;
-  export let message: string;
+  interface Props {
+    header: string;
+    message: string;
+  }
+
+  let { header, message }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
@@ -29,8 +33,8 @@
     <div class="p-2 dark:bg-slate-900 dark:text-white">
       <p class="pb-2">{message}</p>
       <form method="dialog" class="flex justify-around">
-        <button class="btn btn-success" on:click={confirm} aria-label="Yes">Yes</button>
-        <button class="btn btn-danger" on:click={cancel} aria-label="No">No</button>
+        <button class="btn btn-success" onclick={confirm} aria-label="Yes">Yes</button>
+        <button class="btn btn-danger" onclick={cancel} aria-label="No">No</button>
       </form>
     </div>
   </div>

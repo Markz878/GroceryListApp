@@ -10,10 +10,10 @@
   import type { StoreProduct } from "../types/StoreProducts";
   import { derived } from "svelte/store";
 
-  let newProduct = new CartProduct();
-  let editingItem: CartProduct | null;
-  let movingItem: CartProduct | null;
-  let newProductNameBox: HTMLInputElement;
+  let newProduct = $state(new CartProduct());
+  let editingItem = $state<CartProduct | null>();
+  let movingItem = $state<CartProduct | null>();
+  let newProductNameBox = $state<HTMLInputElement>();
 
   let cartProductService: ICartProductsService | null;
   let storeProductService: IStoreProductsService | null;
@@ -89,7 +89,7 @@
     newProduct = new CartProduct();
     await saveCartProduct(cartProduct);
     await saveStoreProduct(cartProduct);
-    newProductNameBox.focus();
+    newProductNameBox?.focus();
   }
 
   async function saveCartProduct(product: CartProduct) {
@@ -192,7 +192,7 @@
   <span class="text-center">Reorder</span>
   <span class="text-center">Collected</span>
   <div class="flex justify-center">
-    <button on:click={changeSortDirectionAndSortItems} aria-label="Sort items" class="cursor-pointer"> Product </button>
+    <button onclick={changeSortDirectionAndSortItems} aria-label="Sort items" class="cursor-pointer"> Product </button>
     {#if $sortState !== "None"}
       <img class="scale-50 h-6 dark:invert" alt={$sortState == "Ascending" ? "sort down" : "sort up"} src={$sortState == "Ascending" ? "icons/arrow-down.svg" : "icons/arrow-up.svg"} />
     {/if}
@@ -203,12 +203,12 @@
   <span></span>
 
   <span></span>
-  <div class="flex justify-center"><button id="add-cartproduct-button" type="submit" class="btn btn-success" on:click={addNewProduct} aria-label="Add product">Add</button></div>
+  <div class="flex justify-center"><button id="add-cartproduct-button" type="submit" class="btn btn-success" onclick={addNewProduct} aria-label="Add product">Add</button></div>
   <span>
-    <input id="newproduct-name-input" type="text" list="products" class="form-control text-center" aria-label="Product name input" autocomplete="off" bind:value={newProduct.name} on:focusout={getItemPrice} bind:this={newProductNameBox} />
+    <input id="newproduct-name-input" type="text" list="products" class="form-control text-center" aria-label="Product name input" autocomplete="off" bind:value={newProduct.name} onfocusout={getItemPrice} bind:this={newProductNameBox} />
     <datalist id="products">
       {#each $storeProducts.filter((s) => $cartProducts.every((c) => c.name !== s.name)) as storeProduct}
-        <option value={storeProduct.name} />
+        <option value={storeProduct.name}></option>
       {/each}
     </datalist>
   </span>
@@ -221,19 +221,19 @@
   {#each $cartProductsFilteredList as cartProduct (cartProduct.product.name)}
     <div role="row" class="absolute h-12 w-full grid grid-cols-base sm:grid-cols-sm md:grid-cols-md lg:grid-cols-lg transition-[top] motion-reduce:transition-none border-t-2 {getRowClass(cartProduct.product)}" style="top: {cartProduct.top}rem;">
       {#if cartProduct.product !== editingItem}
-        <button class="btn btn-primary w-9 h-9 p-0 m-auto {cartProduct.product == movingItem ? 'bg-blue-800' : ''}" aria-label="Reorder" on:click={() => move(cartProduct.product)}>
+        <button class="btn btn-primary w-9 h-9 p-0 m-auto {cartProduct.product == movingItem ? 'bg-blue-800' : ''}" aria-label="Reorder" onclick={() => move(cartProduct.product)}>
           <img class="m-auto invert w-7 h-7" src="icons/swap.svg" alt="Swap" aria-hidden="true" />
         </button>
-        <input type="checkbox" class="scale-150 m-auto" checked={cartProduct.product.isCollected} aria-label="Mark collected" on:change={(e) => markItemCollected(cartProduct.product, e)} />
+        <input type="checkbox" class="scale-150 m-auto" checked={cartProduct.product.isCollected} aria-label="Mark collected" onchange={(e) => markItemCollected(cartProduct.product, e)} />
         <span class="m-auto {cartProduct.product.isCollected ? 'line-through' : ''}" aria-label="Product name">{cartProduct.product.name}</span>
         <span class="m-auto hidden md:block" aria-label="Amount">{cartProduct.product.amount}</span>
         <span class="m-auto hidden sm:block" aria-label="Unit price">{cartProduct.product.unitPrice}</span>
         <span class="m-auto hidden lg:block" aria-label="Total price">{cartProduct.product.unitPrice * cartProduct.product.amount}</span>
         <div class="flex">
-          <button class="btn btn-success w-9 h-9 p-0 m-auto hidden sm:block" on:click={() => startEditItem(cartProduct.product)} aria-label="Edit product" disabled={cartProduct.product.isCollected}>
+          <button class="btn btn-success w-9 h-9 p-0 m-auto hidden sm:block" onclick={() => startEditItem(cartProduct.product)} aria-label="Edit product" disabled={cartProduct.product.isCollected}>
             <img class="m-auto invert w-6 h-6" src="icons/edit.svg" alt="Edit" aria-hidden="true" />
           </button>
-          <button class="btn btn-danger w-9 h-9 p-0 m-auto" on:click={() => removeProduct(cartProduct.product)} aria-label="Delete product" disabled={cartProduct.product.isCollected}>
+          <button class="btn btn-danger w-9 h-9 p-0 m-auto" onclick={() => removeProduct(cartProduct.product)} aria-label="Delete product" disabled={cartProduct.product.isCollected}>
             <img class="m-auto invert w-6 h-6" src="icons/delete.svg" alt="Delete" aria-hidden="true" />
           </button>
         </div>
@@ -241,10 +241,10 @@
         <span></span>
         <span></span>
         <span class="m-auto {cartProduct.product.isCollected ? 'line-through' : ''}" aria-label="Product name">{cartProduct.product.name}</span>
-        <input type="number" step="0.01" min="0" class="form-control text-center m-auto hidden md:block" aria-label="Edit amount" value={cartProduct.product.amount} on:change={(e) => setProductAmount(e, cartProduct.product)} />
-        <input type="number" step="0.01" min="0" class="form-control text-center my-auto mx-2 hidden sm:block" aria-label="Edit unit price" value={cartProduct.product.unitPrice} on:change={(e) => setProductPrice(e, cartProduct.product)} />
+        <input type="number" step="0.01" min="0" class="form-control text-center m-auto hidden md:block" aria-label="Edit amount" value={cartProduct.product.amount} onchange={(e) => setProductAmount(e, cartProduct.product)} />
+        <input type="number" step="0.01" min="0" class="form-control text-center my-auto mx-2 hidden sm:block" aria-label="Edit unit price" value={cartProduct.product.unitPrice} onchange={(e) => setProductPrice(e, cartProduct.product)} />
         <span class="m-auto hidden lg:block" aria-label="Total price">{cartProduct.product.unitPrice * cartProduct.product.amount}</span>
-        <button class="btn btn-success m-auto h-9 w-9 p-1" on:click={() => updateCartProduct(cartProduct.product)} aria-label="Submit edit">
+        <button class="btn btn-success m-auto h-9 w-9 p-1" onclick={() => updateCartProduct(cartProduct.product)} aria-label="Submit edit">
           <img class="m-auto invert" src="icons/check.svg" alt="Accept" aria-hidden="true" />
         </button>
       {/if}

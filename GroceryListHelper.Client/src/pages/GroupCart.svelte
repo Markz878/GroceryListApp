@@ -12,9 +12,13 @@
   interface GroupCartParams {
     groupid: string;
   }
-  export let params: GroupCartParams = { groupid: "" };
+  interface Props {
+    params?: GroupCartParams;
+  }
 
-  let groupInfo: CartGroup | null;
+  let { params = { groupid: "" } }: Props = $props();
+
+  let groupInfo = $state<CartGroup>();
 
   onMount(async () => {
     await forceAuthenticationAsync();

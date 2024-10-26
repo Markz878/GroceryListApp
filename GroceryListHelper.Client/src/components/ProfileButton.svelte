@@ -3,8 +3,8 @@
   import { getAuthenticationStateAsync } from "../services/AuthenticationStateProvider";
   import { EmailClaimName, NameClaimName } from "../helpers/globalConstants";
   import { link } from "svelte-spa-router";
-  let email: string | undefined;
-  let userName: string | undefined;
+  let email: string | undefined = $state();
+  let userName: string | undefined = $state();
 
   onMount(async () => {
     const authState = await getAuthenticationStateAsync();
@@ -16,7 +16,7 @@
     if (userName) {
       const names = userName.toUpperCase().split(" ", 2);
       if (names.length === 2) {
-        return names[0][0] + names[1][0];
+        return (names[0]?.[0] ?? '') + (names[1]?.[0] ?? '');
       }
       return userName.substring(0, 2).toUpperCase();
     }
@@ -53,7 +53,7 @@
     {/if}
     <p class="flex items-center">
       <img class="h-4 mr-2 dark:invert" src="icons/group.svg" alt="Group" aria-hidden="true" />
-      <a href="/managegroups" use:link class="hover:text-gray-400 hover:underline" on:click={closeMenu}>Manage groups</a>
+      <a href="/managegroups" use:link class="hover:text-gray-400 hover:underline" onclick={closeMenu}>Manage groups</a>
     </p>
     <form id="signout-form" method="post" action="api/Account/Logout" class="flex items-center">
       <img src="icons/logout.svg" alt="Log out" class="h-4 mr-2 dark:invert" aria-hidden="true" />

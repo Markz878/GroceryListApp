@@ -3,11 +3,11 @@
   import { routes } from "./helpers/routes";
   import Modal from "./components/Modal.svelte";
   import { onMount } from "svelte";
-  import type { UserInfo } from "./types/UserInfo";
+  import { UserInfo } from "./types/UserInfo";
   import { getAuthenticationStateAsync } from "./services/AuthenticationStateProvider";
   import ProfileButton from "./components/ProfileButton.svelte";
 
-  let userInfo: UserInfo | null;
+  let userInfo = $state<UserInfo>();
 
   onMount(async () => {
     const authState = await getAuthenticationStateAsync();

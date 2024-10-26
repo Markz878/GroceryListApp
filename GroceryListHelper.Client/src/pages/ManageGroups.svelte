@@ -7,19 +7,19 @@
   import Confirm from "../components/Confirm.svelte";
   import { link } from "svelte-spa-router";
 
-  let cartGroups: CartGroup[] | undefined;
-  let isCreatingNewGroup = false;
-  let createCartGroupRequest = new CreateCartGroupRequest();
-  let newMemberEmail = "";
-  let isBusy = false;
+  let cartGroups = $state<CartGroup[]>();
+  let isCreatingNewGroup = $state(false);
+  let createCartGroupRequest = $state(new CreateCartGroupRequest());
+  let newMemberEmail = $state("");
+  let isBusy = $state(false);
   let oldGroupName = "";
-  let editingGroup: CartGroup | null = null;
-  let deletingGroup: CartGroup | null = null;
-  let confirm: Confirm | undefined;
+  let editingGroup = $state<CartGroup | null>();
+  let deletingGroup = $state<CartGroup | null>();
+  let confirm = $state<Confirm>();
 
   onMount(async () => {
     const userInfo = await forceAuthenticationAsync();
-    if (userInfo.isAuthenticated) {
+    if (userInfo?.isAuthenticated) {
       const groupsResponse = await getCartGroups();
       if (groupsResponse instanceof Error) {
         showError("Could not load groups, please try again later");
@@ -139,15 +139,15 @@
         {#each createCartGroupRequest.otherUsers as email}
           <div class="flex mx-3 my-1">
             <span class="align-middle">{email}</span>
-            <button class="btn btn-danger w-6 h-6 p-0 leading-4 ml-1 font-bold" on:click={() => removeNewMember(email)}>&times;</button>
+            <button class="btn btn-danger w-6 h-6 p-0 leading-4 ml-1 font-bold" onclick={() => removeNewMember(email)}>&times;</button>
           </div>
         {/each}
       </div>
       <div class="flex">
         <input id="add-user-to-group" class="form-control" bind:value={newMemberEmail} size="30" placeholder="New member email" />
-        <button id="add-member-btn" class="btn btn-success w-9 h-9 p-0 ml-2 font-extrabold text-2xl" on:click={addMember}>+</button>
+        <button id="add-member-btn" class="btn btn-success w-9 h-9 p-0 ml-2 font-extrabold text-2xl" onclick={addMember}>+</button>
       </div>
-      <button id="create-group-btn" class="btn btn-success flex items-center mt-4 gap-2" on:click={createGroup}>
+      <button id="create-group-btn" class="btn btn-success flex items-center mt-4 gap-2" onclick={createGroup}>
         <img src="icons/group.svg" alt="group" class="m-auto h-5 invert" />
         {#if isBusy}
           <div class="flex items-center">
@@ -160,7 +160,7 @@
       </button>
     </fieldset>
   {:else}
-    <button id="create-group-btn" class="btn btn-success flex items-center gap-2" on:click={createGroup}>
+    <button id="create-group-btn" class="btn btn-success flex items-center gap-2" onclick={createGroup}>
       <img src="icons/group.svg" alt="group" class="m-auto h-5 invert" />
       Create group
     </button>
@@ -178,20 +178,20 @@
               </svg>
               <span>{group.name}</span>
             </a>
-            <button class="btn btn-success h-8 w-8 p-[3px]" on:click={() => editGroup(group)} aria-label="Edit group name" disabled={editingGroup !== null}>
+            <button class="btn btn-success h-8 w-8 p-[3px]" onclick={() => editGroup(group)} aria-label="Edit group name" disabled={editingGroup !== null}>
               <img src="icons/edit.svg" alt="Edit" class="m-auto invert" />
             </button>
-            <button class="btn btn-danger p-[4px] w-8 h-8 text-lg leading-4" on:click={() => showDeleteConfirm(group)} aria-label="Delete group">
+            <button class="btn btn-danger p-[4px] w-8 h-8 text-lg leading-4" onclick={() => showDeleteConfirm(group)} aria-label="Delete group">
               <img src="icons/delete.svg" alt="Delete" class="m-auto invert" />
             </button>
           </div>
         {:else}
           <div class="flex items-center gap-1">
             <input id="edit-group-name-input" class="form-control-small" aria-label="Group name input" bind:value={group.name} />
-            <button class="btn btn-success h-8 w-8 p-0" aria-label="Submit name edit" on:click={() => submitEditGroup(group)}>
+            <button class="btn btn-success h-8 w-8 p-0" aria-label="Submit name edit" onclick={() => submitEditGroup(group)}>
               <img src="icons/check.svg" alt="Accept" class="p-[2px] invert" aria-hidden="true" />
             </button>
-            <button class="btn btn-danger px-1 leading-4 h-8" aria-label="Cancel name edit" on:click={stopEditGroup}>Cancel</button>
+            <button class="btn btn-danger px-1 leading-4 h-8" aria-label="Cancel name edit" onclick={stopEditGroup}>Cancel</button>
           </div>
         {/if}
         <p>Members: You, {Array.from(group.otherUsers).join(", ")}</p>
