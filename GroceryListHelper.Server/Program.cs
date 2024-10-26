@@ -43,13 +43,13 @@ app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600000")
 });
-app.UseHttpLogging();
 if (app.Environment.IsDevelopment()) { app.UseCors(); }
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 app.UseRateLimiter();
 app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseHttpLogging();
 app.MapAPIEndpoints();
 app.MapHub<CartHub>("/carthub", options => options.AllowStatefulReconnects = true);
 app.MapHealthChecks("/health");

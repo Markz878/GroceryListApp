@@ -1,4 +1,5 @@
-﻿using Microsoft.ApplicationInsights.Channel;
+﻿using GroceryListHelper.Server.HelperMethods;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpLogging;
@@ -13,8 +14,9 @@ public class LoggingInstaller : IInstaller
         builder.Services.AddHttpLogging(logging =>
         {
             logging.CombineLogs = true;
-            logging.LoggingFields = HttpLoggingFields.All;
+            logging.LoggingFields = HttpLoggingFields.ResponseStatusCode;
         });
+        builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
         if (builder.Configuration.GetValue<bool>("AddLogging"))
         {
             builder.Logging.AddSimpleConsole(x =>
@@ -30,6 +32,34 @@ public class LoggingInstaller : IInstaller
                 c.SetAzureTokenCredential(new ManagedIdentityCredential());
             });
         }
+    }
+}
+
+public class HttpLoggingInterceptor : IHttpLoggingInterceptor
+{
+    public ValueTask OnRequestAsync(HttpLoggingInterceptorContext logContext)
+    {
+        string? user = logContext.HttpContext.User.FindFirstValue(AuthenticationConstants.EmailClaimName);
+        string? path = logContext.HttpContext.Request?.Path.Value;
+        string? query = logContext.HttpContext.Request?.QueryString.Value;
+        if (!string.IsNullOrWhiteSpace(user))
+        {
+            logContext.AddParameter("User", user);
+        }
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            logContext.AddParameter("Path", path);
+        }
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            logContext.AddParameter("Query", query);
+        }
+        return default;
+    }
+
+    public ValueTask OnResponseAsync(HttpLoggingInterceptorContext logContext)
+    {
+        return default;
     }
 }
 

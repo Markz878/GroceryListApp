@@ -13,9 +13,9 @@ public sealed class RateLimitInstaller : IInstaller
         builder.Services.AddRateLimiter(opt =>
         {
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            opt.AddPolicy(PolicyName, policy =>
+            opt.AddPolicy(PolicyName, httpContext =>
             {
-                Guid? userId = policy.User?.GetUserId();
+                Guid? userId = httpContext.User?.GetUserId();
                 if (userId == null)
                 {
                     return RateLimitPartition.GetTokenBucketLimiter(Guid.Empty, _ =>

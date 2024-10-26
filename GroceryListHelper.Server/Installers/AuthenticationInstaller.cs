@@ -9,7 +9,7 @@ public sealed class AuthenticationInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+        builder.Services.AddAntiforgery(options => { options.HeaderName = "X-XSRF-TOKEN"; options.Cookie.SameSite = SameSiteMode.Strict; });
         builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
         builder.Services.Configure(CookieAuthenticationDefaults.AuthenticationScheme, (CookieAuthenticationOptions options) =>
         {
