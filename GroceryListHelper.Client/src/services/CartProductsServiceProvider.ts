@@ -1,20 +1,19 @@
 import type { ICartProductsService } from "../types/ICartProductsService";
 import { CartProductsApiService } from "./CartProductsApiService";
 import { CartProductsLocalService } from "./CartProductsLocalService";
-import { getAuthenticationStateAsync } from "./AuthenticationStateProvider";
 import { CartProductsGroupService } from "./CartProductsGroupService";
+import type { UserInfo } from "../types/UserInfo";
 
-export async function getCartProductsService(): Promise<ICartProductsService> {
-    const userInfo = await getAuthenticationStateAsync();
-    if (userInfo.isAuthenticated) {
-        if (window.location.href.includes("groupcart")) {
-            return new CartProductsGroupService();
-        }
-        else {
-            return new CartProductsApiService();
-        }
+export function getCartProductsService(userInfo?: UserInfo): ICartProductsService {
+  if (userInfo?.isAuthenticated) {
+    if (window.location.href.includes("groupcart")) {
+      return new CartProductsGroupService();
     }
     else {
-        return new CartProductsLocalService();
+      return new CartProductsApiService();
     }
+  }
+  else {
+    return new CartProductsLocalService();
+  }
 }

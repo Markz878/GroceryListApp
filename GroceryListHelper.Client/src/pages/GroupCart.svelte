@@ -6,7 +6,7 @@
   import CartSummaryRow from "../components/CartSummaryRow.svelte";
   import GroupName from "../components/GroupName.svelte";
   import { joinGroup, leaveGroup } from "../helpers/cartHubClient";
-  import { showError } from "../helpers/store";
+  import store from "../helpers/store.svelte";
   import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
 
   interface Props {
@@ -21,7 +21,7 @@
     await forceAuthenticationAsync();
     const groupInfoResponse = await getCartGroup(params.groupid);
     if (groupInfoResponse instanceof Error) {
-      showError(groupInfoResponse.message);
+      store.showError(groupInfoResponse.message);
     } else {
       groupInfo = groupInfoResponse;
     }

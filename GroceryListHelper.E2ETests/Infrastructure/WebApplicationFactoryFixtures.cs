@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace GroceryListHelper.E2ETests.Infrastructure;
 
-public sealed class WebApplicationFactoryFixture : WebApplicationFactory<GroceryListHelper.Server.Program>, IAsyncLifetime
+public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>, IAsyncLifetime
 {
     public ITestOutputHelper? TestOutputHelper { get; set; }
     public IPlaywright? PlaywrightInstance { get; private set; }
@@ -34,7 +34,7 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Grocery
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = true,
+            Headless = false,
             SlowMo = 200,
         });
     }

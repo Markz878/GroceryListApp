@@ -1,14 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { getNewOrder } from "../helpers/sortOrderMethods";
-  import { cartProducts, showOnlyUncollected, sortState, storeProducts, showError, sortCartProducts, checkError } from "../helpers/store";
+  import store from "../helpers/store.svelte";
   import { CartProduct } from "../types/CartProduct";
   import type { ICartProductsService } from "../types/ICartProductsService";
   import { getCartProductsService } from "../services/CartProductsServiceProvider";
   import { getStoreProductsService } from "../services/StoreProductsServiceProvider";
   import type { IStoreProductsService } from "../types/IStoreProductsService";
   import type { StoreProduct } from "../types/StoreProducts";
-  import { derived } from "svelte/store";
 
   let newProduct = $state(new CartProduct());
   let editingItem = $state<CartProduct | null>();
@@ -19,25 +18,25 @@
   let storeProductService: IStoreProductsService | null;
 
   onMount(async () => {
-    cartProductService = await getCartProductsService();
-    storeProductService = await getStoreProductsService();
+    cartProductService = getCartProductsService(store.authInfo);
+    storeProductService = getStoreProductsService(store.authInfo);
     const cartProductsResponse = await cartProductService.getCartProducts();
     if (cartProductsResponse instanceof Error) {
-      showError(cartProductsResponse.message);
+      store.showError(cartProductsResponse.message);
     } else {
-      cartProducts.set(cartProductsResponse);
+      store.cartProducts = cartProductsResponse;
     }
     const storeProductsResponse = await storeProductService.getStoreProducts();
     if (storeProductsResponse instanceof Error) {
-      showError(storeProductsResponse.message);
+      store.showError(storeProductsResponse.message);
     } else {
-      storeProducts.set(storeProductsResponse);
+      store.storeProducts = storeProductsResponse;
     }
   });
 
-  const cartProductsFilteredList = derived([cartProducts, showOnlyUncollected], ([$cartProducts, $showOnlyUncollected]) => {
+  const cartProductsFilteredList = $derived(() => {
     const result: { product: CartProduct; top: number }[] = [];
-    const filtered = $cartProducts.filter((x) => !$showOnlyUncollected || !x.isCollected);
+    const filtered = store.cartProducts.filter((x) => !store.showOnlyUncollected || !x.isCollected);
     const sorted = filtered.toSorted((a, b) => a.order - b.order);
     const topMap = new Map<string, number>();
     for (let i = 0; i < sorted.length; i++) {
@@ -50,39 +49,34 @@
   });
 
   function getItemPrice() {
-    const product = $storeProducts.find((x) => x.name == newProduct.name);
+    const product = store.storeProducts.find((x) => x.name == newProduct.name);
     if (product && product.unitPrice > 0) {
       newProduct.unitPrice = product.unitPrice;
     }
   }
 
   async function changeSortDirectionAndSortItems() {
-    sortState.update((x) => {
-      if (x === "Ascending") {
-        return "Descending";
-      }
-      return "Ascending";
-    });
-    const sortDirection = $sortState === "Ascending" ? "Ascending" : "Descending";
-    sortCartProducts(sortDirection);
-    checkError(await cartProductService?.sortCartProducts(sortDirection));
+    const sortDirection = store.sortState === "Ascending" ? "Ascending" : "Descending";
+    store.sortState = sortDirection;
+    store.sortCartProducts(sortDirection);
+    store.checkError(await cartProductService?.sortCartProducts(sortDirection));
   }
 
   async function addNewProduct() {
     if (newProduct.name.length === 0) {
-      showError("Product name not given");
+      store.showError("Product name not given");
       return;
-    } else if ($cartProducts.some((x) => x.name === newProduct.name)) {
-      showError(`Product ${newProduct.name} is already in cart`);
+    } else if (store.cartProducts.some((x) => x.name === newProduct.name)) {
+      store.showError(`Product ${newProduct.name} is already in cart`);
       return;
     } else if (newProduct.amount < 0 || newProduct.amount > 1000) {
-      showError("Amount must be between 0 and 10 000");
+      store.showError("Amount must be between 0 and 10 000");
       return;
     } else if (newProduct.unitPrice < 0 || newProduct.unitPrice > 1000) {
-      showError("Price must be between 0 and 10 000");
+      store.showError("Price must be between 0 and 10 000");
       return;
-    } else if ($cartProducts.length > 150) {
-      showError("Cart can have a maximum of 150 items");
+    } else if (store.cartProducts.length > 150) {
+      store.showError("Cart can have a maximum of 150 items");
       return;
     }
     const cartProduct = { ...newProduct };
@@ -94,28 +88,28 @@
 
   async function saveCartProduct(product: CartProduct) {
     product.order = getNewCartProductOrder();
-    cartProducts.update((x) => [...x, product]);
-    checkError(await cartProductService?.createCartProduct(product));
+    store.cartProducts.push(product);
+    store.checkError(await cartProductService?.createCartProduct(product));
   }
 
   async function saveStoreProduct(product: StoreProduct) {
-    const existingProduct = $storeProducts.find((x) => x.name == product.name);
+    const existingProduct = store.storeProducts.find((x) => x.name == product.name);
     if (existingProduct) {
       if (existingProduct.unitPrice !== product.unitPrice) {
         existingProduct.unitPrice = product.unitPrice;
-        checkError(await storeProductService?.updateStoreProduct(existingProduct));
+        store.checkError(await storeProductService?.updateStoreProduct(existingProduct));
       }
     } else {
-      storeProducts.update((x) => [...x, { name: product.name, unitPrice: product.unitPrice }]);
-      checkError(await storeProductService?.createStoreProduct(product));
+      store.storeProducts.push({ name: product.name, unitPrice: product.unitPrice });
+      store.checkError(await storeProductService?.createStoreProduct(product));
     }
   }
 
   function getNewCartProductOrder() {
-    if ($cartProducts.length === 0) {
+    if (store.cartProducts.length === 0) {
       return 1000;
     }
-    const order = Math.round(Math.max(...$cartProducts.map((x) => x.order)) + 1000);
+    const order = Math.round(Math.max(...store.cartProducts.map((x) => x.order)) + 1000);
     return order;
   }
 
@@ -126,8 +120,7 @@
   async function markItemCollected(product: CartProduct, e: Event) {
     if (e.target instanceof HTMLInputElement) {
       product.isCollected = e.target.checked;
-      cartProducts.update((x) => x);
-      checkError(await cartProductService?.updateCartProduct(product));
+      store.checkError(await cartProductService?.updateCartProduct(product));
     }
   }
 
@@ -136,18 +129,17 @@
   }
 
   async function removeProduct(product: CartProduct) {
-    cartProducts.update((p) => p.filter((f) => f.name !== product.name));
-    checkError(await cartProductService?.deleteCartProduct(product.name));
+    store.deleteCartProduct(product.name);
+    store.checkError(await cartProductService?.deleteCartProduct(product.name));
   }
 
   async function updateCartProduct(product: CartProduct) {
     editingItem = null;
-    $cartProducts = $cartProducts;
     await cartProductService?.updateCartProduct(product);
-    const storeProduct = $storeProducts.find((x) => x.name == product.name);
+    const storeProduct = store.storeProducts.find((x) => x.name == product.name);
     if (storeProduct && storeProduct.unitPrice !== product.unitPrice) {
       storeProduct.unitPrice = product.unitPrice;
-      checkError(await storeProductService?.updateStoreProduct(storeProduct));
+      store.checkError(await storeProductService?.updateStoreProduct(storeProduct));
     }
   }
 
@@ -157,20 +149,17 @@
     } else if (product === movingItem) {
       movingItem = null;
     } else {
-      sortState.set("None");
-      cartProducts.update((cartProducts) => {
-        for (const p of cartProducts) {
-          if (p.name === movingItem?.name) {
-            p.order = getNewOrder(
-              cartProducts.map((x) => x.order),
-              movingItem.order,
-              product.order
-            );
-          }
+      store.sortState = "None";
+      for (const p of store.cartProducts) {
+        if (p.name === movingItem?.name) {
+          p.order = getNewOrder(
+            store.cartProducts.map((x) => x.order),
+            movingItem.order,
+            product.order
+          );
         }
-        return [...cartProducts];
-      });
-      checkError(await cartProductService?.updateCartProduct(movingItem));
+      }
+      store.checkError(await cartProductService?.updateCartProduct(movingItem));
       movingItem = null;
     }
   }
@@ -193,8 +182,8 @@
   <span class="text-center">Collected</span>
   <div class="flex justify-center">
     <button onclick={changeSortDirectionAndSortItems} aria-label="Sort items" class="cursor-pointer"> Product </button>
-    {#if $sortState !== "None"}
-      <img class="scale-50 h-6 dark:invert" alt={$sortState == "Ascending" ? "sort down" : "sort up"} src={$sortState == "Ascending" ? "icons/arrow-down.svg" : "icons/arrow-up.svg"} />
+    {#if store.sortState !== "None"}
+      <img class="scale-50 h-6 dark:invert" alt={store.sortState == "Ascending" ? "sort down" : "sort up"} src={store.sortState == "Ascending" ? "icons/arrow-down.svg" : "icons/arrow-up.svg"} />
     {/if}
   </div>
   <span class="text-center hidden md:block">Amount</span>
@@ -207,7 +196,7 @@
   <span>
     <input id="newproduct-name-input" type="text" list="products" class="form-control text-center" aria-label="Product name input" autocomplete="off" bind:value={newProduct.name} onfocusout={getItemPrice} bind:this={newProductNameBox} />
     <datalist id="products">
-      {#each $storeProducts.filter((s) => $cartProducts.every((c) => c.name !== s.name)) as storeProduct}
+      {#each store.storeProducts.filter((s) => store.cartProducts.every((c) => c.name !== s.name)) as storeProduct}
         <option value={storeProduct.name}></option>
       {/each}
     </datalist>
@@ -217,8 +206,8 @@
   <span></span>
 </div>
 
-<div role="rowgroup" class="relative transition-[height]" style="height: {$cartProducts.filter((x) => !$showOnlyUncollected || !x.isCollected).length * 3 + 1}rem;">
-  {#each $cartProductsFilteredList as cartProduct (cartProduct.product.name)}
+<div role="rowgroup" class="relative transition-[height]" style="height: {store.cartProducts.filter((x) => !store.showOnlyUncollected || !x.isCollected).length * 3 + 1}rem;">
+  {#each cartProductsFilteredList() as cartProduct (cartProduct.product.name)}
     <div role="row" class="absolute h-12 w-full grid grid-cols-base sm:grid-cols-sm md:grid-cols-md lg:grid-cols-lg transition-[top] motion-reduce:transition-none border-t-2 {getRowClass(cartProduct.product)}" style="top: {cartProduct.top}rem;">
       {#if cartProduct.product !== editingItem}
         <button class="btn btn-primary w-9 h-9 p-0 m-auto {cartProduct.product == movingItem ? 'bg-blue-800' : ''}" aria-label="Reorder" onclick={() => move(cartProduct.product)}>

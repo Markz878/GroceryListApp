@@ -4,17 +4,17 @@ namespace GroceryListHelper.E2ETests.Infrastructure;
 
 internal class XUnitLoggingProvider : ILoggerProvider
 {
-    private readonly ITestOutputHelper testOutputHelper;
+    private readonly Func<ITestOutputHelper> testOutputHelperGetter;
     private readonly LoggerExternalScopeProvider scopeProvider = new();
 
-    public XUnitLoggingProvider(ITestOutputHelper testOutputHelper)
+    public XUnitLoggingProvider(Func<ITestOutputHelper> testOutputHelperGetter)
     {
-        this.testOutputHelper = testOutputHelper;
+        this.testOutputHelperGetter = testOutputHelperGetter;
     }
 
     public ILogger CreateLogger(string categoryName)
     {
-        return new XUnitLogger(testOutputHelper, scopeProvider, categoryName);
+        return new XUnitLogger(testOutputHelperGetter, scopeProvider, categoryName);
     }
 
     public void Dispose()
@@ -22,33 +22,20 @@ internal class XUnitLoggingProvider : ILoggerProvider
     }
 }
 
-internal class XUnitLogger<T> : XUnitLogger, ILogger<T>
-{
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-    : base(testOutputHelper, scopeProvider, typeof(T).FullName ?? throw new ArgumentNullException("T type name"))
-    {
-    }
-}
-
 internal class XUnitLogger : ILogger
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    private readonly Func<ITestOutputHelper> _testOutputHelperGetter;
     private readonly string _categoryName;
     private readonly LoggerExternalScopeProvider _scopeProvider;
 
-    public static ILogger CreateLogger(ITestOutputHelper testOutputHelper)
+    public static ILogger CreateLogger(Func<ITestOutputHelper> testOutputHelperGetter)
     {
-        return new XUnitLogger(testOutputHelper, new LoggerExternalScopeProvider(), "");
+        return new XUnitLogger(testOutputHelperGetter, new LoggerExternalScopeProvider(), "");
     }
 
-    public static ILogger<T> CreateLogger<T>(ITestOutputHelper testOutputHelper)
+    public XUnitLogger(Func<ITestOutputHelper> testOutputHelperGetter, LoggerExternalScopeProvider scopeProvider, string categoryName)
     {
-        return new XUnitLogger<T>(testOutputHelper, new LoggerExternalScopeProvider());
-    }
-
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider, string categoryName)
-    {
-        _testOutputHelper = testOutputHelper;
+        _testOutputHelperGetter = testOutputHelperGetter;
         _scopeProvider = scopeProvider;
         _categoryName = categoryName;
     }
@@ -84,7 +71,7 @@ internal class XUnitLogger : ILogger
                 state.Append(scope);
             }, sb);
 
-            _testOutputHelper.WriteLine(sb.ToString());
+            _testOutputHelperGetter().WriteLine(sb.ToString());
         }
         catch
         {

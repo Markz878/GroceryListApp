@@ -3,7 +3,7 @@
   import { CreateCartGroupRequest, CartGroup } from "../types/CartGroup";
   import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
   import { createCartGroup, deleteCartGroup, getCartGroups, updateCartGroupName } from "../services/CartGroupsService";
-  import { showError } from "../helpers/store";
+  import store from "../helpers/store.svelte";
   import Confirm from "../components/Confirm.svelte";
   import { link } from "svelte-spa-router";
 
@@ -13,8 +13,8 @@
   let newMemberEmail = $state("");
   let isBusy = $state(false);
   let oldGroupName = "";
-  let editingGroup = $state<CartGroup | null>();
-  let deletingGroup = $state<CartGroup | null>();
+  let editingGroup = $state<CartGroup | null>(null);
+  let deletingGroup = $state<CartGroup | null>(null);
   let confirm = $state<Confirm>();
 
   onMount(async () => {
@@ -22,13 +22,11 @@
     if (userInfo?.isAuthenticated) {
       const groupsResponse = await getCartGroups();
       if (groupsResponse instanceof Error) {
-        showError("Could not load groups, please try again later");
+        store.showError("Could not load groups, please try again later");
         console.log(groupsResponse.message);
       } else {
         cartGroups = groupsResponse;
       }
-    } else {
-
     }
   });
 
@@ -49,7 +47,7 @@
       try {
         const response = await createCartGroup(createCartGroupRequest);
         if (response instanceof Error) {
-          showError(response.message);
+         store.showError(response.message);
         } else {
           const cartGroup = new CartGroup();
           cartGroup.id = response;
@@ -62,7 +60,7 @@
         }
       } catch (e) {
         if (e instanceof Error) {
-          showError(e.message);
+          store.showError(e.message);
         }
       } finally {
         isBusy = false;
@@ -94,11 +92,11 @@
       try {
         const response = await updateCartGroupName(group.id, group.name);
         if (response instanceof Error) {
-          showError(response.message);
+          store.showError(response.message);
         }
       } catch (e) {
         if (e instanceof Error) {
-          showError(e.message);
+          store.showError(e.message);
         }
       }
     }
@@ -115,14 +113,14 @@
       try {
         const response = await deleteCartGroup(deletingGroup.id);
         if (response instanceof Error) {
-          showError(response.message);
+          store.showError(response.message);
         } else {
           cartGroups = cartGroups?.filter((x) => x.id !== deletingGroup?.id);
           deletingGroup = null;
         }
       } catch (e) {
         if (e instanceof Error) {
-          showError(e.message);
+          store.showError(e.message);
         }
       }
     }

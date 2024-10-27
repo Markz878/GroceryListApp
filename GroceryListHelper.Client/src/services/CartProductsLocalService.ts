@@ -2,8 +2,7 @@ import type { CartProduct } from "../types/CartProduct";
 import type { ICartProductsService } from "../types/ICartProductsService";
 import type { SortDirection } from "../types/SortState";
 import { cartProductsKey } from "../helpers/globalConstants";
-import { cartProducts } from "../helpers/store";
-import { get } from 'svelte/store';
+import store from "../helpers/store.svelte";
 
 
 
@@ -46,7 +45,7 @@ export class CartProductsLocalService implements ICartProductsService {
 
     private async saveCartProductsToLocalStorage() {
         try {
-            localStorage.setItem(cartProductsKey, JSON.stringify(get(cartProducts)));
+            localStorage.setItem(cartProductsKey, JSON.stringify(store.cartProducts));
             return null;
         }
         catch (e) {

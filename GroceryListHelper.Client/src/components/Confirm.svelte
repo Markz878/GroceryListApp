@@ -3,12 +3,7 @@
 
   let dialog = $state<HTMLDialogElement>();
 
-  interface Props {
-    header: string;
-    message: string;
-  }
-
-  let { header, message }: Props = $props();
+  let { header, message }: { header: string, message: string } = $props();
 
   const dispatch = createEventDispatcher();
 

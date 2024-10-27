@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { derived } from "svelte/store";
-  import { cartProducts, checkError, showOnlyUncollected, storeProducts } from "../helpers/store";
+  import store from "../helpers/store.svelte";
   import Confirm from "./Confirm.svelte";
   import { onMount } from "svelte";
   import type { ICartProductsService } from "../types/ICartProductsService";
@@ -8,19 +7,19 @@
   import { getCartProductsService } from "../services/CartProductsServiceProvider";
   import { getStoreProductsService } from "../services/StoreProductsServiceProvider";
 
-  let confirmMessage = $state('');
+  let confirmMessage = $state("");
   let confirmCallback = $state<() => void>();
   let confirmDialog = $state<Confirm>();
   let cartProductsService: ICartProductsService;
   let storeProductsService: IStoreProductsService;
 
-  onMount(async () => {
-    cartProductsService = await getCartProductsService();
-    storeProductsService = await getStoreProductsService();
+  onMount(() => {
+    cartProductsService = getCartProductsService(store.authInfo);
+    storeProductsService = getStoreProductsService(store.authInfo);
   });
 
-  let total = derived(cartProducts, ($cartProducts) => {
-    return $cartProducts.reduce((x, c) => x + c.unitPrice * c.amount, 0);
+  const total = $derived(() => {
+    return store.cartProducts.reduce((x, c) => x + c.unitPrice * c.amount, 0);
   });
 
   function showDeleteConfirm(message: string, func: () => void) {
@@ -31,19 +30,18 @@
 
   function setFilterCollected(e: Event) {
     if (e.target instanceof HTMLInputElement) {
-      showOnlyUncollected.set(e.target.checked);
-      $showOnlyUncollected = $showOnlyUncollected;
+      store.showOnlyUncollected = e.target.checked;
     }
   }
 
   async function clearCartProducts() {
-    cartProducts.set([]);
-    checkError(await cartProductsService?.deleteAllCartProducts());
+    store.cartProducts = [];
+    store.checkError(await cartProductsService?.deleteAllCartProducts());
   }
 
   async function clearStoreProducts() {
-    storeProducts.set([]);
-    checkError(await storeProductsService?.deleteStoreProducts());
+    store.storeProducts = []
+    store.checkError(await storeProductsService?.deleteStoreProducts());
   }
 </script>
 
@@ -52,7 +50,7 @@
     <input id="filter-collected-checkbox" type="checkbox" class="scale-150" onchange={(e) => setFilterCollected(e)} />
     <label id="filter-collected-label" class="ml-3 mb-[2.75px] font-bold whitespace-nowrap" for="filter-collected-checkbox">Filter collected</label>
   </div>
-  <b id="cart-total">Total: {$total} €</b>
+  <b id="cart-total">Total: {total()} €</b>
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all current cart items?", clearCartProducts)}>Clear cart</button>
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all stored shop items?", clearStoreProducts)}>Clear shop</button>
 </div>

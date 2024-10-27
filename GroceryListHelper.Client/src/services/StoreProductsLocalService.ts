@@ -1,8 +1,7 @@
 import type { StoreProduct } from "../types/StoreProducts";
 import type { IStoreProductsService } from "../types/IStoreProductsService";
 import { storeProductsKey } from "../helpers/globalConstants";
-import { storeProducts } from "../helpers/store";
-import { get } from 'svelte/store';
+import store from "../helpers/store.svelte";
 
 export class StoreProductsLocalService implements IStoreProductsService {
     getStoreProducts = async () => {
@@ -35,7 +34,7 @@ export class StoreProductsLocalService implements IStoreProductsService {
 
     private async saveStoreProductsToLocalStorage() {
         try {
-            localStorage.setItem(storeProductsKey, JSON.stringify(get(storeProducts)));
+            localStorage.setItem(storeProductsKey, JSON.stringify(store.storeProducts));
             return null;
         }
         catch (e) {

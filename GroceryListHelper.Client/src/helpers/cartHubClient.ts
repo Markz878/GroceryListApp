@@ -1,6 +1,6 @@
 import * as signalR from "@microsoft/signalr";
 import * as signalRMsgPack from "@microsoft/signalr-protocol-msgpack"
-import { addCartProduct, showInfo, updateCartProduct, deleteCartProduct, deleteCartProducts, isSharing, sortCartProducts, sortState } from "./store";
+import store from "./store.svelte";
 import type { SortDirection } from "../types/SortState";
 import type { CartProduct } from "../types/CartProduct";
 import type { PascalCase } from "../types/PascalCase";
@@ -16,28 +16,28 @@ const connection = new signalR.HubConnectionBuilder()
 
 connection.on("GetMessage", (message: string) => {
   console.log(message);
-  showInfo(message);
+  store.showInfo(message);
 });
 
 connection.on("ProductAdded", (product: PascalCase<CartProduct>) => {
-  addCartProduct({ amount: product.Amount, isCollected: product.IsCollected, name: product.Name, order: product.Order, unitPrice: product.UnitPrice });
+  store.cartProducts.push({ amount: product.Amount, isCollected: product.IsCollected, name: product.Name, order: product.Order, unitPrice: product.UnitPrice });
 });
 
 connection.on("ProductModified", (product: PascalCase<CartProduct>) => {
-  updateCartProduct({ amount: product.Amount, isCollected: product.IsCollected, name: product.Name, order: product.Order, unitPrice: product.UnitPrice });
+  store.updateCartProduct({ amount: product.Amount, isCollected: product.IsCollected, name: product.Name, order: product.Order, unitPrice: product.UnitPrice });
 });
 
 connection.on("ProductDeleted", (name: string) => {
-  deleteCartProduct(name);
+  store.deleteCartProduct(name);
 });
 
 connection.on("ProductsDeleted", () => {
-  deleteCartProducts();
+  store.cartProducts = []
 });
 
 connection.on("ProductsSorted", (direction: SortDirection) => {
-  sortCartProducts(direction);
-  sortState.set(direction);
+  store.sortCartProducts(direction);
+  store.sortState = direction;
 });
 
 export async function joinGroup(groupId: string) {
@@ -45,7 +45,7 @@ export async function joinGroup(groupId: string) {
     if (connection.state === "Disconnected") {
       await connection.start();
       await connection.invoke("JoinGroup", groupId);
-      isSharing.set(true);
+      store.isSharing = true;
     }
   } catch (e) {
     console.log(e);
@@ -57,7 +57,7 @@ export async function leaveGroup(groupId: string) {
 
     await connection.invoke("LeaveGroup", groupId);
     await connection.stop();
-    isSharing.set(false);
+    store.isSharing = false;
   } catch (e) {
     console.log(e);
   }

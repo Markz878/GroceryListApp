@@ -1,23 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getAuthenticationStateAsync } from "../services/AuthenticationStateProvider";
   import { EmailClaimName, NameClaimName } from "../helpers/globalConstants";
   import { link } from "svelte-spa-router";
-  
+  import type { UserInfo } from "../types/UserInfo";
+
+  let { userInfo }: { userInfo: UserInfo } = $props();
+
   let email = $state<string>();
   let userName = $state<string>();
 
-  onMount(async () => {
-    const authState = await getAuthenticationStateAsync();
-    email = authState.claims.find((x) => x.type === EmailClaimName)?.value;
-    userName = authState.claims.find((x) => x.type === NameClaimName)?.value;
+  onMount(() => {
+    email = userInfo.claims.find((x) => x.type === EmailClaimName)?.value;
+    userName = userInfo.claims.find((x) => x.type === NameClaimName)?.value;
   });
 
   function getUserInitials(userName: string, email: string) {
     if (userName) {
       const names = userName.toUpperCase().split(" ", 2);
       if (names.length === 2) {
-        return (names[0]?.[0] ?? '') + (names[1]?.[0] ?? '');
+        return (names[0]?.[0] ?? "") + (names[1]?.[0] ?? "");
       }
       return userName.substring(0, 2).toUpperCase();
     }

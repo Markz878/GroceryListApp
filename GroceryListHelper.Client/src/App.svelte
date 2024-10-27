@@ -3,15 +3,13 @@
   import { routes } from "./helpers/routes";
   import Modal from "./components/Modal.svelte";
   import { onMount } from "svelte";
-  import { UserInfo } from "./types/UserInfo";
   import { getAuthenticationStateAsync } from "./services/AuthenticationStateProvider";
   import ProfileButton from "./components/ProfileButton.svelte";
-
-  let userInfo = $state<UserInfo>();
+  import store from "./helpers/store.svelte";
 
   onMount(async () => {
     const authState = await getAuthenticationStateAsync();
-    userInfo = authState;
+    store.authInfo = authState;
   });
 </script>
 
@@ -23,8 +21,8 @@
         <span class="font-bold text-xl dark:text-gray-100">Grocery List Helper</span>
       </a>
     </div>
-    {#if userInfo && userInfo.isAuthenticated}
-      <ProfileButton />
+    {#if store.authInfo?.isAuthenticated}
+      <ProfileButton userInfo={store.authInfo} />
     {:else}
       <a id="login-link" class="btn btn-success font-bold text-lg mx-4 align-middle" href="api/Account/Login">Log in</a>
     {/if}

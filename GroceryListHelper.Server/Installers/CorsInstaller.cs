@@ -9,7 +9,7 @@ public class CorsInstaller : IInstaller
         {
             builder.Services.AddCors(x => x.AddDefaultPolicy(p =>
             {
-                p.WithOrigins("https://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                p.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             }));
         }
     }

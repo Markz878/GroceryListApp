@@ -18,12 +18,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:7021/',
+        target: 'http://localhost:5280/',
         changeOrigin: true,
         secure: false
       },
       '/signin-oidc': {
-        target: 'http://localhost:7021/',
+        target: 'http://localhost:5280/',
         changeOrigin: true,
         secure: false
       }

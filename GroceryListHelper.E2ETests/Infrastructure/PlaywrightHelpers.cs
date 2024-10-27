@@ -14,12 +14,12 @@ internal static class PlaywrightHelpers
         });
         if (fakeAuth != null)
         {
-            await browserContext.SetExtraHTTPHeadersAsync(new List<KeyValuePair<string, string>>
-            {
+            await browserContext.SetExtraHTTPHeadersAsync(
+            [
                 new("fake-username", fakeAuth.UserName),
                 new("fake-email", fakeAuth.Email),
                 new("fake-userid", fakeAuth.Guid.ToString())
-            });
+            ]);
         }
         return browserContext;
     }
@@ -27,6 +27,7 @@ internal static class PlaywrightHelpers
     internal static async Task<IPage> GotoPage(this IBrowserContext browserContext, string url, bool checkIfAuthenticated = false)
     {
         IPage page = await browserContext.NewPageAsync();
+        page.SetDefaultTimeout(5000);
         await page.GotoAsync(url, new PageGotoOptions() { WaitUntil = WaitUntilState.NetworkIdle });
         if (checkIfAuthenticated)
         {

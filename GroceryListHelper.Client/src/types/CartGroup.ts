@@ -1,10 +1,12 @@
+import { SvelteSet } from "svelte/reactivity";
+
 export class CartGroup {
     id = "";
     name = "";
-    otherUsers = new Set<string>();
+    otherUsers = new SvelteSet<string>();
 }
 
 export class CreateCartGroupRequest {
     name = "";
-    otherUsers = new Set<string>();
+    otherUsers = new SvelteSet<string>();
 }
