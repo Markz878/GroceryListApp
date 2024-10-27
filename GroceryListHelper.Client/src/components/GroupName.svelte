@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { CartGroup } from "../types/CartGroup";
   import { isSharing } from "../helpers/store";
+
   interface Props {
     groupInfo: CartGroup;
   }
-
   let { groupInfo }: Props = $props();
 </script>
 

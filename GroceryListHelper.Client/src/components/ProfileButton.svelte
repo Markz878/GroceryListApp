@@ -3,8 +3,9 @@
   import { getAuthenticationStateAsync } from "../services/AuthenticationStateProvider";
   import { EmailClaimName, NameClaimName } from "../helpers/globalConstants";
   import { link } from "svelte-spa-router";
-  let email: string | undefined = $state();
-  let userName: string | undefined = $state();
+  
+  let email = $state<string>();
+  let userName = $state<string>();
 
   onMount(async () => {
     const authState = await getAuthenticationStateAsync();

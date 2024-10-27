@@ -9,11 +9,8 @@
   import { showError } from "../helpers/store";
   import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
 
-  interface GroupCartParams {
-    groupid: string;
-  }
   interface Props {
-    params?: GroupCartParams;
+    params?: { groupid: string };
   }
 
   let { params = { groupid: "" } }: Props = $props();
