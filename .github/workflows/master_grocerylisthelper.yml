@@ -37,7 +37,7 @@ jobs:
         run: |
           cd GroceryListHelper.Client
           npm install
-          npm build
+          npm run build
 
       # - name: Initialize CodeQL
       #   uses: github/codeql-action/init@v2
@@ -101,7 +101,7 @@ jobs:
         run: |
           cd GroceryListHelper.Client
           npm install
-          npm build
+          npm run build
                   
       - name: Publish app
         run: dotnet publish GroceryListHelper.Server -o "${{ env.WebappPackagePath }}"
