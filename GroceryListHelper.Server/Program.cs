@@ -39,10 +39,11 @@ else
     app.UseHsts();
 }
 app.UseResponseCompression();
-app.UseStaticFiles(new StaticFileOptions
-{
-    OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600000")
-});
+app.MapStaticAssets();
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600000")
+//});
 if (app.Environment.IsDevelopment()) { app.UseCors(); }
 app.UseAuthentication();
 app.UseAuthorization();

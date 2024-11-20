@@ -14,13 +14,15 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
+    "moduleDetection": "force",
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "alwaysStrict": true,
     "noUnusedParameters": false,
     "noUnusedLocals": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]

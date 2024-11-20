@@ -18,7 +18,7 @@
     storeProductsService = getStoreProductsService(store.authInfo);
   });
 
-  const total = $derived(() => {
+  const total = $derived.by(() => {
     return store.cartProducts.reduce((x, c) => x + c.unitPrice * c.amount, 0);
   });
 
@@ -50,7 +50,7 @@
     <input id="filter-collected-checkbox" type="checkbox" class="scale-150" onchange={(e) => setFilterCollected(e)} />
     <label id="filter-collected-label" class="ml-3 mb-[2.75px] font-bold whitespace-nowrap" for="filter-collected-checkbox">Filter collected</label>
   </div>
-  <b id="cart-total">Total: {total()} €</b>
+  <b id="cart-total">Total: {total} €</b>
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all current cart items?", clearCartProducts)}>Clear cart</button>
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all stored shop items?", clearStoreProducts)}>Clear shop</button>
 </div>

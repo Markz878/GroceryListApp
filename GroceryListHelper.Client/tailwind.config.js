@@ -1,7 +1,9 @@
-/** @type {import('tailwindcss').Config}*/
-const config = {
-  content: ["./src/**/*.{html,svelte}"],
-
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.svelte",
+  ],
   theme: {
     screens: {
       sm: "440px",
@@ -32,8 +34,5 @@ const config = {
       },
     },
   },
-
   plugins: [],
-};
-
-module.exports = config;
+}

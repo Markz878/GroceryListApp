@@ -26,7 +26,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.x'
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -71,7 +71,7 @@ jobs:
       - name: Install Playwright
         run: |
           dotnet build GroceryListHelper.E2ETests -c Release
-          pwsh GroceryListHelper.E2ETests/bin/Release/net8.0/playwright.ps1 install
+          pwsh GroceryListHelper.E2ETests/bin/Release/net9.0/playwright.ps1 install
 
       - name: Run E2E Tests
         run: dotnet test GroceryListHelper.E2ETests -c Release
@@ -90,7 +90,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.x'
 
       - name: Use Node.js
         uses: actions/setup-node@v3

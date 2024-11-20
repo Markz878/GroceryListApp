@@ -17,5 +17,5 @@
     </div>
     <p class="text-sm text-gray-400">{store.isSharing ? "Sharing cart" : "Sharing starting..."}</p>
   </div>
-  <p class="my-2"><b>Members: </b>{Array.from(groupInfo.otherUsers).join(", ")}</p>
+  <p class="my-2"><b class="mr-2">Members: </b>{Array.from(groupInfo.otherUsers).join(", ")}</p>
 </div>
