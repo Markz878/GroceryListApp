@@ -13,7 +13,7 @@
     store.clearModal();
   }
 
-  const modalBackground = $derived(() => (store.modalState.header === "Error" ? "bg-red-600" : "bg-green-600"));
+  const modalBackground = $derived(store.modalState.header === "Error" ? "bg-red-600" : "bg-green-600");
 </script>
 
 <dialog id="modal" class="border-2 border-gray-500 mt-32 rounded max-w-md animate-fade-in-down p-0 backdrop:bg-gray-900/60" bind:this={dialog}>

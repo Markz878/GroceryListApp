@@ -2,7 +2,7 @@ import type { StoreProduct } from '../types/StoreProducts';
 import type { CartProduct } from '../types/CartProduct';
 import type { CartSortState, SortDirection } from '../types/SortState';
 import type { ModalInfo } from '../types/ModalInfo';
-import { UserInfo } from '../types/UserInfo';
+import type { UserInfo } from '../types/UserInfo';
 
 class Store {
   authInfo = $state<UserInfo>();

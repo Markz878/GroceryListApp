@@ -1,7 +1,7 @@
-import { StoreProduct } from "./StoreProducts";
+import type { StoreProduct } from "./StoreProducts";
 
-export class CartProduct extends StoreProduct {
-    amount =0;
-    order = 0;
-    isCollected = false;
+export interface CartProduct extends StoreProduct {
+    amount: number;
+    order: number;
+    isCollected: boolean;
 }

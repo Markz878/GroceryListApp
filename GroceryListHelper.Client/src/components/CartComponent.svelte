@@ -2,14 +2,14 @@
   import { onMount } from "svelte";
   import { getNewOrder } from "../helpers/sortOrderMethods";
   import store from "../helpers/store.svelte";
-  import { CartProduct } from "../types/CartProduct";
+  import type { CartProduct } from "../types/CartProduct";
   import type { ICartProductsService } from "../types/ICartProductsService";
   import { getCartProductsService } from "../services/CartProductsServiceProvider";
   import { getStoreProductsService } from "../services/StoreProductsServiceProvider";
   import type { IStoreProductsService } from "../types/IStoreProductsService";
   import type { StoreProduct } from "../types/StoreProducts";
 
-  let newProduct = $state(new CartProduct());
+  let newProduct = $state<CartProduct>({ name: "", amount: 0, isCollected: false, order: 0, unitPrice: 0 });
   let editingItem = $state<CartProduct | null>();
   let movingItem = $state<CartProduct | null>();
   let newProductNameBox = $state<HTMLInputElement>();
@@ -56,7 +56,7 @@
   }
 
   async function changeSortDirectionAndSortItems() {
-    const sortDirection = store.sortState === "Ascending" ? "Ascending" : "Descending";
+    const sortDirection = store.sortState === "Ascending" ? "Descending" : "Ascending";
     store.sortState = sortDirection;
     store.sortCartProducts(sortDirection);
     store.checkError(await cartProductService?.sortCartProducts(sortDirection));
@@ -80,7 +80,7 @@
       return;
     }
     const cartProduct = { ...newProduct };
-    newProduct = new CartProduct();
+    newProduct = { name: "", amount: 0, isCollected: false, order: 0, unitPrice: 0 };
     await saveCartProduct(cartProduct);
     await saveStoreProduct(cartProduct);
     newProductNameBox?.focus();

@@ -1,15 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { CreateCartGroupRequest, CartGroup } from "../types/CartGroup";
+  import type { CreateCartGroupRequest, CartGroup } from "../types/CartGroup";
   import { forceAuthenticationAsync } from "../services/AuthenticationStateProvider";
   import { createCartGroup, deleteCartGroup, getCartGroups, updateCartGroupName } from "../services/CartGroupsService";
   import store from "../helpers/store.svelte";
   import Confirm from "../components/Confirm.svelte";
   import { link } from "svelte-spa-router";
+  import { SvelteSet } from "svelte/reactivity";
 
   let cartGroups = $state<CartGroup[]>();
   let isCreatingNewGroup = $state(false);
-  let createCartGroupRequest = $state(new CreateCartGroupRequest());
+  let createCartGroupRequest = $state<CreateCartGroupRequest>({ name: "", otherUsers: new SvelteSet<string>() });
   let newMemberEmail = $state("");
   let isBusy = $state(false);
   let oldGroupName = "";
@@ -47,16 +48,16 @@
       try {
         const response = await createCartGroup(createCartGroupRequest);
         if (response instanceof Error) {
-         store.showError(response.message);
+          store.showError(response.message);
         } else {
-          const cartGroup = new CartGroup();
+          const cartGroup: CartGroup = { id: "", name: "", otherUsers: new SvelteSet<string>() };
           cartGroup.id = response;
           cartGroup.name = createCartGroupRequest.name;
           cartGroup.otherUsers = createCartGroupRequest.otherUsers;
           cartGroups?.push(cartGroup);
           cartGroups = cartGroups;
           isCreatingNewGroup = false;
-          createCartGroupRequest = new CreateCartGroupRequest();
+          createCartGroupRequest = { name: "", otherUsers: new SvelteSet<string>() };
         }
       } catch (e) {
         if (e instanceof Error) {

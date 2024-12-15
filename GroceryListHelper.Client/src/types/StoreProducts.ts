@@ -1,4 +1,4 @@
-export class StoreProduct {
-    name = "";
-    unitPrice = 0;
+export interface StoreProduct {
+    name: string;
+    unitPrice: number;
 }
