@@ -34,9 +34,9 @@ jobs:
           node-version: 22.x
 
       - name: Build client
+        working-directory: GroceryListHelper.Client
         run: |
-          cd GroceryListHelper.Client
-          npm i
+          npm ci
           npm run build
 
       # - name: Initialize CodeQL
@@ -98,9 +98,9 @@ jobs:
           node-version: 22.x
 
       - name: Build client
+        working-directory: GroceryListHelper.Client
         run: |
-          cd GroceryListHelper.Client
-          npm i
+          npm ci
           npm run build
                   
       - name: Publish app
