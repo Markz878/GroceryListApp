@@ -1,46 +1,32 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Azure.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace GroceryListHelper.Core.DataAccess.HelperMethods;
 
 public static class ServiceExtensions
 {
-    public static void AddDataAccessServices(this IServiceCollection services)
+    public static void AddDataAccessServices(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
-        services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<CoreMarker>());
-    }
-
-    public static void InitDatabase(this IServiceProvider services)
-    {
-        TableServiceClient tableService = services.GetRequiredService<TableServiceClient>();
-        tableService.CreateTableIfNotExists(CartProductDbModel.GetTableName());
-        tableService.CreateTableIfNotExists(StoreProductDbModel.GetTableName());
-        tableService.CreateTableIfNotExists(CartGroupUserDbModel.GetTableName());
-        tableService.CreateTableIfNotExists(CartUserGroupDbModel.GetTableName());
-        tableService.CreateTableIfNotExists(UserDbModel.GetTableName());
-    }
-
-    public static void DeleteDatabase(this IServiceProvider services)
-    {
-        TableServiceClient tableService = services.GetRequiredService<TableServiceClient>();
-        if (tableService.AccountName == "devstoreaccount1")
+        CosmosClientOptions options = new()
         {
-            tableService.DeleteTable(CartProductDbModel.GetTableName());
-            tableService.DeleteTable(StoreProductDbModel.GetTableName());
-            tableService.DeleteTable(CartGroupUserDbModel.GetTableName());
-            tableService.DeleteTable(CartUserGroupDbModel.GetTableName());
-            tableService.DeleteTable(UserDbModel.GetTableName());
+            ApplicationName = "GroceryListHelper",
+            ConnectionMode = ConnectionMode.Direct,
+            UseSystemTextJsonSerializerWithOptions = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            },
+            EnableContentResponseOnWrite = false,
+        };
+        if (isDevelopment)
+        {
+            services.AddSingleton(new CosmosClient(configuration.GetConnectionString("CosmosDb"), options));
         }
-    }
-
-    public static string[] GetTables()
-    {
-        return
-        [
-            CartProductDbModel.GetTableName(),
-            StoreProductDbModel.GetTableName(),
-            CartGroupUserDbModel.GetTableName(),
-            CartUserGroupDbModel.GetTableName(),
-            UserDbModel.GetTableName()
-        ];
+        else
+        {
+            services.AddSingleton(new CosmosClient(configuration.GetConnectionString("CosmosDb"), new ManagedIdentityCredential(), options));
+        }
+        services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<CoreMarker>());
     }
 }

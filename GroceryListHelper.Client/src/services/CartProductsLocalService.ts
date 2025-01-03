@@ -4,8 +4,6 @@ import type { SortDirection } from "../types/SortState";
 import { cartProductsKey } from "../helpers/globalConstants";
 import store from "../helpers/store.svelte";
 
-
-
 export class CartProductsLocalService implements ICartProductsService {
     getCartProducts = async () => {
         try {

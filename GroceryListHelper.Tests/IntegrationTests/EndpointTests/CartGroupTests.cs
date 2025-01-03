@@ -33,7 +33,7 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
     public async Task GetGroupById_NotFound()
     {
         HttpResponseMessage response = await _client.GetAsync($"{_uri}/{Guid.NewGuid()}");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
     {
         Guid groupId = await CreateNewGroup(true);
         HttpResponseMessage response = await _client.GetAsync($"{_uri}/{groupId}");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await _mediator.Send(new DeleteCartGroupCommand() { GroupId = groupId, UserEmail = TestAuthHandler.UserEmail });
     }
 
@@ -73,8 +73,8 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
         Guid groupId = await CreateNewGroup();
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{groupId}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        Result<CartGroup, ForbiddenError, NotFoundError> groupResponse = await _mediator.Send(new GetCartGroupQuery() { GroupId = groupId, UserEmail = TestAuthHandler.UserEmail });
-        Assert.False(groupResponse.IsSuccess);
+        response = await _client.DeleteAsync($"{_uri}/{groupId}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
     {
         Guid groupId = await CreateNewGroup(true);
         HttpResponseMessage response = await _client.DeleteAsync($"{_uri}/{groupId}");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await _mediator.Send(new DeleteCartGroupCommand() { GroupId = groupId, UserEmail = "test1@email.com" });
     }
 
@@ -109,7 +109,7 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
         Guid groupId = await CreateNewGroup(true);
         UpdateCartGroupNameRequest group = new() { Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync($"{_uri}/{groupId}", group);
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await _mediator.Send(new DeleteCartGroupCommand() { GroupId = groupId, UserEmail = "test1@email.com" });
     }
 
@@ -118,6 +118,6 @@ public sealed class CartGroupTests(WebApplicationFactoryFixture factory, ITestOu
     {
         UpdateCartGroupNameRequest group = new() { Name = "Updated" };
         HttpResponseMessage response = await _client.PutAsJsonAsync($"{_uri}/{Guid.NewGuid()}", group);
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

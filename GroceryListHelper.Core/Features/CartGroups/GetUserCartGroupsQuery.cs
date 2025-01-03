@@ -5,31 +5,20 @@ public sealed record GetUserCartGroupsQuery : IRequest<List<CartGroup>>
     public required string UserEmail { get; init; }
 }
 
-internal sealed class GetCartGroupsQueryHandler(TableServiceClient db) : IRequestHandler<GetUserCartGroupsQuery, List<CartGroup>>
+internal sealed class GetCartGroupsQueryHandler(CosmosClient db) : IRequestHandler<GetUserCartGroupsQuery, List<CartGroup>>
 {
     public async Task<List<CartGroup>> Handle(GetUserCartGroupsQuery request, CancellationToken cancellationToken = default)
     {
-        List<CartGroup> result = [];
-        List<CartUserGroupDbModel> cartUserGroups = await db.GetTableEntitiesByPrimaryKey<CartUserGroupDbModel>(request.UserEmail, select: GetColumns());
-        foreach (CartUserGroupDbModel? cartUserGroup in cartUserGroups.DistinctBy(x => x.GroupId))
+        Container groupsContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartGroupsContainer);
+        string sql = "SELECT * FROM c WHERE ARRAY_CONTAINS(c.memberEmails, @userEmail)";
+        QueryDefinition query = new QueryDefinition(sql).WithParameter("@userEmail", request.UserEmail);
+        List<CartGroup> groups = await groupsContainer.Query<CartGroupEntity, CartGroup>(x => new CartGroup()
         {
-            List<CartGroupUserDbModel> cartGroupUsers = await db.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(cartUserGroup.GroupId.ToString());
-            if (cartGroupUsers.Count > 1)
-            {
-                CartGroup group = new() { Id = cartGroupUsers[0].GroupId, Name = cartGroupUsers[0].Name };
-                foreach (CartGroupUserDbModel? cartGroupUser in cartGroupUsers.Where(x => x.MemberEmail != request.UserEmail))
-                {
-                    group.OtherUsers.Add(cartGroupUser.MemberEmail);
-                }
-                result.Add(group);
-            }
-        }
-        return result;
-    }
-
-    private static IEnumerable<string> GetColumns()
-    {
-        yield return "GroupId";
+            Name = x.Name,
+            Id = x.Id,
+            OtherUsers = x.MemberEmails
+        }, query);
+        return groups;
     }
 }
 

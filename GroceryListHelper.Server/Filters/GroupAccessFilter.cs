@@ -19,7 +19,7 @@ public class GroupAccessFilter(IMediator mediator) : IEndpointFilter
         }
         else
         {
-            return TypedResults.Unauthorized();
+            return TypedResults.NotFound();
         }
     }
 }

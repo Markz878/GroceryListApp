@@ -9,7 +9,7 @@ namespace GroceryListHelper.Server.Endpoints;
 
 public static class AccountEndpointsMapper
 {
-    public static void AddAccountEndpoints(this RouteGroupBuilder builder)
+    public static RouteGroupBuilder AddAccountEndpoints(this RouteGroupBuilder builder)
     {
         RouteGroupBuilder accountGroup = builder.MapGroup("account").WithTags("Account");
         accountGroup.MapGet("user", GetUserInfo).AllowAnonymous();
@@ -17,6 +17,7 @@ public static class AccountEndpointsMapper
         accountGroup.MapGet("login", Login).AllowAnonymous();
         accountGroup.MapPost("logout", Logout);
         accountGroup.MapGet("signout", PostLogoutRedirect).AllowAnonymous().ExcludeFromDescription();
+        return builder;
     }
 
     private static readonly CookieOptions csrfTokenOptions = new() { HttpOnly = false, Secure = true };

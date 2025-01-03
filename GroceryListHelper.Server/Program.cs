@@ -16,7 +16,6 @@ global using Microsoft.AspNetCore.ResponseCompression;
 global using Microsoft.Extensions.Primitives;
 global using Microsoft.Identity.Web;
 global using Microsoft.OpenApi.Models;
-global using System.ComponentModel;
 global using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -28,6 +27,7 @@ WebApplication app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryListHelper.Server v1"));
     app.UseMiddleware<FakeAuthenticationMiddleware>();
@@ -38,24 +38,17 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseResponseCompression();
 app.MapStaticAssets();
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600000")
-//});
-if (app.Environment.IsDevelopment()) { app.UseCors(); }
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
-app.UseRateLimiter();
-app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseHttpLogging();
+app.UseResponseCompression();
+app.UseRateLimiter();
 app.MapAPIEndpoints();
 app.MapHub<CartHub>("/carthub", options => options.AllowStatefulReconnects = true);
 app.MapHealthChecks("/health");
 app.MapFallbackToFile("index.html");
-app.Services.InitDatabase();
 app.Run();
 
 namespace GroceryListHelper.Server

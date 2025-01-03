@@ -25,8 +25,8 @@ public sealed class SharedCartTests : IAsyncLifetime
     {
         using IServiceScope scope = server.Services.CreateScope();
         IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new AddUserCommand() { Email = FakeAuth1.Email, Id = FakeAuth1.Guid, Name = FakeAuth1.UserName });
-        await mediator.Send(new AddUserCommand() { Email = FakeAuth2.Email, Id = FakeAuth2.Guid, Name = FakeAuth2.UserName });
+        await mediator.Send(new AddUserCommand() { Email = FakeAuth1.Email, Name = FakeAuth1.UserName });
+        await mediator.Send(new AddUserCommand() { Email = FakeAuth2.Email, Name = FakeAuth2.UserName });
         browserContext1 = await server.GetNewBrowserContext(FakeAuth1);
         page1 = await browserContext1.GotoPage(server.BaseUrl, true);
         browserContext2 = await server.GetNewBrowserContext(FakeAuth2);

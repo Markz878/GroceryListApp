@@ -18,7 +18,7 @@ export class CartProductsApiService implements ICartProductsService {
     }
 
     updateCartProduct = async (product: CartProduct) => {
-        const response = await send(this.url, "PUT", product);
+        const response = await send(this.url, "POST", product);
         return response;
     }
 

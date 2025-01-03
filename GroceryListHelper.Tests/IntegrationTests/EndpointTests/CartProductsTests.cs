@@ -103,62 +103,6 @@ public sealed class CartProductsTests(WebApplicationFactoryFixture factory, ITes
     }
 
     [Fact]
-    public async Task UpdateCartProduct_Success_ReturnsOk()
-    {
-        List<CartProduct> insertedProducts = await SaveCartProducts(1);
-        CartProduct cartProduct = new()
-        {
-            Amount = insertedProducts[0].Amount + 1,
-            Name = insertedProducts[0].Name,
-            Order = insertedProducts[0].Order + 1000,
-            UnitPrice = insertedProducts[0].UnitPrice + 1,
-            IsCollected = true
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = TestAuthHandler.UserId });
-        CartProduct product = products.First(x => x.Name == cartProduct.Name);
-        Assert.Equal(cartProduct.Amount, product.Amount);
-        Assert.Equal(cartProduct.Name, product.Name);
-        Assert.Equal(cartProduct.Order, product.Order);
-        Assert.Equal(cartProduct.UnitPrice, product.UnitPrice);
-        Assert.Equal(cartProduct.IsCollected, product.IsCollected);
-    }
-
-    [Fact]
-    public async Task UpdateCartProduct_InvalidProduct_ReturnsBadRequest()
-    {
-        await SaveCartProducts(1);
-        CartProduct cartProduct = new()
-        {
-            Amount = -Random.Shared.NextDouble() * 10,
-            Name = new string('x', 31),
-            Order = 1500,
-            UnitPrice = -Random.Shared.NextDouble() * 10,
-            IsCollected = true
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task UpdateCartProduct_InvalidProductName_ReturnsNotFound()
-    {
-        List<CartProduct> insertedProducts = await SaveCartProducts(1);
-        CartProduct cartProduct = new()
-        {
-            Amount = insertedProducts[0].Amount + 1,
-            Name = insertedProducts[0].Name + 'A',
-            Order = insertedProducts[0].Order + 1000,
-            UnitPrice = insertedProducts[0].UnitPrice + 1,
-            IsCollected = true
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
-
-
-    [Fact]
     public async Task SortCartProducts_OrderAscending()
     {
         List<CartProduct> insertedProducts = await SaveCartProducts(5);

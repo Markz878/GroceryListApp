@@ -15,10 +15,10 @@ public sealed class RateLimitInstaller : IInstaller
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.AddPolicy(PolicyName, httpContext =>
             {
-                Guid? userId = httpContext.User?.GetUserId();
-                if (userId == null)
+                Guid userId = httpContext.User.GetUserId();
+                if (userId == default)
                 {
-                    return RateLimitPartition.GetTokenBucketLimiter(Guid.Empty, _ =>
+                    return RateLimitPartition.GetTokenBucketLimiter(userId, _ =>
                         new TokenBucketRateLimiterOptions
                         {
                             TokenLimit = rateLimitOptions.AnonTokenLimit,
@@ -31,7 +31,7 @@ public sealed class RateLimitInstaller : IInstaller
                 }
                 else
                 {
-                    return RateLimitPartition.GetTokenBucketLimiter(userId.Value, _ =>
+                    return RateLimitPartition.GetTokenBucketLimiter(userId, _ =>
                         new TokenBucketRateLimiterOptions
                         {
                             TokenLimit = rateLimitOptions.UserTokenLimit,

@@ -1,8 +1,9 @@
-﻿using Azure;
-using Azure.Data.Tables;
+﻿using GroceryListHelper.Core;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.Azure.Cosmos;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 
 namespace GroceryListHelper.Server.Installers;
@@ -11,22 +12,20 @@ public sealed class DataAccessInstaller : IInstaller
 {
     public void Install(WebApplicationBuilder builder)
     {
-        builder.Services.AddDataAccessServices();
+        builder.Services.AddDataAccessServices(builder.Configuration, builder.Environment.IsDevelopment());
         builder.Services.AddMemoryCache();
-        builder.Services.AddDataProtection().PersistKeysToAzureTableStorage(builder.Configuration, builder.Environment.IsDevelopment());
+        builder.Services.AddDataProtection().PersistKeysToAzureTableStorage();
     }
 }
 
 public static class DataProtectionExtensions
 {
-    public static IDataProtectionBuilder PersistKeysToAzureTableStorage(this IDataProtectionBuilder builder, IConfiguration configuration, bool isDevelopment)
+    public static IDataProtectionBuilder PersistKeysToAzureTableStorage(this IDataProtectionBuilder builder)
     {
+        CosmosClient cosmosClient = builder.Services.BuildServiceProvider().GetRequiredService<CosmosClient>();
         builder.Services.Configure<KeyManagementOptions>(options =>
         {
-            TableServiceClient tableServiceClient = isDevelopment ?
-            new TableServiceClient("UseDevelopmentStorage=true") :
-            new TableServiceClient(new Uri($"{configuration["TableStorageUri"] ?? throw new ArgumentNullException("TableStorageUri configuration value")}"), new ManagedIdentityCredential());
-            options.XmlRepository = new AzureTableStorageRepository(tableServiceClient);
+            options.XmlRepository = new CosmosStorageRepository(cosmosClient);
         });
         return builder;
     }
@@ -34,61 +33,34 @@ public static class DataProtectionExtensions
 
 
 
-public class AzureTableStorageRepository : IXmlRepository
+public class CosmosStorageRepository(CosmosClient db) : IXmlRepository
 {
-    private readonly TableClient _tableClient;
-    public AzureTableStorageRepository(TableServiceClient tableServiceClient)
-    {
-        _tableClient = tableServiceClient.GetTableClient("DataProtectionKeys");
-        _tableClient.CreateIfNotExists();
-    }
+    private readonly Container dataKeysContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.DataProtectionKeysContainer);
 
     public IReadOnlyCollection<XElement> GetAllElements()
     {
-        List<XElement> elements = [];
-
-        try
+        List<XElement> result = Task.Run(async () =>
         {
-            Pageable<DataProtectionKeyEntity> query = _tableClient.Query<DataProtectionKeyEntity>();
-
-            foreach (DataProtectionKeyEntity entity in query)
-            {
-                elements.Add(XElement.Parse(entity.XmlData));
-            }
-        }
-        catch (RequestFailedException ex)
-        {
-            Console.WriteLine($"Error retrieving keys from Azure Table Storage: {ex.Message}");
-        }
-
-        return elements.AsReadOnly();
+            return await dataKeysContainer.Query<DataProtectionKeyEntity, XElement>(x => XElement.Parse(x.XmlData));
+        }).Result;
+        return result;
     }
 
-    public void StoreElement(XElement element, string friendlyName)
+    public async void StoreElement(XElement element, string friendlyName)
     {
-        try
+        DataProtectionKeyEntity dataProtectionEntity = new()
         {
-            DataProtectionKeyEntity dataProtectionEntity = new()
-            {
-                PartitionKey = "DataProtectionKeys",
-                RowKey = Guid.NewGuid().ToString(),
-                XmlData = element.ToString()
-            };
+            Id = friendlyName,
+            XmlData = element.ToString()
+        };
 
-            _tableClient.AddEntity(dataProtectionEntity);
-        }
-        catch (RequestFailedException ex)
-        {
-            Console.WriteLine($"Error storing keys in Azure Table Storage: {ex.Message}");
-        }
+        await dataKeysContainer.UpsertItemAsync(dataProtectionEntity);
     }
 }
 
-public class DataProtectionKeyEntity : ITableEntity
+public sealed class DataProtectionKeyEntity
 {
-    public string PartitionKey { get; set; } = "DataProtectionKeys";
-    public required string RowKey { get; set; }
-    public DateTimeOffset? Timestamp { get; set; }
-    public ETag ETag { get; set; }
+    [JsonPropertyName("id")]
+    public required string Id { get; set; }
     public required string XmlData { get; set; }
 }

@@ -3,30 +3,25 @@
   import { getNewOrder } from "../helpers/sortOrderMethods";
   import store from "../helpers/store.svelte";
   import type { CartProduct } from "../types/CartProduct";
-  import type { ICartProductsService } from "../types/ICartProductsService";
-  import { getCartProductsService } from "../services/CartProductsServiceProvider";
-  import { getStoreProductsService } from "../services/StoreProductsServiceProvider";
-  import type { IStoreProductsService } from "../types/IStoreProductsService";
-  import type { StoreProduct } from "../types/StoreProducts";
+  import type { StoreProduct } from "../types/StoreProduct";
+  import { CartProductsProxyService } from "../services/CartProductsProxyService";
+  import { StoreProductsProxyService } from "../services/StoreProductsProxyService";
 
   let newProduct = $state<CartProduct>({ name: "", amount: 0, isCollected: false, order: 0, unitPrice: 0 });
   let editingItem = $state<CartProduct | null>();
   let movingItem = $state<CartProduct | null>();
   let newProductNameBox = $state<HTMLInputElement>();
-
-  let cartProductService: ICartProductsService | null;
-  let storeProductService: IStoreProductsService | null;
+  let cartProductsService = new CartProductsProxyService();
+  let storeProductsService = new StoreProductsProxyService();
 
   onMount(async () => {
-    cartProductService = getCartProductsService(store.authInfo);
-    storeProductService = getStoreProductsService(store.authInfo);
-    const cartProductsResponse = await cartProductService.getCartProducts();
+    const cartProductsResponse = await cartProductsService.getCartProducts();
     if (cartProductsResponse instanceof Error) {
       store.showError(cartProductsResponse.message);
     } else {
       store.cartProducts = cartProductsResponse;
     }
-    const storeProductsResponse = await storeProductService.getStoreProducts();
+    const storeProductsResponse = await storeProductsService.getStoreProducts();
     if (storeProductsResponse instanceof Error) {
       store.showError(storeProductsResponse.message);
     } else {
@@ -34,7 +29,7 @@
     }
   });
 
-  const cartProductsFilteredList = $derived(() => {
+  const cartProductsFilteredList = $derived.by(() => {
     const result: { product: CartProduct; top: number }[] = [];
     const filtered = store.cartProducts.filter((x) => !store.showOnlyUncollected || !x.isCollected);
     const sorted = filtered.toSorted((a, b) => a.order - b.order);
@@ -59,7 +54,7 @@
     const sortDirection = store.sortState === "Ascending" ? "Descending" : "Ascending";
     store.sortState = sortDirection;
     store.sortCartProducts(sortDirection);
-    store.checkError(await cartProductService?.sortCartProducts(sortDirection));
+    store.checkError(await cartProductsService.sortCartProducts(sortDirection));
   }
 
   async function addNewProduct() {
@@ -89,7 +84,7 @@
   async function saveCartProduct(product: CartProduct) {
     product.order = getNewCartProductOrder();
     store.cartProducts.push(product);
-    store.checkError(await cartProductService?.createCartProduct(product));
+    store.checkError(await cartProductsService.createCartProduct(product));
   }
 
   async function saveStoreProduct(product: StoreProduct) {
@@ -97,11 +92,11 @@
     if (existingProduct) {
       if (existingProduct.unitPrice !== product.unitPrice) {
         existingProduct.unitPrice = product.unitPrice;
-        store.checkError(await storeProductService?.updateStoreProduct(existingProduct));
+        store.checkError(await storeProductsService.updateStoreProduct(existingProduct));
       }
     } else {
       store.storeProducts.push({ name: product.name, unitPrice: product.unitPrice });
-      store.checkError(await storeProductService?.createStoreProduct(product));
+      store.checkError(await storeProductsService.createStoreProduct(product));
     }
   }
 
@@ -120,7 +115,7 @@
   async function markItemCollected(product: CartProduct, e: Event) {
     if (e.target instanceof HTMLInputElement) {
       product.isCollected = e.target.checked;
-      store.checkError(await cartProductService?.updateCartProduct(product));
+      store.checkError(await cartProductsService.updateCartProduct(product));
     }
   }
 
@@ -130,16 +125,16 @@
 
   async function removeProduct(product: CartProduct) {
     store.deleteCartProduct(product.name);
-    store.checkError(await cartProductService?.deleteCartProduct(product.name));
+    store.checkError(await cartProductsService.deleteCartProduct(product.name));
   }
 
   async function updateCartProduct(product: CartProduct) {
     editingItem = null;
-    await cartProductService?.updateCartProduct(product);
+    await cartProductsService.updateCartProduct(product);
     const storeProduct = store.storeProducts.find((x) => x.name == product.name);
     if (storeProduct && storeProduct.unitPrice !== product.unitPrice) {
       storeProduct.unitPrice = product.unitPrice;
-      store.checkError(await storeProductService?.updateStoreProduct(storeProduct));
+      store.checkError(await storeProductsService.updateStoreProduct(storeProduct));
     }
   }
 
@@ -159,7 +154,7 @@
           );
         }
       }
-      store.checkError(await cartProductService?.updateCartProduct(movingItem));
+      store.checkError(await cartProductsService.updateCartProduct(movingItem));
       movingItem = null;
     }
   }
@@ -207,7 +202,7 @@
 </div>
 
 <div role="rowgroup" class="relative transition-[height]" style="height: {store.cartProducts.filter((x) => !store.showOnlyUncollected || !x.isCollected).length * 3 + 1}rem;">
-  {#each cartProductsFilteredList() as cartProduct (cartProduct.product.name)}
+  {#each cartProductsFilteredList as cartProduct}
     <div role="row" class="absolute h-12 w-full grid grid-cols-base sm:grid-cols-sm md:grid-cols-md lg:grid-cols-lg transition-[top] motion-reduce:transition-none border-t-2 {getRowClass(cartProduct.product)}" style="top: {cartProduct.top}rem;">
       {#if cartProduct.product !== editingItem}
         <button class="btn btn-primary w-9 h-9 p-0 m-auto {cartProduct.product == movingItem ? 'bg-blue-800' : ''}" aria-label="Reorder" onclick={() => move(cartProduct.product)}>

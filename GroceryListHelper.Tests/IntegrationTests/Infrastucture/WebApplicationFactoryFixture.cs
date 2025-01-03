@@ -1,5 +1,4 @@
-﻿using GroceryListHelper.Core.DataAccess.HelperMethods;
-using GroceryListHelper.Core.Features.Users;
+﻿using GroceryListHelper.Core.Features.Users;
 
 namespace GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 
@@ -10,12 +9,11 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
     public async Task InitializeAsync()
     {
         using IServiceScope scope = Server.Services.CreateScope();
-        scope.ServiceProvider.DeleteDatabase();
-        scope.ServiceProvider.InitDatabase();
+        await scope.ServiceProvider.SeedDatabase();
         IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.UserEmail, Id = Guid.NewGuid(), Name = "Test User" });
-        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.RandomEmail1, Id = Guid.NewGuid(), Name = "Random User 1" });
-        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.RandomEmail2, Id = Guid.NewGuid(), Name = "Random User 2" });
+        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.UserEmail, Name = "Test User" });
+        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.RandomEmail1, Name = "Random User 1" });
+        await mediator.Send(new AddUserCommand() { Email = TestAuthHandler.RandomEmail2, Name = "Random User 2" });
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder hostBuilder)

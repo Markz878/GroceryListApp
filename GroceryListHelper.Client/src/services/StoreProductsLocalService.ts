@@ -1,4 +1,4 @@
-import type { StoreProduct } from "../types/StoreProducts";
+import type { StoreProduct } from "../types/StoreProduct";
 import type { IStoreProductsService } from "../types/IStoreProductsService";
 import { storeProductsKey } from "../helpers/globalConstants";
 import store from "../helpers/store.svelte";

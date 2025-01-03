@@ -1,4 +1,4 @@
-import type { StoreProduct } from "./StoreProducts";
+import type { StoreProduct } from "./StoreProduct";
 
 export interface IStoreProductsService {
     getStoreProducts: () => Promise<StoreProduct[] | Error>;

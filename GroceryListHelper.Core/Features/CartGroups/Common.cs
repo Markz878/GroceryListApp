@@ -2,10 +2,14 @@
 
 public static class Common
 {
-    public static async Task<bool> CheckGroupAccess(TableServiceClient db, Guid groupId, string userEmail, CancellationToken cancellationToken)
+    public static async Task<bool> CheckGroupAccess(CosmosClient db, Guid groupId, string userEmail, CancellationToken cancellationToken)
     {
-        TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        NullableResponse<CartGroupUserDbModel> group = await cartGroupUserTableClient.GetEntityIfExistsAsync<CartGroupUserDbModel>(groupId.ToString(), userEmail, Array.Empty<string>(), cancellationToken);
-        return group.HasValue;
+        Container cartGroupContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartGroupsContainer);
+        string sql = "SELECT * FROM c WHERE c.id = @groupId AND ARRAY_CONTAINS(c.memberEmails, @userEmail)";
+        QueryDefinition query = new QueryDefinition(sql)
+            .WithParameter("@groupId", groupId.ToString())
+            .WithParameter("@userEmail", userEmail);
+        List<CartGroupEntity> groups = await cartGroupContainer.Query<CartGroupEntity>(query);
+        return groups.Count > 0;
     }
 }

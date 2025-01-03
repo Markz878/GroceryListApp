@@ -101,7 +101,7 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         Guid invalidGroupId = Guid.NewGuid();
         List<CartProduct> savedProducts = await SaveCartProducts(3, invalidGroupId);
         HttpResponseMessage response = await _client.DeleteAsync($"api/cartgroupproducts/{invalidGroupId}/{savedProducts[1].Name}");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         List<CartProduct> products = await _mediator.Send(new GetUserCartProductsQuery() { UserId = invalidGroupId });
         Assert.Equal(3, products.Count);
     }
@@ -143,22 +143,6 @@ public sealed class CartGroupProductsTests(WebApplicationFactoryFixture factory,
         };
         HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task UpdateCartProduct_InvalidProductName_ReturnsNotFound()
-    {
-        List<CartProduct> insertedProducts = await SaveCartProducts(1, groupId);
-        CartProduct cartProduct = new()
-        {
-            Amount = insertedProducts[0].Amount + 1,
-            Name = insertedProducts[0].Name + 'A',
-            Order = insertedProducts[0].Order + 1000,
-            UnitPrice = insertedProducts[0].UnitPrice + 1,
-            IsCollected = true
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, cartProduct);
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]

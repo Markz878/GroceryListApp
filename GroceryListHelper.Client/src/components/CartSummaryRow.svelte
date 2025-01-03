@@ -1,26 +1,16 @@
 <script lang="ts">
   import store from "../helpers/store.svelte";
+  import { CartProductsProxyService } from "../services/CartProductsProxyService";
+  import { StoreProductsProxyService } from "../services/StoreProductsProxyService";
   import Confirm from "./Confirm.svelte";
-  import { onMount } from "svelte";
-  import type { ICartProductsService } from "../types/ICartProductsService";
-  import type { IStoreProductsService } from "../types/IStoreProductsService";
-  import { getCartProductsService } from "../services/CartProductsServiceProvider";
-  import { getStoreProductsService } from "../services/StoreProductsServiceProvider";
 
   let confirmMessage = $state("");
   let confirmCallback = $state<() => void>();
   let confirmDialog = $state<Confirm>();
-  let cartProductsService: ICartProductsService;
-  let storeProductsService: IStoreProductsService;
+  let cartProductsService = new CartProductsProxyService();
+  let storeProductsService = new StoreProductsProxyService();
 
-  onMount(() => {
-    cartProductsService = getCartProductsService(store.authInfo);
-    storeProductsService = getStoreProductsService(store.authInfo);
-  });
-
-  const total = $derived.by(() => {
-    return store.cartProducts.reduce((x, c) => x + c.unitPrice * c.amount, 0);
-  });
+  const total = $derived(store.cartProducts.reduce((x, c) => x + c.unitPrice * c.amount, 0));
 
   function showDeleteConfirm(message: string, func: () => void) {
     confirmMessage = message;
@@ -40,7 +30,7 @@
   }
 
   async function clearStoreProducts() {
-    store.storeProducts = []
+    store.storeProducts = [];
     store.checkError(await storeProductsService?.deleteStoreProducts());
   }
 </script>

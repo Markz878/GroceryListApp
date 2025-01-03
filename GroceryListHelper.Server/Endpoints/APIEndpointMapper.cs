@@ -8,6 +8,7 @@ public static class APIEndpointMapper
         apiGroup.AddEndpointFilter<AntiforgeryTokenFilter>();
         apiGroup.AddFluentValidation();
         apiGroup.RequireRateLimiting(RateLimitInstaller.PolicyName);
+        apiGroup.AddEndpointFilter<ExceptionFilter>();
         apiGroup.AddAccountEndpoints();
         apiGroup.AddCartProductEndpoints();
         apiGroup.AddCartGroupProductEndpoints();

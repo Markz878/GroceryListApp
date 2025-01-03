@@ -7,7 +7,7 @@ public sealed record UpdateGroupNameCommand : IRequest<NotFoundError?>
     public required string GroupName { get; init; }
 }
 
-internal sealed class UpdateGroupNameCommandHandler(TableServiceClient db) : IRequestHandler<UpdateGroupNameCommand, NotFoundError?>
+internal sealed class UpdateGroupNameCommandHandler(CosmosClient db) : IRequestHandler<UpdateGroupNameCommand, NotFoundError?>
 {
     public async Task<NotFoundError?> Handle(UpdateGroupNameCommand request, CancellationToken cancellationToken = default)
     {
@@ -16,13 +16,10 @@ internal sealed class UpdateGroupNameCommandHandler(TableServiceClient db) : IRe
         {
             return new NotFoundError();
         }
-        TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(request.GroupId.ToString());
-        foreach (CartGroupUserDbModel cartGroupUser in cartGroupUsers)
-        {
-            cartGroupUser.Name = request.GroupName;
-        }
-        await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.UpdateMerge, x)), cancellationToken);
+        Container groupsContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartGroupsContainer);
+        string id = request.GroupId.ToString();
+        await groupsContainer.PatchItemAsync<CartGroupEntity>(id, new PartitionKey(id),
+            [PatchOperation.Replace("/name", request.GroupName)]);
         return null;
     }
 }

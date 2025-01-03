@@ -1,4 +1,5 @@
 ﻿using GroceryListHelper.Core.Domain.CartProducts;
+using System.ComponentModel;
 
 namespace GroceryListHelper.Server.Interfaces;
 

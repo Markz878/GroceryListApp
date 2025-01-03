@@ -7,7 +7,7 @@ public sealed record DeleteCartGroupCommand : IRequest<NotFoundError?>
 }
 
 
-internal sealed class DeleteCartGroupCommandHandler(TableServiceClient db) : IRequestHandler<DeleteCartGroupCommand, NotFoundError?>
+internal sealed class DeleteCartGroupCommandHandler(CosmosClient db) : IRequestHandler<DeleteCartGroupCommand, NotFoundError?>
 {
     public async Task<NotFoundError?> Handle(DeleteCartGroupCommand request, CancellationToken cancellationToken = default)
     {
@@ -16,34 +16,21 @@ internal sealed class DeleteCartGroupCommandHandler(TableServiceClient db) : IRe
         {
             return new NotFoundError();
         }
-        List<CartGroupUserDbModel> cartGroupUsers = await DeleteCartGroupUsers(db, request.GroupId, cancellationToken);
-        await DeleteCartUserGroups(db, cartGroupUsers, cancellationToken);
-        await DeleteCartGroupProducts(db, request.GroupId, cancellationToken);
+        await DeleteCartGroupProducts(db, request.GroupId);
+        await DeleteCartUserGroups(db, request.GroupId);
         return null;
     }
 
-    private static async Task<List<CartGroupUserDbModel>> DeleteCartGroupUsers(TableServiceClient db, Guid groupId, CancellationToken cancellationToken)
+    private static async Task DeleteCartUserGroups(CosmosClient db, Guid groupId)
     {
-        TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        List<CartGroupUserDbModel> cartGroupUsers = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
-        await cartGroupUserTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)), cancellationToken);
-        return cartGroupUsers;
+        Container groupsContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartGroupsContainer);
+        await groupsContainer.DeleteItemStreamAsync(groupId.ToString(), new PartitionKey(groupId.ToString()));
     }
 
-    private static async Task DeleteCartUserGroups(TableServiceClient db, List<CartGroupUserDbModel> cartGroupUsers, CancellationToken cancellationToken)
+    private static async Task DeleteCartGroupProducts(CosmosClient db, Guid groupId)
     {
-        TableClient cartUserGroupTableClient = db.GetTableClient(CartUserGroupDbModel.GetTableName());
-        await cartUserGroupTableClient.SubmitTransactionAsync(cartGroupUsers.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, new CartUserGroupDbModel() { MemberEmail = x.MemberEmail, GroupId = x.GroupId })), cancellationToken);
-    }
-
-    private static async Task DeleteCartGroupProducts(TableServiceClient db, Guid groupId, CancellationToken cancellationToken)
-    {
-        TableClient cartProductsTableClient = db.GetTableClient(CartProductDbModel.GetTableName());
-        List<CartProductDbModel> cartProducts = await cartProductsTableClient.GetTableEntitiesByPrimaryKey<CartProductDbModel>(groupId.ToString());
-        if (cartProducts.Count > 0)
-        {
-            await cartProductsTableClient.SubmitTransactionAsync(cartProducts.Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)), cancellationToken);
-        }
+        Container container = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartProductsContainer);
+        await container.DeleteAllItemsByPartitionKeyStreamAsync(new PartitionKey(groupId.ToString()));
     }
 }
 

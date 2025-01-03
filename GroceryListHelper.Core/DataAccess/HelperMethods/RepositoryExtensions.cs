@@ -1,22 +1,27 @@
 ﻿namespace GroceryListHelper.Core.DataAccess.HelperMethods;
-internal static class RepositoryExtensions
+
+public static class RepositoryExtensions
 {
-    internal static async Task<List<T>> GetTableEntitiesByPrimaryKey<T>(this TableServiceClient tableServiceClient, string partitionKey, int pageSize = 20, IEnumerable<string>? select = null) where T : class, ITable
+    public static async Task<List<T>> Query<T>(this Container container, QueryDefinition? query = null)
     {
-        TableClient tableClient = tableServiceClient.GetTableClient(T.GetTableName());
-        return await tableClient.GetTableEntitiesByPrimaryKey<T>(partitionKey, pageSize, select);
+        List<T> result = [];
+        using FeedIterator<T> iterator = query is null ? container.GetItemQueryIterator<T>() : container.GetItemQueryIterator<T>(query);
+        while (iterator.HasMoreResults)
+        {
+            FeedResponse<T> response = await iterator.ReadNextAsync();
+            result.AddRange(response);
+        }
+        return result;
     }
 
-    internal static async Task<List<T>> GetTableEntitiesByPrimaryKey<T>(this TableClient tableClient, string partitionKey, int pageSize = 20, IEnumerable<string>? select = null) where T : class, ITable
+    public static async Task<List<TResult>> Query<TEntity, TResult>(this Container container, Func<TEntity, TResult> map, QueryDefinition? query = null)
     {
-        AsyncPageable<T> tableQueryPage = tableClient.QueryAsync<T>(x => x.PartitionKey == partitionKey, pageSize, select);
-        List<T> result = [];
-        string? token = null;
-        await foreach (Page<T> page in tableQueryPage.AsPages(token, pageSize))
+        List<TResult> result = [];
+        using FeedIterator<TEntity> iterator = query is null ? container.GetItemQueryIterator<TEntity>() : container.GetItemQueryIterator<TEntity>(query);
+        while (iterator.HasMoreResults)
         {
-            token = page.ContinuationToken;
-            IReadOnlyList<T> pageResults = page.Values;
-            result.AddRange(pageResults);
+            FeedResponse<TEntity> response = await iterator.ReadNextAsync();
+            result.AddRange(response.Select(map));
         }
         return result;
     }

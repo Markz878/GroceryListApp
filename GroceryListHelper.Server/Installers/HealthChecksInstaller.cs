@@ -1,6 +1,4 @@
-﻿using Azure;
-using Azure.Data.Tables;
-using Azure.Data.Tables.Models;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace GroceryListHelper.Server.Installers;
@@ -13,28 +11,25 @@ public sealed class HealthChecksInstaller : IInstaller
     }
 }
 
-internal class DbHealthCheck(TableServiceClient tableServiceClient, ILogger<DbHealthCheck> logger) : IHealthCheck
+internal class DbHealthCheck(CosmosClient db, ILogger<DbHealthCheck> logger) : IHealthCheck
 {
-    private readonly TableServiceClient tableServiceClient = tableServiceClient;
-    private readonly ILogger<DbHealthCheck> logger = logger;
-    private readonly string[] tableNames = ServiceExtensions.GetTables();
-
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         try
         {
-            AsyncPageable<TableItem> tablePages = tableServiceClient.QueryAsync(cancellationToken: cancellationToken);
-            await foreach (Page<TableItem> tablePage in tablePages.AsPages())
-            {
-                IEnumerable<string> existingTableNames = tablePage.Values.Select(x => x.Name);
-                foreach (string tableName in tableNames)
-                {
-                    if (!existingTableNames.Contains(tableName))
-                    {
-                        return HealthCheckResult.Unhealthy($"No table called {tableName} found in database.");
-                    }
-                }
-            }
+            AccountProperties account = await db.ReadAccountAsync();
+            //AsyncPageable<TableItem> tablePages = tableServiceClient.QueryAsync(cancellationToken: cancellationToken);
+            //await foreach (Page<TableItem> tablePage in tablePages.AsPages())
+            //{
+            //    IEnumerable<string> existingTableNames = tablePage.Values.Select(x => x.Name);
+            //    foreach (string tableName in tableNames)
+            //    {
+            //        if (!existingTableNames.Contains(tableName))
+            //        {
+            //            return HealthCheckResult.Unhealthy($"No table called {tableName} found in database.");
+            //        }
+            //    }
+            //}
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)

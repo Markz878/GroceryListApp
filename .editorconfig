@@ -9,6 +9,9 @@ dotnet_diagnostic.RCS1090.severity = none
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
 
+# CA2016: Forward the 'CancellationToken' parameter to methods
+dotnet_diagnostic.CA2016.severity = silent
+
 [*.{cs,vb}]
 #### Naming styles ####
 

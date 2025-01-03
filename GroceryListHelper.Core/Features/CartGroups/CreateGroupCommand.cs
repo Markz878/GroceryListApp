@@ -6,7 +6,7 @@ public sealed record CreateGroupCommand : IRequest<Result<Guid, NotFoundError>>
     public required HashSet<string> UserEmails { get; init; }
 }
 
-internal sealed class CreateGroupCommandHandler(TableServiceClient db) : IRequestHandler<CreateGroupCommand, Result<Guid, NotFoundError>>
+internal sealed class CreateGroupCommandHandler(CosmosClient db) : IRequestHandler<CreateGroupCommand, Result<Guid, NotFoundError>>
 {
     public async Task<Result<Guid, NotFoundError>> Handle(CreateGroupCommand request, CancellationToken cancellationToken = default)
     {
@@ -16,33 +16,24 @@ internal sealed class CreateGroupCommandHandler(TableServiceClient db) : IReques
             return new NotFoundError(missingUserEmail);
         }
 
-        TableClient cartUserGroupTableClient = db.GetTableClient(CartUserGroupDbModel.GetTableName());
-        TableClient cartGroupUserTableClient = db.GetTableClient(CartGroupUserDbModel.GetTableName());
-        Guid groupId = await GetNewGroupId(cartGroupUserTableClient);
-        foreach (string item in request.UserEmails)
+        Container groupsContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartGroupsContainer);
+        Guid groupId = await GetNewGroupId(groupsContainer);
+        await groupsContainer.UpsertItemAsync(new CartGroupEntity()
         {
-            await cartUserGroupTableClient.AddEntityAsync(new CartUserGroupDbModel()
-            {
-                MemberEmail = item,
-                GroupId = groupId
-            }, cancellationToken);
-            await cartGroupUserTableClient.AddEntityAsync(new CartGroupUserDbModel()
-            {
-                GroupId = groupId,
-                MemberEmail = item,
-                Name = request.GroupName
-            }, cancellationToken);
-        }
+            Id = groupId,
+            Name = request.GroupName,
+            MemberEmails = request.UserEmails
+        });
+
         return groupId;
 
-        static async Task<string?> CheckAllUsersFound(TableServiceClient db, IEnumerable<string> emails, CancellationToken cancellationToken)
+        static async Task<string?> CheckAllUsersFound(CosmosClient db, IEnumerable<string> emails, CancellationToken cancellationToken)
         {
-            TableClient userTableClient = db.GetTableClient(UserDbModel.GetTableName());
+            Container container = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.UsersContainer);
             foreach (string email in emails)
             {
-                NullableResponse<UserDbModel> userFoundResponse = await userTableClient
-                    .GetEntityIfExistsAsync<UserDbModel>(email, email, Array.Empty<string>(), cancellationToken);
-                if (userFoundResponse.HasValue is false)
+                ResponseMessage userFoundResponse = await container.ReadItemStreamAsync(email, new PartitionKey(email));
+                if (userFoundResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     return email;
                 }
@@ -50,15 +41,15 @@ internal sealed class CreateGroupCommandHandler(TableServiceClient db) : IReques
             return null;
         }
 
-        static async Task<Guid> GetNewGroupId(TableClient cartGroupUserTableClient)
+        static async Task<Guid> GetNewGroupId(Container groupsContainer)
         {
-            Guid groupId;
-            List<CartGroupUserDbModel> entities;
-            do
+            Guid groupId = Guid.NewGuid();
+            string groupString = groupId.ToString();
+            ResponseMessage existsResponse = await groupsContainer.ReadItemStreamAsync(groupString, new PartitionKey(groupString));
+            if(existsResponse.StatusCode != System.Net.HttpStatusCode.NotFound)
             {
-                groupId = Guid.NewGuid();
-                entities = await cartGroupUserTableClient.GetTableEntitiesByPrimaryKey<CartGroupUserDbModel>(groupId.ToString());
-            } while (entities.Count > 0);
+                return await GetNewGroupId(groupsContainer);
+            }
             return groupId;
         }
     }

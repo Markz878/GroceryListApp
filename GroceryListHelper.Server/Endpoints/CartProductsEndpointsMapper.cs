@@ -1,5 +1,6 @@
 ﻿using GroceryListHelper.Core.Domain.CartProducts;
 using GroceryListHelper.Server.HelperMethods;
+using System.ComponentModel;
 
 namespace GroceryListHelper.Server.Endpoints;
 
@@ -13,15 +14,12 @@ public static class CartProductsEndpointsMapper
         group.MapGet("", GetAll)
             .WithName("Get cart products for a user");
 
-        group.MapPost("", AddProduct)
-            .WithSummary("Add a cart product")
-            .WithDescription("Add a cart product to your cart.");
+        group.MapPost("", UpsertCartProduct)
+            .WithDescription("Upsert cart products to a cart.");
 
         group.MapDelete("", DeleteAllProducts);
 
         group.MapDelete("/{productName}", DeleteProduct);
-
-        group.MapPut("", UpdateProduct);
 
         group.MapPatch("/sort/{sortDirection:int:range(0,1)}", SortCartProducts);
     }
@@ -32,15 +30,9 @@ public static class CartProductsEndpointsMapper
         return TypedResults.Ok(results);
     }
 
-    public static async Task<Results<Created, Conflict<string>>> AddProduct(CartProduct product, ClaimsPrincipal user, IMediator mediator)
-    {
-        ConflictError? error = await mediator.Send(new AddCartProductCommand() { CartProduct = product, UserId = user.GetUserId() });
-        return error is null ? TypedResults.Created($"api/cartproducts") : TypedResults.Conflict("Product already exists");
-    }
-
     public static async Task<NoContent> DeleteAllProducts(ClaimsPrincipal user, IMediator mediator)
     {
-        await mediator.Send(new ClearCartProductsCommand() { UserId = user.GetUserId() });
+        await mediator.Send(new ClearUserCartProductsCommand() { UserId = user.GetUserId() });
         return TypedResults.NoContent();
     }
 
@@ -50,15 +42,15 @@ public static class CartProductsEndpointsMapper
         return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 
-    public static async Task<Results<NoContent, NotFound, ForbidHttpResult, ProblemHttpResult>> UpdateProduct(CartProduct updatedProduct, ClaimsPrincipal user, IMediator mediator)
+    public static async Task<Results<Created, NotFound, ForbidHttpResult, ProblemHttpResult>> UpsertCartProduct(CartProduct updatedProduct, ClaimsPrincipal user, IMediator mediator)
     {
-        NotFoundError? ex = await mediator.Send(new UpdateProductCommand() { UserId = user.GetUserId(), CartProduct = updatedProduct });
-        return ex == null ? TypedResults.NoContent() : TypedResults.NotFound();
+        await mediator.Send(new UpsertCartProductsCommand() { UserId = user.GetUserId(), CartProducts = [updatedProduct] });
+        return TypedResults.Created();
     }
 
     public static async Task<NoContent> SortCartProducts(ListSortDirection sortDirection, ClaimsPrincipal user, IMediator mediator)
     {
-        await mediator.Send(new SortCartProductsCommand() { UserId = user.GetUserId(), SortDirection = sortDirection });
+        await mediator.Send(new SortCartProductsByNameCommand() { UserId = user.GetUserId(), SortDirection = sortDirection });
         return TypedResults.NoContent();
     }
 }

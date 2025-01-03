@@ -18,11 +18,9 @@ public sealed class AuthenticationInstaller : IInstaller
                 ArgumentNullException.ThrowIfNull(context.Principal);
                 string? email = context.Principal.GetUserEmail();
                 ArgumentNullException.ThrowIfNull(email);
-                Guid? userId = context.Principal.GetUserId();
-                ArgumentNullException.ThrowIfNull(userId);
                 string? name = context.Principal.GetUserName();
                 IMediator mediator = context.HttpContext.RequestServices.GetRequiredService<IMediator>();
-                await mediator.Send(new AddUserCommand() { Email = email, Id = userId.Value, Name = name ?? "" });
+                await mediator.Send(new AddUserCommand() { Email = email, Name = name ?? "" });
             };
         });
         builder.Services.Configure(OpenIdConnectDefaults.AuthenticationScheme, (OpenIdConnectOptions options) =>

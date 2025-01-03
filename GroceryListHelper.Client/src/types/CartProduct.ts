@@ -1,4 +1,4 @@
-import type { StoreProduct } from "./StoreProducts";
+import type { StoreProduct } from "./StoreProduct";
 
 export interface CartProduct extends StoreProduct {
     amount: number;

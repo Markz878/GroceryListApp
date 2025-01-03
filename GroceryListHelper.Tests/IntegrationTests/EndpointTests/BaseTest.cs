@@ -39,15 +39,15 @@ public abstract class BaseTest : IAsyncLifetime
 
     protected async Task<List<CartProduct>> SaveCartProducts(int n, Guid? ownerId = null)
     {
-        await _mediator.Send(new ClearCartProductsCommand() { UserId = TestAuthHandler.UserId });
-        List<CartProduct> result = new(n);
+        await _mediator.Send(new ClearUserCartProductsCommand() { UserId = TestAuthHandler.UserId });
+        List<CartProduct> products = new(n);
         for (int i = 0; i < n; i++)
         {
             CartProduct product = GetRandomCartProduct(i * 1000);
-            result.Add(product);
-            await _mediator.Send(new AddCartProductCommand() { CartProduct = product, UserId = ownerId.GetValueOrDefault(TestAuthHandler.UserId) });
+            products.Add(product);
         }
-        return result;
+        await _mediator.Send(new UpsertCartProductsCommand() { CartProducts = products, UserId = ownerId.GetValueOrDefault(TestAuthHandler.UserId) });
+        return products;
 
         static CartProduct GetRandomCartProduct(int order = 0)
         {
@@ -63,14 +63,14 @@ public abstract class BaseTest : IAsyncLifetime
 
     protected async Task<List<StoreProduct>> SaveStoreProducts(int n)
     {
-        List<StoreProduct> result = new(n);
+        List<StoreProduct> storeProducts = new(n);
         for (int i = 0; i < n; i++)
         {
             StoreProduct product = GetRandomStoreProduct();
-            result.Add(product);
-            await _mediator.Send(new AddStoreProductCommand() { Product = product, UserId = TestAuthHandler.UserId });
+            storeProducts.Add(product);
         }
-        return result;
+        await _mediator.Send(new UpsertStoreProductsCommand() { StoreProducts = storeProducts, UserId = TestAuthHandler.UserId });
+        return storeProducts;
 
         static StoreProduct GetRandomStoreProduct()
         {

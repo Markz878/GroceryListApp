@@ -7,7 +7,7 @@ import type { PascalCase } from "../types/PascalCase";
 
 
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl(import.meta.env.DEV ? "https://localhost:7021/carthub" : "/carthub")
+  .withUrl(import.meta.env.DEV ? "http://localhost:5280/carthub" : "/carthub")
   .configureLogging(import.meta.env.DEV ? signalR.LogLevel.Information : signalR.LogLevel.Warning)
   .withHubProtocol(new signalRMsgPack.MessagePackHubProtocol())
   .withAutomaticReconnect()

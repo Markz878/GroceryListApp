@@ -1,4 +1,4 @@
-import type { StoreProduct } from '../types/StoreProducts';
+import type { StoreProduct } from '../types/StoreProduct';
 import type { CartProduct } from '../types/CartProduct';
 import type { CartSortState, SortDirection } from '../types/SortState';
 import type { ModalInfo } from '../types/ModalInfo';

@@ -57,45 +57,4 @@ public sealed class StoreProductsTests(WebApplicationFactoryFixture factory, ITe
         List<StoreProduct> products = await _mediator.Send(new GetUserStoreProductsQuery() { UserId = TestAuthHandler.UserId });
         Assert.Empty(products);
     }
-
-    [Fact]
-    public async Task UpdateStoreProduct_Success_ReturnsOk()
-    {
-        List<StoreProduct> insertedProducts = await SaveStoreProducts(1);
-        StoreProduct storeProduct = new()
-        {
-            Name = insertedProducts[0].Name,
-            UnitPrice = insertedProducts[0].UnitPrice + 1,
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, storeProduct);
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        List<StoreProduct> storeProducts = await _mediator.Send(new GetUserStoreProductsQuery() { UserId = TestAuthHandler.UserId });
-        StoreProduct product = storeProducts.First(x => x.Name == storeProduct.Name);
-        Assert.Equal(storeProduct.UnitPrice, product.UnitPrice);
-    }
-
-    [Fact]
-    public async Task UpdateStoreProduct_InvalidProduct_ReturnsBadRequest()
-    {
-        StoreProduct storeProduct = new()
-        {
-            Name = new string('x', 31),
-            UnitPrice = -Random.Shared.NextDouble() * 10,
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, storeProduct);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task UpdateStoreProduct_InvalidProductName_ReturnsNotFound()
-    {
-        List<StoreProduct> insertedProducts = await SaveStoreProducts(1);
-        StoreProduct storeProduct = new()
-        {
-            Name = "Test",
-            UnitPrice = insertedProducts[0].UnitPrice + 1,
-        };
-        HttpResponseMessage response = await _client.PutAsJsonAsync(_uri, storeProduct);
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
 }

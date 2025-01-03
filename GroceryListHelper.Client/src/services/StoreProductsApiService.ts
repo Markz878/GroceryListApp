@@ -1,4 +1,4 @@
-import type { StoreProduct } from "../types/StoreProducts";
+import type { StoreProduct } from "../types/StoreProduct";
 import type { IStoreProductsService } from "../types/IStoreProductsService";
 import { get, send } from "../helpers/httpHelpers";
 
@@ -16,7 +16,7 @@ export class StoreProductsApiService implements IStoreProductsService {
     }
 
     updateStoreProduct = async (product: StoreProduct) => {
-        const response = await send(this.url, "PUT", product);
+        const response = await send(this.url, "POST", product);
         return response;
     }
 
