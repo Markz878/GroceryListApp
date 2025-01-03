@@ -27,7 +27,8 @@ jobs:
         run: |
           Write-Host "Launching Cosmos DB Emulator"
           Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-          Start-CosmosDbEmulator
+          Microsoft.Azure.Cosmos.Emulator.exe /DisableRateLimiting /NoUI
+          Start-CosmosDbEmulator -Timeout 900
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
@@ -48,6 +49,18 @@ jobs:
       - name: Run Tests
         run: |
           dotnet test GroceryListHelper.Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"
+          $htmlContent = Get-Content -Path 'coverageresults\index.html' -Raw
+          if ($htmlContent -match '<tr><th>Line coverage:<\/th><td>(\d+\.\d+)%' {
+            $percentage = [float]$matches[1]  # Extract the number and convert to float
+                # Check if the percentage is greater than 80
+            if ($percentage -gt 80) {
+              Write-Host "The percentage ($percentage%) is greater than 80."
+            } else {
+              Write-Host "The percentage ($percentage%) is not greater than 80."
+            }
+          } else {
+            Write-Host "No percentage found."
+          }
 
       - name: Install Playwright
         run: |
