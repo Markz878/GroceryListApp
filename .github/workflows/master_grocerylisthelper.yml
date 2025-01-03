@@ -45,21 +45,13 @@ jobs:
           npm i
           npm run build
 
+      - name: Install Coverlet
+        run: dotnet tool install --global coverlet.console
+
       - name: Run Tests
         run: |
-          dotnet test GroceryListHelper.Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"
-          $htmlContent = Get-Content -Path 'coverageresults\index.html' -Raw
-          if ($htmlContent -match '<tr><th>Line coverage:<\/th><td>(\d+\.\d+)%' {
-            $percentage = [float]$matches[1]  # Extract the number and convert to float
-                # Check if the percentage is greater than 80
-            if ($percentage -gt 80) {
-              Write-Host "The percentage ($percentage%) is greater than 80."
-            } else {
-              Write-Host "The percentage ($percentage%) is not greater than 80."
-            }
-          } else {
-            Write-Host "No percentage found."
-          }
+          dotnet build -c Release
+          coverlet GroceryListHelper.Tests/bin/Release/net9.0/GroceryListHelper.Tests.dll --target "dotnet" --targetargs "test GroceryListHelper.Tests -c Release --no-build" --threshold 80 --threshold-type line --exclude-by-attribute 'GeneratedCode' --exclude-by-attribute 'CompilerGenerated'
 
       - name: Install Playwright
         run: |
