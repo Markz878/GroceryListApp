@@ -5,6 +5,7 @@ param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
 param storageName string = 'st${webSiteName}'
+param cosmosName string = 'cosmos-${webSiteName}'
 param signalRName string = 'sigr-${webSiteName}'
 param sku string = 'B1'
 
@@ -71,6 +72,31 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
     ]
   }
 }
+
+resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-preview' = {
+  name: cosmosName
+  location: location
+  kind: 'GlobalDocumentDB'
+  properties: {
+    consistencyPolicy: {
+      defaultConsistencyLevel: 'Eventual'
+    }
+    locations: [
+      {
+        locationName: location
+        failoverPriority: 0
+      }
+    ]
+    databaseAccountOfferType: 'Standard'
+    enableAutomaticFailover: true
+    capabilities: [
+      {
+        name: 'Serverless'
+      }
+    ]
+  }
+}
+
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageName

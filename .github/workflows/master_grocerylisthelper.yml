@@ -56,9 +56,6 @@ jobs:
       # - name: Perform CodeQL Analysis
       #   uses: github/codeql-action/analyze@v2
 
-      - name: Run Azurite in Docker
-        run: docker run -p 10002:10002 -d mcr.microsoft.com/azure-storage/azurite
-
       - name: Run Tests
         run: dotnet test GroceryListHelper.Tests -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage --settings runsettings.xml --logger "console;verbosity=normal"
 
