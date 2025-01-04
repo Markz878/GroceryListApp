@@ -14,52 +14,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  # build-and-test:
-  #   runs-on: windows-latest
-  #   env:
-  #     AddLogging: false
+  build-and-test:
+    runs-on: windows-latest
+    env:
+      AddLogging: false
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Start Azure Cosmos DB emulator
-  #       run: |
-  #         Write-Host "Launching Cosmos DB Emulator"
-  #         Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-  #         Start-CosmosDbEmulator -Timeout 900
+      - name: Start Azure Cosmos DB emulator
+        run: |
+          Write-Host "Launching Cosmos DB Emulator"
+          Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+          Start-CosmosDbEmulator -Timeout 900
 
-  #     - name: Set up .NET
-  #       uses: actions/setup-dotnet@v3
-  #       with:
-  #         dotnet-version: '9.x'
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
 
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 22.x
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
 
-  #     - name: Build client
-  #       working-directory: GroceryListHelper.Client
-  #       run: |
-  #         npm i
-  #         npm run build
+      - name: Build client
+        working-directory: GroceryListHelper.Client
+        run: |
+          npm i
+          npm run build
 
-  #     - name: Run Tests
-  #       run: |
-  #         dotnet test GroceryListHelper.Tests -c Release /p:CollectCoverage=true /p:Threshold=75 /p:ThresholdType=line /p:ThresholdStat=total
+      - name: Run Tests
+        run: |
+          dotnet test GroceryListHelper.Tests -c Release /p:CollectCoverage=true /p:Threshold=75 /p:ThresholdType=line /p:ThresholdStat=total
 
-  #     - name: Install Playwright
-  #       run: |
-  #         dotnet build GroceryListHelper.E2ETests -c Release
-  #         pwsh GroceryListHelper.E2ETests/bin/Release/net9.0/playwright.ps1 install
+      - name: Install Playwright
+        run: |
+          dotnet build GroceryListHelper.E2ETests -c Release
+          pwsh GroceryListHelper.E2ETests/bin/Release/net9.0/playwright.ps1 install
 
-  #     - name: Run E2E Tests
-  #       run: dotnet test GroceryListHelper.E2ETests -c Release
+      - name: Run E2E Tests
+        run: dotnet test GroceryListHelper.E2ETests -c Release
 
   deploy:
     runs-on: ubuntu-latest
-    # needs: build-and-test
+    needs: build-and-test
     env:
       WebappPackagePath: 'publish'
       WebsiteName: 'grocerylisthelper'
@@ -98,7 +98,7 @@ jobs:
         run: >
           az deployment group create --resource-group ${{ secrets.AZURE_RG }} 
           --template-file Infrastructure/main.bicep 
-          --parameters webSiteName=${{ env.WebsiteName }}
+          --parameters webSiteName=${{ env.WebsiteName }} allowedIps="${{ secrets.ALLOWED_IPS }}"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2

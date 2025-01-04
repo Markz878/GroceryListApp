@@ -15,7 +15,6 @@
 		<PackageReference Include="Microsoft.Azure.SignalR" Version="1.29.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Identity.Web" Version="3.5.0" />
-		<PackageReference Include="Microsoft.Identity.Web.UI" Version="3.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
 	</ItemGroup>
 

@@ -6,6 +6,7 @@ param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
 param cosmosName string = 'cosmos-${webSiteName}'
 param signalRName string = 'sigr-${webSiteName}'
+param allowedIps string[] = []
 param sku string = 'B1'
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
@@ -66,13 +67,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
           addressPrefix: '10.0.0.0/24'
           serviceEndpoints: [
             {
-              service: 'Microsoft.Storage'
-              locations: [
-                'northeurope'
-                'westeurope'
-              ]
-            }
-            {
               service: 'Microsoft.AzureCosmosDB'
               locations: [
                 'northeurope'
@@ -93,6 +87,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
     ]
   }
 }
+
+var allowedIpRules = [
+  for ip in allowedIps: {
+    ipAddressOrRange: ip
+  }
+]
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-preview' = {
   name: cosmosName
@@ -126,20 +126,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
         ignoreMissingVNetServiceEndpoint: false
       }
     ]
-    ipRules: [
-      {
-        ipAddressOrRange: '4.210.172.107'
-      }
-      {
-        ipAddressOrRange: '13.88.56.148'
-      }
-      {
-        ipAddressOrRange: '13.91.105.215'
-      }
-      {
-        ipAddressOrRange: '40.91.218.243'
-      }
-    ]
+    ipRules: allowedIpRules
   }
 }
 
@@ -153,17 +140,17 @@ resource sqlDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-11-15' =
   }
 }
 
-resource sqlRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
+resource contributorRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
   name: '00000000-0000-0000-0000-000000000002'
   parent: cosmosDbAccount
 }
 
 resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-12-01-preview' = {
-  name: guid(sqlRoleDefinition.id, appService.id, cosmosDbAccount.id)
+  name: guid(contributorRoleDefinition.id, appService.id, cosmosDbAccount.id)
   parent: cosmosDbAccount
   properties: {
     principalId: appService.identity.principalId
-    roleDefinitionId: sqlRoleDefinition.id
+    roleDefinitionId: contributorRoleDefinition.id
     scope: cosmosDbAccount.id
   }
 }
@@ -248,34 +235,6 @@ resource cartgroupsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases
   }
 }
 
-// resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-//   name: storageName
-//   location: location
-//   kind: 'StorageV2'
-//   sku: {
-//     name: 'Standard_ZRS'
-//   }
-//   properties: {
-//     allowSharedKeyAccess: false
-//     publicNetworkAccess: 'Enabled'
-//     supportsHttpsTrafficOnly: true
-//     allowBlobPublicAccess: false
-//     defaultToOAuthAuthentication: true
-//     minimumTlsVersion: 'TLS1_2'
-//     networkAcls: {
-//       bypass: 'None'
-//       defaultAction: 'Deny'
-//       virtualNetworkRules: [
-//         {
-//           id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
-//           action: 'Allow'
-//         }
-//       ]
-//       ipRules: []
-//     }
-//   }
-// }
-
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: planName
   location: location
@@ -335,21 +294,6 @@ resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections
     isSwift: true
   }
 }
-
-// resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(resourceGroup().id, appService.id, storage_table_contributor.id)
-//   scope: storageAccount
-//   properties: {
-//     roleDefinitionId: storage_table_contributor.id
-//     principalId: appService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-//   scope: storageAccount
-//   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
-// }
 
 resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {
   name: signalRName
