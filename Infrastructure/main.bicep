@@ -153,14 +153,17 @@ resource sqlDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-11-15' =
   }
 }
 
-var contributorDefinitionId = '00000000-0000-0000-0000-000000000002'
+resource sqlRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
+  name: '00000000-0000-0000-0000-000000000002'
+  parent: cosmosDbAccount
+}
 
 resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-12-01-preview' = {
-  name: guid(contributorDefinitionId, appService.id, cosmosDbAccount.id)
+  name: guid(sqlRoleDefinition.id, appService.id, cosmosDbAccount.id)
   parent: cosmosDbAccount
   properties: {
     principalId: appService.identity.principalId
-    roleDefinitionId: contributorDefinitionId
+    roleDefinitionId: sqlRoleDefinition.id
     scope: cosmosDbAccount.id
   }
 }
