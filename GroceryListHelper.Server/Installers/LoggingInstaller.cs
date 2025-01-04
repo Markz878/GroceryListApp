@@ -11,26 +11,30 @@ public class LoggingInstaller : IInstaller
     public void Install(WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
-        builder.Services.AddHttpLogging(logging =>
-        {
-            logging.CombineLogs = true;
-            logging.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.ResponseStatusCode;
-        });
-        builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
         if (builder.Configuration.GetValue<bool>("AddLogging"))
         {
             builder.Logging.AddSimpleConsole(x =>
             {
                 x.UseUtcTimestamp = true;
                 x.TimestampFormat = "dd/MM/yy HH:mm:ss ";
+                x.SingleLine = builder.Environment.IsProduction();
             });
-            builder.Logging.AddApplicationInsights();
-            builder.Services.AddApplicationInsightsTelemetry(x => x.EnableDependencyTrackingTelemetryModule = false);
-            builder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            builder.Services.Configure<TelemetryConfiguration>(c =>
+            builder.Services.AddHttpLogging(logging =>
             {
-                c.SetAzureTokenCredential(new ManagedIdentityCredential());
+                logging.CombineLogs = true;
+                logging.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.ResponseStatusCode;
             });
+            builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
+            if (builder.Environment.IsProduction())
+            {
+                builder.Logging.AddApplicationInsights();
+                builder.Services.AddApplicationInsightsTelemetry(x => x.EnableDependencyTrackingTelemetryModule = false);
+                builder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+                builder.Services.Configure<TelemetryConfiguration>(c =>
+                {
+                    c.SetAzureTokenCredential(new ManagedIdentityCredential());
+                });
+            }
         }
     }
 }

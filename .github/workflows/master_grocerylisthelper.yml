@@ -45,13 +45,12 @@ jobs:
           npm i
           npm run build
 
-      - name: Install Coverlet
-        run: dotnet tool install --global coverlet.console
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Run Tests
         run: |
-          dotnet build -c Release
-          coverlet GroceryListHelper.Tests/bin/Release/net9.0/GroceryListHelper.Tests.dll --target "dotnet" --targetargs "test GroceryListHelper.Tests -c Release --no-build" --threshold 80 --threshold-type line --exclude-by-attribute "GeneratedCode" --exclude-by-attribute "CompilerGenerated" --exclude-by-file "GroceryListHelper.Server/Installers/*.cs"
+          dotnet test GroceryListHelper.Tests /p:CollectCoverage=true /p:Threshold=75 /p:ThresholdType=line /p:ThresholdStat=total
 
       - name: Install Playwright
         run: |

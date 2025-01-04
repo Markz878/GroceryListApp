@@ -3,6 +3,7 @@ using GroceryListHelper.Core.Domain.CartProducts;
 using GroceryListHelper.Core.Domain.StoreProducts;
 using GroceryListHelper.Server.Models.CartGroups;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,6 +20,7 @@ public class JsonSerializerInstaller : IInstaller
     }
 }
 
+[ExcludeFromCodeCoverage]
 [JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
 [JsonSerializable(typeof(HttpValidationProblemDetails))]
 [JsonSerializable(typeof(ProblemDetails))]
