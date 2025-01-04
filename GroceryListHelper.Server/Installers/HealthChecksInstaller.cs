@@ -17,7 +17,7 @@ internal class DbHealthCheck(CosmosClient db, ILogger<DbHealthCheck> logger) : I
     {
         try
         {
-            AccountProperties account = await db.ReadAccountAsync();
+            //AccountProperties account = await db.ReadAccountAsync();
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)
