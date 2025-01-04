@@ -27,7 +27,7 @@ jobs:
         run: |
           Write-Host "Launching Cosmos DB Emulator"
           Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-          Start-CosmosDbEmulator -Timeout 900 -DisableRateLimiting
+          Start-CosmosDbEmulator -Timeout 900
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
