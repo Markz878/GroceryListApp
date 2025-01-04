@@ -2,10 +2,10 @@
 
 public static class DataAccessConstants
 {
-    public static string Database { get; } = "GroceryListHelper";
-    public static string CartProductsContainer { get; } = "CartProducts";
-    public static string StoreProductsContainer { get; } = "StoreProducts";
-    public static string UsersContainer { get; } = "Users";
-    public static string CartGroupsContainer { get; } = "CartGroups";
-    public static string DataProtectionKeysContainer { get; } = "DataProtectionKeys";
+    public static string Database { get; } = "grocerylisthelper";
+    public static string CartProductsContainer { get; } = "cartproducts";
+    public static string StoreProductsContainer { get; } = "storeproducts";
+    public static string UsersContainer { get; } = "users";
+    public static string CartGroupsContainer { get; } = "cartgroups";
+    public static string DataProtectionKeysContainer { get; } = "dataprotectionkeys";
 }

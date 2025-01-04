@@ -4,7 +4,6 @@ param vnetName string = 'vnet-${webSiteName}'
 param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
-param storageName string = 'st${webSiteName}'
 param cosmosName string = 'cosmos-${webSiteName}'
 param signalRName string = 'sigr-${webSiteName}'
 param sku string = 'B1'
@@ -36,6 +35,21 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+resource appinsights_monitoring_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, appService.id, appinsights_monitoring_publisher.id)
+  scope: appInsights
+  properties: {
+    roleDefinitionId: appinsights_monitoring_publisher.id
+    principalId: appService.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource appinsights_monitoring_publisher 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: appInsights
+  name: '3913510d-42f4-4e42-8a64-420c390055eb'
+}
+
 resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   name: vnetName
   location: location
@@ -53,6 +67,13 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
           serviceEndpoints: [
             {
               service: 'Microsoft.Storage'
+              locations: [
+                'northeurope'
+                'westeurope'
+              ]
+            }
+            {
+              service: 'Microsoft.AzureCosmosDB'
               locations: [
                 'northeurope'
                 'westeurope'
@@ -79,58 +100,202 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
   kind: 'GlobalDocumentDB'
   properties: {
     consistencyPolicy: {
-      defaultConsistencyLevel: 'Eventual'
+      defaultConsistencyLevel: 'Session'
     }
     locations: [
       {
         locationName: location
         failoverPriority: 0
+        isZoneRedundant: false
       }
     ]
+    backupPolicy: {
+      type: 'Continuous'
+      continuousModeProperties: {
+        tier: 'Continuous7Days'
+      }
+    }
     databaseAccountOfferType: 'Standard'
     enableAutomaticFailover: true
-    capabilities: [
+    capacityMode: 'Serverless'
+    disableLocalAuth: true
+    isVirtualNetworkFilterEnabled: true
+    virtualNetworkRules: [
       {
-        name: 'Serverless'
+        id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
+        ignoreMissingVNetServiceEndpoint: false
+      }
+    ]
+    ipRules: [
+      {
+        ipAddressOrRange: '4.210.172.107'
+      }
+      {
+        ipAddressOrRange: '13.88.56.148'
+      }
+      {
+        ipAddressOrRange: '13.91.105.215'
+      }
+      {
+        ipAddressOrRange: '40.91.218.243'
       }
     ]
   }
 }
 
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: storageName
-  location: location
-  kind: 'StorageV2'
-  sku: {
-    name: 'Standard_ZRS'
-  }
+resource sqlDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-11-15' = {
+  name: webSiteName
+  parent: cosmosDbAccount
   properties: {
-    allowSharedKeyAccess: false
-    publicNetworkAccess: 'Enabled'
-    supportsHttpsTrafficOnly: true
-    allowBlobPublicAccess: false
-    defaultToOAuthAuthentication: true
-    minimumTlsVersion: 'TLS1_2'
-    networkAcls: {
-      bypass: 'None'
-      defaultAction: 'Deny'
-      virtualNetworkRules: [
-        {
-          id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
-          action: 'Allow'
-        }
-      ]
-      ipRules: []
+    resource: {
+      id: webSiteName
     }
   }
 }
+
+resource sqlRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' = {
+  name: guid('sql-role-definition-', appService.id, cosmosDbAccount.id)
+  parent: cosmosDbAccount
+  properties: {
+    roleName: 'ReadWrite Role'
+    type: 'CustomRole'
+    assignableScopes: [
+      cosmosDbAccount.id
+    ]
+    permissions: [
+      {
+        dataActions: [
+          'Microsoft.DocumentDB/databaseAccounts/readMetadata'
+          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
+        ]
+      }
+    ]
+  }
+}
+
+resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-12-01-preview' = {
+  name: guid(sqlRoleDefinition.id, appService.id, cosmosDbAccount.id)
+  parent: cosmosDbAccount
+  properties: {
+    roleDefinitionId: sqlRoleDefinition.id
+    principalId: appService.identity.principalId
+    scope: cosmosDbAccount.id
+  }
+}
+
+resource cartproductsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+  parent: sqlDb
+  name: 'cartproducts'
+  properties: {
+    resource: {
+      id: 'cartproducts'
+      partitionKey: {
+        paths: [
+          '/userId'
+        ]
+        kind: 'Hash'
+      }
+    }
+  }
+}
+
+resource storeproductsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+  parent: sqlDb
+  name: 'storeproducts'
+  properties: {
+    resource: {
+      id: 'storeproducts'
+      partitionKey: {
+        paths: [
+          '/userId'
+        ]
+        kind: 'Hash'
+      }
+    }
+  }
+}
+
+resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+  parent: sqlDb
+  name: 'users'
+  properties: {
+    resource: {
+      id: 'users'
+      partitionKey: {
+        paths: [
+          '/id'
+        ]
+        kind: 'Hash'
+      }
+    }
+  }
+}
+
+resource dataprotectionkeysContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+  parent: sqlDb
+  name: 'dataprotectionkeys'
+  properties: {
+    resource: {
+      id: 'dataprotectionkeys'
+      partitionKey: {
+        paths: [
+          '/id'
+        ]
+        kind: 'Hash'
+      }
+    }
+  }
+}
+
+resource cartgroupsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+  parent: sqlDb
+  name: 'cartgroups'
+  properties: {
+    resource: {
+      id: 'cartgroups'
+      partitionKey: {
+        paths: [
+          '/id'
+        ]
+        kind: 'Hash'
+      }
+    }
+  }
+}
+
+// resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+//   name: storageName
+//   location: location
+//   kind: 'StorageV2'
+//   sku: {
+//     name: 'Standard_ZRS'
+//   }
+//   properties: {
+//     allowSharedKeyAccess: false
+//     publicNetworkAccess: 'Enabled'
+//     supportsHttpsTrafficOnly: true
+//     allowBlobPublicAccess: false
+//     defaultToOAuthAuthentication: true
+//     minimumTlsVersion: 'TLS1_2'
+//     networkAcls: {
+//       bypass: 'None'
+//       defaultAction: 'Deny'
+//       virtualNetworkRules: [
+//         {
+//           id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
+//           action: 'Allow'
+//         }
+//       ]
+//       ipRules: []
+//     }
+//   }
+// }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: planName
   location: location
   kind: 'linux'
-  sku:{
+  sku: {
     name: sku
   }
   properties: {
@@ -165,8 +330,8 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
           value: appInsights.properties.ConnectionString
         }
         {
-          name: 'TableStorageUri'
-          value: storageAccount.properties.primaryEndpoints.table
+          name: 'ConnectionStrings__CosmosDb'
+          value: cosmosDbAccount.properties.documentEndpoint
         }
         {
           name: 'Azure__SignalR__ConnectionString'
@@ -186,86 +351,71 @@ resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections
   }
 }
 
-resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, appService.id, storage_table_contributor.id)
-  scope: storageAccount
-  properties: {
-    roleDefinitionId: storage_table_contributor.id
-    principalId: appService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource app_storage_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, appService.id, storage_table_contributor.id)
+//   scope: storageAccount
+//   properties: {
+//     roleDefinitionId: storage_table_contributor.id
+//     principalId: appService.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
-resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: storageAccount
-  name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
-}
-
-resource appinsights_monitoring_roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, appService.id, appinsights_monitoring_publisher.id)
-  scope: appInsights
-  properties: {
-    roleDefinitionId: appinsights_monitoring_publisher.id
-    principalId: appService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource appinsights_monitoring_publisher 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: appInsights
-  name: '3913510d-42f4-4e42-8a64-420c390055eb'
-}
+// resource storage_table_contributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+//   scope: storageAccount
+//   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+// }
 
 resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {
   name: signalRName
   location: location
   sku: {
-      capacity: 1
-      name: 'Free_F1'
+    capacity: 1
+    name: 'Free_F1'
   }
   kind: 'SignalR'
   identity: {
-      type: 'None'
+    type: 'None'
   }
   properties: {
-      tls: {
-          clientCertEnabled: false
+    tls: {
+      clientCertEnabled: false
+    }
+    disableLocalAuth: true
+    features: [
+      {
+        flag: 'ServiceMode'
+        value: 'Default'
       }
-      disableLocalAuth: true
-      features: [
-          {
-              flag: 'ServiceMode'
-              value: 'Default'
-          }
-          {
-              flag: 'EnableConnectivityLogs'
-              value: 'True'
-          }
-          {
-              flag: 'EnableMessagingLogs'
-              value: 'False'
-          }
-          {
-              flag: 'EnableLiveTrace'
-              value: 'False'
-          }
+      {
+        flag: 'EnableConnectivityLogs'
+        value: 'True'
+      }
+      {
+        flag: 'EnableMessagingLogs'
+        value: 'False'
+      }
+      {
+        flag: 'EnableLiveTrace'
+        value: 'False'
+      }
+    ]
+    cors: {
+      allowedOrigins: [
+        '*'
       ]
-      cors: {
-          allowedOrigins: [
-              '*'
-          ]
+    }
+    networkACLs: {
+      defaultAction: 'Deny'
+      publicNetwork: {
+        allow: [
+          'ClientConnection'
+          'ServerConnection'
+          'RESTAPI'
+          'Trace'
+        ]
       }
-      networkACLs: {
-          defaultAction: 'Deny'
-          publicNetwork: {
-              allow: [
-                  'ClientConnection'
-                  'ServerConnection'
-                  'RESTAPI'
-                  'Trace'
-              ]
-          }
-      }
+    }
   }
 }
 resource signalRAppServerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
@@ -276,8 +426,8 @@ resource webappSignalRRoleassignment 'Microsoft.Authorization/roleAssignments@20
   name: guid(resourceGroup().id, appService.id, signalRAppServerRole.id)
   scope: signalR
   properties: {
-      roleDefinitionId: signalRAppServerRole.id
-      principalId: appService.identity.principalId
-      principalType: 'ServicePrincipal'
+    roleDefinitionId: signalRAppServerRole.id
+    principalId: appService.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
