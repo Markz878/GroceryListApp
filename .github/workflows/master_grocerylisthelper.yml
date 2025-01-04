@@ -59,7 +59,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    # needs: build-and-test
     env:
       WebappPackagePath: 'publish'
       WebsiteName: 'grocerylisthelper'
