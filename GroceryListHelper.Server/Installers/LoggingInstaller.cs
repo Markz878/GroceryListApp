@@ -11,6 +11,11 @@ public class LoggingInstaller : IInstaller
     public void Install(WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
+        builder.Services.AddHttpLogging(logging =>
+        {
+            logging.CombineLogs = true;
+            logging.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.ResponseStatusCode;
+        });
         if (builder.Configuration.GetValue<bool>("AddLogging"))
         {
             builder.Logging.AddSimpleConsole(x =>
@@ -18,11 +23,6 @@ public class LoggingInstaller : IInstaller
                 x.UseUtcTimestamp = true;
                 x.TimestampFormat = "dd/MM/yy HH:mm:ss ";
                 x.SingleLine = builder.Environment.IsProduction();
-            });
-            builder.Services.AddHttpLogging(logging =>
-            {
-                logging.CombineLogs = true;
-                logging.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.ResponseStatusCode;
             });
             builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
             if (builder.Environment.IsProduction())

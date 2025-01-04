@@ -27,7 +27,7 @@ jobs:
         run: |
           Write-Host "Launching Cosmos DB Emulator"
           Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-          Start-CosmosDbEmulator -Timeout 900
+          Start-CosmosDbEmulator -Timeout 900 -DisableRateLimiting
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
@@ -45,12 +45,9 @@ jobs:
           npm i
           npm run build
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-
       - name: Run Tests
         run: |
-          dotnet test GroceryListHelper.Tests /p:CollectCoverage=true /p:Threshold=75 /p:ThresholdType=line /p:ThresholdStat=total
+          dotnet test GroceryListHelper.Tests -c Release /p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=line /p:ThresholdStat=total
 
       - name: Install Playwright
         run: |
