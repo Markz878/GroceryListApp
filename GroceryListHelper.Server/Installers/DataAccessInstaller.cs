@@ -22,10 +22,12 @@ public static class DataProtectionExtensions
 {
     public static IDataProtectionBuilder PersistKeysToAzureTableStorage(this IDataProtectionBuilder builder)
     {
-        CosmosClient cosmosClient = builder.Services.BuildServiceProvider().GetRequiredService<CosmosClient>();
+        ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
+        CosmosClient cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
+        ILogger<CosmosStorageRepository> logger = serviceProvider.GetRequiredService<ILogger<CosmosStorageRepository>>();
         builder.Services.Configure<KeyManagementOptions>(options =>
         {
-            options.XmlRepository = new CosmosStorageRepository(cosmosClient);
+            options.XmlRepository = new CosmosStorageRepository(cosmosClient, logger);
         });
         return builder;
     }
@@ -33,28 +35,42 @@ public static class DataProtectionExtensions
 
 
 
-public class CosmosStorageRepository(CosmosClient db) : IXmlRepository
+public class CosmosStorageRepository(CosmosClient db, ILogger<CosmosStorageRepository> logger) : IXmlRepository
 {
     private readonly Container dataKeysContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.DataProtectionKeysContainer);
 
     public IReadOnlyCollection<XElement> GetAllElements()
     {
-        List<XElement> result = Task.Run(async () =>
+        try
         {
-            return await dataKeysContainer.Query<DataProtectionKeyEntity, XElement>(x => XElement.Parse(x.XmlData));
-        }).Result;
-        return result;
+            List<XElement> result = Task.Run(async () =>
+            {
+                return await dataKeysContainer.Query<DataProtectionKeyEntity, XElement>(x => XElement.Parse(x.XmlData));
+            }).Result;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not retrieve data protection keys.");
+            return [];
+        }
     }
 
     public async void StoreElement(XElement element, string friendlyName)
     {
-        DataProtectionKeyEntity dataProtectionEntity = new()
+        try
         {
-            Id = friendlyName,
-            XmlData = element.ToString()
-        };
-
-        await dataKeysContainer.UpsertItemAsync(dataProtectionEntity);
+            DataProtectionKeyEntity dataProtectionEntity = new()
+            {
+                Id = friendlyName,
+                XmlData = element.ToString()
+            };
+            await dataKeysContainer.UpsertItemAsync(dataProtectionEntity);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not store data protection key.");
+        }
     }
 }
 

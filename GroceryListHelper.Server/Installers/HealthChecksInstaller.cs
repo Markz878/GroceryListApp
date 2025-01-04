@@ -18,18 +18,6 @@ internal class DbHealthCheck(CosmosClient db, ILogger<DbHealthCheck> logger) : I
         try
         {
             AccountProperties account = await db.ReadAccountAsync();
-            //AsyncPageable<TableItem> tablePages = tableServiceClient.QueryAsync(cancellationToken: cancellationToken);
-            //await foreach (Page<TableItem> tablePage in tablePages.AsPages())
-            //{
-            //    IEnumerable<string> existingTableNames = tablePage.Values.Select(x => x.Name);
-            //    foreach (string tableName in tableNames)
-            //    {
-            //        if (!existingTableNames.Contains(tableName))
-            //        {
-            //            return HealthCheckResult.Unhealthy($"No table called {tableName} found in database.");
-            //        }
-            //    }
-            //}
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)
