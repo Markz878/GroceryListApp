@@ -20,7 +20,7 @@ public static class AccountEndpointsMapper
         return builder;
     }
 
-    private static readonly CookieOptions csrfTokenOptions = new() { HttpOnly = false, Secure = true };
+    private static readonly CookieOptions csrfTokenOptions = new() { HttpOnly = false, Secure = true, SameSite = SameSiteMode.Strict };
     public static NoContent GetToken(IAntiforgery antiforgery, HttpContext context)
     {
         AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
