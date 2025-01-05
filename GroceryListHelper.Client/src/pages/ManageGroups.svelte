@@ -198,4 +198,4 @@
     {/each}
   {/if}
 </div>
-<Confirm header="Confirm delete" message="This will delete the group and its products for all group members, are you sure?" on:ok={deleteGroup} on:cancel={cancelGroupDelete} bind:this={confirm} />
+<Confirm header="Confirm delete" message="This will delete the group and its products for all group members, are you sure?" confirm={deleteGroup} cancel={cancelGroupDelete} bind:this={confirm} />

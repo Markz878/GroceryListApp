@@ -44,4 +44,4 @@
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all current cart items?", clearCartProducts)}>Clear cart</button>
   <button class="btn btn-primary w-24" onclick={() => showDeleteConfirm("Delete all stored shop items?", clearStoreProducts)}>Clear shop</button>
 </div>
-<Confirm header="Confirm delete" message={confirmMessage} on:ok={confirmCallback ?? (() => {})} bind:this={confirmDialog} />
+<Confirm header="Confirm delete" message={confirmMessage} confirm={confirmCallback ?? (() => {})} bind:this={confirmDialog} />
