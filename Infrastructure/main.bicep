@@ -9,7 +9,7 @@ param signalRName string = 'sigr-${webSiteName}'
 param allowedIps string[] = []
 param sku string = 'B1'
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: logAnalyticsName
   location: location
   properties: {
@@ -51,7 +51,7 @@ resource appinsights_monitoring_publisher 'Microsoft.Authorization/roleDefinitio
   name: '3913510d-42f4-4e42-8a64-420c390055eb'
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   name: vnetName
   location: location
   properties: {
@@ -88,6 +88,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   }
 }
 
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'default'
+}
+
 var allowedIpRules = [
   for ip in allowedIps: {
     ipAddressOrRange: ip
@@ -122,7 +127,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
     isVirtualNetworkFilterEnabled: true
     virtualNetworkRules: [
       {
-        id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, 'default')
+        id: subnet.id
         ignoreMissingVNetServiceEndpoint: false
       }
     ]
@@ -286,16 +291,16 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2022-09-01' = {
+resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections@2024-04-01' = {
   parent: appService
   name: guid(resourceGroup().id, appService.id, vnet.id)
   properties: {
-    vnetResourceId: vnet.properties.subnets[0].id
+    vnetResourceId: subnet.id
     isSwift: true
   }
 }
 
-resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {
+resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
   name: signalRName
   location: location
   sku: {
