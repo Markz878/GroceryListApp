@@ -264,7 +264,7 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     vnetRouteAllEnabled: true
-    virtualNetworkSubnetId: vnet.properties.subnets[0].id
+    virtualNetworkSubnetId: subnet.id
     siteConfig: {
       alwaysOn: true
       http20Enabled: true
