@@ -172,6 +172,14 @@ resource cartproductsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabas
         ]
         kind: 'Hash'
       }
+      indexingPolicy: {
+        includedPaths: [
+          {
+            path: '/*'
+          }
+        ]
+        excludedPaths: [for path in ['/unitPrice/?', '/amount/?', '/order/?', '/isCollected/?', '/_ts/?']: { path: path }]
+      }
     }
   }
 }
