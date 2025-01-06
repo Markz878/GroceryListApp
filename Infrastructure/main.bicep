@@ -221,6 +221,11 @@ resource dataprotectionkeysContainer 'Microsoft.DocumentDB/databaseAccounts/sqlD
         kind: 'Hash'
       }
       indexingPolicy: {
+        includedPaths: [
+          {
+            path: '/*'
+          }
+        ]
         excludedPaths: [
           {
             path: '/xmlData/?'
