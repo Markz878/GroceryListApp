@@ -160,105 +160,52 @@ resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignm
   }
 }
 
-resource cartproductsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
+
+var containersData = [
+  {
+    name: 'cartproducts'
+    partitionKey: '/userId'
+    excludedPaths: ['/unitPrice/?', '/amount/?', '/order/?', '/isCollected/?', '/_ts/?']
+  }
+  {
+    name: 'storeproducts'
+    partitionKey: '/userId'
+    excludedPaths: ['/unitPrice/?', '/_ts/?']
+  }
+  {
+    name: 'users'
+    partitionKey: '/id'
+    excludedPaths: ['/_ts/?']
+  }
+  {
+    name: 'dataprotectionkeys'
+    partitionKey: '/id'
+    excludedPaths: ['/xmlData/?', '/_ts/?']
+  }
+  {
+    name: 'cartgroups'
+    partitionKey: '/id'
+    excludedPaths: ['/name/?', '/_ts/?']
+  }
+]
+
+resource containers 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = [for container in containersData: {
   parent: sqlDb
-  name: 'cartproducts'
+  name: container.name
   properties: {
     resource: {
-      id: 'cartproducts'
+      id: container.name
       partitionKey: {
-        paths: [
-          '/userId'
-        ]
+        paths: [container.partitionKey]
         kind: 'Hash'
       }
       indexingPolicy: {
-        includedPaths: [
-          {
-            path: '/*'
-          }
-        ]
-        excludedPaths: [for path in ['/unitPrice/?', '/amount/?', '/order/?', '/isCollected/?', '/_ts/?']: { path: path }]
+        includedPaths: [{ path: '/*' }]
+        excludedPaths: [for path in container.excludedPaths: { path: path }]
       }
     }
   }
-}
-
-resource storeproductsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
-  parent: sqlDb
-  name: 'storeproducts'
-  properties: {
-    resource: {
-      id: 'storeproducts'
-      partitionKey: {
-        paths: [
-          '/userId'
-        ]
-        kind: 'Hash'
-      }
-    }
-  }
-}
-
-resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
-  parent: sqlDb
-  name: 'users'
-  properties: {
-    resource: {
-      id: 'users'
-      partitionKey: {
-        paths: [
-          '/id'
-        ]
-        kind: 'Hash'
-      }
-    }
-  }
-}
-
-resource dataprotectionkeysContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
-  parent: sqlDb
-  name: 'dataprotectionkeys'
-  properties: {
-    resource: {
-      id: 'dataprotectionkeys'
-      partitionKey: {
-        paths: [
-          '/id'
-        ]
-        kind: 'Hash'
-      }
-      indexingPolicy: {
-        includedPaths: [
-          {
-            path: '/*'
-          }
-        ]
-        excludedPaths: [
-          {
-            path: '/xmlData/?'
-          }
-        ]
-      }
-    }
-  }
-}
-
-resource cartgroupsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = {
-  parent: sqlDb
-  name: 'cartgroups'
-  properties: {
-    resource: {
-      id: 'cartgroups'
-      partitionKey: {
-        paths: [
-          '/id'
-        ]
-        kind: 'Hash'
-      }
-    }
-  }
-}
+}]
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: planName
