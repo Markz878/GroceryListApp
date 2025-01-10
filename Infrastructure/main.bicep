@@ -65,15 +65,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
         name: 'default'
         properties: {
           addressPrefix: '10.0.0.0/24'
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.AzureCosmosDB'
-              locations: [
-                'northeurope'
-                'westeurope'
-              ]
-            }
-          ]
+          // serviceEndpoints: [
+          //   {
+          //     service: 'Microsoft.AzureCosmosDB'
+          //     locations: [
+          //       '*'
+          //     ]
+          //   }
+          // ]
           delegations: [
             {
               name: 'delegation'
@@ -84,11 +83,24 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
           ]
         }
       }
+      {
+        name: 'cosmos'
+        properties: {
+          addressPrefix: '10.0.0.0/24'
+          privateEndpointNetworkPolicies: 'Disabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
     ]
   }
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+resource subnetDefault 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'default'
+}
+
+resource subnetCosmos 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
   parent: vnet
   name: 'default'
 }
@@ -120,17 +132,18 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
         tier: 'Continuous7Days'
       }
     }
+    publicNetworkAccess: 'Disabled'
     databaseAccountOfferType: 'Standard'
     enableAutomaticFailover: true
     capacityMode: 'Serverless'
     disableLocalAuth: true
-    isVirtualNetworkFilterEnabled: true
-    virtualNetworkRules: [
-      {
-        id: subnet.id
-        ignoreMissingVNetServiceEndpoint: false
-      }
-    ]
+    isVirtualNetworkFilterEnabled: false
+    // virtualNetworkRules: [
+    //   {
+    //     id: subnetDefault.id
+    //     ignoreMissingVNetServiceEndpoint: false
+    //   }
+    // ]
     ipRules: allowedIpRules
   }
 }
@@ -142,6 +155,43 @@ resource sqlDb 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-11-15' =
     resource: {
       id: webSiteName
     }
+  }
+}
+
+resource cosmosPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+  name: 'pe-cosmos-${webSiteName}'
+  location: location
+  properties: {
+    subnet: {
+      id: subnetCosmos.id
+    }
+    customNetworkInterfaceName: 'pe-cosmos-${webSiteName}-nic'
+    privateLinkServiceConnections: [
+      {
+        name: 'pe-cosmos-grocerylisthelper'
+        properties: {
+          privateLinkServiceId: cosmosDbAccount.id
+          groupIds: [
+            'Sql'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource cosmosPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+  name: 'privatelink.documents.azure.com'
+  location: 'global'
+}
+
+resource cosmosPrivateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+  name: 'pe-cosmos-${webSiteName}-link'
+  parent: cosmosPrivateDnsZone
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: { id: vnet.id }
   }
 }
 
@@ -231,7 +281,7 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     vnetRouteAllEnabled: true
-    virtualNetworkSubnetId: subnet.id
+    virtualNetworkSubnetId: subnetDefault.id
     siteConfig: {
       alwaysOn: true
       http20Enabled: true
@@ -262,7 +312,7 @@ resource appServiceVnetConnection 'Microsoft.Web/sites/virtualNetworkConnections
   parent: appService
   name: guid(resourceGroup().id, appService.id, vnet.id)
   properties: {
-    vnetResourceId: subnet.id
+    vnetResourceId: subnetDefault.id
     isSwift: true
   }
 }
