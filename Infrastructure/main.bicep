@@ -66,14 +66,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
         properties: {
           addressPrefix: '10.0.0.0/24'
           defaultOutboundAccess: false
-          // serviceEndpoints: [
-          //   {
-          //     service: 'Microsoft.AzureCosmosDB'
-          //     locations: [
-          //       '*'
-          //     ]
-          //   }
-          // ]
           delegations: [
             {
               name: 'delegation'
@@ -140,12 +132,6 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
     capacityMode: 'Serverless'
     disableLocalAuth: true
     isVirtualNetworkFilterEnabled: false
-    // virtualNetworkRules: [
-    //   {
-    //     id: subnetDefault.id
-    //     ignoreMissingVNetServiceEndpoint: false
-    //   }
-    // ]
     ipRules: allowedIpRules
   }
 }
@@ -197,6 +183,21 @@ resource cosmosPrivateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetw
   }
 }
 
+resource cosmosPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
+  name: 'pe-cosmos-${webSiteName}-dnszonegroup'
+  parent: cosmosPrivateEndpoint
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'privatelink_documents_azure_com'
+        properties: {
+          privateDnsZoneId: cosmosPrivateDnsZone.id
+        }
+      }
+    ]
+  }
+}
+
 resource contributorRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
   name: '00000000-0000-0000-0000-000000000002'
   parent: cosmosDbAccount
@@ -240,23 +241,25 @@ var containersData = [
   }
 ]
 
-resource containers 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = [for container in containersData: {
-  parent: sqlDb
-  name: container.name
-  properties: {
-    resource: {
-      id: container.name
-      partitionKey: {
-        paths: [container.partitionKey]
-        kind: 'Hash'
-      }
-      indexingPolicy: {
-        includedPaths: [{ path: '/*' }]
-        excludedPaths: [for path in container.excludedPaths: { path: path }]
+resource containers 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-12-01-preview' = [
+  for container in containersData: {
+    parent: sqlDb
+    name: container.name
+    properties: {
+      resource: {
+        id: container.name
+        partitionKey: {
+          paths: [container.partitionKey]
+          kind: 'Hash'
+        }
+        indexingPolicy: {
+          includedPaths: [{ path: '/*' }]
+          excludedPaths: [for path in container.excludedPaths: { path: path }]
+        }
       }
     }
   }
-}]
+]
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: planName
@@ -357,17 +360,6 @@ resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
         '*'
       ]
     }
-    // networkACLs: {
-    //   defaultAction: 'Deny'
-    //   publicNetwork: {
-    //     allow: [
-    //       'ClientConnection'
-    //       'ServerConnection'
-    //       'RESTAPI'
-    //       'Trace'
-    //     ]
-    //   }
-    // }
   }
 }
 resource signalRAppServerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
