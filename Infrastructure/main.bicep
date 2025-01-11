@@ -65,6 +65,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
         name: 'default'
         properties: {
           addressPrefix: '10.0.0.0/24'
+          defaultOutboundAccess: false
           // serviceEndpoints: [
           //   {
           //     service: 'Microsoft.AzureCosmosDB'
@@ -86,9 +87,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
       {
         name: 'cosmos'
         properties: {
-          addressPrefix: '10.0.0.0/24'
+          addressPrefix: '10.0.1.0/24'
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
+          defaultOutboundAccess: false
         }
       }
     ]
@@ -102,7 +104,7 @@ resource subnetDefault 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' ex
 
 resource subnetCosmos 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
   parent: vnet
-  name: 'default'
+  name: 'cosmos'
 }
 
 var allowedIpRules = [
@@ -132,7 +134,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-previ
         tier: 'Continuous7Days'
       }
     }
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     databaseAccountOfferType: 'Standard'
     enableAutomaticFailover: true
     capacityMode: 'Serverless'
@@ -209,7 +211,6 @@ resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignm
     scope: cosmosDbAccount.id
   }
 }
-
 
 var containersData = [
   {
@@ -356,17 +357,17 @@ resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
         '*'
       ]
     }
-    networkACLs: {
-      defaultAction: 'Deny'
-      publicNetwork: {
-        allow: [
-          'ClientConnection'
-          'ServerConnection'
-          'RESTAPI'
-          'Trace'
-        ]
-      }
-    }
+    // networkACLs: {
+    //   defaultAction: 'Deny'
+    //   publicNetwork: {
+    //     allow: [
+    //       'ClientConnection'
+    //       'ServerConnection'
+    //       'RESTAPI'
+    //       'Trace'
+    //     ]
+    //   }
+    // }
   }
 }
 resource signalRAppServerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
