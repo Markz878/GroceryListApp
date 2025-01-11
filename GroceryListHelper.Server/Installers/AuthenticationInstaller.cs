@@ -15,12 +15,22 @@ public sealed class AuthenticationInstaller : IInstaller
         {
             options.Events.OnSignedIn = async context =>
             {
-                ArgumentNullException.ThrowIfNull(context.Principal);
-                string? email = context.Principal.GetUserEmail();
-                ArgumentNullException.ThrowIfNull(email);
-                string? name = context.Principal.GetUserName();
-                IMediator mediator = context.HttpContext.RequestServices.GetRequiredService<IMediator>();
-                await mediator.Send(new AddUserCommand() { Email = email, Name = name ?? "" });
+                try
+                {
+                    ArgumentNullException.ThrowIfNull(context.Principal);
+                    string? email = context.Principal.GetUserEmail();
+                    ArgumentNullException.ThrowIfNull(email);
+                    string? name = context.Principal.GetUserName();
+                    IMediator mediator = context.HttpContext.RequestServices.GetRequiredService<IMediator>();
+                    await mediator.Send(new AddUserCommand() { Email = email, Name = name ?? "" });
+                }
+                catch (Exception ex)
+                {
+                    ILogger<AuthenticationInstaller> logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthenticationInstaller>>();
+                    logger.LogError(ex, "Could not upsert user.");
+                    throw;
+                }
+
             };
         });
         builder.Services.Configure(OpenIdConnectDefaults.AuthenticationScheme, (OpenIdConnectOptions options) =>
