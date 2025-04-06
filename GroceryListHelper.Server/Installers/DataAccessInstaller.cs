@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.Azure.Cosmos;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
@@ -15,6 +16,7 @@ public sealed class DataAccessInstaller : IInstaller
         builder.Services.AddDataAccessServices(builder.Configuration, builder.Environment.IsDevelopment());
         builder.Services.AddMemoryCache();
         builder.Services.AddDataProtection().PersistKeysToAzureTableStorage();
+        builder.Services.AddScoped<CosmosXMLRepository>();
     }
 }
 
@@ -22,12 +24,12 @@ public static class DataProtectionExtensions
 {
     public static IDataProtectionBuilder PersistKeysToAzureTableStorage(this IDataProtectionBuilder builder)
     {
-        ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
-        CosmosClient cosmosClient = serviceProvider.GetRequiredService<CosmosClient>();
-        ILogger<CosmosStorageRepository> logger = serviceProvider.GetRequiredService<ILogger<CosmosStorageRepository>>();
-        builder.Services.Configure<KeyManagementOptions>(options =>
+        builder.Services.AddOptions<KeyManagementOptions>().Configure<IServiceScopeFactory>(static (options, services) =>
         {
-            options.XmlRepository = new CosmosStorageRepository(cosmosClient, logger);
+            IServiceScope scope = services.CreateScope();
+            CosmosXMLRepository cosmosXMLRepository = scope.ServiceProvider.GetRequiredService<CosmosXMLRepository>();
+            options.XmlRepository = cosmosXMLRepository;
+            options.XmlEncryptor = new NullXmlEncryptor();
         });
         return builder;
     }
@@ -35,7 +37,7 @@ public static class DataProtectionExtensions
 
 
 
-public class CosmosStorageRepository(CosmosClient db, ILogger<CosmosStorageRepository> logger) : IXmlRepository
+public sealed class CosmosXMLRepository(CosmosClient db, ILogger<CosmosXMLRepository> logger) : IXmlRepository
 {
     private readonly Container dataKeysContainer = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.DataProtectionKeysContainer);
 

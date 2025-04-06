@@ -12,6 +12,16 @@
   onMount(() => {
     email = userInfo.claims.find((x) => x.type === EmailClaimName)?.value;
     userName = userInfo.claims.find((x) => x.type === NameClaimName)?.value;
+
+    document.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      const profileMenu = document.getElementById("profile-menu") as HTMLDivElement;
+      const profileBtn = document.getElementById("profile-btn") as HTMLInputElement;
+
+      if (profileMenu && !profileMenu.contains(target) && !profileBtn?.contains(target)) {
+        profileBtn.checked = false;
+      }
+    });
   });
 
   function getUserInitials(userName: string, email: string) {
