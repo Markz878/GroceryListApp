@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Static assets
+GroceryListHelper.Server/wwwroot/assets
+GroceryListHelper.Server/wwwroot/index.html
+
 # User-specific files
 *.rsuser
 *.suo

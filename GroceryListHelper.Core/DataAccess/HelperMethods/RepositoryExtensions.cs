@@ -25,4 +25,18 @@ public static class RepositoryExtensions
         }
         return result;
     }
+
+    public static async Task BatchDelete(this Container container, IEnumerable<string> ids, PartitionKey partitionKey)
+    {
+        if (!ids.Any())
+        {
+            return;
+        }
+        TransactionalBatch batch = container.CreateTransactionalBatch(partitionKey);
+        foreach (string id in ids)
+        {
+            batch.DeleteItem(id);
+        }
+        await batch.ExecuteAsync();
+    }
 }

@@ -10,7 +10,12 @@ internal sealed class ClearCartProductsCommandHandler(CosmosClient db) : IReques
     public async Task Handle(ClearUserCartProductsCommand request, CancellationToken cancellationToken = default)
     {
         Container container = db.GetContainer(DataAccessConstants.Database, DataAccessConstants.CartProductsContainer);
-        await container.DeleteAllItemsByPartitionKeyStreamAsync(new PartitionKey(request.UserId.ToString()));
+        string sql = "SELECT * FROM c WHERE c.userId=@userId";
+        QueryDefinition query = new QueryDefinition(sql)
+            .WithParameter("@userId", request.UserId);
+        List<CartProductEntity> products = await container.Query<CartProductEntity>(query);
+        PartitionKey partitionKey = new(request.UserId.ToString());
+        await container.BatchDelete(products.Select(x => x.Name), partitionKey);
     }
 }
 
