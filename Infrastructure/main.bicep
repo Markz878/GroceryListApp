@@ -211,9 +211,8 @@ resource cosmosCustomRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRo
       {
         dataActions: [
           'Microsoft.DocumentDB/databaseAccounts/readMetadata'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/write'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/read'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/delete'
+          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/*'
+          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*'
           'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
         ]
       }
