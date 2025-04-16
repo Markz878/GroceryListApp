@@ -198,39 +198,17 @@ resource cosmosPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDn
   }
 }
 
-resource cosmosCustomRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' = {
-  name: guid(cosmosDbAccount.id, 'allow-all-role-definition')
+resource contributorRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
+  name: '00000000-0000-0000-0000-000000000002'
   parent: cosmosDbAccount
-  properties: {
-    roleName: 'AllowAllRoleDefinition'
-    type: 'CustomRole'
-    assignableScopes: [
-      cosmosDbAccount.id
-    ]
-    permissions: [
-      {
-        dataActions: [
-          'Microsoft.DocumentDB/databaseAccounts/readMetadata'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/*'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
-        ]
-      }
-    ]
-  }
 }
 
-// resource contributorRoleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions@2024-12-01-preview' existing = {
-//   name: '00000000-0000-0000-0000-000000000002'
-//   parent: cosmosDbAccount
-// }
-
 resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-12-01-preview' = {
-  name: guid(cosmosCustomRoleDefinition.id, appService.id, cosmosDbAccount.id)
+  name: guid(contributorRoleDefinition.id, appService.id, cosmosDbAccount.id)
   parent: cosmosDbAccount
   properties: {
     principalId: appService.identity.principalId
-    roleDefinitionId: cosmosCustomRoleDefinition.id
+    roleDefinitionId: contributorRoleDefinition.id
     scope: cosmosDbAccount.id
   }
 }
