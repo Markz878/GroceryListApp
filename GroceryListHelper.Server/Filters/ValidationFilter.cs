@@ -23,7 +23,7 @@ public static class ValidatorFactory
                 IValidator? validator = eb.ApplicationServices.GetService(validatorType) as IValidator;
                 if (validator is not null)
                 {
-                    eb.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), 400, new[] { "application/problem+json" }));
+                    eb.Metadata.Add(new ProducesResponseTypeMetadata(typeof(HttpValidationProblemDetails), 400, ["application/problem+json"]));
                     eb.FilterFactories.Add((_, next) =>
                     {
                         ValidationDescriptor validationDescriptor = new(i, parameters[i].ParameterType, validator);

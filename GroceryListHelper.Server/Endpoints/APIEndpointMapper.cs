@@ -5,7 +5,6 @@ public static class APIEndpointMapper
     public static void MapAPIEndpoints(this WebApplication app)
     {
         RouteGroupBuilder apiGroup = app.MapGroup("api").RequireAuthorization();
-        apiGroup.AddEndpointFilter<AntiforgeryTokenFilter>();
         apiGroup.AddFluentValidation();
         apiGroup.RequireRateLimiting(RateLimitInstaller.PolicyName);
         apiGroup.AddEndpointFilter<ExceptionFilter>();
