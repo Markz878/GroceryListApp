@@ -42,7 +42,7 @@ jobs:
       - name: Build client
         working-directory: GroceryListHelper.Client
         run: |
-          npm i
+          npm ci
           npm run build
 
       - name: Run Tests
