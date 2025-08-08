@@ -1,13 +1,13 @@
 param location string = resourceGroup().location
 param webSiteName string = 'grocerylisthelper'
 param vnetName string = 'vnet-${webSiteName}'
-param planName string = 'asp-${webSiteName}'
 param logAnalyticsName string = 'log-${webSiteName}'
 param appInsightsName string = 'ai-${webSiteName}'
 param cosmosName string = 'cosmos-${webSiteName}'
 param signalRName string = 'sigr-${webSiteName}'
 param allowedIps string[] = []
-param sku string = 'B1'
+param appServicePlanName string
+param appServicePlanResourceGroupName string
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: logAnalyticsName
@@ -261,16 +261,9 @@ resource containers 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containe
   }
 ]
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: planName
-  location: location
-  kind: 'linux'
-  sku: {
-    name: sku
-  }
-  properties: {
-    reserved: true
-  }
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' existing = {
+  name: appServicePlanName
+  scope: resourceGroup(appServicePlanResourceGroupName)
 }
 
 resource appService 'Microsoft.Web/sites@2022-09-01' = {
