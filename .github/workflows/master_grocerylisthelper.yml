@@ -98,11 +98,7 @@ jobs:
         run: >
           az deployment group create --resource-group ${{ secrets.AZURE_RG }} 
           --template-file Infrastructure/main.bicep 
-          --parameters 
-          webSiteName=${{ env.WebsiteName }} 
-          allowedIps="${{ secrets.ALLOWED_IPS }}"
-          appServicePlanName=${{ secrets.AZURE_SHARED_PLAN }} 
-          appServicePlanResourceGroupName=${{ secrets.AZURE_SHARED_PLAN_RG }}
+          --parameters webSiteName=${{ env.WebsiteName }} allowedIps="${{ secrets.ALLOWED_IPS }}"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
