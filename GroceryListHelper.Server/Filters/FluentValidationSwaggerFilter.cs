@@ -5,13 +5,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GroceryListHelper.Server.Filters;
 
-public class FluentValidationSwaggerFilter : IRequestBodyFilter
+public class FluentValidationSwaggerFilter(IServiceProvider services) : IRequestBodyFilter
 {
-    private readonly IServiceProvider services;
-    public FluentValidationSwaggerFilter(IServiceProvider services)
-    {
-        this.services = services;
-    }
     public void Apply(IOpenApiRequestBody requestBody, RequestBodyFilterContext context)
     {
         Type validatorType = typeof(IValidator<>).MakeGenericType(context.BodyParameterDescription.Type);
@@ -28,7 +23,7 @@ public class FluentValidationSwaggerFilter : IRequestBodyFilter
                     //switch (propertyValidator)
                     //{
                     //    case INotEmptyValidator:
-                    //        schema.Properties?[property]. = false;
+                    //        schema.Properties?[property].Nullable = false;
                     //        break;
                     //    case IMinimumLengthValidator minLengthValidator:
                     //        schema.Properties[property].MinLength = minLengthValidator.Min;
