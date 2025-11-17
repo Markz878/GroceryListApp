@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Server.Installers;
+﻿using Microsoft.OpenApi;
+
+namespace GroceryListHelper.Server.Installers;
 
 public sealed class SwaggerInstaller : IInstaller
 {

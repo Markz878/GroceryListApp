@@ -8,6 +8,10 @@ internal static class DataSeeder
     public static async Task SeedDatabase(this IServiceProvider services)
     {
         CosmosClient client = services.GetRequiredService<CosmosClient>();
+        if(client.Endpoint.AbsoluteUri != "https://localhost:8081/")
+        {
+            throw new Exception("Attempted to data seed against a non-emulator Cosmos DB instance.");
+        }
         await client.GetDatabase(DataAccessConstants.Database).DeleteStreamAsync();
         Database database = await client.CreateDatabaseAsync(DataAccessConstants.Database);
         await database.CreateContainerIfNotExistsAsync(GetContainerProperties(DataAccessConstants.CartProductsContainer, "/userId", "/unitPrice/?", "/amount/?", "/order/?", "/isCollected/?", "/_ts/?"));

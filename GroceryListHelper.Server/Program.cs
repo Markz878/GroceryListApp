@@ -15,7 +15,6 @@ global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.ResponseCompression;
 global using Microsoft.Extensions.Primitives;
 global using Microsoft.Identity.Web;
-global using Microsoft.OpenApi.Models;
 global using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

@@ -1,1 +1,1 @@
-pwsh ../bin/Debug/net9.0/playwright.ps1 codegen https://localhost:7021/
+pwsh ../bin/Debug/net10.0/playwright.ps1 codegen https://localhost:7021/

@@ -290,7 +290,7 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
       alwaysOn: true
       http20Enabled: true
       minTlsVersion: '1.2'
-      linuxFxVersion: 'DOTNETCORE|9.0'
+      linuxFxVersion: 'DOTNETCORE|10.0'
       webSocketsEnabled: true
       use32BitWorkerProcess: false
       healthCheckPath: '/health'
