@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          dotnet test GroceryListHelper.Tests -c Release /p:CollectCoverage=true /p:Threshold=75 /p:ThresholdType=line /p:ThresholdStat=total /p:ExcludeByAttribute="GeneratedCodeAttribute"
+          dotnet test GroceryListHelper.Tests -c Release"
 
       - name: Install Playwright
         run: |

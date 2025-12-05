@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GroceryListHelper.Core/GroceryListHelper.Core.csproj" />
+  <Project Path="GroceryListHelper.E2ETests/GroceryListHelper.E2ETests.csproj" />
+  <Project Path="GroceryListHelper.Server/GroceryListHelper.Server.csproj" />
+  <Project Path="GroceryListHelper.Tests/GroceryListHelper.Tests.csproj" />
+</Solution>
