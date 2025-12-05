@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          dotnet test GroceryListHelper.Tests -c Release"
+          dotnet test GroceryListHelper.Tests -c Release
 
       - name: Install Playwright
         run: |
