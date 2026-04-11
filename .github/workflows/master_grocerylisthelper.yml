@@ -96,9 +96,10 @@ jobs:
 
       - name: Deploy Azure Infra
         run: >
-          az deployment group create --resource-group ${{ secrets.AZURE_RG }} 
-          --template-file Infrastructure/main.bicep 
+          az deployment group create --resource-group ${{ secrets.AZURE_RG }} --template-file Infrastructure/main.bicep 
           --parameters webSiteName=${{ env.WebsiteName }} allowedIps="${{ secrets.ALLOWED_IPS }}"
+          sharedResourceGroupName=${{ secrets.AZURE_SHARED_PLAN_RG }} sharedPlanNameName=${{ secrets.AZURE_SHARED_PLAN }}
+          
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
