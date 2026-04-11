@@ -1,7 +1,4 @@
 ﻿using GroceryListHelper.Server.HelperMethods;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpLogging;
 
 namespace GroceryListHelper.Server.Installers;
@@ -27,12 +24,10 @@ public class LoggingInstaller : IInstaller
             builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
             if (builder.Environment.IsProduction())
             {
-                builder.Logging.AddApplicationInsights();
-                builder.Services.AddApplicationInsightsTelemetry(x => x.EnableDependencyTrackingTelemetryModule = false);
-                builder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-                builder.Services.Configure<TelemetryConfiguration>(c =>
+                builder.Services.AddApplicationInsightsTelemetry(x =>
                 {
-                    c.SetAzureTokenCredential(new ManagedIdentityCredential());
+                    x.EnableDependencyTrackingTelemetryModule = false;
+                    x.Credential = new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
                 });
             }
         }
@@ -64,40 +59,5 @@ public class HttpLoggingInterceptor : IHttpLoggingInterceptor
     public ValueTask OnResponseAsync(HttpLoggingInterceptorContext logContext)
     {
         return default;
-    }
-}
-
-public class IgnoreRequestPathsTelemetryProcessor(ITelemetryProcessor next) : ITelemetryProcessor
-{
-    private readonly ITelemetryProcessor _next = next;
-
-    public void Process(ITelemetry telemetry)
-    {
-        if (telemetry is RequestTelemetry requestTelemetry)
-        {
-            if (SkipTelemetry(requestTelemetry.Url.AbsolutePath))
-            {
-                return;
-            }
-        }
-        _next.Process(telemetry);
-    }
-
-    private static readonly string[] _ignorePaths = ["/health", "/favicon.ico", "_framework/opaque-redirect"];
-    private static readonly string[] _fileEndings = [".html", ".br", ".js", ".svg", ".png", ".css", ".json"];
-    private static bool SkipTelemetry(string path)
-    {
-        if (_ignorePaths.Contains(path))
-        {
-            return true;
-        }
-        foreach (string fileEnding in _fileEndings)
-        {
-            if (path.EndsWith(fileEnding))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

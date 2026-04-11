@@ -25,7 +25,7 @@ public static class ServiceExtensions
         }
         else
         {
-            services.AddSingleton(new CosmosClient(configuration.GetConnectionString("CosmosDb"), new ManagedIdentityCredential(), options));
+            services.AddSingleton(new CosmosClient(configuration.GetConnectionString("CosmosDb"), new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned), options));
         }
         services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<CoreMarker>());
     }
