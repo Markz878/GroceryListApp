@@ -1,4 +1,4 @@
-﻿namespace GroceryListHelper.E2ETests.Infrastructure;
+﻿namespace GroceryListHelper.Tests.E2ETests.Infrastructure;
 
 internal static class ShareCartMethods
 {

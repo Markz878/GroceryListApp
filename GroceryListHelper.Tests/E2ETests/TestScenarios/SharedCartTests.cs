@@ -1,9 +1,10 @@
 ﻿using GroceryListHelper.Core.Features.Users;
+using GroceryListHelper.Tests.E2ETests.Infrastructure;
 using MediatR;
 
-namespace GroceryListHelper.E2ETests.TestScenarios;
+namespace GroceryListHelper.Tests.E2ETests.TestScenarios;
 
-[Collection(nameof(WebApplicationFactoryCollection))]
+[Collection(nameof(WebApplicationFactoryE2ECollection))]
 public sealed class SharedCartTests : IAsyncLifetime
 {
     private readonly WebApplicationFactoryFixture server;
@@ -21,7 +22,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         this.server = server;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         using IServiceScope scope = server.Services.CreateScope();
         IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -33,7 +34,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         page2 = await browserContext2.GotoPage(server.BaseUrl, true);
         await ShareCartMethods.StartShare(page1, page2, FakeAuth2.Email);
     }
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await browserContext1.DisposeAsync();
         await browserContext2.DisposeAsync();
@@ -67,7 +68,7 @@ public sealed class SharedCartTests : IAsyncLifetime
         Assert.Equal(productName2, currentTopItemName);
 
         await page2.GetByRole(AriaRole.Link, new() { Name = "Logo" }).ClickAsync();
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
         IElementHandle? messageElement = await page1.GetByText($"{FakeAuth2.Email} has left cart sharing.").ElementHandleAsync();
         Assert.NotNull(messageElement);
     }

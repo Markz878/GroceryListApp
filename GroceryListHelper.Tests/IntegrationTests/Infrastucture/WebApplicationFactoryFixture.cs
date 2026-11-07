@@ -6,7 +6,7 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
 {
     public required ITestOutputHelper TestOutputHelper { get; set; }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         using IServiceScope scope = Server.Services.CreateScope();
         await scope.ServiceProvider.SeedDatabase();
@@ -24,8 +24,8 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
         });
     }
 
-    Task IAsyncLifetime.DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        await base.DisposeAsync();
     }
 }

@@ -4,6 +4,7 @@ using GroceryListHelper.Core.Domain.StoreProducts;
 using GroceryListHelper.Core.Features.CartGroups;
 using GroceryListHelper.Core.Features.CartProducts;
 using GroceryListHelper.Core.Features.StoreProducts;
+using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
 using System.Text.Json;
 
 namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
@@ -26,7 +27,7 @@ public abstract class BaseTest : IAsyncLifetime
     }
 
 
-    public virtual async Task InitializeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
         HttpResponseMessage csrfTokenResponse = await _client.GetAsync("api/account/token");
         IEnumerable<string> setCookieHeaders = csrfTokenResponse.Headers.GetValues("Set-Cookie");
@@ -94,9 +95,9 @@ public abstract class BaseTest : IAsyncLifetime
         return response.Map(x => x, e => throw new Exception());
     }
 
-    public virtual Task DisposeAsync()
+    public virtual ValueTask DisposeAsync()
     {
         _scope.Dispose();
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }

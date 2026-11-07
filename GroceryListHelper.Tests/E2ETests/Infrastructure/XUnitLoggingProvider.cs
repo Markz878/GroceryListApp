@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text;
-namespace GroceryListHelper.E2ETests.Infrastructure;
+namespace GroceryListHelper.Tests.E2ETests.Infrastructure;
 
 internal class XUnitLoggingProvider : ILoggerProvider
 {

@@ -1,9 +1,10 @@
 using GroceryListHelper.Core.Domain.CartProducts;
+using GroceryListHelper.Tests.E2ETests.Infrastructure;
 using System.Text.Json;
 
-namespace GroceryListHelper.E2ETests.TestScenarios;
+namespace GroceryListHelper.Tests.E2ETests.TestScenarios;
 
-[Collection(nameof(WebApplicationFactoryCollection))]
+[Collection(nameof(WebApplicationFactoryE2ECollection))]
 public sealed class LocalStorageCartTests : IAsyncLifetime
 {
     private readonly WebApplicationFactoryFixture server;
@@ -17,7 +18,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         this.server = server;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         browserContext = await server.GetNewBrowserContext();
         page = await browserContext.GotoPage(server.BaseUrl);
@@ -75,7 +76,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
         }
         await page.ClickReorderButton(moveItemIndex);
         await page.ClickReorderButton(toTargetIndex);
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         int sourceTop = await page.GetRowTopPixels(moveItemIndex);
         int targetTop = await page.GetRowTopPixels(toTargetIndex);
         if (toTargetIndex > 0)
@@ -139,7 +140,7 @@ public sealed class LocalStorageCartTests : IAsyncLifetime
     }
 
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await browserContext.DisposeAsync();
     }

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace GroceryListHelper.E2ETests.Infrastructure;
+namespace GroceryListHelper.Tests.E2ETests.Infrastructure;
 
 internal static class PlaywrightHelpers
 {

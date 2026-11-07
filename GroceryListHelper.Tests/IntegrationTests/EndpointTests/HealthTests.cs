@@ -1,4 +1,6 @@
-﻿namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
+﻿using GroceryListHelper.Tests.IntegrationTests.Infrastucture;
+
+namespace GroceryListHelper.Tests.IntegrationTests.EndpointTests;
 
 [Collection(nameof(WebApplicationFactoryCollection))]
 public class HealthTests(WebApplicationFactoryFixture factory, ITestOutputHelper testOutputHelper) : BaseTest(factory, testOutputHelper)
@@ -6,9 +8,9 @@ public class HealthTests(WebApplicationFactoryFixture factory, ITestOutputHelper
     [Fact]
     public async Task PingHealth_Success()
     {
-        HttpResponseMessage result = await _client.GetAsync("/health");
+        HttpResponseMessage result = await _client.GetAsync("/health", TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        string healthInfo = await result.Content.ReadAsStringAsync();
+        string healthInfo = await result.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.Equal("Healthy", healthInfo);
     }
 }

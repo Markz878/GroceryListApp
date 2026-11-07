@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Hosting;
-using System.Net;
+﻿using Microsoft.Extensions.Hosting;
 using System.Net.Sockets;
 using System.Text.Json;
 
-namespace GroceryListHelper.E2ETests.Infrastructure;
+namespace GroceryListHelper.Tests.E2ETests.Infrastructure;
 
 public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.Program>, IAsyncLifetime
 {
@@ -29,7 +26,7 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
         return fixtureHost;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         PlaywrightInstance = await Playwright.CreateAsync();
         BrowserInstance = await PlaywrightInstance.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -39,13 +36,14 @@ public sealed class WebApplicationFactoryFixture : WebApplicationFactory<Server.
         });
     }
 
-    async Task IAsyncLifetime.DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         if (BrowserInstance is not null && PlaywrightInstance is not null)
         {
             await BrowserInstance.DisposeAsync();
             PlaywrightInstance.Dispose();
         }
+        await base.DisposeAsync();
     }
 
     private static int GetRandomUnusedPort()
