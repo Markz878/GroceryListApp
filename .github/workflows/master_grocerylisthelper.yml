@@ -49,10 +49,11 @@ jobs:
         run: |
           dotnet build GroceryListHelper.Tests -c Release
           pwsh GroceryListHelper.Tests/bin/Release/net10.0/playwright.ps1 install
-          
+
       - name: Run Tests
         run: |
-          dotnet test GroceryListHelper.Tests -c Release
+          cd GroceryListHelper.Tests
+          dotnet test -c Release
 
   deploy:
     runs-on: ubuntu-latest
