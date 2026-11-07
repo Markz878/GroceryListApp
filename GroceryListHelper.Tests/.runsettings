@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+    <CodeCoverage>
+        <!--
+        About include/exclude lists:
+        Empty "Include" clauses imply all; empty "Exclude" clauses imply none.
+        Each element in the list is a regular expression (ECMAScript syntax). See /visualstudio/ide/using-regular-expressions-in-visual-studio.
+        An item must first match at least one entry in the include list to be included.
+        Included items must then not match any entries in the exclude list to remain included.
+        -->
+
+        <!-- Match fully qualified names of functions: -->
+        <!-- (Use "\." to delimit namespaces in C# or Visual Basic, "::" in C++.)  -->
+        <Functions>
+            <Exclude>
+				<Function>^GroceryListHelper\.Server\.Installers\..*</Function>
+            </Exclude>
+        </Functions>
+
+        <!-- Match attributes on any code element: -->
+        <Attributes>
+            <Exclude>
+            <!-- Don't forget "Attribute" at the end of the name -->
+                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+            </Exclude>
+        </Attributes>
+
+
+        <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
+        <EnableDynamicManagedInstrumentation>True</EnableDynamicManagedInstrumentation>
+    </CodeCoverage>
+</Configuration>
